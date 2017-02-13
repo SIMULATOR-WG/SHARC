@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jan  4 19:46:20 2017
+
+@author: edgar
+"""
+
+import time
+
+from threading import Thread, Event
+
+class SimulationThread(Thread):
+    """
+    This class extends the Thread class and controls the simulation (start/stop)
+    
+    Attributes
+    ----------
+        _stop : Event
+            This flag is used to control when simulation is stopped by user
+        model : Model
+            Reference to the Model implementation of MVC
+    """
+    
+    def __init__(self, model):
+        Thread.__init__(self)
+        self.model = model
+        self._stop = Event()
+        
+    def stop(self):
+        """
+        This is called by the controller when it receives the stop command by 
+        view. This method sets the stop flag that is checked during the 
+        simulation. Simulation stops when stop flag is set.
+        """
+        self._stop.set()
+        
+    def is_stopped(self):
+        """
+        Checks if stop flag is set
+        
+        Returns
+        -------
+        boolean
+            True if simulation is stopped
+        """
+        return self._stop.isSet()
+        
+    def run(self):
+        """
+        This is overriden from base class and represents the thread's activity.
+        """
+        start = time.perf_counter()
+        
+        self.model.initialize()
+        while not self.model.is_finished() and not self.is_stopped():
+            self.model.step()
+        self.model.finalize()
+        
+        end = time.perf_counter()
+        elapsed_time = time.gmtime(end - start)
+        self.model.set_elapsed_time(time.strftime("%M min %S seg", elapsed_time))
+        
+        
+        
