@@ -17,9 +17,8 @@ class Model(Observable):
     Implements the Observable interface. It has a reference to the simulation
     object and controls the simulation flow (init/step/finilize).
     
-    Attributes
-    ----------
-        __simulation : Simulation
+    Attributes:
+        __simulation (Simulation)
     """
     
     def __init__(self):
@@ -27,6 +26,9 @@ class Model(Observable):
         #self.simulation = SimulationDownlink()
         
     def initialize(self):
+        """
+        Initializes the simulation and performs all pre-simulation tasks
+        """
         self.notify_observers(source=__name__,
                               message="Simulation is running...",
                               state=State.RUNNING )
@@ -34,24 +36,44 @@ class Model(Observable):
         #self.simulation.initialize()
         
     def step(self):
+        """
+        Performs one simulation step and collects the results
+        """
         self.notify_observers(source=__name__,
                               message="Snapshot #" + str(self.current_snapshot))
         time.sleep(1)
         #self.simulation.snapshot()
         self.current_snapshot += 1
             
-    def is_finished(self):
+    def is_finished(self) -> bool:
+        """
+        Checks is simulation is finished by checking if maximum number of 
+        snashots is reached.
+        
+        Returns:
+            True if simulation is finished; False otherwise.
+        """
         if self.current_snapshot <= Parameters.num_snapshots:
             return False
         else:
             return True
             
     def finalize(self):
+        """
+        Finalizes the simulation and performs all post-simulation tasks
+        """
         #self.simulation.finalize()
         self.notify_observers(source=__name__, 
                               message="FINISHED!", state=State.FINISHED)
         
-    def set_elapsed_time(self, elapsed_time):
+    def set_elapsed_time(self, elapsed_time: str):
+        """
+        Sends the elapsed simulation time to all observers. Simulation time is
+        calculated in SimulationThread
+        
+        Args:
+            elapsed_time: Elapsed time.
+        """
         self.notify_observers(source=__name__, 
                               message="Elapsed time: " + elapsed_time, 
                               state=State.FINISHED)

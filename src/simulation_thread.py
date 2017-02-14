@@ -5,23 +5,22 @@ Created on Wed Jan  4 19:46:20 2017
 @author: edgar
 """
 
-import time
+from model import Model
 
+import time
 from threading import Thread, Event
 
 class SimulationThread(Thread):
     """
     This class extends the Thread class and controls the simulation (start/stop)
     
-    Attributes
-    ----------
-        _stop : Event
-            This flag is used to control when simulation is stopped by user
-        model : Model
-            Reference to the Model implementation of MVC
+    Attributes:
+        _stop (Event) : This flag is used to control when simulation is stopped
+            by user
+        model (Model) : Reference to the Model implementation of MVC
     """
     
-    def __init__(self, model):
+    def __init__(self, model: Model):
         Thread.__init__(self)
         self.model = model
         self._stop = Event()
@@ -34,13 +33,11 @@ class SimulationThread(Thread):
         """
         self._stop.set()
         
-    def is_stopped(self):
+    def is_stopped(self) -> bool:
         """
-        Checks if stop flag is set
+        Checks if stop flag is set.
         
-        Returns
-        -------
-        boolean
+        Returns:
             True if simulation is stopped
         """
         return self._stop.isSet()
@@ -55,7 +52,7 @@ class SimulationThread(Thread):
         while not self.model.is_finished() and not self.is_stopped():
             self.model.step()
         self.model.finalize()
-        
+        # calculates simulation time when it finishes and sets the elapsed time
         end = time.perf_counter()
         elapsed_time = time.gmtime(end - start)
         self.model.set_elapsed_time(time.strftime("%M min %S seg", elapsed_time))
