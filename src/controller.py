@@ -6,6 +6,8 @@ Created on Mon Dec 26 17:32:02 2016
 """
 
 from support.enumerations import Action 
+from model import Model
+
 from simulation_thread import SimulationThread
 
 class Controller:
@@ -15,11 +17,14 @@ class Controller:
     behavior, map user actions to model updates and select view for response.
     """
     
-    def __init__(self, model, view):
-        self.model = model
-        self.view = view
-        self.model.add_observer(view)
-        self.view.add_controller(self)
+    def __init__(self):
+        pass
+        
+    def set_model(self, model: Model):
+        self.__model = model
+
+    def get_model(self):
+        return self.__model
         
     def action(self, *args):
         """
@@ -27,14 +32,11 @@ class Controller:
         appropriate action. Currently, the only supported actions are the ones
         that start and stop simulation. 
         
-        Parameters
-        ----------
-        Action
-            This non-keyworded argument indicates the action to be taken
-            
+        Args:
+            Action: this non-keyworded argument indicates the action to be taken
         """
         if Action.START_SIMULATION in args:
-            self.simulation_thread = SimulationThread(self.model)
+            self.simulation_thread = SimulationThread(self.__model)
             self.simulation_thread.start()
             #self.simulation_thread.run()
         if Action.STOP_SIMULATION in args:
