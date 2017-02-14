@@ -13,7 +13,13 @@ from controller import Controller
 from support.logging import Logging
 
 Logging.setup_logging()
+
 model = Model()
-view = View(None)
-controller = Controller(model, view)
+view = View()
+controller = Controller()
+
+view.set_controller(controller)
+controller.set_model(model)
+model.add_observer(view)
+
 view.mainloop()
