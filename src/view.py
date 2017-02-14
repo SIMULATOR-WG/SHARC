@@ -30,8 +30,8 @@ class View(tkinter.Tk, Observer):
         """
         self.title("SHARC simulator")
         
-        img = tkinter.PhotoImage(file="img/app_icon.png")
-        self.tk.call('wm', 'iconphoto', self._w, img)        
+        self.__app_icon = tkinter.PhotoImage(file="img/app_icon.png")
+        self.tk.call('wm', 'iconphoto', self._w, self.__app_icon)        
         
         self.__frame = tkinter.Frame(self, bg = '#CCCCCC')
         self.__frame.pack(fill='both', expand='yes')
