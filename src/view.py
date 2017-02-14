@@ -28,7 +28,10 @@ class View(tkinter.Tk, Observer):
         """
         Creates all the graphical components
         """
-        self.title("Simulator")
+        self.title("SHARC simulator")
+        
+        img = tkinter.PhotoImage(file="img/app_icon.png")
+        self.tk.call('wm', 'iconphoto', self._w, img)        
         
         self.__frame = tkinter.Frame(self, bg = '#CCCCCC')
         self.__frame.pack(fill='both', expand='yes')
@@ -84,7 +87,7 @@ class View(tkinter.Tk, Observer):
         This method is called when copy button is clicked
         """        
         self.clipboard_clear()
-        self.clipboard_append(self.scrolledtext.get(1.0, tkinter.END))  
+        self.clipboard_append(self.__scrolledtext.get(1.0, tkinter.END))  
         self.__popup("Copied to clipboard.")
         
     def __insert_text(self, source: str, text: str):
@@ -160,6 +163,9 @@ class View(tkinter.Tk, Observer):
         """
         top_level = tkinter.Toplevel(self, bg='#FFFFFF', padx=0, pady=0)
         top_level.title("Message")
+        
+        img = tkinter.PhotoImage(file="img/app_icon.png")
+        top_level.tk.call('wm', 'iconphoto', top_level._w, img)    
         
         empty_top_label = tkinter.Label(top_level, height=1, bg='#FFFFFF')
         empty_top_label.pack()
