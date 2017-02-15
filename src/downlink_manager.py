@@ -5,10 +5,11 @@ Created on Wed Feb  8 15:51:29 2017
 @author: edgar
 """
 import numpy as np
-import math
 
 from station_manager import StationManager
 from antenna import Antenna
+from parameters.parameters_imt import ParametersImt
+from macrocell_topology import MacrocellTopology
 
 class DownlinkManager(object):
     
@@ -27,25 +28,11 @@ class DownlinkManager(object):
         self.__bandwidth = 0
         self.__frequency = 0
         
+        self.__topology = MacrocellTopology(ParametersImt.intersite_distance,
+                                            ParametersImt.num_clusters)
+        
     def generate_base_stations(self, intersite_distance, num_clusters=1):
-        d = intersite_distance
-        h = (d/3)*math.sqrt(3)/2
-        # these are the coordinates of the central cluster
-        x_central = np.array([0, d, d/2, -d/2, -d, -d/2, 
-                         d/2, 2*d, 3*d/2, d, 0, -d, 
-                         -3*d/2, -2*d, -3*d/2, -d, 0, d, 3*d/2])
-        y_central = np.array([0, 0, 3*h, 3*h, 0, -3*h, 
-                         -3*h, 0, 3*h, 6*h, 6*h, 6*h, 
-                         3*h, 0, -3*h, -6*h, -6*h, -6*h, -3*h])
-        x_coord = np.copy(x_central)
-        y_coord = np.copy(y_central)
-        # other clusters are calculated by shifting the central cluster
-        if num_clusters == 7:
-            x_shift = np.array([7*d/2, -d/2, -4*d, -7*d/2, d/2, 4*d])
-            y_shift = np.array([9*h, 15*h, 6*h, -9*h, -15*h, -6*h])
-            for x, y in zip(x_shift, y_shift):
-                x_coord = np.concatenate((x_coord, x_central+x))
-                y_coord = np.concatenate((y_coord, y_central+y))
+        (x_coord, y_coord) = self.__topology.get_coordinates()
         # now we set the coordinates
         self.__transmitter.set_x(x_coord)
         self.__transmitter.set_y(y_coord)
