@@ -14,6 +14,11 @@ from station_manager import StationManager
 
 
 class StationManagerTest(unittest.TestCase):
+    """
+    This test case contains sereval tests that could be written using the
+    assert.allclose statement. But when we do it, it crashes Spyder. That is
+    the reason for wrinting np.all(np.equal())
+    """
     
     def setUp(self):
         self.station_manager = StationManager(3)
@@ -80,7 +85,7 @@ class StationManagerTest(unittest.TestCase):
         self.assertTrue(np.all(np.equal([15,9], self.station_manager.get_y([0,1]))))
         # set two values and then get all values
         self.station_manager.set_y([7,21], [0,2])
-        self.assertTrue(np.all(np.equal([7,9,21], self.station_manager.get_y())))        
+        self.assertTrue(np.all(np.equal([7,9,21], self.station_manager.get_y())))
        
     def test_height(self):
         # get a single value from the original array
@@ -96,7 +101,7 @@ class StationManagerTest(unittest.TestCase):
         self.assertTrue(np.all(np.equal([7,3], self.station_manager.get_height([1,2]))))
         # set two values and then get all values
         self.station_manager.set_height([5,4], [0,2])
-        self.assertTrue(np.all(np.equal([5,7,4], self.station_manager.get_height())))           
+        self.assertTrue(np.all(np.equal([5,7,4], self.station_manager.get_height())))
         
     def test_tx_power(self):
         # get a single value from the original array
@@ -112,7 +117,7 @@ class StationManagerTest(unittest.TestCase):
         self.assertTrue(np.all(np.equal([40,50], self.station_manager.get_tx_power([2,1]))))
         # set two values and then get all values
         self.station_manager.set_tx_power([20,38], [0,2])
-        self.assertTrue(np.all(np.equal([20,50,38], self.station_manager.get_tx_power())))           
+        self.assertTrue(np.all(np.equal([20,50,38], self.station_manager.get_tx_power())))
         
     def test_rx_power(self):
         # get a single value from the original array
@@ -128,7 +133,7 @@ class StationManagerTest(unittest.TestCase):
         self.assertTrue(np.all(np.equal([-15,-50], self.station_manager.get_rx_power([2,0]))))
         # set two values and then get all values
         self.station_manager.set_rx_power([-60,-30], [0,1])
-        self.assertTrue(np.all(np.equal([-60,-30,-15], self.station_manager.get_rx_power())))           
+        self.assertTrue(np.all(np.equal([-60,-30,-15], self.station_manager.get_rx_power())))      
         
     def test_tx_antenna(self):
         self.assertEqual(10, self.station_manager.get_tx_antenna(0))
@@ -136,16 +141,16 @@ class StationManagerTest(unittest.TestCase):
         self.assertEqual(Antenna(30), self.station_manager.get_tx_antenna(2))
         self.assertTrue(np.all(np.equal([10,25], self.station_manager.get_tx_antenna([0,1]))))
         self.assertTrue(np.all(np.equal([10,30], self.station_manager.get_tx_antenna([0,2]))))
-        self.assertTrue(np.all(np.equal([30,25], self.station_manager.get_tx_antenna([2,1]))))  
-        self.assertTrue(np.all(np.equal([30,25,10], self.station_manager.get_tx_antenna([2,1,0]))))  
-        self.assertTrue(np.all(np.equal([10,25,30], self.station_manager.get_tx_antenna())))  
+        self.assertTrue(np.all(np.equal([30,25], self.station_manager.get_tx_antenna([2,1])))  )
+        self.assertTrue(np.all(np.equal([30,25,10], self.station_manager.get_tx_antenna([2,1,0]))))
+        self.assertTrue(np.all(np.equal([10,25,30], self.station_manager.get_tx_antenna())))
         self.assertTrue(np.all(np.equal([Antenna(10),Antenna(25),30], self.station_manager.get_tx_antenna())))
         # test setting one antenna
         self.station_manager.set_tx_antenna(Antenna(2),0)
-        self.assertTrue(np.all(np.equal([2,25,30], self.station_manager.get_tx_antenna())))  
+        self.assertTrue(np.all(np.equal([2,25,30], self.station_manager.get_tx_antenna())))
         # test setting two antennas
         self.station_manager.set_tx_antenna([Antenna(2),Antenna(4)],[1,0])
-        self.assertTrue(np.all(np.equal([4,2,30], self.station_manager.get_tx_antenna())))  
+        self.assertTrue(np.all(np.equal([4,2,30], self.station_manager.get_tx_antenna())))
         
     def test_rx_antenna(self):
         self.assertEqual(5, self.station_manager.get_rx_antenna(0))
@@ -153,16 +158,16 @@ class StationManagerTest(unittest.TestCase):
         self.assertEqual(Antenna(20), self.station_manager.get_rx_antenna(2))
         self.assertTrue(np.all(np.equal([5,15], self.station_manager.get_rx_antenna([0,1]))))
         self.assertTrue(np.all(np.equal([5,20], self.station_manager.get_rx_antenna([0,2]))))
-        self.assertTrue(np.all(np.equal([20,15], self.station_manager.get_rx_antenna([2,1]))))  
-        self.assertTrue(np.all(np.equal([20,15,5], self.station_manager.get_rx_antenna([2,1,0]))))  
-        self.assertTrue(np.all(np.equal([5,15,20], self.station_manager.get_rx_antenna())))  
+        self.assertTrue(np.all(np.equal([20,15], self.station_manager.get_rx_antenna([2,1]))))
+        self.assertTrue(np.all(np.equal([20,15,5], self.station_manager.get_rx_antenna([2,1,0]))))
+        self.assertTrue(np.all(np.equal([5,15,20], self.station_manager.get_rx_antenna())))
         self.assertTrue(np.all(np.equal([Antenna(5),Antenna(15),20], self.station_manager.get_rx_antenna())))
         # test setting one antenna
         self.station_manager.set_rx_antenna(Antenna(7),0)
-        self.assertTrue(np.all(np.equal([7,15,20], self.station_manager.get_rx_antenna())))  
+        self.assertTrue(np.all(np.equal([7,15,20], self.station_manager.get_rx_antenna())))
         # test setting two antennas
         self.station_manager.set_rx_antenna([Antenna(8),Antenna(9)],[1,0])
-        self.assertTrue(np.all(np.equal([9,8,20], self.station_manager.get_rx_antenna())))         
+        self.assertTrue(np.all(np.equal([9,8,20], self.station_manager.get_rx_antenna())))
         
     def test_station(self):
         # test if manager returns the correct station
