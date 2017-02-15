@@ -13,20 +13,24 @@ from macrocell_topology import MacrocellTopology
 
 class DownlinkManager(object):
     
-    def __init__(self, k, n_cluster=1):
-        self.reset(n_cluster, k)
+    def __init__(self):
+        self.reset()
         
-    def reset(self, k, n_cluster=1):
-        n_bs = 19
-        self.__transmitter = StationManager(n_cluster*n_bs)
-        self.__receiver = StationManager(n_cluster*n_bs*k*10)
-        self.__link_tx = np.empty(n_cluster*n_bs*k)
-        self.__link_rx = np.empty(n_cluster*n_bs*k)
-        self.__coupling_loss = np.empty(n_cluster*n_bs*k)
-        self.__acir = np.empty(n_cluster*n_bs*k)
-        self.__thermal_noise = np.empty(n_cluster*n_bs*k)
-        self.__bandwidth = 0
-        self.__frequency = 0
+    def reset(self):
+        bs = ParametersImt.num_base_stations
+        c = ParametersImt.num_clusters
+        k = ParametersImt.ue_k
+        m = ParametersImt.ue_k_m
+        
+        self.__transmitter = StationManager(c*bs)
+        self.__receiver = StationManager(c*bs*k*m)
+        self.__link_tx = np.empty(c*bs*k)
+        self.__link_rx = np.empty(c*bs*k)
+        self.__coupling_loss = np.empty(c*bs*k)
+        self.__acir = np.empty(c*bs*k)
+        self.__thermal_noise = np.empty(c*bs*k)
+        self.__bandwidth = ParametersImt.bandwidth
+        self.__frequency = ParametersImt.frequency
         
         self.__topology = MacrocellTopology(ParametersImt.intersite_distance,
                                             ParametersImt.num_clusters)
