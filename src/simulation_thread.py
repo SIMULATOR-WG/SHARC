@@ -14,7 +14,8 @@ class SimulationThread(Thread):
     """
     This class extends the Thread class and controls the simulation (start/stop)
     
-    Attributes:
+    Attributes
+    ----------
         _stop (Event) : This flag is used to control when simulation is stopped
             by user
         model (Model) : Reference to the Model implementation of MVC
@@ -37,7 +38,8 @@ class SimulationThread(Thread):
         """
         Checks if stop flag is set.
         
-        Returns:
+        Returns
+        -------
             True if simulation is stopped
         """
         return self._stop.isSet()
