@@ -10,15 +10,12 @@ import time
 from support.observable import Observable
 from support.enumerations import State
 #from simulation_downlink import SimulationDownlink
-from parameters import Parameters
+from parameters.parameters_general import ParametersGeneral
 
 class Model(Observable):
     """
     Implements the Observable interface. It has a reference to the simulation
     object and controls the simulation flow (init/step/finilize).
-    
-    Attributes:
-        __simulation (Simulation)
     """
     
     def __init__(self):
@@ -50,10 +47,11 @@ class Model(Observable):
         Checks is simulation is finished by checking if maximum number of 
         snashots is reached.
         
-        Returns:
+        Returns
+        -------
             True if simulation is finished; False otherwise.
         """
-        if self.current_snapshot <= Parameters.num_snapshots:
+        if self.current_snapshot <= ParametersGeneral.num_snapshots:
             return False
         else:
             return True
@@ -71,7 +69,8 @@ class Model(Observable):
         Sends the elapsed simulation time to all observers. Simulation time is
         calculated in SimulationThread
         
-        Args:
+        Parameters
+        ----------
             elapsed_time: Elapsed time.
         """
         self.notify_observers(source=__name__, 
