@@ -17,3 +17,11 @@ class Topology(object):
     def get_coordinates(self) -> typing.Tuple[np.array, np.array]:
         pass
     
+    @abstractmethod
+    def get_x_limits(self) -> typing.Tuple[float, float]:
+        pass
+
+    @abstractmethod
+    def get_y_limits(self) -> typing.Tuple[float, float]:
+        pass
+    
