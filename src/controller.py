@@ -32,7 +32,8 @@ class Controller:
         appropriate action. Currently, the only supported actions are the ones
         that start and stop simulation. 
         
-        Args:
+        Parameters
+        ----------
             Action: this non-keyworded argument indicates the action to be taken
         """
         if Action.START_SIMULATION in args:
