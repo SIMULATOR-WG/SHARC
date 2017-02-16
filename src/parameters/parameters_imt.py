@@ -7,8 +7,20 @@ Created on Wed Feb 15 16:05:58 2017
 
 class ParametersImt(object):
 
+    __instance = None
+    
+    def __new__(cls, val):
+        """
+        This is the Singleton Pattern to ensure that this class will have only
+        one instance
+        """
+        if ParametersImt.__instance is None:
+            ParametersImt.__instance = object.__new__(cls)
+        ParametersImt.__instance.val = val
+        return ParametersImt.__instance    
+    
     ###########################################################################
-    # Number of base stations per cluster
+    # Number of base stations per cluster (must set to 19 in macrocell network)
     num_base_stations = 19
     
     ###########################################################################
@@ -33,7 +45,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT bandwidth [MHz]
-    bandwidth = 100    
+    bandwidth = 500    
     
     ###########################################################################
     # The load probability (or activity factor) models the statistical 
@@ -42,7 +54,11 @@ class ParametersImt(object):
     bs_load_probability = 0.5
     
     ###########################################################################
-    # Base station transmit power [dBm]
+    # Number of resource blocks per UE
+    num_resource_blocks = 10
+
+    ###########################################################################
+    # Maximum base station transmit power [dBm]
     bs_tx_power = 37
     
     ###########################################################################
@@ -50,9 +66,25 @@ class ParametersImt(object):
     bs_height = 30
 
     ###########################################################################
+    # Base station transmit antenna gain [dBi]
+    bs_tx_antenna_gain = 30
+    
+    ###########################################################################
+    # Base station receive antenna gain [dBi]
+    bs_rx_antenna_gain = 30
+    
+    ###########################################################################
+    # Adjacent channel leakage power Ratio of the base station [dB]
+    bs_aclr = 40    
+
+    ###########################################################################
+    # Adjacent channel selectivity of the base station [dB]
+    bs_acs = 30    
+    
+    ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 30
+    ue_k = 10
     
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
@@ -63,8 +95,26 @@ class ParametersImt(object):
     
     ###########################################################################
     # UE maximum transmit power [dBm]
-    ue_tx_power = 37
+    ue_tx_power = 20
     
     ###########################################################################
     # UE height [m]
-    ue_height = 30
+    ue_height = 1.5
+    
+    ###########################################################################
+    # UE transmit antenna gain [dBi]
+    ue_tx_antenna_gain = 0
+    
+    ###########################################################################
+    # UE receive antenna gain [dBi]
+    ue_rx_antenna_gain = 0    
+    
+    ###########################################################################
+    # Adjacent channel leakage power Ratio of the user equipment [dB]
+    ue_aclr = 35    
+
+    ###########################################################################
+    # Adjacent channel selectivity of the user equipment [dB]
+    ue_acs = 25    
+    
+    
