@@ -97,7 +97,8 @@ class View(tkinter.Tk, Observer):
         the name of the class that called the method. By default, all logging
         messages will be written in INFO level.
         
-        Args:
+        Parameters
+        ----------
             source : Class name that called the method
             text : Message that will be displayed on console and on log file
         """
@@ -111,7 +112,8 @@ class View(tkinter.Tk, Observer):
         Sets the state of the graphical user interface, i.e. enables or
         disables the buttons according to the state of the simulation
         
-        Args:
+        Parameters
+        ----------
             state : Enumaration that defines the simulation state
         """
         if state == State.INITIAL or state == State.FINISHED or state == State.STOPPED:
@@ -134,7 +136,8 @@ class View(tkinter.Tk, Observer):
         """
         Keeps the reference to the controller
         
-        Args:
+        Parameters
+        ----------
             controller : Reference to the controller
         """
         self.__controller = controller
@@ -144,7 +147,8 @@ class View(tkinter.Tk, Observer):
         Implements the method from Observer class. See documentation on the 
         super class.
         
-        Args:
+        Parameters
+        ----------
             state : Enumaration that defines the simulation state
             message : Message that will be displayed on console and on log file
         """
@@ -158,7 +162,8 @@ class View(tkinter.Tk, Observer):
         """
         Displays a message on a popup window.
         
-        Args:
+        Parameters
+        ----------
             message : Message to be displayed on the popup window
         """
         top_level = tkinter.Toplevel(self, bg='#FFFFFF', padx=0, pady=0)
