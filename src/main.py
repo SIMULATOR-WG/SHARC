@@ -8,7 +8,7 @@ Created on Mon Dec 26 17:05:49 2016
 
     
 from model import Model
-from view import View
+from gui.view import View
 from controller import Controller
 from support.logging import Logging
 
