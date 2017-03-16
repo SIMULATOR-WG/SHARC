@@ -7,7 +7,6 @@ Created on Tue Feb 14 12:48:58 2017
 
 from abc import ABCMeta, abstractmethod
 import numpy as np
-import typing
  
 class Topology(object):
     
@@ -15,65 +14,116 @@ class Topology(object):
     
     def __init__(self, intersite_distance: float, cell_radius: float, 
                  num_clusters: int):
-        self.__intersite_distance = intersite_distance
-        self.__cell_radius = cell_radius
-        self.__num_clusters = num_clusters
+        self._intersite_distance = intersite_distance
+        self._cell_radius = cell_radius
+        self._num_clusters = num_clusters
+        self._x = np.empty(0)
+        self._y = np.empty(0)        
+        self._x_min = 0
+        self._x_max = 0
+        self._y_min = 0
+        self._y_max = 0
         self._calculate_coordinates()
         self._calculate_limits()
     
+    @property
+    def intersite_distance(self):
+        return self._intersite_distance
+        
+    @intersite_distance.setter
+    def intersite_distance(self, value):
+        """
+        Sets class atribute and recalculates coordinates and limits
+        """
+        self._intersite_distance = value
+        self._calculate_coordinates()
+        self._calculate_limits()        
+
+    @property
+    def cell_radius(self):
+        return self._cell_radius
+
+    @cell_radius.setter
+    def cell_radius(self, value):
+        """
+        Sets class atribute and recalculates coordinates and limits
+        """
+        self._cell_radius = value
+        self._calculate_coordinates()
+        self._calculate_limits() 
+        
+    @property
+    def num_clusters(self):
+        return self._num_clusters        
+    
+    @num_clusters.setter
+    def num_clusters(self, value):
+        """
+        Sets class atribute and recalculates coordinates and limits
+        """
+        self._num_clusters = value
+        self._calculate_coordinates()
+        self._calculate_limits()   
+        
+    @property
+    def x(self):
+        return self._x
+        
+    @x.setter
+    def x(self, value):
+        self._x = value
+        
+    @property
+    def y(self):
+        return self._y  
+        
+    @y.setter
+    def y(self, value):
+        self._y = value        
+        
+    @property
+    def x_min(self):
+        return self._x_min
+
+    @x_min.setter
+    def x_min(self, value):
+        self._x_min = value
+        
+    @property
+    def x_max(self):
+        return self._x_max
+
+    @x_max.setter
+    def x_max(self, value):
+        self._x_max = value
+        
+    @property
+    def y_min(self):
+        return self._y_min
+
+    @y_min.setter
+    def y_min(self, value):
+        self._y_min = value
+        
+    @property
+    def y_max(self):
+        return self._y_max        
+        
+    @y_max.setter
+    def y_max(self, value):
+        self._y_max = value
+        
     @abstractmethod
     def _calculate_coordinates(self):
-        self.__x_coord = np.empty(0)
-        self.__y_coord = np.empty(0)
+        """
+        Calculates the coordinates of the stations according to the class
+        atributes.
+        """        
+        pass
         
     @abstractmethod
     def _calculate_limits(self):
-        self.__x_min = 0
-        self.__x_max = 0
-        self.__y_min = 0
-        self.__y_max = 0
-    
-    def get_coordinates(self) -> typing.Tuple[np.array, np.array]:
-        return (self.__x_coord, self.__y_coord)
-        
-    def get_x_limits(self) -> typing.Tuple[float, float]:
-        return (self.__x_min, self.__x_max)
-
-    def get_y_limits(self) -> typing.Tuple[float, float]:
-        return (self.__y_min, self.__y_max)    
-        
-    def set_coordinates(self, x_coord: np.array, y_coord: np.array):
-        self.__x_coord = np.asarray(x_coord)
-        self.__y_coord = np.asarray(y_coord)
-        
-    def set_x_limits(self, x_min: float, x_max: float):
-        self.__x_min = x_min
-        self.__x_max = x_max
-
-    def set_y_limits(self, y_min: float, y_max: float):
-        self.__y_min = y_min
-        self.__y_max = y_max         
-        
-    def set_intersite_distance(self, intersite_distance: float):
-        self.__intersite_distance = intersite_distance
-        self._calculate_coordinates()
-        self._calculate_limits()        
-        
-    def get_intersite_distance(self) -> float:
-        return self.__intersite_distance     
-        
-    def set_cell_radius(self, cell_radius: float):
-        self.__cell_radius = cell_radius
-        self._calculate_coordinates()
-        self._calculate_limits()        
-        
-    def get_cell_radius(self) -> float:
-        return self.__cell_radius         
-        
-    def set_num_clusters(self, num_clusters: int):
-        self.__num_clusters = num_clusters
-        self._calculate_coordinates()
-        self._calculate_limits()        
-        
-    def get_num_clusters(self) -> int:
-        return self.__num_clusters        
+        """
+        Calculates the coordinates of the scenario's borders
+        """        
+        pass

@@ -30,6 +30,24 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager.set_tx_antenna([Antenna(10),Antenna(25),Antenna(30)])
         self.station_manager.set_rx_antenna([Antenna(5),Antenna(15),Antenna(20)])
         
+        self.station_manager2 = StationManager(2)
+        self.station_manager2.set_x([100,200])
+        self.station_manager2.set_y([105,250])
+        self.station_manager2.set_height([4,5])
+        self.station_manager2.set_tx_power([20,25])
+        self.station_manager2.set_rx_power([-50,-35])
+        self.station_manager2.set_tx_antenna([Antenna(10),Antenna(25)])
+        self.station_manager2.set_rx_antenna([Antenna(5),Antenna(15)])        
+        
+        self.station_manager3 = StationManager(1)
+        self.station_manager3.set_x([300])
+        self.station_manager3.set_y([400])
+        self.station_manager3.set_height([2])
+        self.station_manager3.set_tx_power([22])
+        self.station_manager3.set_rx_power([-50,-35])
+        self.station_manager3.set_tx_antenna([Antenna(10),Antenna(25)])
+        self.station_manager3.set_rx_antenna([Antenna(5),Antenna(15)])         
+        
         self.station = Station()
         self.station.set_id(0)
         self.station.set_x(10)
@@ -48,7 +66,8 @@ class StationManagerTest(unittest.TestCase):
         self.station2.set_tx_power(35)
         self.station2.set_rx_power(-35)
         self.station2.set_tx_antenna(Antenna(25))
-        self.station2.set_rx_antenna(Antenna(15))          
+        self.station2.set_rx_antenna(Antenna(15))     
+        
         
     def test_num_stations(self):
         self.assertEqual(3, self.station_manager.get_num_stations())
@@ -191,6 +210,27 @@ class StationManagerTest(unittest.TestCase):
         self.assertTrue(self.station not in station_list)
         self.assertTrue(self.station2 not in station_list)        
         
+    def test_distance_to(self):
+        ref_distance = np.asarray([[ 356.405,  180.277]])
+        distance = self.station_manager3.get_distance_to(self.station_manager2)
+        self.assertTrue(np.all(np.isclose(ref_distance, distance, atol=1e-2)))        
+        
+        ref_distance = np.asarray([[ 127.279,  302.200],
+                                   [ 113.137,  288.140],
+                                   [  98.994,  274.089]])
+        distance = self.station_manager.get_distance_to(self.station_manager2)
+        self.assertTrue(np.all(np.isclose(ref_distance, distance, atol=1e-2)))
+        
+    def test_3d_distance_to(self):
+        ref_distance = np.asarray([[ 356.411,  180.302]])
+        distance = self.station_manager3.get_3d_distance_to(self.station_manager2)
+        self.assertTrue(np.all(np.isclose(ref_distance, distance, atol=1e-2)))        
+        
+        ref_distance = np.asarray([[ 127.314,  302.226],
+                                   [ 113.154,  288.156],
+                                   [  99,  274.096]])
+        distance = self.station_manager.get_3d_distance_to(self.station_manager2)
+        self.assertTrue(np.all(np.isclose(ref_distance, distance, atol=1e-2)))        
         
 if __name__ == '__main__':
     unittest.main()
