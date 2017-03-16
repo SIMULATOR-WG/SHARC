@@ -21,7 +21,7 @@ class ParametersImt(object):
     
     ###########################################################################
     # Number of base stations per cluster (must set to 19 in macrocell network)
-    num_base_stations = 19
+    num_base_stations = 1
     
     ###########################################################################
     # Number of clusters (should be 1 or 7)
@@ -33,11 +33,11 @@ class ParametersImt(object):
     
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 1500
+    intersite_distance = 150
     
     ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
-    interfered_with = False
+    interfered_with = True
     
     ###########################################################################
     # IMT center frequency [MHz]
@@ -45,7 +45,15 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT bandwidth [MHz]
-    bandwidth = 500    
+    bandwidth = 100    
+    
+    ###########################################################################
+    # Minimum Coupling Loss (MCL) [dB]
+    mcl = 40    
+
+    ###########################################################################
+    # Handover margin [dB]
+    ho_margin = 3
     
     ###########################################################################
     # The load probability (or activity factor) models the statistical 
@@ -59,19 +67,19 @@ class ParametersImt(object):
 
     ###########################################################################
     # Maximum base station transmit power [dBm]
-    bs_tx_power = 37
+    bs_tx_power = 45.9
     
     ###########################################################################
     # Base station height [m]
-    bs_height = 30
+    bs_height = 10
 
     ###########################################################################
     # Base station transmit antenna gain [dBi]
-    bs_tx_antenna_gain = 30
+    bs_tx_antenna_gain = 29.1
     
     ###########################################################################
     # Base station receive antenna gain [dBi]
-    bs_rx_antenna_gain = 30
+    bs_rx_antenna_gain = 29.1
     
     ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
@@ -80,22 +88,30 @@ class ParametersImt(object):
     ###########################################################################
     # Adjacent channel selectivity of the base station [dB]
     bs_acs = 30    
+
+    ###########################################################################
+    # Base station noise figure [dB]
+    bs_noise_figure = 7  
+    
+    ###########################################################################
+    # Base station feed loss [dB]
+    bs_feed_loss = 3
     
     ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 10
+    ue_k = 4
     
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies 
     # between 2 and 10 according to the user drop method
-    ue_k_m = 10
+    ue_k_m = 1
     
     ###########################################################################
     # UE maximum transmit power [dBm]
-    ue_tx_power = 20
+    ue_tx_power = 22
     
     ###########################################################################
     # UE height [m]
@@ -103,11 +119,11 @@ class ParametersImt(object):
     
     ###########################################################################
     # UE transmit antenna gain [dBi]
-    ue_tx_antenna_gain = 0
+    ue_tx_antenna_gain = 14
     
     ###########################################################################
     # UE receive antenna gain [dBi]
-    ue_rx_antenna_gain = 0    
+    ue_rx_antenna_gain = 14    
     
     ###########################################################################
     # Adjacent channel leakage power Ratio of the user equipment [dB]
@@ -117,4 +133,11 @@ class ParametersImt(object):
     # Adjacent channel selectivity of the user equipment [dB]
     ue_acs = 25    
     
+    ###########################################################################
+    # User equipment noise figure [dB]
+    ue_noise_figure = 9    
+    
+    ###########################################################################
+    # User equipment feed loss [dB]
+    ue_feed_loss = 3
     
