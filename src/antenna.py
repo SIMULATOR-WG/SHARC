@@ -11,15 +11,15 @@ class Antenna(object):
     """
     
     def __init__(self, gain: float = 0):
-        self._gain = gain
+        self.__gain = gain
     
     @property
     def gain(self):
-        return self._gain
+        return self.__gain
         
     @gain.setter
     def gain(self, value):
-        self._gain = value
+        self.__gain = value
                 
         
     """
