@@ -14,63 +14,63 @@ class StationTest(unittest.TestCase):
     
     def setUp(self):
         self.station = Station()
-        self.station.set_id(1)
-        self.station.set_x(10)
-        self.station.set_y(15)
-        self.station.set_height(6)
-        self.station.set_tx_power(20)
-        self.station.set_rx_power(-3)
-        self.station.set_tx_antenna(Antenna(30))
-        self.station.set_rx_antenna(Antenna(35))
+        self.station.id = 1
+        self.station.x = 10
+        self.station.y = 15
+        self.station.height = 6
+        self.station.tx_power = 20
+        self.station.rx_power = -3
+        self.station.tx_antenna = Antenna(30)
+        self.station.rx_antenna = Antenna(35)
         
         self.station2 = Station()
-        self.station2.set_id(1)
-        self.station2.set_x(10)
-        self.station2.set_y(15)
-        self.station2.set_height(6)
-        self.station2.set_tx_power(17)
-        self.station2.set_rx_power(9)
-        self.station2.set_tx_antenna(Antenna(10))
-        self.station2.set_rx_antenna(Antenna(12))       
+        self.station2.id = 1
+        self.station2.x = 10
+        self.station2.y = 15
+        self.station2.height = 6
+        self.station2.tx_power = 17
+        self.station2.rx_power = 9
+        self.station2.tx_antenna = Antenna(10)
+        self.station2.rx_antenna = Antenna(12)
         
         self.station3 = Station()
-        self.station3.set_id(2)
-        self.station3.set_x(10)
-        self.station3.set_y(15)
-        self.station3.set_height(6)
-        self.station3.set_tx_power(20)
-        self.station3.set_rx_power(-3)
-        self.station3.set_tx_antenna(Antenna(30))
-        self.station3.set_rx_antenna(Antenna(35))       
+        self.station3.id = 2
+        self.station3.x = 10
+        self.station3.y = 15
+        self.station3.height = 6
+        self.station3.tx_power = 20
+        self.station3.rx_power = -3
+        self.station3.tx_antenna = Antenna(30)
+        self.station3.rx_antenna = Antenna(35)   
         
     def test_id(self):
-        self.assertEqual(1, self.station.get_id())
+        self.assertEqual(self.station.id, 1)
 
     def test_x(self):
-        self.assertEqual(10, self.station.get_x())
+        self.assertEqual(self.station.x, 10)
 
     def test_y(self):
-        self.assertEqual(15, self.station.get_y())
+        self.assertEqual(self.station.y, 15)
 
     def test_height(self):
-        self.assertEqual(6, self.station.get_height())
+        self.assertEqual(self.station.height, 6)
 
     def test_tx_power(self):
-        self.assertEqual(20, self.station.get_tx_power())
+        self.assertEqual(self.station.tx_power, 20)
 
     def test_rx_power(self):
-        self.assertEqual(-3, self.station.get_rx_power())
+        self.assertEqual(self.station.rx_power, -3)
 
     def test_tx_antenna(self):
-        self.assertEqual(30, self.station.get_tx_antenna().get_gain())
+        self.assertEqual(self.station.tx_antenna.gain, 30)
 
     def test_rx_antenna(self):
-        self.assertEqual(35, self.station.get_rx_antenna().get_gain())
+        self.assertEqual(self.station.rx_antenna.gain, 35)
         
     def test_eq(self):
         self.assertTrue(self.station == self.station2)
         # changing id, x, y, or height should change the result
-        self.station.set_x(11)
+        self.station.x = 11
         self.assertFalse(self.station == self.station2)
         #
         self.assertFalse(self.station == self.station3)
@@ -79,7 +79,7 @@ class StationTest(unittest.TestCase):
     def test_ne(self):
         self.assertFalse(self.station != self.station2)
         # changing id, x, y, or height should change the result
-        self.station.set_height(9)
+        self.station.height = 9
         self.assertTrue(self.station != self.station2)   
         #
         self.assertTrue(self.station != self.station3)

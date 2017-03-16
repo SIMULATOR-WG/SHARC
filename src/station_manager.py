@@ -9,7 +9,7 @@ import numpy as np
 
 from station import Station
 from antenna import Antenna
-from parameters.ParametersImt import ParametersImt
+from parameters.parameters_imt import ParametersImt
 
 class StationManager(object):
     """
@@ -21,9 +21,6 @@ class StationManager(object):
     """
     
     def __init__(self, n):
-        self.reset(n)
-        
-    def reset(self, n):
         self.__num_stations = n
         self.__x = np.empty(n)
         self.__y = np.empty(n)
@@ -53,10 +50,12 @@ class StationManager(object):
     @staticmethod
     def generate_imt_ue(num_ue, x_limits, y_limits):
         imt_ue = StationManager(num_ue)
-        x_coord = (x_limits(1)-x_limits(0))*np.random.random(num_ue)+x_limits(0)
-        y_coord = (y_limits(1)-y_limits(0))*np.random.random(num_ue)+y_limits(0)
+        x_coord = (x_limits[1]-x_limits[0])*np.random.random(num_ue)+x_limits[0]
+        y_coord = (y_limits[1]-y_limits[0])*np.random.random(num_ue)+y_limits[0]
         imt_ue.set_x(x_coord)
-        imt_ue.set_x(y_coord)
+        imt_ue.set_y(y_coord)
+#        imt_ue.set_x(300)
+#        imt_ue.set_y(400)
         imt_ue.set_height(ParametersImt.ue_height*np.ones(num_ue))
         imt_ue.set_tx_power(ParametersImt.ue_tx_power*np.ones(num_ue))
         imt_ue.set_tx_antenna(
@@ -67,7 +66,7 @@ class StationManager(object):
         
     def get_station_list(self,id=None):
         if(id is None):
-            id = range(self.get_num_stations())
+            id = range(self.num_stations)
         station_list = list()
         for i in id:
             station_list.append(self.get_station(i))
@@ -75,96 +74,101 @@ class StationManager(object):
       
     def get_station(self,id):
         station = Station()
-        station.set_id(id)
-        station.set_x(self.get_x(id))
-        station.set_y(self.get_y(id))
-        station.set_height(self.get_height(id))
-        station.set_active(self.get_active(id))
-        station.set_tx_power(self.get_tx_power(id))
-        station.set_rx_power(self.get_rx_power(id))
-        station.set_tx_antenna(self.get_tx_antenna(id))
-        station.set_rx_antenna(self.get_rx_antenna(id))
+        station.id = id
+        station.x = self.x[id]
+        station.y = self.y[id]
+        station.height = self.height[id]
+        station.active = self.active[id]
+        station.tx_power = self.tx_power[id]
+        station.rx_power = self.rx_power[id]
+        station.tx_antenna = self.tx_antenna[id]
+        station.rx_antenna = self.rx_antenna[id]
         return station
         
-    def get_num_stations(self):
+    def get_distance_to(self, station) -> np.array:
+        distance = np.empty([self.num_stations, station.num_stations])
+        for i in range(self.num_stations):
+            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) + 
+                           np.power(self.y[i] - station.y, 2))
+        return distance
+        
+    def get_3d_distance_to(self, station) -> np.array:
+        distance = np.empty([self.num_stations, station.num_stations])
+        for i in range(self.num_stations):
+            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) + 
+                           np.power(self.y[i] - station.y, 2) +
+                            np.power(self.height[i] - station.height, 2))
+        return distance        
+        
+    @property
+    def num_stations(self):
         return self.__num_stations
         
-    def set_x(self, x, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__x[id] = np.asarray(x)
+    @num_stations.setter
+    def num_stations(self, value):
+        self.__num_stations = np.array(value)
+        
+    @property
+    def x(self):
+        return self.__x
+        
+    @x.setter
+    def x(self, value):
+        self.__x = np.array(value)
+        
+    @property
+    def y(self):
+        return self.__y
+        
+    @y.setter
+    def y(self, value):
+        self.__y = np.array(value)
+        
+    @property
+    def height(self):
+        return self.__height
+        
+    @height.setter
+    def height(self, value):
+        self.__height = np.array(value)        
 
-    def get_x(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__x[id]
+    @property
+    def active(self):
+        return self.__active
+        
+    @active.setter
+    def active(self, value):
+        self.__active = np.array(value)
 
-    def set_y(self, y, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__y[id] = np.asarray(y)
-
-    def get_y(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__y[id]
-
-    def set_height(self, height, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__height[id] = np.asarray(height)
-
-    def get_height(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__height[id]
-
-    def set_active(self, active, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__active[id] = np.asarray(active)
-
-    def get_active(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__active[id]
-
-    def set_tx_power(self, tx_power, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__tx_power[id] = np.asarray(tx_power)
-
-    def get_tx_power(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__tx_power[id]
-
-    def set_rx_power(self, rx_power, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__rx_power[id] = np.asarray(rx_power)
-
-    def get_rx_power(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__rx_power[id]
-
-    def set_tx_antenna(self, tx_antenna, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__tx_antenna[id] = tx_antenna
-
-    def get_tx_antenna(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__tx_antenna[id]
-
-    def set_rx_antenna(self, rx_antenna, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        self.__rx_antenna[id] = rx_antenna
-
-    def get_rx_antenna(self, id=None):
-        if(id is None):
-            id = range(self.get_num_stations())
-        return self.__rx_antenna[id]
+    @property
+    def tx_power(self):
+        return self.__tx_power
+        
+    @tx_power.setter
+    def tx_power(self, value):
+        self.__tx_power = np.array(value)
+    
+    @property
+    def rx_power(self):
+        return self.__rx_power
+        
+    @rx_power.setter
+    def rx_power(self, value):
+        self.__rx_power = np.array(value)
+            
+    @property
+    def tx_antenna(self):
+        return self.__tx_antenna
+        
+    @tx_antenna.setter
+    def tx_antenna(self, value):
+        self.__tx_antenna = np.array(value)
+    
+    @property
+    def rx_antenna(self):
+        return self.__rx_antenna
+        
+    @rx_antenna.setter
+    def rx_antenna(self, value):
+        self.__rx_antenna = np.array(value)
+        
