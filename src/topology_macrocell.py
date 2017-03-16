@@ -77,7 +77,7 @@ class TopologyMacrocell(Topology):
     @Topology.cell_radius.setter
     def cell_radius(self, value):
         """
-        When cell radius changes, intersite distance also has to change
+        When cell radius changes, intersite distance has to be updated
         """
         self._intersite_distance = value*3/2
         Topology.cell_radius.fset(self, value)
@@ -85,7 +85,7 @@ class TopologyMacrocell(Topology):
     @Topology.intersite_distance.setter
     def intersite_distance(self, value):
         """
-        When intersite distance changes, cell radius also has to change
+        When intersite distance changes, cell radius has to be updated
         """
         self._cell_radius = value*2/3
         Topology.intersite_distance.fset(self, value)
