@@ -10,7 +10,7 @@ from model import Model
 import time
 from threading import Thread, Event
 
-class SimulationThread(Thread):
+class ThreadSimulation(Thread):
     """
     This class extends the Thread class and controls the simulation (start/stop)
     
