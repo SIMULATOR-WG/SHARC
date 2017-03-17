@@ -8,7 +8,7 @@ Created on Mon Dec 26 17:32:02 2016
 from support.enumerations import Action 
 from model import Model
 
-from simulation_thread import SimulationThread
+from thread_simulation import ThreadSimulation
 
 class Controller:
     """
@@ -37,7 +37,7 @@ class Controller:
             Action: this non-keyworded argument indicates the action to be taken
         """
         if Action.START_SIMULATION in args:
-            self.simulation_thread = SimulationThread(self.__model)
+            self.simulation_thread = ThreadSimulation(self.__model)
             self.simulation_thread.start()
             #self.simulation_thread.run()
         if Action.STOP_SIMULATION in args:
