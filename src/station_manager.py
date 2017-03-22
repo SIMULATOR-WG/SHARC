@@ -5,10 +5,12 @@ Created on Fri Feb  3 15:29:48 2017
 @author: edgar
 """
 
+import math
 import numpy as np
 
 from station import Station
 from antenna import Antenna
+from topology import Topology
 from parameters.parameters_imt import ParametersImt
 
 class StationManager(object):
@@ -28,43 +30,51 @@ class StationManager(object):
         self.__active = np.ones(n, dtype=bool)
         self.__tx_power = np.empty(n)
         self.__rx_power = np.empty(n)
+        self.__rx_interference = np.empty(n)
         self.__tx_antenna = np.array([Antenna() for i in range(n)])
         self.__rx_antenna = np.array([Antenna() for i in range(n)])
+        self.__bandwidth = np.empty(n)
+        self.__noise_figure = np.empty(n)
+        self.__thermal_noise = np.empty(n)
+        self.__total_interference = np.empty(n)
+        self.__sinr = np.empty(n)
         
     @staticmethod
-    def generate_imt_base_stations(num_base_stations, topology):
-        imt_base_stations = StationManager(num_base_stations)
-        (x_coord, y_coord) = topology.get_coordinates()
+    def generate_imt_base_stations(param: ParametersImt, topology: Topology):
+        num_bs = param.num_clusters*param.num_base_stations
+        imt_base_stations = StationManager(num_bs)
         # now we set the coordinates
-        imt_base_stations.set_x(x_coord)
-        imt_base_stations.set_y(y_coord)
-        imt_base_stations.set_height(ParametersImt.bs_height*np.ones(num_base_stations))
-        imt_base_stations.set_active(np.ones(num_base_stations, dtype=bool))
-        imt_base_stations.set_tx_power(ParametersImt.bs_tx_power*np.ones(num_base_stations))
-        imt_base_stations.set_tx_antenna(
-            np.array([Antenna(ParametersImt.bs_tx_antenna_gain) for i in range(num_base_stations)]))
-        imt_base_stations.set_rx_antenna(
-            np.array([Antenna(ParametersImt.bs_rx_antenna_gain) for i in range(num_base_stations)]))                
+        imt_base_stations.x = topology.x
+        imt_base_stations.y = topology.y
+        imt_base_stations.height = param.bs_height*np.ones(num_bs)
+        imt_base_stations.active = np.ones(num_bs, dtype=bool)
+        imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
+        imt_base_stations.tx_antenna = \
+            np.array([Antenna(param.bs_tx_antenna_gain) for i in range(num_bs)])
+        imt_base_stations.rx_antenna = \
+            np.array([Antenna(param.bs_rx_antenna_gain) for i in range(num_bs)])  
+        imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
+        imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         return imt_base_stations
         
     @staticmethod
-    def generate_imt_ue(num_ue, x_limits, y_limits):
+    def generate_imt_ue(param: ParametersImt, topology: Topology):
+        num_ue = param.num_clusters*param.num_base_stations*param.ue_k*param.ue_k_m
         imt_ue = StationManager(num_ue)
-        x_coord = (x_limits[1]-x_limits[0])*np.random.random(num_ue)+x_limits[0]
-        y_coord = (y_limits[1]-y_limits[0])*np.random.random(num_ue)+y_limits[0]
-        imt_ue.set_x(x_coord)
-        imt_ue.set_y(y_coord)
-#        imt_ue.set_x(300)
-#        imt_ue.set_y(400)
-        imt_ue.set_height(ParametersImt.ue_height*np.ones(num_ue))
-        imt_ue.set_tx_power(ParametersImt.ue_tx_power*np.ones(num_ue))
-        imt_ue.set_tx_antenna(
-            np.array([Antenna(ParametersImt.ue_tx_antenna_gain) for i in range(num_ue)]))
-        imt_ue.set_rx_antenna(
-            np.array([Antenna(ParametersImt.ue_rx_antenna_gain) for i in range(num_ue)]))                
+        imt_ue.x = (topology.x_max - topology.x_min)*np.random.random(num_ue) + topology.x_min
+        imt_ue.y = (topology.y_max - topology.y_min)*np.random.random(num_ue) + topology.y_min
+        imt_ue.height = param.ue_height*np.ones(num_ue)
+        imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
+        imt_ue.rx_interference = -300*np.ones(num_ue)
+        imt_ue.tx_antenna = \
+            np.array([Antenna(param.ue_tx_antenna_gain) for i in range(num_ue)])
+        imt_ue.rx_antenna = \
+            np.array([Antenna(param.ue_rx_antenna_gain) for i in range(num_ue)])   
+        imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
+        imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         return imt_ue
         
-    def get_station_list(self,id=None):
+    def get_station_list(self,id=None) -> list:
         if(id is None):
             id = range(self.num_stations)
         station_list = list()
@@ -72,7 +82,7 @@ class StationManager(object):
             station_list.append(self.get_station(i))
         return station_list
       
-    def get_station(self,id):
+    def get_station(self,id) -> Station:
         station = Station()
         station.id = id
         station.x = self.x[id]
@@ -146,7 +156,7 @@ class StationManager(object):
         
     @tx_power.setter
     def tx_power(self, value):
-        self.__tx_power = np.array(value)
+        self.__tx_power = value
     
     @property
     def rx_power(self):
@@ -155,6 +165,14 @@ class StationManager(object):
     @rx_power.setter
     def rx_power(self, value):
         self.__rx_power = np.array(value)
+    
+    @property
+    def rx_interference(self):
+        return self.__rx_interference
+        
+    @rx_interference.setter
+    def rx_interference(self, value):
+        self.__rx_interference = np.array(value)
             
     @property
     def tx_antenna(self):
@@ -171,4 +189,45 @@ class StationManager(object):
     @rx_antenna.setter
     def rx_antenna(self, value):
         self.__rx_antenna = np.array(value)
+
+    @property
+    def bandwidth(self):
+        return self.__bandwidth
         
+    @bandwidth.setter
+    def bandwidth(self, value):
+        self.__bandwidth = np.array(value)        
+        
+    @property
+    def noise_figure(self):
+        return self.__noise_figure
+        
+    @noise_figure.setter
+    def noise_figure(self, value):
+        self.__noise_figure = np.array(value)
+        
+    @property
+    def thermal_noise(self):
+        return self.__thermal_noise
+        
+    @thermal_noise.setter
+    def thermal_noise(self, value):
+        self.__thermal_noise = np.array(value)
+                        
+    @property
+    def total_interference(self):
+        return self.__total_interference
+        
+    @total_interference.setter
+    def total_interference(self, value):
+        self.__total_interference = np.array(value)
+         
+    @property
+    def sinr(self):
+        return self.__sinr
+        
+    @sinr.setter
+    def sinr(self, value):
+        self.__sinr = np.array(value)          
+        
+
