@@ -21,7 +21,8 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager.x = [10, 20, 30]
         self.station_manager.y = [15, 25, 35]
         self.station_manager.height = [1, 2, 3]
-        self.station_manager.tx_power = [30, 35, 40]
+        # this is for downlink
+        self.station_manager.tx_power = dict({0: [27, 30], 1: [35], 2: [40]})
         self.station_manager.rx_power = [-50, -35, -10]
         self.station_manager.tx_antenna = [Antenna(10), Antenna(25), Antenna(30)]
         self.station_manager.rx_antenna = [Antenna(5), Antenna(15), Antenna(20)]
@@ -30,7 +31,8 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager2.x = [100, 200]
         self.station_manager2.y = [105, 250]
         self.station_manager2.height = [4, 5]
-        self.station_manager2.tx_power = [20, 25]
+        # this is for downlink
+        self.station_manager2.tx_power = dict({0: [25], 1: [28,35]})
         self.station_manager2.rx_power = [-50, -35]
         self.station_manager2.tx_antenna = [Antenna(10), Antenna(25)]
         self.station_manager2.rx_antenna = [Antenna(5), Antenna(15)]      
@@ -39,7 +41,8 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager3.x = [300]
         self.station_manager3.y = [400]
         self.station_manager3.height = [2]
-        self.station_manager3.tx_power = [22]
+        # this is for uplink
+        self.station_manager3.tx_power = 22
         self.station_manager3.rx_power = [-50,-35]
         self.station_manager3.tx_antenna = [Antenna(10), Antenna(25)]
         self.station_manager3.rx_antenna = [Antenna(5), Antenna(15)]
@@ -120,19 +123,16 @@ class StationManagerTest(unittest.TestCase):
         
     def test_tx_power(self):
         # get a single value from the original array
-        self.assertEqual(self.station_manager.tx_power[1], 35)
-        # get two specific values
-        npt.assert_array_equal(self.station_manager.tx_power[[0,2]], [30,40])
-        # get values in reverse order
-        npt.assert_array_equal(self.station_manager.tx_power[[2,1,0]], [40,35,30])
+        self.assertEqual(self.station_manager.tx_power[0], [27,30])
+        self.assertEqual(self.station_manager.tx_power[1], [35])
         # get all values (no need to specify the id's)
-        npt.assert_array_equal(self.station_manager.tx_power, [30,35,40])
+        npt.assert_array_equal(self.station_manager.tx_power, dict({0: [27, 30], 1: [35], 2: [40]}))
         # set a single value and get it
-        self.station_manager.tx_power[1] = 50
-        npt.assert_array_equal(self.station_manager.tx_power[[2,1]], [40,50])
+        self.station_manager.tx_power[0] = [33,38]
+        npt.assert_array_equal(self.station_manager.tx_power[0], [33,38])
         # set two values and then get all values
-        self.station_manager.tx_power[[0,2]] = [20,38]
-        npt.assert_array_equal(self.station_manager.tx_power, [20,50,38])
+        self.station_manager.tx_power[2] = [20,25]
+        npt.assert_array_equal(self.station_manager.tx_power, dict({0: [33,38], 1: [35], 2: [20,25]}))
         
     def test_rx_power(self):
         # get a single value from the original array
