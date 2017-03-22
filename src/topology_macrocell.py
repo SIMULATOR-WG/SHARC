@@ -26,10 +26,11 @@ class TopologyMacrocell(Topology):
             intersite_distance : Distance between stations
             num_clusters : Number of cluters, should be 1 or 7
         """
-        self.__ALLOWED_NUM_CLUSTERS = [1,7]
+        allowed_num_clusters = [1,7]
         cell_radius = intersite_distance*2/3
         super(TopologyMacrocell, self).__init__(intersite_distance, 
-                                                cell_radius, num_clusters)
+                                                cell_radius, num_clusters,
+                                                allowed_num_clusters)
 
     def _calculate_coordinates(self):
         """
@@ -55,25 +56,6 @@ class TopologyMacrocell(Topology):
                 self.x = np.concatenate((self.x, x_central + xs))
                 self.y = np.concatenate((self.x, y_central + ys))    
     
-    def _calculate_limits(self):
-        """
-        Calculates the coordinates of the scenario's borders
-        """
-        self.x_min = np.min(self.x) - self.cell_radius
-        self.x_max = np.max(self.x) + self.cell_radius
-        self.y_min = np.min(self.y) - self.cell_radius
-        self.y_max = np.max(self.y) + self.cell_radius
-
-    @Topology.num_clusters.setter
-    def num_clusters(self, value):
-        """
-        Override the definition and check if number of clusters is valid
-        """
-        if value not in self.__ALLOWED_NUM_CLUSTERS:
-            error_message = "invalid number of clusters ({})".format(value)
-            raise ValueError(error_message)
-        Topology.num_clusters.fset(self, value)
-        
     @Topology.cell_radius.setter
     def cell_radius(self, value):
         """

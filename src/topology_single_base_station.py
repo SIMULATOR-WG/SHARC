@@ -12,7 +12,7 @@ class TopologySingleBaseStation(Topology):
     Generates the a single base station centered at (0,0).
     """
     
-    def __init__(self, cell_radius: float):
+    def __init__(self, cell_radius: float, num_clusters: int):
         """
         Constructor method that sets the parameters and already calls the 
         calculation methods.
@@ -21,44 +21,40 @@ class TopologySingleBaseStation(Topology):
         ----------
             cell_radius : radius of the cell
         """
+        allowed_num_clusters = [1,2]
         # Actually, intersite distance is not used
         intersite_distance = 2*cell_radius
-        # Naturally, number of clusters has to be equal to 1
-        num_clusters = 1
         super(TopologySingleBaseStation, self).__init__(intersite_distance, 
-                                                cell_radius, num_clusters)
+                                                cell_radius, num_clusters,
+                                                allowed_num_clusters)
         
     def _calculate_coordinates(self):
         """
         Defines the coordinates of the station.
         """        
-        self.x = 0
-        self.y = 0
+        if self.num_clusters == 1:
+            self.x = [0]
+            self.y = [0]
+        elif self.num_clusters == 2:
+            self.x = [-self.cell_radius, self.cell_radius]
+            self.y = [0, 0]
+        else:
+            error_message = "invalid number of clusters ({})".format(self.num_clusters)
+            raise ValueError(error_message)             
         
-    def _calculate_limits(self):
+    @Topology.cell_radius.setter
+    def cell_radius(self, value):
         """
-        Calculates the coordinates of the scenario's borders
+        When cell radius changes, intersite distance has to be updated
         """
-        self.x_min = self.x - self.cell_radius
-        self.x_max = self.x + self.cell_radius
-        self.y_min = self.y - self.cell_radius
-        self.y_max = self.y + self.cell_radius
-
-    @Topology.num_clusters.setter
-    def num_clusters(self, value):
-        """
-        The single base station topology supports only one cluster. Any attempt
-        to set this value will raise an error.
-        """
-        error_message = "Cannot set number of clusters in single base station network topology"
-        raise NotImplementedError(error_message)
+        self._intersite_distance = 2*value
+        Topology.cell_radius.fset(self, value)
         
     @Topology.intersite_distance.setter
     def intersite_distance(self, value):
         """
-        The intersite distance attribute is meaningless in the single base 
-        station topology. Any attempt to set this value will raise an error.
+        When intersite distance changes, cell radius has to be updated
         """
-        error_message = "Cannot set intersite distance in single base station network topology"
-        raise NotImplementedError(error_message)
+        self._cell_radius = value/2
+        Topology.intersite_distance.fset(self, value)
  
