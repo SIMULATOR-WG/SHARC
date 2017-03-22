@@ -9,14 +9,13 @@ class ParametersImt(object):
 
     __instance = None
     
-    def __new__(cls, val):
+    def __new__(cls):
         """
         This is the Singleton Pattern to ensure that this class will have only
         one instance
         """
         if ParametersImt.__instance is None:
             ParametersImt.__instance = object.__new__(cls)
-        ParametersImt.__instance.val = val
         return ParametersImt.__instance    
     
     ###########################################################################
@@ -24,7 +23,7 @@ class ParametersImt(object):
     num_base_stations = 1
     
     ###########################################################################
-    # Number of clusters (should be 1 or 7)
+    # Number of clusters
     num_clusters = 1
     
     ###########################################################################
@@ -45,7 +44,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT bandwidth [MHz]
-    bandwidth = 100    
+    bandwidth = 200    
     
     ###########################################################################
     # Minimum Coupling Loss (MCL) [dB]
@@ -92,6 +91,10 @@ class ParametersImt(object):
     ###########################################################################
     # Base station noise figure [dB]
     bs_noise_figure = 7  
+
+    ###########################################################################
+    # User equipment noise temperature [K]
+    bs_noise_temperature = 290
     
     ###########################################################################
     # Base station feed loss [dB]
@@ -140,4 +143,9 @@ class ParametersImt(object):
     ###########################################################################
     # User equipment feed loss [dB]
     ue_feed_loss = 3
+    
+    noise_temperature = 290
+    
+    BOLTZMANN_CONSTANT = 1.38064852e-23
+
     
