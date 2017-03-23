@@ -10,9 +10,8 @@ import math
 
 from simulation import Simulation
 from parameters.parameters_imt import ParametersImt
-from station_manager import StationManager
-from topology_macrocell import TopologyMacrocell
-from topology_single_base_station import TopologySingleBaseStation
+from station_factory import StationFactory
+from topology_factory import TopologyFactory
 from propagation_free_space import PropagationFreeSpace
 from results import Results
 
@@ -27,8 +26,7 @@ class SimulationDownlink(Simulation):
         
         self.__param = param
         
-        #self.__topology = TopologyMacrocell(self.__param.intersite_distance, self.__param.num_clusters)
-        self.__topology = TopologySingleBaseStation(self.__param.intersite_distance/2, self.__param.num_clusters)
+        self.__topology = TopologyFactory.createTopology(self.__param)
         self.__propagation = PropagationFreeSpace()
         
         self.__num_transmitters = self.__param.num_clusters*self.__param.num_base_stations
@@ -44,7 +42,7 @@ class SimulationDownlink(Simulation):
     def initialize(self, *args, **kwargs):
         pass
         self.__transmitter = \
-            StationManager.generate_imt_base_stations(self.__param,
+            StationFactory.generate_imt_base_stations(self.__param,
                                                       self.__topology)
     
     def snapshot(self, *args, **kwargs):
@@ -77,7 +75,7 @@ class SimulationDownlink(Simulation):
         self.notify_observers(source=__name__, results=self.__results)
         
     def _create_ue(self):
-        self.__receiver = StationManager.generate_imt_ue(self.__param,
+        self.__receiver = StationFactory.generate_imt_ue(self.__param,
                                                          self.__topology)    
     
     def _calculate_coupling_loss(self):

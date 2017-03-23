@@ -19,6 +19,10 @@ class ParametersImt(object):
         return ParametersImt.__instance    
     
     ###########################################################################
+    # Network topology. Possible values are "MACROCELL", "SINGLE_BS"
+    topology = "SINGLE_BS"
+
+    ###########################################################################
     # Number of base stations per cluster (must set to 19 in macrocell network)
     num_base_stations = 1
     
