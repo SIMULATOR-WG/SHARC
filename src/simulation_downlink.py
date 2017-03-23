@@ -14,6 +14,7 @@ from station_manager import StationManager
 from topology_macrocell import TopologyMacrocell
 from topology_single_base_station import TopologySingleBaseStation
 from propagation_free_space import PropagationFreeSpace
+from results import Results
 
 class SimulationDownlink(Simulation):
     """
@@ -21,13 +22,13 @@ class SimulationDownlink(Simulation):
     """
     
     def __init__(self, param: ParametersImt):
+        super(SimulationDownlink, self).__init__()
         np.random.seed(0)
         
         self.__param = param
         
         #self.__topology = TopologyMacrocell(self.__param.intersite_distance, self.__param.num_clusters)
-        self.__topology = TopologySingleBaseStation(self.__param.intersite_distance/2, 
-                                                    self.__param.num_clusters)
+        self.__topology = TopologySingleBaseStation(self.__param.intersite_distance/2, self.__param.num_clusters)
         self.__propagation = PropagationFreeSpace()
         
         self.__num_transmitters = self.__param.num_clusters*self.__param.num_base_stations
@@ -38,6 +39,7 @@ class SimulationDownlink(Simulation):
         self.__transmitter = np.empty(self.__num_transmitters)
         self.__receiver = np.empty(self.__num_receivers)            
         self.__link = dict([(bs,list()) for bs in range(self.__num_transmitters)])
+        self.__results = Results()
         
     def initialize(self, *args, **kwargs):
         pass
@@ -62,17 +64,17 @@ class SimulationDownlink(Simulation):
             #self._recalculate_sinr()
             #self._calculate_imt_degradation()
         else:
-            #self.beamforming()
-            #self.apply_power_control()
-            #self.scheduler()
-            #self.select_active_bs()
-            #self.calculate_other_interference()
-            #self.calculate_other_degradation()
+            #self._beamforming()
+            #self._apply_power_control()
+            #self._scheduler()
+            #self._select_active_bs()
+            #self._calculate_other_interference()
+            #self._calculate_other_degradation()
             pass
-        #self.collect_results()
+        self._collect_results()
 
     def finalize(self, *args, **kwargs):
-        pass
+        self.notify_observers(source=__name__, results=self.__results)
         
     def _create_ue(self):
         self.__receiver = StationManager.generate_imt_ue(self.__param,
@@ -89,8 +91,9 @@ class SimulationDownlink(Simulation):
         tx_gain = np.transpose(np.tile(tx_antenna, (self.__receiver.num_stations, 1)))
         rx_gain = np.tile(rx_antenna, (self.__transmitter.num_stations, 1))
         # calculate coupling loss
-        self.__coupling_loss = np.maximum(path_loss - tx_gain - rx_gain, 
-                                          ParametersImt.mcl)
+        self.__coupling_loss = path_loss - tx_gain - rx_gain
+#        self.__coupling_loss = np.maximum(path_loss - tx_gain - rx_gain, 
+#                                          ParametersImt.mcl)
         
     def _connect_ue_to_bs(self):
         """
@@ -157,9 +160,19 @@ class SimulationDownlink(Simulation):
         self.receiver.total_interference = \
             10*np.log10(np.power(10, 0.1*self.receiver.rx_interference) + \
                         np.power(10, 0.1*self.receiver.thermal_noise))
-        self.receiver.sinr = self.receiver.rx_power - self.receiver.total_interference                    
+        self.receiver.sinr = self.receiver.rx_power - self.receiver.total_interference  
+        self.receiver.snr = self.receiver.rx_power - self.receiver.thermal_noise  
                     
-                    
+    def _collect_results(self):
+        self.__results.add_coupling_loss_dl( \
+            np.reshape(self.coupling_loss, self.__num_transmitters*self.__num_receivers).tolist())
+        
+        for bs in range(self.__num_transmitters):
+            self.__results.add_tx_power_dl(self.transmitter.tx_power[bs])
+            
+        self.__results.add_sinr_dl(self.receiver.sinr.tolist())
+        self.__results.add_snr_dl(self.receiver.snr.tolist())
+        
     @property
     def transmitter(self):
         return self.__transmitter
