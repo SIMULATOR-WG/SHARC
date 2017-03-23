@@ -9,23 +9,26 @@ class ParametersImt(object):
 
     __instance = None
     
-    def __new__(cls, val):
+    def __new__(cls):
         """
         This is the Singleton Pattern to ensure that this class will have only
         one instance
         """
         if ParametersImt.__instance is None:
             ParametersImt.__instance = object.__new__(cls)
-        ParametersImt.__instance.val = val
         return ParametersImt.__instance    
     
     ###########################################################################
+    # Network topology. Possible values are "MACROCELL", "SINGLE_BS"
+    topology = "SINGLE_BS"
+
+    ###########################################################################
     # Number of base stations per cluster (must set to 19 in macrocell network)
-    num_base_stations = 19
+    num_base_stations = 1
     
     ###########################################################################
-    # Number of clusters (should be 1 or 7)
-    num_clusters = 1
+    # Number of clusters
+    num_clusters = 2
     
     ###########################################################################
     # Configures static or dynamic positions for base stations
@@ -33,19 +36,27 @@ class ParametersImt(object):
     
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 1500
+    intersite_distance = 2000
     
     ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
-    interfered_with = False
+    interfered_with = True
     
     ###########################################################################
     # IMT center frequency [MHz]
-    frequency = 27250
+    frequency = 50000
 
     ###########################################################################
     # IMT bandwidth [MHz]
-    bandwidth = 500    
+    bandwidth = 200    
+    
+    ###########################################################################
+    # Minimum Coupling Loss (MCL) [dB]
+    mcl = 127    
+
+    ###########################################################################
+    # Handover margin [dB]
+    ho_margin = 3
     
     ###########################################################################
     # The load probability (or activity factor) models the statistical 
@@ -59,19 +70,19 @@ class ParametersImt(object):
 
     ###########################################################################
     # Maximum base station transmit power [dBm]
-    bs_tx_power = 37
+    bs_tx_power = 40
     
     ###########################################################################
     # Base station height [m]
-    bs_height = 30
+    bs_height = 10
 
     ###########################################################################
     # Base station transmit antenna gain [dBi]
-    bs_tx_antenna_gain = 30
+    bs_tx_antenna_gain = 0
     
     ###########################################################################
     # Base station receive antenna gain [dBi]
-    bs_rx_antenna_gain = 30
+    bs_rx_antenna_gain = 0
     
     ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
@@ -80,22 +91,34 @@ class ParametersImt(object):
     ###########################################################################
     # Adjacent channel selectivity of the base station [dB]
     bs_acs = 30    
+
+    ###########################################################################
+    # Base station noise figure [dB]
+    bs_noise_figure = 7  
+
+    ###########################################################################
+    # User equipment noise temperature [K]
+    bs_noise_temperature = 290
+    
+    ###########################################################################
+    # Base station feed loss [dB]
+    bs_feed_loss = 3
     
     ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 10
+    ue_k = 3
     
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies 
     # between 2 and 10 according to the user drop method
-    ue_k_m = 10
+    ue_k_m = 1
     
     ###########################################################################
     # UE maximum transmit power [dBm]
-    ue_tx_power = 20
+    ue_tx_power = 22
     
     ###########################################################################
     # UE height [m]
@@ -117,4 +140,16 @@ class ParametersImt(object):
     # Adjacent channel selectivity of the user equipment [dB]
     ue_acs = 25    
     
+    ###########################################################################
+    # User equipment noise figure [dB]
+    ue_noise_figure = 9    
+    
+    ###########################################################################
+    # User equipment feed loss [dB]
+    ue_feed_loss = 3
+    
+    noise_temperature = 290
+    
+    BOLTZMANN_CONSTANT = 1.38064852e-23
+
     

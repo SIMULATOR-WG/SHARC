@@ -7,6 +7,7 @@ Created on Mon Feb  6 18:13:11 2017
 
 import unittest
 import numpy as np
+import numpy.testing as npt
 
 from antenna import Antenna
 from station import Station
@@ -14,167 +15,181 @@ from station_manager import StationManager
 
 
 class StationManagerTest(unittest.TestCase):
-    """
-    This test case contains sereval tests that could be written using the
-    assert.allclose statement. But when we do it, it crashes Spyder. That is
-    the reason for wrinting np.all(np.equal())
-    """
     
     def setUp(self):
         self.station_manager = StationManager(3)
-        self.station_manager.set_x([10,20,30])
-        self.station_manager.set_y([15,25,35])
-        self.station_manager.set_height([1,2,3])
-        self.station_manager.set_tx_power([30,35,40])
-        self.station_manager.set_rx_power([-50,-35,-10])
-        self.station_manager.set_tx_antenna([Antenna(10),Antenna(25),Antenna(30)])
-        self.station_manager.set_rx_antenna([Antenna(5),Antenna(15),Antenna(20)])
+        self.station_manager.x = [10, 20, 30]
+        self.station_manager.y = [15, 25, 35]
+        self.station_manager.height = [1, 2, 3]
+        # this is for downlink
+        self.station_manager.tx_power = dict({0: [27, 30], 1: [35], 2: [40]})
+        self.station_manager.rx_power = [-50, -35, -10]
+        self.station_manager.tx_antenna = [Antenna(10), Antenna(25), Antenna(30)]
+        self.station_manager.rx_antenna = [Antenna(5), Antenna(15), Antenna(20)]
+        
+        self.station_manager2 = StationManager(2)
+        self.station_manager2.x = [100, 200]
+        self.station_manager2.y = [105, 250]
+        self.station_manager2.height = [4, 5]
+        # this is for downlink
+        self.station_manager2.tx_power = dict({0: [25], 1: [28,35]})
+        self.station_manager2.rx_power = [-50, -35]
+        self.station_manager2.tx_antenna = [Antenna(10), Antenna(25)]
+        self.station_manager2.rx_antenna = [Antenna(5), Antenna(15)]      
+        
+        self.station_manager3 = StationManager(1)
+        self.station_manager3.x = [300]
+        self.station_manager3.y = [400]
+        self.station_manager3.height = [2]
+        # this is for uplink
+        self.station_manager3.tx_power = 22
+        self.station_manager3.rx_power = [-50,-35]
+        self.station_manager3.tx_antenna = [Antenna(10), Antenna(25)]
+        self.station_manager3.rx_antenna = [Antenna(5), Antenna(15)]
         
         self.station = Station()
-        self.station.set_id(0)
-        self.station.set_x(10)
-        self.station.set_y(15)
-        self.station.set_height(1)
-        self.station.set_tx_power(30)
-        self.station.set_rx_power(-50)
-        self.station.set_tx_antenna(Antenna(10))
-        self.station.set_rx_antenna(Antenna(5))        
+        self.station.id = 0
+        self.station.x = 10
+        self.station.y = 15
+        self.station.height = 1
+        self.station.tx_power = 30
+        self.station.rx_power = -50
+        self.station.tx_antenna = Antenna(10)
+        self.station.rx_antenna = Antenna(5)
 
         self.station2 = Station()
-        self.station2.set_id(1)
-        self.station2.set_x(20)
-        self.station2.set_y(25)
-        self.station2.set_height(2)
-        self.station2.set_tx_power(35)
-        self.station2.set_rx_power(-35)
-        self.station2.set_tx_antenna(Antenna(25))
-        self.station2.set_rx_antenna(Antenna(15))          
+        self.station2.id = 1
+        self.station2.x = 20
+        self.station2.y = 25
+        self.station2.height = 2
+        self.station2.tx_power = 35
+        self.station2.rx_power = -35
+        self.station2.tx_antenna = Antenna(25)
+        self.station2.rx_antenna = Antenna(15)
+        
         
     def test_num_stations(self):
-        self.assertEqual(3, self.station_manager.get_num_stations())
-        self.station_manager.reset(5)
-        self.assertEqual(5, self.station_manager.get_num_stations())
+        self.assertEqual(self.station_manager.num_stations, 3)
+        self.assertEqual(self.station_manager2.num_stations, 2)
+        self.assertEqual(self.station_manager3.num_stations, 1)
 
     def test_x(self):
         # get a single value from the original array
-        self.assertEqual(10, self.station_manager.get_x(0))
+        self.assertEqual(self.station_manager.x[0], 10)
         # get two specific values
-        self.assertTrue(np.all(np.equal([20,30], self.station_manager.get_x([1,2]))))
+        npt.assert_array_equal(self.station_manager.x[[1,2]], [20,30])
         # get values in reverse order
-        self.assertTrue(np.all(np.equal([30,20,10], self.station_manager.get_x([2,1,0]))))
+        npt.assert_array_equal(self.station_manager.x[[2,1,0]], [30,20,10])
         # get all values (no need to specify the id's)
-        self.assertTrue(np.all(np.equal([10,20,30], self.station_manager.get_x())))
+        npt.assert_array_equal(self.station_manager.x, [10,20,30])
         # set a single value and get it
-        self.station_manager.set_x(8, 0)
-        self.assertTrue(np.all(np.equal([8,20], self.station_manager.get_x([0,1]))))
+        self.station_manager.x[0] = 8
+        npt.assert_array_equal(self.station_manager.x[[0,1]], [8,20])
         # set two values and then get all values
-        self.station_manager.set_x([16,32], [1,2])
-        self.assertTrue(np.all(np.equal([8,16,32], self.station_manager.get_x())))
+        self.station_manager.x[[1,2]] = [16,32]
+        npt.assert_array_equal(self.station_manager.x, [8,16,32])
         
     def test_y(self):
         # get a single value from the original array
-        self.assertEqual(15, self.station_manager.get_y(0))
+        self.assertEqual(self.station_manager.y[0], 15)
         # get two specific values
-        self.assertTrue(np.all(np.equal([25,35], self.station_manager.get_y([1,2]))))
+        npt.assert_array_equal(self.station_manager.y[[1,2]], [25,35])
         # get values in reverse order
-        self.assertTrue(np.all(np.equal([35,25,15], self.station_manager.get_y([2,1,0]))))
+        npt.assert_array_equal(self.station_manager.y[[2,1,0]], [35,25,15])
         # get all values (no need to specify the id's)
-        self.assertTrue(np.all(np.equal([15,25,35], self.station_manager.get_y())))
+        npt.assert_array_equal(self.station_manager.y, [15,25,35])
         # set a single value and get it
-        self.station_manager.set_y(9, 1)
-        self.assertTrue(np.all(np.equal([15,9], self.station_manager.get_y([0,1]))))
+        self.station_manager.y[1] = 9
+        npt.assert_array_equal(self.station_manager.y[[0,1]], [15,9])
         # set two values and then get all values
-        self.station_manager.set_y([7,21], [0,2])
-        self.assertTrue(np.all(np.equal([7,9,21], self.station_manager.get_y())))
+        self.station_manager.y[[0,2]] = [7,21]
+        npt.assert_array_equal(self.station_manager.y, [7,9,21])
        
     def test_height(self):
         # get a single value from the original array
-        self.assertEqual(1, self.station_manager.get_height(0))
+        self.assertEqual(self.station_manager.height[0], 1)
         # get two specific values
-        self.assertTrue(np.all(np.equal([1,3], self.station_manager.get_height([0,2]))))
+        npt.assert_array_equal(self.station_manager.height[[0,2]], [1,3])
         # get values in reverse order
-        self.assertTrue(np.all(np.equal([3,2,1], self.station_manager.get_height([2,1,0]))))
+        npt.assert_array_equal(self.station_manager.height[[2,1,0]], [3,2,1])
         # get all values (no need to specify the id's)
-        self.assertTrue(np.all(np.equal([1,2,3], self.station_manager.get_height())))
+        npt.assert_array_equal(self.station_manager.height, [1,2,3])
         # set a single value and get it
-        self.station_manager.set_height(7, 1)
-        self.assertTrue(np.all(np.equal([7,3], self.station_manager.get_height([1,2]))))
+        self.station_manager.height[1] = 7
+        npt.assert_array_equal(self.station_manager.height[[1,2]], [7,3])
         # set two values and then get all values
-        self.station_manager.set_height([5,4], [0,2])
-        self.assertTrue(np.all(np.equal([5,7,4], self.station_manager.get_height())))
+        self.station_manager.height[[0,2]] = [5,4]
+        npt.assert_array_equal(self.station_manager.height, [5,7,4])
         
     def test_tx_power(self):
         # get a single value from the original array
-        self.assertEqual(35, self.station_manager.get_tx_power(1))
-        # get two specific values
-        self.assertTrue(np.all(np.equal([30,40], self.station_manager.get_tx_power([0,2]))))
-        # get values in reverse order
-        self.assertTrue(np.all(np.equal([40,35,30], self.station_manager.get_tx_power([2,1,0]))))
+        self.assertEqual(self.station_manager.tx_power[0], [27,30])
+        self.assertEqual(self.station_manager.tx_power[1], [35])
         # get all values (no need to specify the id's)
-        self.assertTrue(np.all(np.equal([30,35,40], self.station_manager.get_tx_power())))
+        npt.assert_array_equal(self.station_manager.tx_power, dict({0: [27, 30], 1: [35], 2: [40]}))
         # set a single value and get it
-        self.station_manager.set_tx_power(50, 1)
-        self.assertTrue(np.all(np.equal([40,50], self.station_manager.get_tx_power([2,1]))))
+        self.station_manager.tx_power[0] = [33,38]
+        npt.assert_array_equal(self.station_manager.tx_power[0], [33,38])
         # set two values and then get all values
-        self.station_manager.set_tx_power([20,38], [0,2])
-        self.assertTrue(np.all(np.equal([20,50,38], self.station_manager.get_tx_power())))
+        self.station_manager.tx_power[2] = [20,25]
+        npt.assert_array_equal(self.station_manager.tx_power, dict({0: [33,38], 1: [35], 2: [20,25]}))
         
     def test_rx_power(self):
         # get a single value from the original array
-        self.assertEqual(-10, self.station_manager.get_rx_power(2))
+        self.assertEqual(self.station_manager.rx_power[2], -10)
         # get two specific values
-        self.assertTrue(np.all(np.equal([-50,-35], self.station_manager.get_rx_power([0,1]))))
+        npt.assert_array_equal(self.station_manager.rx_power[[0,1]], [-50,-35])
         # get values in reverse order
-        self.assertTrue(np.all(np.equal([-10,-35,-50], self.station_manager.get_rx_power([2,1,0]))))
+        npt.assert_array_equal(self.station_manager.rx_power[[2,1,0]], [-10,-35,-50] )
         # get all values (no need to specify the id's)
-        self.assertTrue(np.all(np.equal([-50,-35,-10], self.station_manager.get_rx_power())))
+        npt.assert_array_equal(self.station_manager.rx_power, [-50,-35,-10])
         # set a single value and get it
-        self.station_manager.set_rx_power(-15, 2)
-        self.assertTrue(np.all(np.equal([-15,-50], self.station_manager.get_rx_power([2,0]))))
+        self.station_manager.rx_power[2] = -15
+        npt.assert_array_equal(self.station_manager.rx_power[[2,0]], [-15,-50])
         # set two values and then get all values
-        self.station_manager.set_rx_power([-60,-30], [0,1])
-        self.assertTrue(np.all(np.equal([-60,-30,-15], self.station_manager.get_rx_power())))      
+        self.station_manager.rx_power[[0,1]] = [-60,-30]
+        npt.assert_array_equal(self.station_manager.rx_power, [-60,-30,-15])
         
     def test_tx_antenna(self):
-        self.assertEqual(10, self.station_manager.get_tx_antenna(0))
-        self.assertEqual(25, self.station_manager.get_tx_antenna(1))
-        self.assertEqual(Antenna(30), self.station_manager.get_tx_antenna(2))
-        self.assertTrue(np.all(np.equal([10,25], self.station_manager.get_tx_antenna([0,1]))))
-        self.assertTrue(np.all(np.equal([10,30], self.station_manager.get_tx_antenna([0,2]))))
-        self.assertTrue(np.all(np.equal([30,25], self.station_manager.get_tx_antenna([2,1])))  )
-        self.assertTrue(np.all(np.equal([30,25,10], self.station_manager.get_tx_antenna([2,1,0]))))
-        self.assertTrue(np.all(np.equal([10,25,30], self.station_manager.get_tx_antenna())))
-        self.assertTrue(np.all(np.equal([Antenna(10),Antenna(25),30], self.station_manager.get_tx_antenna())))
+        self.assertEqual(self.station_manager.tx_antenna[0], 10)
+        self.assertEqual(self.station_manager.tx_antenna[1], 25)
+        self.assertEqual(self.station_manager.tx_antenna[2], Antenna(30))
+        npt.assert_array_equal(self.station_manager.tx_antenna[[0,1]], [10,25])
+        npt.assert_array_equal(self.station_manager.tx_antenna[[0,2]], [10,30])
+        npt.assert_array_equal(self.station_manager.tx_antenna[[2,1]], [30,25])
+        npt.assert_array_equal(self.station_manager.tx_antenna[[2,1,0]], [30,25,10])
+        npt.assert_array_equal(self.station_manager.tx_antenna, [10,25,30])
+        npt.assert_array_equal(self.station_manager.tx_antenna, [Antenna(10),Antenna(25),30])
         # test setting one antenna
-        self.station_manager.set_tx_antenna(Antenna(2),0)
-        self.assertTrue(np.all(np.equal([2,25,30], self.station_manager.get_tx_antenna())))
+        self.station_manager.tx_antenna[0] = Antenna(2)
+        npt.assert_array_equal(self.station_manager.tx_antenna, [2,25,30])
         # test setting two antennas
-        self.station_manager.set_tx_antenna([Antenna(2),Antenna(4)],[1,0])
-        self.assertTrue(np.all(np.equal([4,2,30], self.station_manager.get_tx_antenna())))
+        self.station_manager.tx_antenna[[1,0]] = [Antenna(2),Antenna(4)]
+        npt.assert_array_equal(self.station_manager.tx_antenna, [4,2,30])
         
     def test_rx_antenna(self):
-        self.assertEqual(5, self.station_manager.get_rx_antenna(0))
-        self.assertEqual(15, self.station_manager.get_rx_antenna(1))
-        self.assertEqual(Antenna(20), self.station_manager.get_rx_antenna(2))
-        self.assertTrue(np.all(np.equal([5,15], self.station_manager.get_rx_antenna([0,1]))))
-        self.assertTrue(np.all(np.equal([5,20], self.station_manager.get_rx_antenna([0,2]))))
-        self.assertTrue(np.all(np.equal([20,15], self.station_manager.get_rx_antenna([2,1]))))
-        self.assertTrue(np.all(np.equal([20,15,5], self.station_manager.get_rx_antenna([2,1,0]))))
-        self.assertTrue(np.all(np.equal([5,15,20], self.station_manager.get_rx_antenna())))
-        self.assertTrue(np.all(np.equal([Antenna(5),Antenna(15),20], self.station_manager.get_rx_antenna())))
+        self.assertEqual(self.station_manager.rx_antenna[0], 5)
+        self.assertEqual(self.station_manager.rx_antenna[1], 15)
+        self.assertEqual(self.station_manager.rx_antenna[2], Antenna(20))
+        npt.assert_array_equal(self.station_manager.rx_antenna[[0,1]], [5,15])
+        npt.assert_array_equal(self.station_manager.rx_antenna[[0,2]], [5,20])
+        npt.assert_array_equal(self.station_manager.rx_antenna[[2,1]], [20,15])
+        npt.assert_array_equal(self.station_manager.rx_antenna[[2,1,0]], [20,15,5])
+        npt.assert_array_equal(self.station_manager.rx_antenna, [5,15,20])
+        npt.assert_array_equal(self.station_manager.rx_antenna, [Antenna(5),Antenna(15),20])
         # test setting one antenna
-        self.station_manager.set_rx_antenna(Antenna(7),0)
-        self.assertTrue(np.all(np.equal([7,15,20], self.station_manager.get_rx_antenna())))
+        self.station_manager.rx_antenna[0] = Antenna(7)
+        npt.assert_array_equal(self.station_manager.rx_antenna, [7,15,20])
         # test setting two antennas
-        self.station_manager.set_rx_antenna([Antenna(8),Antenna(9)],[1,0])
-        self.assertTrue(np.all(np.equal([9,8,20], self.station_manager.get_rx_antenna())))
+        self.station_manager.rx_antenna[[1,0]] = [Antenna(8),Antenna(9)]
+        npt.assert_array_equal(self.station_manager.rx_antenna, [9,8,20])
         
     def test_station(self):
         # test if manager returns the correct station
         self.assertTrue(self.station == self.station_manager.get_station(0))
         self.assertTrue(self.station2 == self.station_manager.get_station(1))
         # now we change station id and verify if stations became different
-        self.station.set_id(1)
+        self.station.id = 1
         self.assertTrue(self.station != self.station_manager.get_station(0))
 
     def test_station_list(self):
@@ -191,6 +206,27 @@ class StationManagerTest(unittest.TestCase):
         self.assertTrue(self.station not in station_list)
         self.assertTrue(self.station2 not in station_list)        
         
+    def test_distance_to(self):
+        ref_distance = np.array([[ 356.405,  180.277]])
+        distance = self.station_manager3.get_distance_to(self.station_manager2)
+        npt.assert_allclose(distance, ref_distance, atol=1e-2)
+        
+        ref_distance = np.asarray([[ 127.279,  302.200],
+                                   [ 113.137,  288.140],
+                                   [  98.994,  274.089]])
+        distance = self.station_manager.get_distance_to(self.station_manager2)
+        npt.assert_allclose(distance, ref_distance, atol=1e-2)
+        
+    def test_3d_distance_to(self):
+        ref_distance = np.asarray([[ 356.411,  180.302]])
+        distance = self.station_manager3.get_3d_distance_to(self.station_manager2)
+        npt.assert_allclose(distance, ref_distance, atol=1e-2)
+        
+        ref_distance = np.asarray([[ 127.314,  302.226],
+                                   [ 113.154,  288.156],
+                                   [  99,  274.096]])
+        distance = self.station_manager.get_3d_distance_to(self.station_manager2)
+        npt.assert_allclose(distance, ref_distance, atol=1e-2)
         
 if __name__ == '__main__':
     unittest.main()

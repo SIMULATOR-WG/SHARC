@@ -5,12 +5,12 @@ Created on Mon Dec 26 17:03:51 2016
 @author: edgar
 """
 
-import time
-
 from support.observable import Observable
+#from support.observer import Observer
 from support.enumerations import State
-#from simulation_downlink import SimulationDownlink
+from simulation_downlink import SimulationDownlink
 from parameters.parameters_general import ParametersGeneral
+from parameters.parameters_imt import ParametersImt
 
 class Model(Observable):
     """
@@ -20,7 +20,11 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        #self.simulation = SimulationDownlink()
+        self.simulation = SimulationDownlink(ParametersImt())
+
+    def add_observer(self, observer):
+        Observable.add_observer(self, observer)
+        self.simulation.add_observer(observer)
         
     def initialize(self):
         """
@@ -30,16 +34,17 @@ class Model(Observable):
                               message="Simulation is running...",
                               state=State.RUNNING )
         self.current_snapshot = 1
-        #self.simulation.initialize()
+        self.simulation.initialize()
         
     def step(self):
         """
         Performs one simulation step and collects the results
         """
-        self.notify_observers(source=__name__,
-                              message="Snapshot #" + str(self.current_snapshot))
-        time.sleep(1)
-        #self.simulation.snapshot()
+        if not self.current_snapshot % 10:
+            self.notify_observers(source=__name__,
+                                  message="Snapshot #" + str(self.current_snapshot))
+        #time.sleep(1)
+        self.simulation.snapshot()
         self.current_snapshot += 1
             
     def is_finished(self) -> bool:
@@ -60,7 +65,7 @@ class Model(Observable):
         """
         Finalizes the simulation and performs all post-simulation tasks
         """
-        #self.simulation.finalize()
+        self.simulation.finalize()
         self.notify_observers(source=__name__, 
                               message="FINISHED!", state=State.FINISHED)
         

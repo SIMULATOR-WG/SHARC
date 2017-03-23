@@ -26,74 +26,97 @@ class Station(object):
         self.__noise_figure = 0
         self.__rx_aggr_interference = -300
 
-    def set_id(self, id):
-        self.__id = id
-
-    def get_id(self):
+    @property
+    def id(self):
         return self.__id
-
-    def set_x(self, x):
-        self.__x = x
-
-    def get_x(self):
+        
+    @id.setter
+    def id(self, value):
+        self.__id = value
+        
+    @property
+    def x(self):
         return self.__x
+        
+    @x.setter
+    def x(self, value):
+        self.__x = value
 
-    def set_y(self, y):
-        self.__y = y
-
-    def get_y(self):
+    @property
+    def y(self):
         return self.__y
-
-    def set_height(self, height):
-        self.__height = height
-
-    def get_height(self):
+        
+    @y.setter
+    def y(self, value):
+        self.__y = value
+        
+    @property
+    def height(self):
         return self.__height
-
-    def set_tx_power(self, tx_power):
-        self.__tx_power = tx_power
-
-    def get_tx_power(self):
+        
+    @height.setter
+    def height(self, value):
+        self.__height = value
+        
+    @property
+    def active(self):
+        return self.__active
+        
+    @active.setter
+    def active(self, value):
+        self.__active = value
+        
+    @property
+    def tx_power(self):
         return self.__tx_power
+        
+    @tx_power.setter
+    def tx_power(self, value):
+        self.__tx_power = value
 
-    def set_rx_power(self, rx_power):
-        self.__rx_power = rx_power
-
-    def get_rx_power(self):
+    @property
+    def rx_power(self):
         return self.__rx_power
+        
+    @rx_power.setter
+    def rx_power(self, value):
+        self.__rx_power = value
 
-    def set_tx_antenna(self, tx_antenna):
-        self.__tx_antenna = tx_antenna
-
-    def get_tx_antenna(self):
+    @property
+    def tx_antenna(self):
         return self.__tx_antenna
+        
+    @tx_antenna.setter
+    def tx_antenna(self, value):
+        self.__tx_antenna = value
 
-    def set_rx_antenna(self, rx_antenna):
-        self.__rx_antenna = rx_antenna
-
-    def get_rx_antenna(self):
+    @property
+    def rx_antenna(self):
         return self.__rx_antenna
+        
+    @rx_antenna.setter
+    def rx_antenna(self, value):
+        self.__rx_antenna = value
     
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            equal = (self.get_id() == other.get_id() and 
-                self.get_x() == other.get_x() and
-                self.get_y() == other.get_y() and
-                self.get_height() == other.get_height())
-            return equal                
+            equal = (self.id == other.id and 
+                self.x == other.x and
+                self.y == other.y and
+                self.height == other.height)
+            return equal
         else:
             return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            not_equal = (self.get_id() != other.get_id() or 
-                self.get_x() != other.get_x() or
-                self.get_y() != other.get_y() or
-                self.get_height() != other.get_height())
-            return not_equal                
+            not_equal = (self.id != other.id or 
+                self.x != other.x or
+                self.y != other.y or
+                self.height != other.height)
+            return not_equal
         else:
-            return NotImplemented  
+            return NotImplemented
             
     def __hash__(self):
-        return hash((self.get_id(), self.get_x(), self.get_y(), 
-                     self.get_height()))
+        return hash(self.id, self.x, self.y, self.height)
