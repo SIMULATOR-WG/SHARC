@@ -9,16 +9,15 @@ class ParametersGeneral(object):
         
     __instance = None
     
-    def __new__(cls, val):
+    def __new__(cls):
         """
         This is the Singleton Pattern to ensure that this class will have only
         one instance
         """        
         if ParametersGeneral.__instance is None:
             ParametersGeneral.__instance = object.__new__(cls)
-        ParametersGeneral.__instance.val = val
         return ParametersGeneral.__instance    
     
     ###########################################################################
     # Number of simulation snapshots
-    num_snapshots = 10
+    num_snapshots = 100
