@@ -37,6 +37,7 @@ class StationManager(object):
         self.__noise_figure = np.empty(n)
         self.__thermal_noise = np.empty(n)
         self.__total_interference = np.empty(n)
+        self.__snr = np.empty(n)
         self.__sinr = np.empty(n)
         
     @staticmethod
@@ -230,4 +231,10 @@ class StationManager(object):
     def sinr(self, value):
         self.__sinr = np.array(value)          
         
-
+    @property
+    def snr(self):
+        return self.__snr
+        
+    @snr.setter
+    def snr(self, value):
+        self.__snr = np.array(value)  
