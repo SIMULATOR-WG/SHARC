@@ -6,6 +6,7 @@ Created on Mon Mar 13 17:21:44 2017
 """
 
 import unittest
+import numpy.testing as npt
 
 from topology_single_base_station import TopologySingleBaseStation
 
@@ -30,15 +31,15 @@ class TopologySingleBaseStationTest(unittest.TestCase):
         # now we change to 2 clusters
         self.topology.cell_radius = 1500
         self.topology.num_clusters = 2
-        self.assertEqual(self.topology.x, [-1500, 1500])
-        self.assertEqual(self.topology.y, [0, 0])
+        npt.assert_array_equal(self.topology.x, [-1500, 1500])
+        npt.assert_array_equal(self.topology.y, [0, 0])
         # 
         self.topology.intersite_distance = 1000
-        self.assertEqual(self.topology.x, [-500, 500])
-        self.assertEqual(self.topology.y, [0, 0])
+        npt.assert_array_equal(self.topology.x, [-500, 500])
+        npt.assert_array_equal(self.topology.y, [0, 0])
         self.topology.cell_radius = 500
-        self.assertEqual(self.topology.x, [-500, 500])
-        self.assertEqual(self.topology.y, [0, 0])
+        npt.assert_array_equal(self.topology.x, [-500, 500])
+        npt.assert_array_equal(self.topology.y, [0, 0])
         
     def test_limits(self):
         # check initial values

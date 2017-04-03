@@ -7,6 +7,7 @@ Created on Tue Feb 14 13:05:42 2017
 
 import unittest
 import numpy as np
+import numpy.testing as npt
 
 from topology_macrocell import TopologyMacrocell
 
@@ -72,8 +73,8 @@ class TopologyMacrocellTest(unittest.TestCase):
         y_ref = np.array([0, 0, 866.02, 866.02, 0, -866.02, 
                          -866.02, 0, 866.02, 1732.05, 1732.05, 1732.05, 
                          866.02, 0, -866.02, -1732.05, -1732.05, -1732.05, -866.02])
-        self.assertTrue(np.all(np.isclose(self.topology.x, x_ref, atol=1e-2)))
-        self.assertTrue(np.all(np.isclose(self.topology.y, y_ref, atol=1e-2)))
+        npt.assert_allclose(self.topology.x, x_ref, atol=1e-2)
+        npt.assert_allclose(self.topology.y, y_ref, atol=1e-2)
         
         # change intersite distance and check new cell radius and coordinates
         self.topology.intersite_distance = 500
@@ -88,8 +89,8 @@ class TopologyMacrocellTest(unittest.TestCase):
         y_ref_h = np.array([0, 0, 433.01, 433.01, 0, -433.01, 
                          -433.01, 0, 433.01, 866.02, 866.02, 866.02, 
                          433.01, 0, -433.01, -866.02, -866.02, -866.02, -433.01])
-        self.assertTrue(np.all(np.isclose(self.topology.x, x_ref_h, atol=1e-2)))
-        self.assertTrue(np.all(np.isclose(self.topology.y, y_ref_h, atol=1e-2)))       
+        npt.assert_allclose(self.topology.x, x_ref_h, atol=1e-2)
+        npt.assert_allclose(self.topology.y, y_ref_h, atol=1e-2)        
             
     def test_limits(self):
         self.assertAlmostEqual(self.topology.x_min, -2666.66, places=1)
