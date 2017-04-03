@@ -4,6 +4,7 @@ Created on Mon Mar 13 15:37:01 2017
 
 @author: edgar
 """
+import numpy as np
 
 from topology import Topology
 
@@ -33,11 +34,11 @@ class TopologySingleBaseStation(Topology):
         Defines the coordinates of the station.
         """        
         if self.num_clusters == 1:
-            self.x = [0]
-            self.y = [0]
+            self.x = np.array([0])
+            self.y = np.array([0])
         elif self.num_clusters == 2:
-            self.x = [-self.cell_radius, self.cell_radius]
-            self.y = [0, 0]
+            self.x = np.array([-self.cell_radius, self.cell_radius])
+            self.y = np.array([0, 0])
         else:
             error_message = "invalid number of clusters ({})".format(self.num_clusters)
             raise ValueError(error_message)             
