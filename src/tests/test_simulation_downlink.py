@@ -17,6 +17,7 @@ class SimulationDownlinkTest(unittest.TestCase):
     
     def setUp(self):
         self.param = ParametersImt()
+        self.param.topology = "SINGLE_BS"
         self.param.num_base_stations = 1
         self.param.num_clusters = 1
         self.param.static_base_stations = True
@@ -59,26 +60,26 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertEqual(self.simulation_downlink.transmitter.num_stations, 1)
         
         # it is time to create user equipments
-        self.simulation_downlink._create_ue()
-        self.simulation_downlink.receiver.x = [100]
-        self.simulation_downlink.receiver.y = [0]
+        self.simulation_downlink.create_ue()
+        self.simulation_downlink.receiver.x = np.array([100])
+        self.simulation_downlink.receiver.y = np.array([0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 1)
         
         # let's calculate coupling loss
-        self.simulation_downlink._calculate_coupling_loss()
+        self.simulation_downlink.calculate_coupling_loss()
         npt.assert_allclose(self.simulation_downlink.coupling_loss, np.array([[106.43]]), atol=1e-2)
         
-        self.simulation_downlink._connect_ue_to_bs()
+        self.simulation_downlink.connect_ue_to_bs()
         self.assertEqual(self.simulation_downlink.link, {0: [0]})
         
-        self.simulation_downlink._scheduler()
+        self.simulation_downlink.scheduler()
         npt.assert_equal(self.simulation_downlink.receiver.bandwidth, 200)
         
-        self.simulation_downlink._apply_power_control()
+        self.simulation_downlink.power_control()
         npt.assert_allclose(self.simulation_downlink.transmitter.tx_power[0], 
                             [40], atol=1e-2)
         
-        self.simulation_downlink._calculate_sinr()      
+        self.simulation_downlink.calculate_sinr()      
         npt.assert_allclose(self.simulation_downlink.receiver.rx_power,
                             [-66.43], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.rx_interference,
@@ -103,26 +104,26 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertEqual(self.simulation_downlink.transmitter.num_stations, 1)
         
         # it is time to create user equipments
-        self.simulation_downlink._create_ue()
-        self.simulation_downlink.receiver.x = [100, 200]
-        self.simulation_downlink.receiver.y = [0, 0]
+        self.simulation_downlink.create_ue()
+        self.simulation_downlink.receiver.x = np.array([100, 200])
+        self.simulation_downlink.receiver.y = np.array([0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 2)
         
         # let's calculate coupling loss
-        self.simulation_downlink._calculate_coupling_loss()
+        self.simulation_downlink.calculate_coupling_loss()
         npt.assert_allclose(self.simulation_downlink.coupling_loss, np.array([[106.43, 112.45]]), atol=1e-2)
         
-        self.simulation_downlink._connect_ue_to_bs()
+        self.simulation_downlink.connect_ue_to_bs()
         self.assertEqual(self.simulation_downlink.link, {0: [0,1]})
         
-        self.simulation_downlink._scheduler()
+        self.simulation_downlink.scheduler()
         npt.assert_equal(self.simulation_downlink.receiver.bandwidth, 100*np.ones(2))
         
-        self.simulation_downlink._apply_power_control()
+        self.simulation_downlink.power_control()
         npt.assert_allclose(self.simulation_downlink.transmitter.tx_power[0], 
                             [36.98,36.98], atol=1e-2)
         
-        self.simulation_downlink._calculate_sinr()      
+        self.simulation_downlink.calculate_sinr()      
         npt.assert_allclose(self.simulation_downlink.receiver.rx_power,
                             [-69.43, -75.46], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.rx_interference,
@@ -136,8 +137,8 @@ class SimulationDownlinkTest(unittest.TestCase):
                 
 
     def test_simulation_1bs_4ue(self):
-        self.param.ue_k = 2
-        self.param.ue_k_m = 2
+        self.param.ue_k = 4
+        self.param.ue_k_m = 1
         self.simulation_downlink = SimulationDownlink(self.param)
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_downlink.transmitter), 1)
@@ -149,32 +150,32 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertEqual(self.simulation_downlink.transmitter.num_stations, 1)
         
         # it is time to create user equipments
-        self.simulation_downlink._create_ue()
-        self.simulation_downlink.receiver.x = [0, 0, 0, 0]
-        self.simulation_downlink.receiver.y = [100, 200, 400, 800]
+        self.simulation_downlink.create_ue()
+        self.simulation_downlink.receiver.x = np.array([100, 200, 400, 800])
+        self.simulation_downlink.receiver.y = np.array([0, 0, 0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 4)
         
         # let's calculate coupling loss
-        self.simulation_downlink._calculate_coupling_loss()
+        self.simulation_downlink.calculate_coupling_loss()
         npt.assert_allclose(self.simulation_downlink.coupling_loss, np.array([[106.43, 112.45, 118.47, 124.49]]), atol=1e-2)
         
         # Now we connect base stations to user equipments
-        self.simulation_downlink._connect_ue_to_bs()
+        self.simulation_downlink.connect_ue_to_bs()
         self.assertEqual(self.simulation_downlink.link, {0: [0,1,2,3]})
         
         # Scheduling algorirhm
-        self.simulation_downlink._scheduler()
+        self.simulation_downlink.scheduler()
         npt.assert_equal(self.simulation_downlink.receiver.bandwidth,
                          50*np.ones(4))
         
         # apply power control to set transmit powers
-        self.simulation_downlink._apply_power_control()
+        self.simulation_downlink.power_control()
         npt.assert_allclose(self.simulation_downlink.transmitter.tx_power[0], 
                             [33.97, 33.97, 33.97, 33.97], 
                             atol=1e-2)
         
         # calculate SINR
-        self.simulation_downlink._calculate_sinr()
+        self.simulation_downlink.calculate_sinr()
         npt.assert_allclose(self.simulation_downlink.receiver.rx_power,
                             [-72.45, -78.47, -84.49, -90.51],
                             atol=1e-2)
@@ -207,41 +208,41 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertEqual(self.simulation_downlink.transmitter.num_stations, 2)
         
         # it is time to create user equipments
-        self.simulation_downlink._create_ue()
-        self.simulation_downlink.receiver.x = [-1200, 0]
-        self.simulation_downlink.receiver.y = [1700, 0]
+        self.simulation_downlink.create_ue()
+        self.simulation_downlink.receiver.x = np.array([-1200, 1700])
+        self.simulation_downlink.receiver.y = np.array([0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 2)
 
         self.simulation_downlink.transmitter.tx_antenna = [Antenna(0), Antenna(1)]
         self.simulation_downlink.receiver.rx_antenna = [Antenna(2), Antenna(3)]
         
         # let's calculate coupling loss
-        self.simulation_downlink._calculate_coupling_loss()
-        npt.assert_allclose(self.simulation_downlink.coupling_loss, np.array([[129.09, 123.42],[132.31, 122.42]]), atol=1e-2)
+        self.simulation_downlink.calculate_coupling_loss()
+        npt.assert_allclose(self.simulation_downlink.coupling_loss, np.array([[110.45, 132.05],[130.27, 119.33]]), atol=1e-2)
         
-        self.simulation_downlink._connect_ue_to_bs()
+        self.simulation_downlink.connect_ue_to_bs()
         self.assertEqual(self.simulation_downlink.link, {0: [0], 1:[1]})
         
-        self.simulation_downlink._scheduler()
+        self.simulation_downlink.scheduler()
         npt.assert_equal(self.simulation_downlink.receiver.bandwidth, 200*np.ones(2))
         
-        self.simulation_downlink._apply_power_control()
+        self.simulation_downlink.power_control()
         npt.assert_allclose(self.simulation_downlink.transmitter.tx_power[0], 
                             [40], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.transmitter.tx_power[1], 
                             [40], atol=1e-2)
         
-        self.simulation_downlink._calculate_sinr()      
+        self.simulation_downlink.calculate_sinr()      
         npt.assert_allclose(self.simulation_downlink.receiver.rx_power,
-                            [-89.09, -82.42], atol=1e-2)
+                            [-70.45, -79.33], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.rx_interference,
-                            [-92.31, -83.42], atol=1e-2)
+                            [-90.27, -92.05], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.thermal_noise,
                             -111.96*np.ones(2), atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.total_interference,
-                            [-92.26, -83.42], atol=1e-2)
+                            [-90.24, -92.01], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.sinr,
-                            [3.16, 0.99], atol=1e-2)
+                            [19.79, 12.68], atol=1e-2)
         
     def test_simulation_2bs_4ue(self):
         self.param.num_base_stations = 1
@@ -262,31 +263,31 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertEqual(self.simulation_downlink.transmitter.num_stations, 2)
         
         # it is time to create user equipments
-        self.simulation_downlink._create_ue()
-        self.simulation_downlink.receiver.x = [-2000, -500, 400, 1500]
-        self.simulation_downlink.receiver.y = [0, 0, 0, 0]
+        self.simulation_downlink.create_ue()
+        self.simulation_downlink.receiver.x = np.array([-2000, -500, 400, 1500])
+        self.simulation_downlink.receiver.y = np.array([0, 0, 0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 4)
 
         self.simulation_downlink.transmitter.tx_antenna = [Antenna(0), Antenna(1)]
         self.simulation_downlink.receiver.rx_antenna = [Antenna(2), Antenna(3), Antenna(4), Antenna(5)]
         
         # let's calculate coupling loss
-        self.simulation_downlink._calculate_coupling_loss()
+        self.simulation_downlink.calculate_coupling_loss()
         npt.assert_allclose(self.simulation_downlink.coupling_loss, 
                             np.array([[124.42,  117.40,  125.35,  129.38], [132.97,  125.95,  116.99,  114.40]]), 
                             atol=1e-2)
         
         # Now we connect base stations to user equipments
-        self.simulation_downlink._connect_ue_to_bs()
+        self.simulation_downlink.connect_ue_to_bs()
         self.assertEqual(self.simulation_downlink.link, {0: [0,1], 1: [2,3]})
         
         # Scheduling algorirhm
-        self.simulation_downlink._scheduler()
+        self.simulation_downlink.scheduler()
         npt.assert_equal(self.simulation_downlink.receiver.bandwidth,
                          100*np.ones(4))
         
         # apply power control to set transmit powers
-        self.simulation_downlink._apply_power_control()
+        self.simulation_downlink.power_control()
         npt.assert_allclose(self.simulation_downlink.transmitter.tx_power[0], 
                             [36.98,36.98], 
                             atol=1e-2)
@@ -295,7 +296,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)        
         
         # calculate SINR
-        self.simulation_downlink._calculate_sinr()
+        self.simulation_downlink.calculate_sinr()
         npt.assert_allclose(self.simulation_downlink.receiver.rx_power,
                             [-87.43, -80.41, -80.00, -77.41],
                             atol=1e-2)
