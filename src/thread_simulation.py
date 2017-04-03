@@ -24,7 +24,7 @@ class ThreadSimulation(Thread):
     def __init__(self, model: Model):
         Thread.__init__(self)
         self.model = model
-        self._stop = Event()
+        self.stop_flag = Event()
         
     def stop(self):
         """
@@ -32,7 +32,7 @@ class ThreadSimulation(Thread):
         view. This method sets the stop flag that is checked during the 
         simulation. Simulation stops when stop flag is set.
         """
-        self._stop.set()
+        self.stop_flag.set()
         
     def is_stopped(self) -> bool:
         """
@@ -42,7 +42,7 @@ class ThreadSimulation(Thread):
         -------
             True if simulation is stopped
         """
-        return self._stop.isSet()
+        return self.stop_flag.isSet()
         
     def run(self):
         """
