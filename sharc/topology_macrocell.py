@@ -5,7 +5,7 @@ Created on Tue Feb 14 12:51:22 2017
 @author: edgar
 """
 
-from topology import Topology
+from sharc.topology import Topology
 
 import math
 import numpy as np

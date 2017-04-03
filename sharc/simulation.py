@@ -6,7 +6,7 @@ Created on Wed Jan 11 19:04:03 2017
 """
 
 from abc import ABCMeta, abstractmethod
-from support.observable import Observable
+from sharc.support.observable import Observable
  
 class Simulation(Observable):
     

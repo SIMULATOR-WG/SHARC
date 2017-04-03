@@ -7,7 +7,7 @@ Created on Mon Feb  6 16:39:34 2017
 
 import unittest
 
-from antenna import Antenna
+from sharc.antenna import Antenna
 
 class AntennaTest(unittest.TestCase):
     

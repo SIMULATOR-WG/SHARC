@@ -9,9 +9,9 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
-from simulation_downlink import SimulationDownlink
-from parameters.parameters_imt import ParametersImt
-from antenna import Antenna
+from sharc.simulation_downlink import SimulationDownlink
+from sharc.parameters.parameters_imt import ParametersImt
+from sharc.antenna import Antenna
 
 class SimulationDownlinkTest(unittest.TestCase):
     

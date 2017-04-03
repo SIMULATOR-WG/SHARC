@@ -9,9 +9,9 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
-from antenna import Antenna
-from station import Station
-from station_manager import StationManager
+from sharc.antenna import Antenna
+from sharc.station import Station
+from sharc.station_manager import StationManager
 
 
 class StationManagerTest(unittest.TestCase):

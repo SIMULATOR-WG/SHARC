@@ -5,7 +5,7 @@ Created on Wed Jan  4 19:46:20 2017
 @author: edgar
 """
 
-from model import Model
+from sharc.model import Model
 
 import time
 from threading import Thread, Event

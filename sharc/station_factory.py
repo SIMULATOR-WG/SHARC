@@ -7,10 +7,10 @@ Created on Thu Mar 23 16:37:32 2017
 
 import numpy as np
 
-from parameters.parameters_imt import ParametersImt
-from station_manager import StationManager
-from antenna import Antenna
-from topology import Topology
+from sharc.parameters.parameters_imt import ParametersImt
+from sharc.station_manager import StationManager
+from sharc.antenna import Antenna
+from sharc.topology import Topology
 
 class StationFactory(object):
     
