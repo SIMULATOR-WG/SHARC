@@ -14,16 +14,16 @@ class Topology(object):
     
     def __init__(self, intersite_distance: float, cell_radius: float, 
                  num_clusters: int, allowed_num_clusters: list):
-        self.__allowed_num_clusters = allowed_num_clusters
+        self.allowed_num_clusters = allowed_num_clusters
         self._intersite_distance = intersite_distance
         self._cell_radius = cell_radius
         self._num_clusters = num_clusters
-        self.__x = np.empty(0)
-        self.__y = np.empty(0)        
-        self.__x_min = 0
-        self.__x_max = 0
-        self.__y_min = 0
-        self.__y_max = 0
+        self.x = np.empty(0)
+        self.y = np.empty(0)        
+        self.x_min = 0
+        self.x_max = 0
+        self.y_min = 0
+        self.y_max = 0
         self._calculate_coordinates()
         self._calculate_limits()
     
@@ -62,60 +62,12 @@ class Topology(object):
         """
         Sets class atribute and recalculates coordinates and limits
         """
-        if value not in self.__allowed_num_clusters:
+        if value not in self.allowed_num_clusters:
             error_message = "invalid number of clusters ({})".format(value)
             raise ValueError(error_message) 
         self._num_clusters = value
         self._calculate_coordinates()
         self._calculate_limits()   
-        
-    @property
-    def x(self):
-        return self.__x
-        
-    @x.setter
-    def x(self, value):
-        self.__x = value
-        
-    @property
-    def y(self):
-        return self.__y  
-        
-    @y.setter
-    def y(self, value):
-        self.__y = value        
-        
-    @property
-    def x_min(self):
-        return self.__x_min
-
-    @x_min.setter
-    def x_min(self, value):
-        self.__x_min = value
-        
-    @property
-    def x_max(self):
-        return self.__x_max
-
-    @x_max.setter
-    def x_max(self, value):
-        self.__x_max = value
-        
-    @property
-    def y_min(self):
-        return self.__y_min
-
-    @y_min.setter
-    def y_min(self, value):
-        self.__y_min = value
-        
-    @property
-    def y_max(self):
-        return self.__y_max        
-        
-    @y_max.setter
-    def y_max(self, value):
-        self.__y_max = value
         
     @abstractmethod
     def _calculate_coordinates(self):

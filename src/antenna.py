@@ -11,16 +11,8 @@ class Antenna(object):
     """
     
     def __init__(self, gain: float = 0):
-        self.__gain = gain
+        self.gain = gain
     
-    @property
-    def gain(self):
-        return self.__gain
-        
-    @gain.setter
-    def gain(self, value):
-        self.__gain = value
-                
         
     """
     TODO: check the validity of operator overriding for Antenna class because

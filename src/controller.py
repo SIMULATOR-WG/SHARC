@@ -21,7 +21,7 @@ class Controller:
         pass
         
     def set_model(self, model: Model):
-        self.__model = model
+        self.model = model
 
     def get_model(self):
         return self.__model
@@ -37,7 +37,7 @@ class Controller:
             Action: this non-keyworded argument indicates the action to be taken
         """
         if Action.START_SIMULATION in args:
-            self.simulation_thread = ThreadSimulation(self.__model)
+            self.simulation_thread = ThreadSimulation(self.model)
             self.simulation_thread.start()
             #self.simulation_thread.run()
         if Action.STOP_SIMULATION in args:
