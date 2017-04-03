@@ -20,15 +20,15 @@ class ParametersImt(object):
     
     ###########################################################################
     # Network topology. Possible values are "MACROCELL", "SINGLE_BS"
-    topology = "SINGLE_BS"
+    topology = "MACROCELL"
 
     ###########################################################################
     # Number of base stations per cluster (must set to 19 in macrocell network)
-    num_base_stations = 1
+    num_base_stations = 19
     
     ###########################################################################
     # Number of clusters
-    num_clusters = 2
+    num_clusters = 1
     
     ###########################################################################
     # Configures static or dynamic positions for base stations
@@ -52,7 +52,7 @@ class ParametersImt(object):
     
     ###########################################################################
     # Minimum Coupling Loss (MCL) [dB]
-    mcl = 127    
+    mcl = 129    
 
     ###########################################################################
     # Handover margin [dB]
@@ -107,14 +107,14 @@ class ParametersImt(object):
     ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 3
+    ue_k = 5
     
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies 
     # between 2 and 10 according to the user drop method
-    ue_k_m = 1
+    ue_k_m = 3
     
     ###########################################################################
     # UE maximum transmit power [dBm]
