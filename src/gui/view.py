@@ -110,8 +110,7 @@ class View(tkinter.Tk, Observer):
                 self.__results = self.__results_queue.get_nowait()
             except queue.Empty:
                 pass
-        else:
-            self.__plot_results(self.__results)
+        self.__plot_results(self.__results)
 
     def __on_clear_button_click(self):
         """
@@ -130,9 +129,9 @@ class View(tkinter.Tk, Observer):
     def __plot_results(self, results: Results):
         n_bins = 500
         
-        #plt.figure(figsize=(16,10), facecolor='w', edgecolor='k')
-        #plt.subplot(2, 2, 1)
-        plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.figure(figsize=(16,10), facecolor='w', edgecolor='k')
+        plt.subplot(2, 2, 1)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
         plt.hist(results.coupling_loss_dl, n_bins, normed=True, 
                  histtype='step', cumulative=True )
         plt.ylim((0, 1))
@@ -141,8 +140,8 @@ class View(tkinter.Tk, Observer):
         plt.ylabel("Probability of IMT coupling loss < $X$")
         plt.grid()
         
-        #plt.subplot(2, 2, 3)
-        plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.subplot(2, 2, 3)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
         plt.hist(results.tx_power_dl, n_bins, normed=True, 
                  histtype='step', cumulative=True )
         plt.ylim((0, 1))
@@ -151,8 +150,8 @@ class View(tkinter.Tk, Observer):
         plt.ylabel("Probability of transmit power < $X$")
         plt.grid()        
         
-        #plt.subplot(2, 2, 2)
-        plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.subplot(2, 2, 2)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
         plt.hist(results.snr_dl, n_bins, normed=True, 
                  histtype='step', cumulative=True )
         plt.ylim((0, 1))
@@ -161,8 +160,8 @@ class View(tkinter.Tk, Observer):
         plt.ylabel("Probability $C/N < X$")
         plt.grid()
 
-        #plt.subplot(2, 2, 4)
-        plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.subplot(2, 2, 4)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
         plt.hist(results.sinr_dl, n_bins, normed=True, 
                  histtype='step', cumulative=True )
         plt.ylim((0, 1))
@@ -172,8 +171,6 @@ class View(tkinter.Tk, Observer):
         plt.grid()        
         
         plt.tight_layout()
-        
-        #plt.figure(1).patch.set_facecolor("white")        
         plt.show()
         
     def __insert_text(self, source: str, text: str):
