@@ -5,8 +5,8 @@ Created on Mon Dec 26 17:32:02 2016
 @author: edgar
 """
 
-from support.enumerations import Action 
-from model import Model
+from sharc.support.enumerations import Action 
+from sharc.model import Model
 
 from thread_simulation import ThreadSimulation
 

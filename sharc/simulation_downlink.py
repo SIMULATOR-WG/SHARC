@@ -9,12 +9,12 @@ import numpy as np
 import random
 import math
 
-from simulation import Simulation
-from parameters.parameters_imt import ParametersImt
-from station_factory import StationFactory
-from topology_factory import TopologyFactory
-from propagation_free_space import PropagationFreeSpace
-from results import Results
+from sharc.simulation import Simulation
+from sharc.parameters.parameters_imt import ParametersImt
+from sharc.station_factory import StationFactory
+from sharc.topology_factory import TopologyFactory
+from sharc.propagation_free_space import PropagationFreeSpace
+from sharc.results import Results
 
 class SimulationDownlink(Simulation):
     """

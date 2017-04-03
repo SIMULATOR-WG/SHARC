@@ -5,12 +5,12 @@ Created on Mon Dec 26 17:03:51 2016
 @author: edgar
 """
 
-from support.observable import Observable
+from sharc.support.observable import Observable
 #from support.observer import Observer
-from support.enumerations import State
-from simulation_downlink import SimulationDownlink
-from parameters.parameters_general import ParametersGeneral
-from parameters.parameters_imt import ParametersImt
+from sharc.support.enumerations import State
+from sharc.simulation_downlink import SimulationDownlink
+from sharc.parameters.parameters_general import ParametersGeneral
+from sharc.parameters.parameters_imt import ParametersImt
 
 class Model(Observable):
     """

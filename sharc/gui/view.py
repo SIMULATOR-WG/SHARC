@@ -5,11 +5,11 @@ Created on Mon Dec 26 17:28:09 2016
 @author: edgar
 """
 
-from controller import Controller
-from support.observer import Observer
-from support.enumerations import Action, State
-from gui.thread_safe_scrolled_text import ThreadSafeScrolledText
-from results import Results
+from sharc.controller import Controller
+from sharc.support.observer import Observer
+from sharc.support.enumerations import Action, State
+from sharc.gui.thread_safe_scrolled_text import ThreadSafeScrolledText
+from sharc.results import Results
 import matplotlib.pyplot as plt
 
 import queue
@@ -198,21 +198,21 @@ class View(tkinter.Tk, Observer):
         ----------
             state : Enumaration that defines the simulation state
         """
-        if state == State.INITIAL:
+        if state is State.INITIAL:
             self.__start_button.config(state=tkinter.NORMAL)
             self.__stop_button.config(state=tkinter.DISABLED)
             self.__results_button.config(state=tkinter.DISABLED)
             self.__start_button.focus_set()
-        elif state == State.RUNNING:
+        elif state is State.RUNNING:
             self.__start_button.config(state=tkinter.DISABLED)
             self.__stop_button.config(state=tkinter.NORMAL)
             self.__results_button.config(state=tkinter.DISABLED)
             self.__stop_button.focus_set()
-        elif state == State.STOPPING:
+        elif state is State.STOPPING:
             self.__start_button.config(state=tkinter.DISABLED)
             self.__stop_button.config(state=tkinter.DISABLED)
             self.__results_button.config(state=tkinter.DISABLED)
-        elif state == State.FINISHED or state == State.STOPPED:
+        elif state is State.FINISHED or state is State.STOPPED:
             self.__start_button.config(state=tkinter.NORMAL)
             self.__stop_button.config(state=tkinter.DISABLED)
             self.__results_button.config(state=tkinter.NORMAL)            

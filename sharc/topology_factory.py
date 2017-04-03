@@ -5,10 +5,10 @@ Created on Thu Mar 23 16:41:25 2017
 @author: edgar
 """
 
-from topology import Topology
-from topology_macrocell import TopologyMacrocell
-from topology_single_base_station import TopologySingleBaseStation
-from parameters.parameters_imt import ParametersImt
+from sharc.topology import Topology
+from sharc.topology_macrocell import TopologyMacrocell
+from sharc.topology_single_base_station import TopologySingleBaseStation
+from sharc.parameters.parameters_imt import ParametersImt
 
 class TopologyFactory(object):
     
