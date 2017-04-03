@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
-from topology_macrocell import TopologyMacrocell
+from sharc.topology_macrocell import TopologyMacrocell
 
 class TopologyMacrocellTest(unittest.TestCase):
     

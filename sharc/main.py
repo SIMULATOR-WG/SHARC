@@ -7,10 +7,10 @@ Created on Mon Dec 26 17:05:49 2016
 
 
     
-from model import Model
-from gui.view import View
-from controller import Controller
-from support.logging import Logging
+from sharc.model import Model
+from sharc.gui.view import View
+from sharc.controller import Controller
+from sharc.support.logging import Logging
 
 Logging.setup_logging()
 

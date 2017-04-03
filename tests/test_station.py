@@ -7,8 +7,8 @@ Created on Mon Feb  6 17:59:07 2017
 
 import unittest
 
-from antenna import Antenna
-from station import Station
+from sharc.antenna import Antenna
+from sharc.station import Station
 
 class StationTest(unittest.TestCase):
     
