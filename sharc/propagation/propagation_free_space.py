@@ -5,7 +5,7 @@ Created on Thu Feb 16 12:04:27 2017
 @author: edgar
 """
 
-from sharc.propagation import Propagation 
+from sharc.propagation.propagation import Propagation 
 
 import numpy as np
  
