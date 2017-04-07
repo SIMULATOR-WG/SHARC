@@ -8,7 +8,7 @@ Created on Mon Mar  13 15:14:34 2017
 import unittest
 import numpy as np
 
-from sharc.propagation_free_space import PropagationFreeSpace
+from sharc.propagation.propagation_free_space import PropagationFreeSpace
 
 class PropagationFreeSpaceTest(unittest.TestCase):
     
