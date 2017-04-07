@@ -8,7 +8,7 @@ Created on Mon Mar 13 17:21:44 2017
 import unittest
 import numpy.testing as npt
 
-from sharc.topology_single_base_station import TopologySingleBaseStation
+from sharc.topology.topology_single_base_station import TopologySingleBaseStation
 
 class TopologySingleBaseStationTest(unittest.TestCase):
     

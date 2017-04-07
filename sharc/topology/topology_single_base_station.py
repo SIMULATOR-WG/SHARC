@@ -6,7 +6,7 @@ Created on Mon Mar 13 15:37:01 2017
 """
 import numpy as np
 
-from sharc.topology import Topology
+from sharc.topology.topology import Topology
 
 class TopologySingleBaseStation(Topology):
     """

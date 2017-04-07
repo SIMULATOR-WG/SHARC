@@ -12,8 +12,8 @@ import math
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.station_factory import StationFactory
-from sharc.topology_factory import TopologyFactory
-from sharc.propagation_free_space import PropagationFreeSpace
+from sharc.topology.topology_factory import TopologyFactory
+from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.results import Results
 
 class SimulationDownlink(Simulation):
