@@ -63,6 +63,9 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation_uplink.initialize()
         self.assertEqual(self.simulation_uplink.bs.num_stations, 2)
         
+        # create FSS system
+        self.simulation_uplink.create_system()
+        
         # it is time to create user equipments
         self.simulation_uplink.create_ue()
         self.simulation_uplink.ue.x = np.array([-2000, -500, 400, 1500])
@@ -73,9 +76,12 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation_uplink.ue.tx_antenna = [Antenna(2), Antenna(3), Antenna(4), Antenna(5)]
         
         # let's calculate coupling loss
-        self.simulation_uplink.calculate_coupling_loss()
+        self.simulation_uplink.coupling_loss =  np.transpose( \
+            self.simulation_uplink.calculate_coupling_loss(self.simulation_uplink.ue,
+                                                           self.simulation_uplink.bs,
+                                                           self.simulation_uplink.propagation_imt) )
         npt.assert_allclose(self.simulation_uplink.coupling_loss, 
-                            np.array([[119.23,  112.21,  120.15,  124.19], [127.77,  120.75,  111.79,  109.21]]), 
+                            np.array([[119.23,  112.21,  120.15,  124.19], [127.77,  120.75,  111.80,  109.21]]), 
                             atol=1e-2)
         
         # Now we connect base stations to user equipments
@@ -93,6 +99,9 @@ class SimulationUplinkTest(unittest.TestCase):
                             22*np.ones(4), 
                             atol=1e-2)
 
+        self.simulation_uplink.calculate_external_interference()   
+        self.assertAlmostEqual(self.simulation_uplink.system.inr, 1.02, places=2)
+        
                 
 if __name__ == '__main__':
     unittest.main()
