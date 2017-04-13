@@ -8,6 +8,7 @@ Created on Thu Mar 23 16:37:32 2017
 import numpy as np
 
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_manager import StationManager
 from sharc.antenna import Antenna
 from sharc.topology.topology import Topology
@@ -24,6 +25,7 @@ class StationFactory(object):
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
         imt_base_stations.active = np.ones(num_bs, dtype=bool)
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
+        imt_base_stations.rx_interference = -500*np.ones(num_bs)
         imt_base_stations.tx_antenna = \
             np.array([Antenna(param.bs_tx_antenna_gain) for i in range(num_bs)])
         imt_base_stations.rx_antenna = \
@@ -54,7 +56,7 @@ class StationFactory(object):
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
         imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
-        imt_ue.rx_interference = -300*np.ones(num_ue)
+        imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.tx_antenna = \
             np.array([Antenna(param.ue_tx_antenna_gain) for i in range(num_ue)])
         imt_ue.rx_antenna = \
@@ -63,4 +65,19 @@ class StationFactory(object):
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         return imt_ue
         
+    @staticmethod
+    def generate_fss_stations(param: ParametersFss):
+        satellite_stations = StationManager(1)
+        # now we set the coordinates
+        satellite_stations.x = 0
+        satellite_stations.y = 0
+        satellite_stations.height = param.sat_height
+        satellite_stations.active = True
+        satellite_stations.rx_antenna = \
+            np.array([Antenna(param.sat_rx_antenna_gain)])  
+        satellite_stations.bandwidth = param.sat_bandwidth
+        satellite_stations.noise_temperature = param.sat_noise_temperature
+        satellite_stations.rx_interference = -500
+        
+        return satellite_stations
     

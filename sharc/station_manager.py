@@ -30,10 +30,12 @@ class StationManager(object):
         self.__rx_antenna = np.array([Antenna() for i in range(n)])
         self.__bandwidth = np.empty(n)
         self.__noise_figure = np.empty(n)
+        self.__noise_temperature = np.empty(n)
         self.__thermal_noise = np.empty(n)
         self.__total_interference = np.empty(n)
         self.__snr = np.empty(n)
         self.__sinr = np.empty(n)
+        self.__inr = np.empty(n)
         
     def get_station_list(self,id=None) -> list:
         if(id is None):
@@ -77,7 +79,7 @@ class StationManager(object):
         
     @num_stations.setter
     def num_stations(self, value):
-        self.__num_stations = np.array(value)
+        self.__num_stations = value
         
     @property
     def x(self):
@@ -168,6 +170,14 @@ class StationManager(object):
         self.__noise_figure = np.array(value)
         
     @property
+    def noise_temperature(self):
+        return self.__noise_temperature
+        
+    @noise_temperature.setter
+    def noise_temperature(self, value):
+        self.__noise_temperature = np.array(value)
+        
+    @property
     def thermal_noise(self):
         return self.__thermal_noise
         
@@ -198,3 +208,11 @@ class StationManager(object):
     @snr.setter
     def snr(self, value):
         self.__snr = np.array(value)  
+        
+    @property
+    def inr(self):
+        return self.__inr
+        
+    @inr.setter
+    def inr(self, value):
+        self.__inr = np.array(value)         

@@ -9,6 +9,7 @@ from sharc.support.observable import Observable
 #from support.observer import Observer
 from sharc.support.enumerations import State
 from sharc.simulation_downlink import SimulationDownlink
+from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 
@@ -20,7 +21,8 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        self.simulation = SimulationDownlink(ParametersImt())
+        #self.simulation = SimulationDownlink(ParametersImt())
+        self.simulation = SimulationUplink(ParametersImt())
 
     def add_observer(self, observer):
         Observable.add_observer(self, observer)
