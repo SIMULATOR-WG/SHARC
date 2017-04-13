@@ -154,6 +154,8 @@ class ParametersImt(object):
     # User equipment feed loss [dB]
     ue_feed_loss = 3
     
+    ###########################################################################
+    # System reecive noise temperature [K]
     noise_temperature = 290
     
     BOLTZMANN_CONSTANT = 1.38064852e-23
