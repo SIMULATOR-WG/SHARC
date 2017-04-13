@@ -40,19 +40,29 @@ class ParametersImt(object):
     
     ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
-    interfered_with = True
+    interfered_with = False
     
     ###########################################################################
     # IMT center frequency [MHz]
-    frequency = 50000
+    frequency = 27250
 
     ###########################################################################
     # IMT bandwidth [MHz]
-    bandwidth = 200    
+    bandwidth = 100    
+    
+    ###########################################################################
+    # IMT resource block bandwidth [MHz]
+    rb_bandwidth = 0.180    
+
+    ###########################################################################
+    # Amount of guard band wrt total bandwidth. Setting this parameter to 0.1
+    # means that 10% of the total bandwidth will be used as guard band: 5% in
+    # the lower 
+    guard_band_ratio = 0.1    
     
     ###########################################################################
     # Minimum Coupling Loss (MCL) [dB]
-    mcl = 129    
+    mcl = 117    
 
     ###########################################################################
     # Handover margin [dB]
@@ -64,10 +74,6 @@ class ParametersImt(object):
     # base stations that are simultaneously transmitting
     bs_load_probability = 0.5
     
-    ###########################################################################
-    # Number of resource blocks per UE
-    num_resource_blocks = 10
-
     ###########################################################################
     # Maximum base station transmit power [dBm]
     bs_tx_power = 40
