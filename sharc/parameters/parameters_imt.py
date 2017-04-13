@@ -36,7 +36,7 @@ class ParametersImt(object):
     
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 2000
+    intersite_distance = 100
     
     ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
@@ -62,7 +62,7 @@ class ParametersImt(object):
     
     ###########################################################################
     # Minimum Coupling Loss (MCL) [dB]
-    mcl = 117    
+    mcl = 98    
 
     ###########################################################################
     # Handover margin [dB]
