@@ -186,15 +186,16 @@ class SimulationUplink(Simulation):
 
     def collect_results(self):
         self.results.add_coupling_loss_dl( \
-            np.reshape(self.coupling_loss, self.num_ue*self.num_bs).tolist())
+            np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
 
-        for bs in range(self.bs.num_stations):
-            self.results.add_tx_power_dl(self.ue.tx_power[bs])
-            
-        # select the active stations
-        ids = np.where(self.bs.active)
-
-        self.results.add_sinr_dl(self.bs.sinr[ids].tolist())
-        self.results.add_snr_dl(self.bs.snr[ids].tolist())
+        # NOT COLLECTING POWER STATISTICS FOR THE MOMENT
+#        for bs in range(self.bs.num_stations):
+#            self.results.add_tx_power_dl(self.ue.tx_power[bs])
+#            
+#        # select the active stations
+#        ids = np.where(self.bs.active)
+#
+#        self.results.add_sinr_dl(self.bs.sinr[ids].tolist())
+#        self.results.add_snr_dl(self.bs.snr[ids].tolist())
         
     
