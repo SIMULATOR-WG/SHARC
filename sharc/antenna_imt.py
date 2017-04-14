@@ -21,7 +21,7 @@ class AntennaImt(Antenna):
         sla_v (float): element vertical sidelobe attenuation
     """
     
-    def __init__(self,g_max: float, theta_3db: float, phy_3db: float, am: float, sla_v: float):
+    def __init__(self,g_max: float, phy_3db: float, theta_3db: float, am: float, sla_v: float):
         """
         Constructs an AntennaImt object.
         
@@ -34,8 +34,8 @@ class AntennaImt(Antenna):
             sla_v (float): vertical front-to-back ratio
         """
         self.__g_max = g_max
-        self.__theta_3db = theta_3db
         self.__phy_3db = phy_3db
+        self.__theta_3db = theta_3db
         self.__am = am
         self.__sla_v = sla_v
         
@@ -46,13 +46,14 @@ class AntennaImt(Antenna):
     def g_max(self):
         return self.__g_max
     
-    @property
-    def theta_3db(self):
-        return self.__theta_3db
-    
+        
     @property
     def phy_3db(self):
         return self.__phy_3db
+    
+    @property
+    def theta_3db(self):
+        return self.__theta_3db
     
     @property
     def am(self):
@@ -61,20 +62,6 @@ class AntennaImt(Antenna):
     @property
     def sla_v(self):
         return self.__sla_v
-    
-    def vertical_pattern(self,theta: float) -> float:
-        """
-        Calculates the vertical radiation pattern.
-        
-        Parameters
-        ----------
-            theta (float): elevation angle [degrees]
-            
-        Returns
-        -------
-            a_v (float): vertical radiation pattern gain value
-        """
-        pass
     
     def horizontal_pattern(self,phy: float) -> float:
         """
@@ -88,9 +75,23 @@ class AntennaImt(Antenna):
         -------
             a_h (float): horizontal radiation pattern gain value
         """
-        pass
+        return -1.0*min(12*(phy/self.phy_3db)**2,self.am)
+    
+    def vertical_pattern(self,theta: float) -> float:
+        """
+        Calculates the vertical radiation pattern.
         
-    def element_pattern(self, theta: float, phy: float) -> float:
+        Parameters
+        ----------
+            theta (float): elevation angle [degrees]
+            
+        Returns
+        -------
+            a_v (float): vertical radiation pattern gain value
+        """
+        return -1.0*min(12*((theta-90.0)/self.theta_3db)**2,self.sla_v)
+        
+    def element_pattern(self, phy: float, theta: float) -> float:
         """
         Calculates the element radiation pattern gain.
         
@@ -101,6 +102,10 @@ class AntennaImt(Antenna):
             
         Returns
         -------
-            a_e (float): element radiation pattern gain value
+            gain (float): element radiation pattern gain value
         """
-        pass
+        att = -1.0*(self.horizontal_pattern(phy) + \
+                    self.vertical_pattern(theta))
+        self.gain = self.g_max - min(att,self.am)
+        
+        return self.gain
