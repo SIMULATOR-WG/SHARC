@@ -62,20 +62,6 @@ class AntennaImt(Antenna):
     def sla_v(self):
         return self.__sla_v
     
-    def horizontal_pattern(self,phy: float) -> float:
-        """
-        Calculates the horizontal radiation pattern.
-        
-        Parameters
-        ----------
-            phy (float): azimuth angle [degrees]
-            
-        Returns
-        -------
-            a_h (float): horizontal radiation pattern valeu
-        """
-        pass
-        
     def vertical_pattern(self,theta: float) -> float:
         """
         Calculates the vertical radiation pattern.
@@ -86,21 +72,35 @@ class AntennaImt(Antenna):
             
         Returns
         -------
-            a_v (float): vertical radiation pattern value
+            a_v (float): vertical radiation pattern gain value
         """
         pass
-        
-    def element_pattern(self, phy: float, theta: float) -> float:
+    
+    def horizontal_pattern(self,phy: float) -> float:
         """
-        Calculates the element radiation pattern.
+        Calculates the horizontal radiation pattern.
         
         Parameters
         ----------
             phy (float): azimuth angle [degrees]
-            theta (float): elevation angle [degrees]
             
         Returns
         -------
-            a_e (float): element radiation pattern value
+            a_h (float): horizontal radiation pattern gain value
+        """
+        pass
+        
+    def element_pattern(self, theta: float, phy: float) -> float:
+        """
+        Calculates the element radiation pattern gain.
+        
+        Parameters
+        ----------
+            theta (float): elevation angle [degrees]
+            phy (float): azimuth angle [degrees]
+            
+        Returns
+        -------
+            a_e (float): element radiation pattern gain value
         """
         pass
