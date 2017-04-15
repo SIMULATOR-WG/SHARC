@@ -35,6 +35,8 @@ class AntennaImt(Antenna):
         """
         self.param = param
         
+        self.__station_type = station_type
+        
         if station_type == "BS":
             self.__g_max = param.bs_element_max_g
             self.__phy_3db = param.bs_element_phy_3db
@@ -50,6 +52,10 @@ class AntennaImt(Antenna):
         
         # Call for super class constructor 
         super().__init__()
+    
+    @property
+    def station_type(self):
+        return self.__station_type
     
     @property
     def g_max(self):
