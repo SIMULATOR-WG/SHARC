@@ -6,40 +6,49 @@ Created on Fri Apr 14 14:13:58 2017
 """
 
 from sharc.antenna import Antenna
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
 class AntennaImt(Antenna):
     """
-    Implements a sectorized antenna, which corresponds to a single element of 
+    Implements a sector antenna, which corresponds to a single element of 
     an antenna array.
     
     Attributes
     ----------
+        gain (float): calculated antenna gain in given direction
         g_max (float): maximum gain of element
-        theta_3db (float): vertical 3dB bandwidth of single element [degrees]
-        phy_3db (float): horizontal 3dB bandwidth of single element [degrees]
+        theta_3db (float): vertical 3dB beamwidth of single element [degrees]
+        phy_3db (float): horizontal 3dB beamwidth of single element [degrees]
         am (float): front-to-back ratio
         sla_v (float): element vertical sidelobe attenuation
     """
     
-    def __init__(self,g_max: float, phy_3db: float, theta_3db: float, am: float, sla_v: float):
+    def __init__(self,param: ParametersAntennaImt, station_type: str):
         """
         Constructs an AntennaImt object.
         
         Parameters
         ---------
-            g_max (float): maximum gain of element
-            theta_3db (float): vertical 3dB bandwidth of single element [degrees]
-            phy_3db (float): horizontal 3dB bandwidth of single element [degrees]
-            am (float): horizontal front-to-back ratio
-            sla_v (float): vertical front-to-back ratio
+            param (ParametersAntennaImt): antenna IMT parameters
+            station_type (srt): type of station. Possible values are "BS" and
+                "UE"
         """
-        self.__g_max = g_max
-        self.__phy_3db = phy_3db
-        self.__theta_3db = theta_3db
-        self.__am = am
-        self.__sla_v = sla_v
+        self.param = param
         
-        # Create 
+        if station_type == "BS":
+            self.__g_max = param.bs_element_max_g
+            self.__phy_3db = param.bs_element_phy_3db
+            self.__theta_3db = param.bs_element_theta_3db
+            self.__am = param.bs_element_am
+            self.__sla_v = param.bs_element_sla_v
+        elif station_type == "UE":
+            self.__g_max = param.ue_element_max_g
+            self.__phy_3db = param.ue_element_phy_3db
+            self.__theta_3db = param.ue_element_theta_3db
+            self.__am = param.ue_element_am
+            self.__sla_v = param.ue_element_sla_v
+        
+        # Call for super class constructor 
         super().__init__()
     
     @property
