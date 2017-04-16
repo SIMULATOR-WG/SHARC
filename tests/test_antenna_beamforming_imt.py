@@ -197,20 +197,20 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta = 0
         v_vec = self.antenna2.super_position_vector(phy, theta)
         expected_v_vec = np.array([[1.0, 1.0],[-1.0, -1.0]])
-        self.assertTrue(np.allclose(abs(v_vec),\
-                                    abs(expected_v_vec),rtol = eps))
-        self.assertTrue(np.allclose(np.angle(v_vec),\
-                                    np.angle(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.real(v_vec),\
+                                    np.real(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(v_vec),\
+                                    np.imag(expected_v_vec),rtol = eps))
         
         # Test 2
         phy = 90
         theta = 90
         v_vec = self.antenna2.super_position_vector(phy, theta)
         expected_v_vec = np.array([[1.0, -1.0],[1.0, -1.0]])
-        self.assertTrue(np.allclose(abs(v_vec),\
-                                    abs(expected_v_vec),rtol = eps))
-        self.assertTrue(np.allclose(np.angle(v_vec),\
-                                    np.angle(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.real(v_vec),\
+                                    np.real(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(v_vec),\
+                                    np.imag(expected_v_vec),rtol = eps))
         
         # Test 3
         phy = 45
@@ -218,10 +218,45 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         v_vec = self.antenna2.super_position_vector(phy, theta)
         expected_v_vec = np.array([[1.0 + 0.0j, 0.0 + 1.0j],\
                     [-0.6056998+0.7956932j, -0.7956932-0.6056998j]])
-        self.assertTrue(np.allclose(abs(v_vec),\
-                                    abs(expected_v_vec),rtol = eps))
-        self.assertTrue(np.allclose(np.angle(v_vec),\
-                                    np.angle(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.real(v_vec),\
+                                    np.real(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(v_vec),\
+                                    np.imag(expected_v_vec),rtol = eps))
+        
+    def test_weight_vector(self):
+        # Error margin
+        eps = 1e-5
+        
+        # Test 1
+        phy_scan = 0
+        theta_tilt = 0
+        w_vec = self.antenna2.weight_vector(phy_scan, theta_tilt)
+        expected_w_vec = np.array([[0.5, 0.5],[0.5, 0.5]])
+        self.assertTrue(np.allclose(np.real(w_vec),\
+                                    np.real(expected_w_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(w_vec),\
+                                    np.imag(expected_w_vec),rtol = eps))
+        
+        # Test 2
+        phy_scan = 90
+        theta_tilt = 90
+        w_vec = self.antenna2.weight_vector(phy_scan, theta_tilt)
+        expected_w_vec = np.array([[0.5, 0.5],[-0.5, -0.5]])
+        self.assertTrue(np.allclose(np.real(w_vec),\
+                                    np.real(expected_w_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(w_vec),\
+                                    np.imag(expected_w_vec),rtol = eps))
+        
+        # Test 3
+        phy_scan = 45
+        theta_tilt = 45
+        w_vec = self.antenna2.weight_vector(phy_scan, theta_tilt)
+        expected_w_vec = np.array([[0.5 + 0.0j, 0.0 - 0.5j],\
+                    [-0.3028499+0.3978466j, 0.3978466+0.3028499j]])
+        self.assertTrue(np.allclose(np.real(w_vec),\
+                                    np.real(expected_w_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(w_vec),\
+                                    np.imag(expected_w_vec),rtol = eps))
         
 if __name__ == '__main__':
     unittest.main()

@@ -93,20 +93,32 @@ class AntennaBeamformingImt(AntennaImt):
         
         return v_vec
         
-    def weight_vector(self, theta_tilt: float, phy_scan: float) -> np.array:
+    def weight_vector(self, phy_scan: float, theta_tilt: float) -> np.array:
         """
         Calculates super position vector.
         
         Parameters
         ----------
-            theta (float): elevation angle [degrees]
-            phy (float): azimuth angle [degrees]
+            phy_scan (float): electrical horizontal steering [degrees]
+            theta_tilt (float): electrical down-tilt steering [degrees]
             
         Returns
         -------
             w_vec (np.array): weighting vector
         """
-        pass
+        r_phy = np.deg2rad(phy_scan)
+        r_theta = np.deg2rad(theta_tilt)
+        
+        n = np.arange(self.n_rows) + 1
+        m = np.arange(self.n_cols) + 1
+        
+        exp_arg = (n[:,np.newaxis] - 1)*self.dv*np.sin(r_theta) - \
+                  (m - 1)*self.dh*np.cos(r_theta)*np.sin(r_phy)
+        
+        w_vec = (1/np.sqrt(self.n_rows*self.n_cols))*\
+                np.exp(2*np.pi*1.0j*exp_arg)
+        
+        return w_vec
     
     def array_gain(self, v_vec: np.array, w_vec: np.array) -> float:
         """
@@ -123,16 +135,16 @@ class AntennaBeamformingImt(AntennaImt):
         """
         pass
     
-    def beam_gain(self,phy: float, theta: float, theta_tilt: float, phy_scan: float) -> np.array:
+    def beam_gain(self,phy: float, theta: float, phy_scan: float, theta_tilt: float) -> np.array:
         """
         Calculates gain for a single beam in a given direction.
         
         Parameters
         ----------
-            theta (float): elevation angle [degrees]
             phy (float): azimuth angle [degrees]
-            theta_tilt (float): electrical down-tilt steering [degrees]
+            theta (float): elevation angle [degrees]
             phy_scan (float): electrical horizontal steering [degrees]
+            theta_tilt (float): electrical down-tilt steering [degrees]
             
         Returns
         -------
