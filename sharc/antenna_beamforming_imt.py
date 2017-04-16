@@ -80,9 +80,20 @@ class AntennaBeamformingImt(AntennaImt):
         -------
             v_vec (np.array): superposition vector
         """
-        pass
+        r_phy = np.deg2rad(phy)
+        r_theta = np.deg2rad(theta)
         
-    def weight_vector(self,phy: float, theta: float, theta_tilt: float, phy_scan: float) -> np.array:
+        n = np.arange(self.n_rows) + 1
+        m = np.arange(self.n_cols) + 1
+        
+        exp_arg = (n[:,np.newaxis] - 1)*self.dv*np.cos(r_theta) + \
+                  (m - 1)*self.dh*np.sin(r_theta)*np.sin(r_phy)
+        
+        v_vec = np.exp(2*np.pi*1.0j*exp_arg)
+        
+        return v_vec
+        
+    def weight_vector(self, theta_tilt: float, phy_scan: float) -> np.array:
         """
         Calculates super position vector.
         
@@ -90,12 +101,25 @@ class AntennaBeamformingImt(AntennaImt):
         ----------
             theta (float): elevation angle [degrees]
             phy (float): azimuth angle [degrees]
-            theta_tilt (float): electrical down-tilt steering [degrees]
-            phy_scan (float): electrical horizontal steering [degrees]
             
         Returns
         -------
             w_vec (np.array): weighting vector
+        """
+        pass
+    
+    def array_gain(self, v_vec: np.array, w_vec: np.array) -> float:
+        """
+        Calculates the array gain. Does not consider element gain,
+        
+        Parameters
+        ----------
+            v_vec (np.array): superposition vector
+            w_vec (np.array): weighting vector
+            
+        Returns
+        -------
+            arrar_g (float): array gain
         """
         pass
     

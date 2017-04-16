@@ -6,6 +6,7 @@ Created on Sat Apr 15 15:36:22 2017
 """
 
 import unittest
+import numpy as np
 
 from sharc.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
@@ -30,7 +31,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.ue_element_am = 25
         self.param.ue_element_sla_v = 35
         self.param.ue_n_rows = 2
-        self.param.ue_n_columns = 1
+        self.param.ue_n_columns = 2
         self.param.ue_element_horiz_spacing = 0.5
         self.param.ue_element_vert_spacing = 0.5
         
@@ -73,13 +74,13 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
     def test_n_cols(self):
         self.assertEqual(self.antenna1.n_cols,16)
-        self.assertEqual(self.antenna2.n_cols,1)
+        self.assertEqual(self.antenna2.n_cols,2)
         
     def test_dh(self):
         self.assertEqual(self.antenna1.dh,1)
         self.assertEqual(self.antenna2.dh,0.5)
         
-    def test_dh(self):
+    def test_dv(self):
         self.assertEqual(self.antenna1.dv,1)
         self.assertEqual(self.antenna2.dv,0.5)
         
@@ -186,6 +187,41 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(e_gain,-25.0)
         self.assertEqual(e_gain,self.antenna1.g_max - self.antenna1.am)
         self.assertTrue(self.antenna1 == -25.0)
+        
+    def test_super_position_vector(self):
+        # Error margin
+        eps = 1e-5
+        
+        # Test 1
+        phy = 0
+        theta = 0
+        v_vec = self.antenna2.super_position_vector(phy, theta)
+        expected_v_vec = np.array([[1.0, 1.0],[-1.0, -1.0]])
+        self.assertTrue(np.allclose(abs(v_vec),\
+                                    abs(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.angle(v_vec),\
+                                    np.angle(expected_v_vec),rtol = eps))
+        
+        # Test 2
+        phy = 90
+        theta = 90
+        v_vec = self.antenna2.super_position_vector(phy, theta)
+        expected_v_vec = np.array([[1.0, -1.0],[1.0, -1.0]])
+        self.assertTrue(np.allclose(abs(v_vec),\
+                                    abs(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.angle(v_vec),\
+                                    np.angle(expected_v_vec),rtol = eps))
+        
+        # Test 3
+        phy = 45
+        theta = 45
+        v_vec = self.antenna2.super_position_vector(phy, theta)
+        expected_v_vec = np.array([[1.0 + 0.0j, 0.0 + 1.0j],\
+                    [-0.6056998+0.7956932j, -0.7956932-0.6056998j]])
+        self.assertTrue(np.allclose(abs(v_vec),\
+                                    abs(expected_v_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.angle(v_vec),\
+                                    np.angle(expected_v_vec),rtol = eps))
         
 if __name__ == '__main__':
     unittest.main()
