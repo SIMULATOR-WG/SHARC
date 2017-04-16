@@ -131,9 +131,11 @@ class AntennaBeamformingImt(AntennaImt):
             
         Returns
         -------
-            arrar_g (float): array gain
+            array_g (float): array gain
         """
-        pass
+        array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
+        return array_g
+        
     
     def beam_gain(self,phy: float, theta: float, phy_scan: float, theta_tilt: float) -> np.array:
         """

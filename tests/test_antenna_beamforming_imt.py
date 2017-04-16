@@ -258,5 +258,23 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertTrue(np.allclose(np.imag(w_vec),\
                                     np.imag(expected_w_vec),rtol = eps))
         
+    def test_array_gain(self):
+        # Error margin
+        eps = 1e-5
+        
+        # Test 1
+        v_vec = np.array([[0.5, 0.5],[0.5, 0.5]])
+        w_vec = np.array([[0.5, 0.5],[0.5, 0.5]])
+        ar_gain = self.antenna2.array_gain(v_vec,w_vec)
+        self.assertEqual(ar_gain,0)
+        
+        # Test 2
+        v_vec = np.array([[0.2  + 0.3j,  0.0 - 0.2j],\
+                          [0.59 + 0.0j, -0.3 + 0.1j]])
+        w_vec = np.array([[0.5  - 0.2j, -0.3 - 0.4j],\
+                          [-0.1 + 1.0j,  0.0 + 0.5j]])
+        ar_gain = self.antenna2.array_gain(v_vec,w_vec)
+        self.assertAlmostEqual(ar_gain,-4.283598, delta = eps)
+        
 if __name__ == '__main__':
     unittest.main()
