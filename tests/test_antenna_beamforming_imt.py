@@ -276,5 +276,18 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         ar_gain = self.antenna2.array_gain(v_vec,w_vec)
         self.assertAlmostEqual(ar_gain,-4.283598, delta = eps)
         
+    def test_beam_gain(self):
+        # Error margin
+        eps = 1e-3
+        
+        # Test 1
+        phy = 45
+        theta = 45
+        phy_scan = 45
+        theta_tilt = 45
+        beam_g = self.antenna2.beam_gain(phy,theta,phy_scan,theta_tilt)
+        self.assertAlmostEqual(beam_g,1.594268,delta = eps)
+        self.assertEqual(beam_g,self.antenna2.gain)
+        
 if __name__ == '__main__':
     unittest.main()

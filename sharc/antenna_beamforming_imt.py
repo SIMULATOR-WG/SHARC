@@ -150,6 +150,15 @@ class AntennaBeamformingImt(AntennaImt):
             
         Returns
         -------
-            beam_gain (float): beam gain [dB]
+            gain (float): beam gain [dBi]
         """
-        pass
+        element_g = self.element_pattern(phy,theta)
+        
+        v_vec = self.super_position_vector(phy,theta)
+        w_vec = self.weight_vector(phy_scan,theta_tilt)
+        
+        array_g = self.array_gain(v_vec,w_vec)
+        
+        self.gain = element_g + array_g
+        
+        return self.gain
