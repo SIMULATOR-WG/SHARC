@@ -27,11 +27,11 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # Base station horizontal 3dB beamwidth of single element [degrees]
-    bs_element_phy_3db = 80
+    bs_element_phi_3db = 80
     
     ###########################################################################
     # Base station vertical 3dB beamwidth of single element [degrees]
-    bs_element_theta_3db = 80
+    bs_element_theta_3db = 65
     
     ###########################################################################
     # Base station front to back ratio of single element [dB]
@@ -63,11 +63,11 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE horizontal 3dB beamwidth of single element [degrees]
-    ue_element_phy_3db = 80
+    ue_element_phi_3db = 80
     
     ###########################################################################
     # UE vertical 3dB beamwidth of single element [degrees]
-    ue_element_theta_3db = 80
+    ue_element_theta_3db = 65
     
     ###########################################################################
     # UE front to back ratio of single element [dB]

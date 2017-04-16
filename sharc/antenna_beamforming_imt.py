@@ -19,7 +19,7 @@ class AntennaBeamformingImt(AntennaImt):
         gain (float): calculated antenna gain in given direction
         g_max (float): maximum gain of element
         theta_3db (float): vertical 3dB bandwidth of single element [degrees]
-        phy_3db (float): horizontal 3dB bandwidth of single element [degrees]
+        phi_3db (float): horizontal 3dB bandwidth of single element [degrees]
         am (float): front-to-back ratio
         sla_v (float): element vertical sidelobe attenuation
         n_rows (int): number of rows in array
@@ -67,53 +67,53 @@ class AntennaBeamformingImt(AntennaImt):
     def dv(self):
         return self.__dv
     
-    def super_position_vector(self,phy: float, theta: float) -> np.array:
+    def super_position_vector(self,phi: float, theta: float) -> np.array:
         """
         Calculates super position vector.
         
         Parameters
         ----------
             theta (float): elevation angle [degrees]
-            phy (float): azimuth angle [degrees]
+            phi (float): azimuth angle [degrees]
             
         Returns
         -------
             v_vec (np.array): superposition vector
         """
-        r_phy = np.deg2rad(phy)
+        r_phi = np.deg2rad(phi)
         r_theta = np.deg2rad(theta)
         
         n = np.arange(self.n_rows) + 1
         m = np.arange(self.n_cols) + 1
         
         exp_arg = (n[:,np.newaxis] - 1)*self.dv*np.cos(r_theta) + \
-                  (m - 1)*self.dh*np.sin(r_theta)*np.sin(r_phy)
+                  (m - 1)*self.dh*np.sin(r_theta)*np.sin(r_phi)
         
         v_vec = np.exp(2*np.pi*1.0j*exp_arg)
         
         return v_vec
         
-    def weight_vector(self, phy_scan: float, theta_tilt: float) -> np.array:
+    def weight_vector(self, phi_scan: float, theta_tilt: float) -> np.array:
         """
         Calculates super position vector.
         
         Parameters
         ----------
-            phy_scan (float): electrical horizontal steering [degrees]
+            phi_scan (float): electrical horizontal steering [degrees]
             theta_tilt (float): electrical down-tilt steering [degrees]
             
         Returns
         -------
             w_vec (np.array): weighting vector
         """
-        r_phy = np.deg2rad(phy_scan)
+        r_phi = np.deg2rad(phi_scan)
         r_theta = np.deg2rad(theta_tilt)
         
         n = np.arange(self.n_rows) + 1
         m = np.arange(self.n_cols) + 1
         
         exp_arg = (n[:,np.newaxis] - 1)*self.dv*np.sin(r_theta) - \
-                  (m - 1)*self.dh*np.cos(r_theta)*np.sin(r_phy)
+                  (m - 1)*self.dh*np.cos(r_theta)*np.sin(r_phi)
         
         w_vec = (1/np.sqrt(self.n_rows*self.n_cols))*\
                 np.exp(2*np.pi*1.0j*exp_arg)
@@ -137,25 +137,25 @@ class AntennaBeamformingImt(AntennaImt):
         return array_g
         
     
-    def beam_gain(self,phy: float, theta: float, phy_scan: float, theta_tilt: float) -> np.array:
+    def beam_gain(self,phi: float, theta: float, phi_scan: float, theta_tilt: float) -> np.array:
         """
         Calculates gain for a single beam in a given direction.
         
         Parameters
         ----------
-            phy (float): azimuth angle [degrees]
+            phi (float): azimuth angle [degrees]
             theta (float): elevation angle [degrees]
-            phy_scan (float): electrical horizontal steering [degrees]
+            phi_scan (float): electrical horizontal steering [degrees]
             theta_tilt (float): electrical down-tilt steering [degrees]
             
         Returns
         -------
             gain (float): beam gain [dBi]
         """
-        element_g = self.element_pattern(phy,theta)
+        element_g = self.element_pattern(phi,theta)
         
-        v_vec = self.super_position_vector(phy,theta)
-        w_vec = self.weight_vector(phy_scan,theta_tilt)
+        v_vec = self.super_position_vector(phi,theta)
+        w_vec = self.weight_vector(phi_scan,theta_tilt)
         
         array_g = self.array_gain(v_vec,w_vec)
         
