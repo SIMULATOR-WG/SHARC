@@ -38,7 +38,18 @@ class AntennaBeamformingImt(AntennaImt):
             station_type (srt): type of station. Possible values are "BS" and
                 "UE"
         """
-        pass
+        super().__init__(param, station_type)
+        
+        if station_type == "BS":
+            self.__n_rows =param.bs_n_rows
+            self.__n_cols =param.bs_n_columns
+            self.__dh =param.bs_element_horiz_spacing
+            self.__dv = param.bs_element_vert_spacing
+        elif station_type == "UE":
+            self.__n_rows =param.ue_n_rows
+            self.__n_cols =param.ue_n_columns
+            self.__dh =param.ue_element_horiz_spacing
+            self.__dv = param.ue_element_vert_spacing
     
     @property
     def n_rows(self):

@@ -33,8 +33,6 @@ class AntennaImt(Antenna):
             station_type (srt): type of station. Possible values are "BS" and
                 "UE"
         """
-        self.param = param
-        
         self.__station_type = station_type
         
         if station_type == "BS":
