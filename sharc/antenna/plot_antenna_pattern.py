@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.antenna_beamforming_imt import AntennaBeamformingImt
+from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 
 class PlotAntennaPattern(object):
     

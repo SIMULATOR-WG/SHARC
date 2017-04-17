@@ -11,7 +11,7 @@ import numpy.testing as npt
 
 from sharc.simulation_downlink import SimulationDownlink
 from sharc.parameters.parameters_imt import ParametersImt
-from sharc.antenna import Antenna
+from sharc.antenna.antenna import Antenna
 
 class SimulationDownlinkTest(unittest.TestCase):
     
