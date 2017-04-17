@@ -83,7 +83,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         npt.assert_allclose(self.simulation_downlink.receiver.rx_power,
                             [-66.43], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.rx_interference,
-                            [-300], atol=1e-2)
+                            [-500], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.thermal_noise,
                             -111.96, atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.total_interference,
@@ -127,7 +127,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         npt.assert_allclose(self.simulation_downlink.receiver.rx_power,
                             [-69.43, -75.46], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.rx_interference,
-                            [-300, -300], atol=1e-2)
+                            [-500, -500], atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.thermal_noise,
                             -114.97, atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.total_interference,
@@ -180,7 +180,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             [-72.45, -78.47, -84.49, -90.51],
                             atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.rx_interference,
-                            [-300,  -300,  -300, -300], 
+                            [-500,  -500,  -500, -500], 
                             atol=1e-2)
         npt.assert_allclose(self.simulation_downlink.receiver.thermal_noise,
                             -117.98*np.ones(4), 
