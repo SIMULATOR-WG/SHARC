@@ -217,11 +217,14 @@ class SimulationUplink(Simulation):
         
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
-        interference_ue = self.ue.tx_power - self.coupling_loss_ue_sat \
+        # calculate interference only from active UE's
+        ue_active = np.where(self.ue.active)
+        interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
                             + 10*math.log10(ue_bandwidth/self.param_system.sat_bandwidth)
         
         # assume BS transmits with full power (no power control) in the whole bandwidth
-        interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat
+        bs_active = np.where(self.bs.active)
+        interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
         
         self.system.rx_interference = 10*math.log10( \
                         math.pow(10, 0.1*self.system.rx_interference) 
