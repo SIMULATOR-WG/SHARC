@@ -48,21 +48,21 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT bandwidth [MHz]
-    bandwidth = 100    
-    
+    bandwidth = 100
+
     ###########################################################################
     # IMT resource block bandwidth [MHz]
-    rb_bandwidth = 0.180    
+    rb_bandwidth = 0.180
 
     ###########################################################################
     # Amount of guard band wrt total bandwidth. Setting this parameter to 0.1
     # means that 10% of the total bandwidth will be used as guard band: 5% in
-    # the lower 
-    guard_band_ratio = 0.1    
-    
+    # the lower
+    guard_band_ratio = 0.1
+
     ###########################################################################
     # Minimum Coupling Loss (MCL) [dB]
-    mcl = 98    
+    mcl = 98
 
     ###########################################################################
     # Handover margin [dB]
@@ -73,6 +73,11 @@ class ParametersImt(object):
     # variation of the network load by defining the number of fully loaded
     # base stations that are simultaneously transmitting
     bs_load_probability = 0.5
+
+    ###########################################################################
+    # Number of resource blocks per UE
+    num_resource_blocks = 10
+
 
     ###########################################################################
     # Maximum base station transmit power [dBm]
@@ -165,7 +170,7 @@ class ParametersImt(object):
 
 
     ###########################################################################
-    # System reecive noise temperature [K]
+    # System receive noise temperature [K]
     noise_temperature = 290
 
     BOLTZMANN_CONSTANT = 1.38064852e-23
