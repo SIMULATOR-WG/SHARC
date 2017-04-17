@@ -1,2 +1,2 @@
 # SHARC
-Simulator for use in sharing and compatibility studies of wireless communication systems
+Simulator for use in sharing and compatibility studies of radio communication systems
