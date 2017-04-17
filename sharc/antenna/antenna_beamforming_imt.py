@@ -7,7 +7,7 @@ Created on Sat Apr 15 15:35:51 2017
 
 import numpy as np
 
-from sharc.antenna_imt import AntennaImt
+from sharc.antenna.antenna_imt import AntennaImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
 class AntennaBeamformingImt(AntennaImt):

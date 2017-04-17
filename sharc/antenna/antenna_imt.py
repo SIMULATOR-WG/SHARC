@@ -5,7 +5,7 @@ Created on Fri Apr 14 14:13:58 2017
 @author: Calil
 """
 
-from sharc.antenna import Antenna
+from sharc.antenna.antenna import Antenna
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
 class AntennaImt(Antenna):
