@@ -5,7 +5,7 @@ Created on Mon Feb  6 10:51:19 2017
 @author: edgar
 """
 
-from sharc.antenna import Antenna
+from sharc.antenna.antenna import Antenna
 
 class Station(object):
     
