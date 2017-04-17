@@ -8,6 +8,7 @@ Created on Fri Apr  7 17:02:35 2017
 import numpy as np
 import random
 import math
+import sys
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
@@ -17,6 +18,10 @@ from sharc.station_manager import StationManager
 from sharc.topology.topology_factory import TopologyFactory
 from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
+from sharc.propagation.propagation_close_in import PropagationCloseIn
+from sharc.propagation.propagation_p619 import PropagationP619
+
+
 from sharc.results import Results
 
 class SimulationUplink(Simulation):
@@ -31,8 +36,25 @@ class SimulationUplink(Simulation):
 
         self.topology = TopologyFactory.createTopology(self.param)
 
-        self.propagation_imt = PropagationFreeSpace()
-        self.propagation_system = PropagationFreeSpace()
+        if self.param.channel_model == "FSPL":
+            self.propagation_imt = PropagationFreeSpace()
+        elif self.param.channel_model == "CI":
+            self.propagation_imt = PropagationCloseIn( self.param.topology,
+                                                   self.param.line_of_sight )
+        else:
+            sys.stderr.write("error: invalid parameter channel_model" + self.param.channel_model
+                             + "in IMT propagation\n")
+            sys.exit(1)
+
+
+        if self.param_system.channel_model == "FSPL":
+            self.propagation_system = PropagationFreeSpace()
+        elif self.param_system.channel_model == "P619":
+            self.propagation_system = PropagationP619()
+        else:
+            sys.stderr.write("error: invalid parameter channel_model" + self.param_system.channel_model
+                             + "in satellite propagation\n")
+            sys.exit(1)
 
         num_ue = self.param.num_clusters*self.param.num_base_stations \
                                  *self.param.ue_k*self.param.ue_k_m
