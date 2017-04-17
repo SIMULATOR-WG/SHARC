@@ -13,7 +13,7 @@ import sys
 class PropagationCloseIn(Propagation):
     """
     Implements the close-in free-space reference distance propagation model
-    Initially only the macro-cell, non LOS is implemented
+    Initially only the macro-cell topology is supported
     """
 
     def __init__(self, topology: str = "MACROCELL", line_of_sight: bool = False,
