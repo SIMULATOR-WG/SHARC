@@ -102,8 +102,6 @@ class SimulationDownlink(Simulation):
         rx_gain = np.tile(rx_antenna, (self.transmitter.num_stations, 1))
         # calculate coupling loss
         self.coupling_loss = path_loss - tx_gain - rx_gain
-#        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain,
-#                                          ParametersImt.mcl)
 
     def connect_ue_to_bs(self):
         """
