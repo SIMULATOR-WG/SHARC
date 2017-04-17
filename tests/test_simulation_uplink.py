@@ -88,6 +88,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation_uplink.connect_ue_to_bs()
         self.assertEqual(self.simulation_uplink.link, {0: [0,1], 1: [2,3]})
         
+        self.simulation_uplink.select_ue()
+        
         # Scheduling algorirhm
         self.simulation_uplink.scheduler()
         npt.assert_equal(self.simulation_uplink.ue.bandwidth,
