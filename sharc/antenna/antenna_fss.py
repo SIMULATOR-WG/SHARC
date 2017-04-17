@@ -5,7 +5,7 @@ Created on Thu Apr 13 17:18:59 2017
 @author: edgar
 """
 
-from antenna import Antenna
+from sharc.antenna.antenna import Antenna
 from parameters.parameters_fss import ParametersFss
 
 class AntennaFss(Antenna):

@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
-from sharc.antenna import Antenna
+from sharc.antenna.antenna import Antenna
 from sharc.station import Station
 from sharc.station_manager import StationManager
 
