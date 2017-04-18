@@ -65,12 +65,16 @@ class SimulationUplink(Simulation):
     
     def snapshot(self, *args, **kwargs):
         self.create_system()
+        
         self.create_ue()
         self.coupling_loss = np.transpose( \
                              self.calculate_coupling_loss(self.ue, self.bs,
                                                           self.propagation_imt))
         self.connect_ue_to_bs()
         self.select_ue()
+        # self.pointing_vector()
+        # Define which BS is connected to each selected UE
+        # Set antenna down-tilt and horizontal steering angles here
         self.scheduler()
         self.power_control()        
        
@@ -86,6 +90,8 @@ class SimulationUplink(Simulation):
             #self.recalculate_sinr()
             #self.calculate_imt_degradation()
         else:
+            # Calculate pointing vector to non-IMT system here.
+            # Set antenna gains here
             self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass

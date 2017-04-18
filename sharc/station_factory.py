@@ -8,9 +8,11 @@ Created on Thu Mar 23 16:37:32 2017
 import numpy as np
 
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna import Antenna
+from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 
 class StationFactory(object):
@@ -57,8 +59,15 @@ class StationFactory(object):
         imt_ue.height = param.ue_height*np.ones(num_ue)
         imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
+        '''
+        TODO Move antena parameter object creation to model class.
+        TODO Consider merging parameters_antenna_imt.py to parameters_imt.py.
+        '''
+        antenna_param = ParametersAntennaImt()
         imt_ue.tx_antenna = \
-            np.array([Antenna(param.ue_tx_antenna_gain) for i in range(num_ue)])
+            np.array([AntennaBeamformingImt(antenna_param,"UE") for i in range(num_ue)])
+        for i in range(num_ue):
+            imt_ue.tx_antenna[i].gain = param.ue_tx_antenna_gain
         imt_ue.rx_antenna = \
             np.array([Antenna(param.ue_rx_antenna_gain) for i in range(num_ue)])   
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
