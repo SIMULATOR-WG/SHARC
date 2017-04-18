@@ -41,11 +41,17 @@ class SimulationUplink(Simulation):
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
+        self.path_loss = np.empty(num_ue)
         
         self.ue = np.empty(num_ue)
         self.bs = np.empty(num_bs)
         self.system = np.empty(1)
         
+        self.ue_tx_power = np.empty([num_ue, num_bs])
+        self.ue_tx_power_control = param.ue_tx_power_control
+        self.ue_tx_power_target = param.ue_tx_power_target
+        self.ue_tx_power_alfa = param. ue_tx_power_alfa
+         
         # this attribute indicates the list of UE's that are connected to each
         # base station. The position the the list indicates the resource block
         # group that is allocated to the given UE
@@ -112,14 +118,14 @@ class SimulationUplink(Simulation):
         # Calculate distance from transmitters to receivers. The result is a
         # num_bs x num_ue array 
         d = station_a.get_3d_distance_to(station_b)
-        path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
+        self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
         antenna_a = station_a.tx_antenna.astype('float')
         antenna_b = station_b.rx_antenna.astype('float')
         # replicate columns to have the appropriate size
         gain_a = np.transpose(np.tile(antenna_a, (station_b.num_stations, 1)))
         gain_b = np.tile(antenna_b, (station_a.num_stations, 1))
         # calculate coupling loss
-        return path_loss - gain_a - gain_b
+        return self.path_loss - gain_a - gain_b
 #        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain, 
 #                                          ParametersImt.mcl)
         
@@ -161,8 +167,16 @@ class SimulationUplink(Simulation):
         """
         Apply uplink power control algorithm
         """
-        # Currently, there is no power control; then, set it to maximum
-        self.ue.tx_power = self.param.ue_tx_power*np.ones(self.ue.num_stations)
+        #power_aux = 0;
+        #pc = 0;
+        if self.ue_tx_power_control == "OFF":
+            self.ue.tx_power = self.param.ue_tx_power*np.ones(self.ue.num_stations)
+        else:
+            power_aux =  10*np.log10(self.num_rb_per_ue) + self.ue_tx_power_target
+            for bs in range(self.bs.num_stations):
+                    power2 = self.path_loss[self.link[bs], bs]
+                    self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
+                    self.ue_tx_power_alfa*power2+power_aux)
         
     def calculate_sinr(self):
         """
