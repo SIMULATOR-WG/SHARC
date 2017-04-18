@@ -32,6 +32,7 @@ class StationFactory(object):
             np.array([Antenna(param.bs_rx_antenna_gain) for i in range(num_bs)])
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
+        imt_base_stations.is_satellite = False
         return imt_base_stations
 
     @staticmethod
@@ -63,6 +64,7 @@ class StationFactory(object):
             np.array([Antenna(param.ue_rx_antenna_gain) for i in range(num_ue)])
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
+        imt_ue.is_satellite = False
         return imt_ue
 
     @staticmethod
@@ -97,5 +99,6 @@ class StationFactory(object):
         satellite_stations.bandwidth = param.sat_bandwidth
         satellite_stations.noise_temperature = param.sat_noise_temperature
         satellite_stations.rx_interference = -500
+        satellite_stations.is_satellite = True
 
         return satellite_stations

@@ -59,8 +59,13 @@ class ParametersFss(object):
     ###########################################################################
     # Channel parameters
     # channel model, possible values are "FSPL" (free-space path loss),
+    #                                    "SatelliteSimple" (FSPL + 4 or 24dB (LOS or NLOS)
     #                                    "P619" (ITU-R P.619-1)
-    channel_model = "P619"
+    channel_model = "SatelliteSimple"
+    line_of_sight = True
+
+    surf_water_vapour_density = 7.5 #g/m^3
+    specific_gaseous_att = 0.1 #db/km
     ###########################################################################
 
     ###########################################################################

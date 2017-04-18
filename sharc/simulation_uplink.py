@@ -20,6 +20,7 @@ from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_close_in import PropagationCloseIn
 from sharc.propagation.propagation_p619 import PropagationP619
+from sharc.propagation.propagation_sat_simple import PropagationSatSimple
 
 
 from sharc.results import Results
@@ -49,6 +50,8 @@ class SimulationUplink(Simulation):
 
         if self.param_system.channel_model == "FSPL":
             self.propagation_system = PropagationFreeSpace()
+        elif self.param_system.channel_model == "SatelliteSimple":
+            self.propagation_system = PropagationSatSimple()
         elif self.param_system.channel_model == "P619":
             self.propagation_system = PropagationP619()
         else:
@@ -134,7 +137,14 @@ class SimulationUplink(Simulation):
         # Calculate distance from transmitters to receivers. The result is a
         # num_bs x num_ue array
         d = station_a.get_3d_distance_to(station_b)
-        path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
+
+        if station_b.is_satellite:
+            elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
+            path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency,
+                                             elevation=elevation_angles, sat_params = self.param_system,
+                                             earth_to_space = True)
+        else:
+            path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
         antenna_a = station_a.tx_antenna.astype('float')
         antenna_b = station_b.rx_antenna.astype('float')
         # replicate columns to have the appropriate size
