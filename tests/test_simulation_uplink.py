@@ -11,7 +11,7 @@ import numpy.testing as npt
 
 from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_imt import ParametersImt
-from sharc.antenna import Antenna
+from sharc.antenna.antenna import Antenna
 
 class SimulationUplinkTest(unittest.TestCase):
     
@@ -87,6 +87,8 @@ class SimulationUplinkTest(unittest.TestCase):
         # Now we connect base stations to user equipments
         self.simulation_uplink.connect_ue_to_bs()
         self.assertEqual(self.simulation_uplink.link, {0: [0,1], 1: [2,3]})
+        
+        self.simulation_uplink.select_ue()
         
         # Scheduling algorirhm
         self.simulation_uplink.scheduler()
