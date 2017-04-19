@@ -299,7 +299,8 @@ class SimulationUplink(Simulation):
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
         self.results.add_coupling_loss_bs_sat(self.coupling_loss_bs_sat.tolist())
         self.results.add_coupling_loss_ue_sat(self.coupling_loss_ue_sat.tolist())
-        self.results.add_interf_power_ul(self.interference_ue.tolist())
+        normalized_interference = self.interference_ue/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6)
+        self.results.add_interf_power_ul(normalized_interference.tolist())
         self.results.add_inr([self.system.inr.tolist()])
 
         for bs in range(self.bs.num_stations):
