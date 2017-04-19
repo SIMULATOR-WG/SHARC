@@ -16,6 +16,11 @@ class AntennaBeamformingImt(AntennaImt):
     
     Attributes
     ----------
+        position (np.array): x, y and z coordinates of array
+        orientation (np.array): phi and theta of antenna orientation
+            based on earth-centered coordinate system
+        beam_orientation (np.array): phi_scan and theta_tilt of 
+            antenna's beam
         gain (float): calculated antenna gain in given direction
         g_max (float): maximum gain of element
         theta_3db (float): vertical 3dB bandwidth of single element [degrees]
@@ -40,6 +45,12 @@ class AntennaBeamformingImt(AntennaImt):
         """
         super().__init__(param, station_type)
         
+        self.__position = np.array([0, 0, 0])
+
+        self.__orientation = np.array([0, 0])
+        
+        self.__beam_orientation = np.array([0, 0])
+        
         if station_type == "BS":
             self.__n_rows =param.bs_n_rows
             self.__n_cols =param.bs_n_columns
@@ -50,6 +61,37 @@ class AntennaBeamformingImt(AntennaImt):
             self.__n_cols =param.ue_n_columns
             self.__dh =param.ue_element_horiz_spacing
             self.__dv = param.ue_element_vert_spacing
+        
+    def set_electrical_tilt(self,direct: np.array):
+        """
+        Set antenna electrical tilt to given earth-centered direction.
+        
+        Parameters
+        ----------
+            direct (np.array): coordinates of pointing target in 
+                earth-coordinate system
+        """
+        pass
+    
+    @property
+    def position(self):
+        return self.__position
+    
+    @position.setter
+    def position(self, pos):
+        self.__position = pos
+    
+    @property
+    def orientation(self):
+        return self.__orientation
+    
+    @orientation.setter
+    def orientation(self, ori):
+        self.__orientation = ori
+    
+    @property
+    def beam_orientation(self):
+        return self.__beam_orientation
     
     @property
     def n_rows(self):
@@ -70,6 +112,7 @@ class AntennaBeamformingImt(AntennaImt):
     def super_position_vector(self,phi: float, theta: float) -> np.array:
         """
         Calculates super position vector.
+        All angles are taken according to the antenna coordinate system.
         
         Parameters
         ----------
@@ -96,6 +139,7 @@ class AntennaBeamformingImt(AntennaImt):
     def weight_vector(self, phi_scan: float, theta_tilt: float) -> np.array:
         """
         Calculates super position vector.
+        All angles are taken according to the antenna coordinate system.
         
         Parameters
         ----------
@@ -122,7 +166,7 @@ class AntennaBeamformingImt(AntennaImt):
     
     def array_gain(self, v_vec: np.array, w_vec: np.array) -> float:
         """
-        Calculates the array gain. Does not consider element gain,
+        Calculates the array gain. Does not consider element gain.
         
         Parameters
         ----------
@@ -140,6 +184,7 @@ class AntennaBeamformingImt(AntennaImt):
     def beam_gain(self,phi: float, theta: float, phi_scan: float, theta_tilt: float) -> np.array:
         """
         Calculates gain for a single beam in a given direction.
+        All angles are taken according to the antenna coordinate system.
         
         Parameters
         ----------
@@ -162,3 +207,64 @@ class AntennaBeamformingImt(AntennaImt):
         self.gain = element_g + array_g
         
         return self.gain
+    
+    def set_gain_to(self, point: np.array):
+        """
+        Calculates gain to given point in the earth-centered coordinate system.
+        
+        Parameters
+        ----------
+            point (np.array): point to which gain is calculated in 
+                earth-centered coordinate system
+        """
+        pass
+    
+    def convert_coordinate(self, point: np.array) -> np.array:
+        """
+        Converts direction in earth-centered coordinate system to antenna 
+        coordinate system.
+        
+        Parameters
+        ----------
+            point (np.array): point in earth-centered coordinate system
+            
+        Returns
+        -------
+            coord_angles (np.array): azimuth and elevation angles
+                based on antenna's coordination system
+        """
+        mov_point = point - self.__position
+        
+        print("mov_point = ",mov_point)
+        
+        r_orient = np.deg2rad(self.__orientation)
+        r_phi = r_orient[0]
+        r_theta = r_orient[1]
+        
+        rot_mtx_phi = np.array([[np.cos(r_phi), -np.sin(r_phi),   0],
+                                [np.sin(r_phi),  np.cos(r_theta), 0],
+                                [0,              0,               1]])
+    
+        print("rot_mtx_phi = ",rot_mtx_phi)
+    
+        rot_mtx_theta = np.array([[np.cos(r_theta),  0,   np.sin(r_theta)],
+                                  [0,                1,                 0],
+                                  [-np.sin(r_theta), 0,   np.cos(r_theta)]])
+        
+        print("rot_mtx_theta = ",rot_mtx_theta)    
+        
+        rot_mtx = np.dot(rot_mtx_phi,rot_mtx_theta)
+        
+        print("rot_mtx = ",rot_mtx)
+        
+        local_point = np.dot(rot_mtx,mov_point)
+        
+        print("local_point = ",local_point)
+        
+        r = np.linalg.norm(local_point)
+        
+        phi = np.arctan(local_point[1]/local_point[0])
+        theta = np.arccos(local_point[2]/r)
+        
+        return np.rad2deg(np.array([phi, theta]))
+    

@@ -21,7 +21,7 @@ class PlotAntennaPattern(object):
     
     def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, plot_type: str):
         
-        phi_escan = 0
+        phi_escan = 180
         theta_tilt = 0
         
         # Plot horizontal pattern
@@ -46,7 +46,7 @@ class PlotAntennaPattern(object):
         elif plot_type == "ARRAY":
             ax1.set_title("Array Horizontal Radiation Pattern")
             
-        ax1.set_xlim(-180, 180)
+#        ax1.set_xlim(-180, 180)
 
         # Plot vertical pattern
         phi = 0 + phi_escan
@@ -69,9 +69,9 @@ class PlotAntennaPattern(object):
         elif plot_type == "ARRAY":
             ax2.set_title("Array Vertical Radiation Pattern")
         
-        ax2.set_xlim(0, 180)
-        top_y_lim = np.ceil(np.max(gain)/10)*10
-        ax2.set_ylim(top_y_lim - 50,top_y_lim)
+#        ax2.set_xlim(0, 180)
+#        top_y_lim = np.ceil(np.max(gain)/10)*10
+#        ax2.set_ylim(top_y_lim - 50,top_y_lim)
         
         if sta_type == "BS":
             file_name = self.figs_dir + "bs_"
