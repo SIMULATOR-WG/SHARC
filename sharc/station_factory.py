@@ -38,7 +38,7 @@ class StationFactory(object):
         
         imt_base_stations.active = np.ones(num_bs)
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
-        imt_base_stations.rx_interference = -500*np.ones(num_bs)
+        imt_base_stations.rx_interference = -500*np.ones(param.ue_k)
         
         if(param_ant.bs_tx_antenna_type == "OMNI"):
             imt_base_stations.tx_antenna = \

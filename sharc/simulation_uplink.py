@@ -131,6 +131,7 @@ class SimulationUplink(Simulation):
             #self.recalculate_sinr()
             #self.calculate_imt_degradation()
         else:
+            self.calculate_sinr()
             self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass
@@ -243,37 +244,40 @@ class SimulationUplink(Simulation):
         """
         Calculates the uplink SINR for each UE. This is useful only in the
         cases when IMT system is interfered by other system
-        TODO: not working yet
         """
-        pass
-#        bs_all = [b for b in range(self.bs.num_stations)]
-#        self.bs.rx_power = dict([(bs,[-300] * len(self.link[bs])) for bs in range(self.bs.num_stations)])
-#
-#        # calculate uplink received power for each BS
-#        for bs, ue_list in self.link.items():
-#            self.bs.rx_power[bs] = np.array(self.ue.tx_power[ue_list]) \
-#                                    - np.array(self.coupling_loss[bs,ue_list])
-#            # create a list with base stations that generate interference in ue_list
-#            bs_interf = [b for b in bs_all if b not in [bs]]
-#
-#            # calculate intra system interference
-#            for bi in bs_interf:
-#                ui = self.link[bi]
-#                interference = self.ue.tx_power[ui] - self.coupling_loss[bi,ui]
-#                self.bs.rx_interference[ue] = 10*math.log10( \
-#                    math.pow(10, 0.1*self.bs.rx_interference[ue])
-#                    + np.sum(np.power(10, 0.1*interference)))
-#
-#        self.bs.thermal_noise = \
-#            10*math.log10(self.param.BOLTZMANN_CONSTANT*self.param.noise_temperature) + \
-#            10*np.log10(self.bs.bandwidth * 1e6) + \
-#            self.bs.noise_figure
-#
-#        self.bs.total_interference = \
-#            10*np.log10(np.power(10, 0.1*self.bs.rx_interference) + \
-#                        np.power(10, 0.1*self.bs.thermal_noise))
-#        self.bs.sinr = self.bs.rx_power - self.bs.total_interference
-#        self.bs.snr = self.bs.rx_power - self.bs.thermal_noise
+        bs_all = [b for b in range(self.bs.num_stations)]
+        self.bs.rx_power = dict([(bs,[-500] * len(self.link[bs])) for bs in range(self.bs.num_stations)])
+        self.bs.rx_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
+        self.bs.total_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
+        self.bs.snr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
+        self.bs.sinr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
+
+        # calculate uplink received power for each BS
+        for bs, ue_list in self.link.items():
+            self.bs.rx_power[bs] = np.array(self.ue.tx_power[ue_list]) \
+                                    - np.array(self.coupling_loss[bs,ue_list])
+            # create a list of BSs that serve the interfering UEs
+            bs_interf = [b for b in bs_all if b not in [bs]]
+
+            # calculate intra system interference
+            for bi in bs_interf:
+                ui_list = self.link[bi]
+                interference = self.ue.tx_power[ui_list] - self.coupling_loss[bs,ui_list]
+                self.bs.rx_interference[bs] = 10*np.log10( \
+                    np.power(10, 0.1*self.bs.rx_interference[bs])
+                    + np.power(10, 0.1*interference))
+
+            self.bs.thermal_noise = \
+                10*np.log10(self.param.BOLTZMANN_CONSTANT*self.param.noise_temperature) + \
+                10*np.log10(self.num_rb_per_ue*self.param.rb_bandwidth * 1e6) + \
+                self.bs.noise_figure
+    
+            self.bs.total_interference[bs] = \
+                10*np.log10(np.power(10, 0.1*self.bs.rx_interference[bs]) + \
+                            np.power(10, 0.1*self.bs.thermal_noise[bs]))
+                
+            self.bs.sinr[bs] = self.bs.rx_power[bs] - self.bs.total_interference[bs]
+            self.bs.snr[bs] = self.bs.rx_power[bs] - self.bs.thermal_noise[bs]
 
     def calculate_external_interference(self):
         """
@@ -320,22 +324,19 @@ class SimulationUplink(Simulation):
 
 
     def collect_results(self):
-        self.results.add_coupling_loss_dl( \
+        self.results.add_coupling_loss_ul( \
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
         self.results.add_coupling_loss_bs_sat(self.coupling_loss_bs_sat.tolist())
         self.results.add_coupling_loss_ue_sat(self.coupling_loss_ue_sat.tolist())
 
         self.results.add_inr([self.system.inr.tolist()])
 
-        # NOT COLLECTING POWER STATISTICS FOR THE MOMENT
-#        for bs in range(self.bs.num_stations):
-#            self.results.add_tx_power_dl(self.ue.tx_power[bs])
-#
-#        # select the active stations
-#        ids = np.where(self.bs.active)
-#
-#        self.results.add_sinr_dl(self.bs.sinr[ids].tolist())
-#        self.results.add_snr_dl(self.bs.snr[ids].tolist())
+        for bs in range(self.bs.num_stations):
+            ue_list = self.link[bs]
+            
+            self.results.add_tx_power_ul(self.ue.tx_power[ue_list].tolist())
+            self.results.add_sinr_ul(self.bs.sinr[bs].tolist())
+            self.results.add_snr_ul(self.bs.snr[bs].tolist())
 
     def calculate_gains(self,
                         station_a: StationManager,

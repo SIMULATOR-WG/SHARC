@@ -157,7 +157,7 @@ class StationManager(object):
 
     @rx_power.setter
     def rx_power(self, value):
-        self.__rx_power = np.array(value)
+        self.__rx_power = value
 
     @property
     def rx_interference(self):
@@ -165,7 +165,7 @@ class StationManager(object):
 
     @rx_interference.setter
     def rx_interference(self, value):
-        self.__rx_interference = np.array(value)
+        self.__rx_interference = value
 
     @property
     def tx_antenna(self):
@@ -213,7 +213,7 @@ class StationManager(object):
 
     @thermal_noise.setter
     def thermal_noise(self, value):
-        self.__thermal_noise = np.array(value)
+        self.__thermal_noise = value
 
     @property
     def total_interference(self):
@@ -221,7 +221,7 @@ class StationManager(object):
 
     @total_interference.setter
     def total_interference(self, value):
-        self.__total_interference = np.array(value)
+        self.__total_interference = value
 
     @property
     def sinr(self):
@@ -229,7 +229,7 @@ class StationManager(object):
 
     @sinr.setter
     def sinr(self, value):
-        self.__sinr = np.array(value)
+        self.__sinr = value
 
     @property
     def snr(self):
@@ -237,7 +237,7 @@ class StationManager(object):
 
     @snr.setter
     def snr(self, value):
-        self.__snr = np.array(value)
+        self.__snr = value
 
     @property
     def inr(self):
