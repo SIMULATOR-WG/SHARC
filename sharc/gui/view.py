@@ -140,35 +140,58 @@ class View(tkinter.Tk, Observer):
         plt.ylabel("Probability of IMT coupling loss < $X$")
         plt.grid()
         
-        plt.subplot(2, 2, 3)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.tx_power_dl, n_bins, normed=True, 
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        plt.title("CDF of base station transmit power [dB]")
-        plt.xlabel("Base station transmit power [dBm]")
-        plt.ylabel("Probability of transmit power < $X$")
-        plt.grid()        
-        
         plt.subplot(2, 2, 2)
         #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.snr_dl, n_bins, normed=True, 
+        plt.hist(results.coupling_loss_ue_sat, n_bins, normed=True, 
                  histtype='step', cumulative=True )
         plt.ylim((0, 1))
-        plt.title("CDF of $C/N$ [dB]")
-        plt.xlabel("$C/N$ [dB]")
-        plt.ylabel("Probability $C/N < X$")
+        plt.xlim((150, 170))
+        plt.title("CDF of UE-satellite coupling loss [dB]")
+        plt.xlabel("Coupling loss [dB]")
+        plt.ylabel("Probability of coupling loss < $X$")
         plt.grid()
 
-        plt.subplot(2, 2, 4)
+        plt.subplot(2, 2, 3)
         #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.sinr_dl, n_bins, normed=True, 
+        plt.hist(results.inr, normed=True, 
                  histtype='step', cumulative=True )
         plt.ylim((0, 1))
-        plt.title("CDF of $C/(N+I)$ [dB]")
-        plt.xlabel("$C/(N+I)$ [dB]")
-        plt.ylabel("Probability $C/(N+I) < X$")
+        plt.xlim((-20, 5))
+        plt.title("CDF of satellite interference to noise ratio [dB]")
+        plt.xlabel("$I/N$ [dB]")
+        plt.ylabel("Probability $I/N < X$")
         plt.grid()        
+        
+        plt.subplot(2, 2, 4)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.hist(results.coupling_loss_bs_sat, n_bins, normed=True, 
+                 histtype='step', cumulative=True )
+        plt.ylim((0, 1))
+        plt.xlim((150, 170))
+        plt.title("CDF of BS-satellite coupling loss [dB]")
+        plt.xlabel("Coupling loss [dB]")
+        plt.ylabel("Probability of coupling loss < $X$")
+        plt.grid()    
+
+#        plt.subplot(2, 2, 2)
+#        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+#        plt.hist(results.snr_dl, n_bins, normed=True, 
+#                 histtype='step', cumulative=True )
+#        plt.ylim((0, 1))
+#        plt.title("CDF of $C/N$ [dB]")
+#        plt.xlabel("$C/N$ [dB]")
+#        plt.ylabel("Probability $C/N < X$")
+#        plt.grid()    
+#        
+#        plt.subplot(2, 2, 3)
+#        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+#        plt.hist(results.tx_power_dl, n_bins, normed=True, 
+#                 histtype='step', cumulative=True )
+#        plt.ylim((0, 1))
+#        plt.title("CDF of base station transmit power [dB]")
+#        plt.xlabel("Base station transmit power [dBm]")
+#        plt.ylabel("Probability of transmit power < $X$")
+#        plt.grid() 
         
         plt.tight_layout()
         plt.show()
