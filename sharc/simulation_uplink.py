@@ -286,7 +286,7 @@ class SimulationUplink(Simulation):
             10*np.log10(np.power(10, 0.1*self.system.rx_interference) + \
                         np.power(10, 0.1*self.system.thermal_noise))
 
-        self.system.inr = self.system.rx_interference / self.system.thermal_noise
+        self.system.inr = self.system.rx_interference - self.system.thermal_noise
 
 
     def collect_results(self):
