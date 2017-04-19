@@ -71,6 +71,7 @@ class SimulationUplink(Simulation):
 
         self.ue = np.empty(num_ue)
         self.bs = np.empty(num_bs)
+        self.bs_load_prob = param.bs_load_probability
         self.system = np.empty(1)
 
         self.ue_tx_power = np.empty([num_ue, num_bs])
@@ -97,6 +98,7 @@ class SimulationUplink(Simulation):
 
     def snapshot(self, *args, **kwargs):
         self.create_system()
+        self.update_bs()
         self.create_ue()
         self.coupling_loss = np.transpose( \
                              self.calculate_coupling_loss(self.ue, self.bs,
@@ -129,6 +131,10 @@ class SimulationUplink(Simulation):
 
     def create_ue(self):
         self.ue = StationFactory.generate_imt_ue(self.param, self.topology)
+
+    def update_bs(self):
+        self.bs.active = np.random.rand(self.bs.num_stations) < self.bs_load_prob
+
 
     def create_system(self):
         self.system = StationFactory.generate_fss_stations(self.param_system)
@@ -271,7 +277,8 @@ class SimulationUplink(Simulation):
 
         # assume BS transmits with full power (no power control) in the whole bandwidth
         bs_active = np.where(self.bs.active)
-        interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
+        #interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
+        interference_bs = -500
 
         self.system.rx_interference = 10*math.log10( \
                         math.pow(10, 0.1*self.system.rx_interference)
