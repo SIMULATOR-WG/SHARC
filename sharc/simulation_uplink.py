@@ -51,7 +51,7 @@ class SimulationUplink(Simulation):
         if self.param_system.channel_model == "FSPL":
             self.propagation_system = PropagationFreeSpace()
         elif self.param_system.channel_model == "SatelliteSimple":
-            self.propagation_system = PropagationSatSimple()
+            self.propagation_system = PropagationSatSimple(self.param_system.line_of_sight_prob)
         elif self.param_system.channel_model == "P619":
             self.propagation_system = PropagationP619()
         else:
