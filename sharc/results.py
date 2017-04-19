@@ -13,7 +13,15 @@ import os
 class Results(object):
     
     def __init__(self):
-        self.output_directory = "output"
+        self.tx_power_ul = list()
+        self.interf_power_ul = list()
+        self.sinr_ul = list()
+        self.snr_ul = list()
+        self.throughoput_ul = list()
+        self.inr = list()
+        self.coupling_loss_ul = list()
+        self.coupling_loss_ue_sat = list()
+        self.coupling_loss_bs_sat = list()
         
         self.imt_ul_tx_power_density = list()
         self.imt_ul_sinr = list()
@@ -34,6 +42,9 @@ class Results(object):
         self.system_dl_interf_power = list()
 
         self.system_inr = list()
+
+    def add_interf_power_ul(self, sample):
+        self.interf_power_ul.extend(sample)
         
         self.plot_list = list()
         
