@@ -132,7 +132,7 @@ class View(tkinter.Tk, Observer):
         plt.figure(figsize=(16,10), facecolor='w', edgecolor='k')
         plt.subplot(2, 2, 1)
         #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.coupling_loss_dl, n_bins, normed=True,
+        plt.hist(results.coupling_loss_ul, n_bins, normed=True, 
                  histtype='step', cumulative=True )
         plt.ylim((0, 1))
         plt.title("CDF of IMT coupling loss [dB]")
@@ -195,6 +195,37 @@ class View(tkinter.Tk, Observer):
 #        plt.ylabel("Probability of transmit power < $X$")
 #        plt.grid()
 
+        plt.figure(figsize=(16,10), facecolor='w', edgecolor='k')
+        plt.subplot(2, 2, 1)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.hist(results.snr_ul, n_bins, normed=True, 
+                 histtype='step', cumulative=True )
+        plt.ylim((0, 1))
+        plt.title("CDF of $C/N$ [dB]")
+        plt.xlabel("$C/N$ [dB]")
+        plt.ylabel("Probability $C/N < X$")
+        plt.grid()    
+        
+        plt.subplot(2, 2, 2)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.hist(results.sinr_ul, n_bins, normed=True, 
+                 histtype='step', cumulative=True )
+        plt.ylim((0, 1))
+        plt.title("CDF of $C/(N+I)$ [dB]")
+        plt.xlabel("$C/(N+I)$ [dB]")
+        plt.ylabel("Probability $C/(N+I) < X$")
+        plt.grid()    
+
+        plt.subplot(2, 2, 3)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.hist(results.tx_power_ul, n_bins, normed=True, 
+                 histtype='step', cumulative=True )
+        plt.ylim((0, 1))
+        plt.title("CDF of user equipment transmit power [dB]")
+        plt.xlabel("User equipment transmit power [dBm]")
+        plt.ylabel("Probability of transmit power < $X$")
+        plt.grid() 
+        
         plt.tight_layout()
         plt.show()
 
