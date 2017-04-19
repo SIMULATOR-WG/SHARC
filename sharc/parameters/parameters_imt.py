@@ -165,7 +165,8 @@ class ParametersImt(object):
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "CI" (close-in FS reference distance)
     channel_model = "CI"
-    line_of_sight = False
+    line_of_sight_prob = 0.75 # probability of line-of-sight (not for FSPL)
+
     ###########################################################################
 
 
