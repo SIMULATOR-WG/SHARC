@@ -61,7 +61,7 @@ class ParametersFss(object):
     #                                    "SatelliteSimple" (FSPL + 4 or 24dB (LOS or NLOS)
     #                                    "P619" (ITU-R P.619-1)
     channel_model = "SatelliteSimple"
-    line_of_sight_prob = 0.75 # probability of line-of-sight between UE and satellite
+    line_of_sight_prob = 0.01 # probability of line-of-sight between UE and satellite
 
     surf_water_vapour_density = 7.5 #g/m^3
     specific_gaseous_att = 0.1 #db/km

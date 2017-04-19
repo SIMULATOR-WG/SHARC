@@ -36,7 +36,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 100
+    intersite_distance = 150
 
     ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
@@ -72,7 +72,7 @@ class ParametersImt(object):
     # The load probability (or activity factor) models the statistical
     # variation of the network load by defining the number of fully loaded
     # base stations that are simultaneously transmitting
-    bs_load_probability = 0.5
+    bs_load_probability = .5
 
     ###########################################################################
     # Number of resource blocks per UE
@@ -125,28 +125,28 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 3
-    
+    ue_k_m = 10
+
     ###########################################################################
-    # Power control algorithm 
+    # Power control algorithm
     # ue_tx_power_control = "ON",power control On
     # ue_tx_power_control = "OFF",power control Off
-    
+
     ue_tx_power_control = "ON"
-    
+
     ###########################################################################
     # Power per RB used as target value in dBm
     ue_tx_power_target = -80
-    
+
     ###########################################################################
-    # Alfa is the balacing factor for UEs with bad channel 
+    # Alfa is the balacing factor for UEs with bad channel
     # and UEs with good channel
     ue_tx_power_alfa = 0.8
-    
+
     ###########################################################################
     # UE maximum transmit power [dBm]
     ue_tx_power = 23
-    
+
     ###########################################################################
     # UE height [m]
     ue_height = 1.5
