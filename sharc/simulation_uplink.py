@@ -63,6 +63,7 @@ class SimulationUplink(Simulation):
                                  *self.param.ue_k*self.param.ue_k_m
         num_bs = self.param.num_clusters*self.param.num_base_stations
 
+        self.interference_ue = np.empty(num_ue)
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
@@ -276,17 +277,17 @@ class SimulationUplink(Simulation):
         # of the satellite's bandwidth
         # calculate interference only from active UE's
         ue_active = np.where(self.ue.active)
-        interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
+        self.interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
                             + 10*math.log10(ue_bandwidth/self.param_system.sat_bandwidth)
 
         # assume BS transmits with full power (no power control) in the whole bandwidth
-        bs_active = np.where(self.bs.active)
+        #bs_active = np.where(self.bs.active)
         #interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
         interference_bs = -500
 
         self.system.rx_interference = 10*math.log10( \
                         math.pow(10, 0.1*self.system.rx_interference)
-                        + np.sum(np.power(10, 0.1*interference_ue)) \
+                        + np.sum(np.power(10, 0.1*self.interference_ue)) \
                         + np.sum(np.power(10, 0.1*interference_bs)))
 
         self.system.thermal_noise = \
@@ -306,7 +307,7 @@ class SimulationUplink(Simulation):
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
         self.results.add_coupling_loss_bs_sat(self.coupling_loss_bs_sat.tolist())
         self.results.add_coupling_loss_ue_sat(self.coupling_loss_ue_sat.tolist())
-
+        self.results.add_interf_power_ul(self.interference_ue.tolist())
         self.results.add_inr([self.system.inr.tolist()])
 
         for bs in range(self.bs.num_stations):
