@@ -186,7 +186,8 @@ class SimulationUplink(Simulation):
             #K = np.random.choice(range(1, len(self.link[bs])))
             del self.link[bs][K:]
             # Activate the selected UE's
-            self.ue.active[self.link[bs]] = np.ones(K, dtype=bool)
+            if self.bs.active[bs]:
+                self.ue.active[self.link[bs]] = np.ones(K, dtype=bool)
 
     def scheduler(self):
         """

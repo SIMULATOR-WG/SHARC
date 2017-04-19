@@ -23,7 +23,7 @@ class StationFactory(object):
         imt_base_stations.x = topology.x
         imt_base_stations.y = topology.y
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
-        imt_base_stations.active = np.ones(num_bs, dtype=bool)
+        imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
         imt_base_stations.rx_interference = -500*np.ones(num_bs)
         imt_base_stations.tx_antenna = \
