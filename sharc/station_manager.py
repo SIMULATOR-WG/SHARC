@@ -8,7 +8,7 @@ Created on Fri Feb  3 15:29:48 2017
 import numpy as np
 
 from sharc.station import Station
-from sharc.antenna import Antenna
+from sharc.antenna.antenna import Antenna
 
 class StationManager(object):
     """

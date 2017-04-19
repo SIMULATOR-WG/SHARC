@@ -66,11 +66,17 @@ class SimulationUplink(Simulation):
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
-
+        self.path_loss = np.empty(num_ue)
+        
         self.ue = np.empty(num_ue)
         self.bs = np.empty(num_bs)
         self.system = np.empty(1)
-
+        
+        self.ue_tx_power = np.empty([num_ue, num_bs])
+        self.ue_tx_power_control = param.ue_tx_power_control
+        self.ue_tx_power_target = param.ue_tx_power_target
+        self.ue_tx_power_alfa = param. ue_tx_power_alfa
+         
         # this attribute indicates the list of UE's that are connected to each
         # base station. The position the the list indicates the resource block
         # group that is allocated to the given UE
@@ -144,15 +150,15 @@ class SimulationUplink(Simulation):
                                              elevation=elevation_angles, sat_params = self.param_system,
                                              earth_to_space = True)
         else:
-            path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
+            self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
         antenna_a = station_a.tx_antenna.astype('float')
         antenna_b = station_b.rx_antenna.astype('float')
         # replicate columns to have the appropriate size
         gain_a = np.transpose(np.tile(antenna_a, (station_b.num_stations, 1)))
         gain_b = np.tile(antenna_b, (station_a.num_stations, 1))
         # calculate coupling loss
-        return path_loss - gain_a - gain_b
-#        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain,
+        return self.path_loss - gain_a - gain_b
+#        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain, 
 #                                          ParametersImt.mcl)
 
     def connect_ue_to_bs(self):
@@ -194,9 +200,15 @@ class SimulationUplink(Simulation):
         """
         Apply uplink power control algorithm
         """
-        # Currently, there is no power control; then, set it to maximum
-        self.ue.tx_power = self.param.ue_tx_power*np.ones(self.ue.num_stations)
-
+        if self.ue_tx_power_control == "OFF":
+            self.ue.tx_power = self.param.ue_tx_power*np.ones(self.ue.num_stations)
+        else:
+            power_aux =  10*np.log10(self.num_rb_per_ue) + self.ue_tx_power_target
+            for bs in range(self.bs.num_stations):
+                    power2 = self.path_loss[self.link[bs], bs]
+                    self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
+                    self.ue_tx_power_alfa*power2+power_aux)
+        
     def calculate_sinr(self):
         """
         Calculates the uplink SINR for each UE. This is useful only in the
@@ -250,12 +262,15 @@ class SimulationUplink(Simulation):
 
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
-        interference_ue = self.ue.tx_power - self.coupling_loss_ue_sat \
+        # calculate interference only from active UE's
+        ue_active = np.where(self.ue.active)
+        interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
                             + 10*math.log10(ue_bandwidth/self.param_system.sat_bandwidth)
 
         # assume BS transmits with full power (no power control) in the whole bandwidth
-        interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat
-
+        bs_active = np.where(self.bs.active)
+        interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
+        
         self.system.rx_interference = 10*math.log10( \
                         math.pow(10, 0.1*self.system.rx_interference)
                         + np.sum(np.power(10, 0.1*interference_ue)) \

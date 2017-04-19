@@ -126,11 +126,27 @@ class ParametersImt(object):
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
     ue_k_m = 3
-
+    
+    ###########################################################################
+    # Power control algorithm 
+    # ue_tx_power_control = "ON",power control On
+    # ue_tx_power_control = "OFF",power control Off
+    
+    ue_tx_power_control = "ON"
+    
+    ###########################################################################
+    # Power per RB used as target value in dBm
+    ue_tx_power_target = -80
+    
+    ###########################################################################
+    # Alfa is the balacing factor for UEs with bad channel 
+    # and UEs with good channel
+    ue_tx_power_alfa = 0.8
+    
     ###########################################################################
     # UE maximum transmit power [dBm]
-    ue_tx_power = 22
-
+    ue_tx_power = 23
+    
     ###########################################################################
     # UE height [m]
     ue_height = 1.5
