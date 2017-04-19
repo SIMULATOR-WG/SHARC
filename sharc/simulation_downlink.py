@@ -35,7 +35,7 @@ class SimulationDownlink(Simulation):
             self.propagation = PropagationFreeSpace()
         elif self.param.channel_model == "CI":
             self.propagation = PropagationCloseIn( self.param.topology,
-                                                   self.param.line_of_sight )
+                                                   self.param.line_of_sight_prob )
         else:
             sys.stderr.write("error: invalid parameter channel_model\n")
             sys.exit(1)
