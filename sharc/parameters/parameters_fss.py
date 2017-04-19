@@ -31,10 +31,6 @@ class ParametersFss(object):
     sat_height = 35786000
     
     ###########################################################################
-    # Satellite peak reeive antenna gain [dBi]
-    sat_rx_antenna_gain = 51
-    
-    ###########################################################################
     # System receive noise temperature [K]
     sat_noise_temperature = 950
 
@@ -43,8 +39,21 @@ class ParametersFss(object):
     sat_interference_noise_ratio = -12.2
 
     ###########################################################################
+    # Satellite peak reeive antenna gain [dBi]
+    sat_rx_antenna_gain = 51
+    
+    ###########################################################################
     # Satellite antenna pattern in the fixed-satellite service
-    sat_antenna_pattern = "ITU-R S.672-4"
+    sat_rx_antenna_pattern = "ITU-R S.672-4"
+    
+    ###########################################################################
+    # The required near-in-side-lobe level (dB) relative to peak gain
+    # according to ITU-R S.672-4
+    sat_rx_antenna_l_s = -20    
+    
+    ###########################################################################
+    # 3 dB beamwidth angle (3 dB below maximum gain) [degrees]
+    sat_rx_antenna_3_dB = 0.65
     
     ###########################################################################
     # 
