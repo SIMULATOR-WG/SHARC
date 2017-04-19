@@ -10,7 +10,7 @@ import numpy as np
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_manager import StationManager
-from sharc.antenna import Antenna
+from sharc.antenna.antenna import Antenna
 from sharc.topology.topology import Topology
 
 class StationFactory(object):
