@@ -67,16 +67,16 @@ class SimulationUplink(Simulation):
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
         self.path_loss = np.empty(num_ue)
-        
+
         self.ue = np.empty(num_ue)
         self.bs = np.empty(num_bs)
         self.system = np.empty(1)
-        
+
         self.ue_tx_power = np.empty([num_ue, num_bs])
         self.ue_tx_power_control = param.ue_tx_power_control
         self.ue_tx_power_target = param.ue_tx_power_target
         self.ue_tx_power_alfa = param. ue_tx_power_alfa
-         
+
         # this attribute indicates the list of UE's that are connected to each
         # base station. The position the the list indicates the resource block
         # group that is allocated to the given UE
@@ -159,7 +159,7 @@ class SimulationUplink(Simulation):
         gain_b = np.tile(antenna_b, (station_a.num_stations, 1))
         # calculate coupling loss
         return self.path_loss - gain_a - gain_b
-#        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain, 
+#        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain,
 #                                          ParametersImt.mcl)
 
     def connect_ue_to_bs(self):
@@ -209,7 +209,7 @@ class SimulationUplink(Simulation):
                     power2 = self.path_loss[self.link[bs], bs]
                     self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
                     self.ue_tx_power_alfa*power2+power_aux)
-        
+
     def calculate_sinr(self):
         """
         Calculates the uplink SINR for each UE. This is useful only in the
@@ -274,7 +274,7 @@ class SimulationUplink(Simulation):
         # assume BS transmits with full power (no power control) in the whole bandwidth
         bs_active = np.where(self.bs.active)
         interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
-        
+
         self.system.rx_interference = 10*math.log10( \
                         math.pow(10, 0.1*self.system.rx_interference)
                         + np.sum(np.power(10, 0.1*interference_ue)) \
