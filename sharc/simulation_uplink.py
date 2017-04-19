@@ -61,7 +61,7 @@ class SimulationUplink(Simulation):
 
         num_ue = self.param.num_clusters*self.param.num_base_stations \
                                  *self.param.ue_k*self.param.ue_k_m
-        num_bs = self.param.num_clusters*self.param.num_base_stations
+        num_bs = 3*self.param.num_clusters*self.param.num_base_stations
 
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)
@@ -99,7 +99,7 @@ class SimulationUplink(Simulation):
         self.create_system()
         self.create_ue()
         self.coupling_loss = np.transpose( \
-                             self.calculate_coupling_loss(self.ue, self.bs,
+                             self.calculate_coupling_loss_imt(self.ue, self.bs,
                                                           self.propagation_imt))
         self.connect_ue_to_bs()
         self.select_ue()
@@ -160,6 +160,41 @@ class SimulationUplink(Simulation):
         # calculate coupling loss
         return self.path_loss - gain_a - gain_b
 #        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain,
+#                                          ParametersImt.mcl)
+
+    def calculate_coupling_loss_imt(self, 
+                                station_a: StationManager, 
+                                station_b: StationManager,
+                                propagation: Propagation) -> np.array:
+        # Terminal: station_a
+        # BS: station_b
+        
+        """
+        Calculates the path coupling loss from each stationA to all stationB. 
+        Result is returned as a numpy array with dimensions num_a x num_b 
+        """
+        # Calculate distance from transmitters to receivers. The result is a
+        # num_bs x num_ue array 
+        d = station_a.get_3d_distance_to(station_b)
+        path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
+        
+        gain_b = np.empty((station_a.num_stations,station_b.num_stations))
+        for k in range(station_a.num_stations): # Loop in the UEs
+            x = station_a.x[k]
+            y = station_a.y[k]
+            z = station_a.height[k]
+            ue_pos = np.array([x, y, z])
+            for i in range(station_b.num_stations): # Loop in the BSs
+                ant = station_b.tx_antenna[i].get_antenna_obj(ue_pos)
+                gain_b[k,i] = ant
+                
+        antenna_a = station_a.tx_antenna.astype('float')
+        # replicate columns to have the appropriate size
+        gain_a = np.transpose(np.tile(antenna_a, (station_b.num_stations, 1)))
+#        gain_b = np.tile(antenna_b, (station_a.num_stations, 1))
+        # calculate coupling loss
+        return path_loss - gain_a - gain_b
+#        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain, 
 #                                          ParametersImt.mcl)
 
     def connect_ue_to_bs(self):

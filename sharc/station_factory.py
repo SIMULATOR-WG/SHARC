@@ -10,6 +10,7 @@ import numpy as np
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_manager import StationManager
+from sharc.antenna.sector_antenna import SectorAntenna
 from sharc.antenna.antenna import Antenna
 from sharc.topology.topology import Topology
 
@@ -17,17 +18,23 @@ class StationFactory(object):
 
     @staticmethod
     def generate_imt_base_stations(param: ParametersImt, topology: Topology):
-        num_bs = param.num_clusters*param.num_base_stations
+        num_bs = 3*param.num_clusters*param.num_base_stations
         imt_base_stations = StationManager(num_bs)
         # now we set the coordinates
-        imt_base_stations.x = topology.x
-        imt_base_stations.y = topology.y
+        imt_base_stations.x = np.repeat(topology.x,3)
+        imt_base_stations.y = np.repeat(topology.y,3)
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
         imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
-        imt_base_stations.rx_interference = -500*np.ones(num_bs)
-        imt_base_stations.tx_antenna = \
-            np.array([Antenna(param.bs_tx_antenna_gain) for i in range(num_bs)])
+        imt_base_stations.rx_interference = -500*np.ones(num_bs)  
+        
+        for i in range(num_bs):
+            azimuth = 60 + 120*(i % 3)
+            pos = np.array([imt_base_stations.x[i],imt_base_stations.y[i],imt_base_stations.height[i]])
+            imt_base_stations.tx_antenna[i] = SectorAntenna(azimuth,pos)
+            
+#        imt_base_stations.tx_antenna = \
+#            np.array([SectorAntenna() for i in range(num_bs)])
         imt_base_stations.rx_antenna = \
             np.array([Antenna(param.bs_rx_antenna_gain) for i in range(num_bs)])
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
