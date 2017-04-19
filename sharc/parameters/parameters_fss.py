@@ -51,10 +51,9 @@ class ParametersFss(object):
     ###########################################################################
     # IMT parameters relevant to the satellite system
     imt_altitude = 1000   # altitude of IMT system (in meters)
-    imt_lat_deg = -15.795038   # latitude of IMT system (in degrees)
-    imt_long_diff_deg = 3 # difference between longitudes of IMT and satellite system
-                          # positive if space-station is to the East of earth-station
-
+    imt_lat_deg = -23.5629739   # latitude of IMT system (in degrees)
+    imt_long_diff_deg = (-46.6555132-75) # difference between longitudes of IMT and satellite system
+                             # positive if space-station is to the East of earth-station
 
     ###########################################################################
     # Channel parameters
