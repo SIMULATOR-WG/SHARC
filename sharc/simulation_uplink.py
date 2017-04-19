@@ -332,7 +332,8 @@ class SimulationUplink(Simulation):
         self.results.imt_ul_coupling_loss.extend( \
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
         self.results.system_inr.extend([self.system.inr.tolist()])
-        self.results.add_interf_power_ul(self.interference_ue.tolist())
+        normalized_interference = self.interference_ue/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6)
+        self.results.add_interf_power_ul(normalized_interference.tolist())
         bs_active = np.where( self.bs.active )[0]
 
         for bs in bs_active:
