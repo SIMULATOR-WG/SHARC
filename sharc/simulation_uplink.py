@@ -40,8 +40,8 @@ class SimulationUplink(Simulation):
         if self.param.channel_model == "FSPL":
             self.propagation_imt = PropagationFreeSpace()
         elif self.param.channel_model == "CI":
-            self.propagation_imt = PropagationCloseIn( self.param.topology,
-                                                   self.param.line_of_sight )
+            self.propagation_imt = PropagationCloseIn(self.param.topology,
+                                                      self.param.line_of_sight_prob)
         else:
             sys.stderr.write("error: invalid parameter channel_model" + self.param.channel_model
                              + "in IMT propagation\n")
