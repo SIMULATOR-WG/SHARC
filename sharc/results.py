@@ -12,6 +12,7 @@ class Results(object):
     
     def __init__(self):
         self.tx_power_ul = list()
+        self.interf_power_ul = list()
         self.sinr_ul = list()
         self.snr_ul = list()
         self.throughoput_ul = list()
@@ -25,6 +26,9 @@ class Results(object):
         
     def add_tx_power_ul(self, sample):
         self.tx_power_ul.extend(sample)
+
+    def add_interf_power_ul(self, sample):
+        self.interf_power_ul.extend(sample)
         
     def add_sinr_ul(self, sample):
         self.sinr_ul.extend(sample)
