@@ -12,7 +12,6 @@ class Antenna(object):
     
     def __init__(self, gain: float = 0):
         self.gain = gain
-    
         
     """
     TODO: check the validity of operator overriding for Antenna class because
