@@ -204,6 +204,16 @@ class View(tkinter.Tk, Observer):
         plt.ylabel("Probability of transmit power < $X$")
         plt.grid() 
         
+        plt.subplot(2, 2, 4)
+        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+        plt.hist(results.interf_power_ul, n_bins, normed=True, 
+                 histtype='step', cumulative=True )
+        plt.ylim((0, 1))
+        plt.title("CDF of received interference at space station [dBm]")
+        plt.xlabel("received interference power [dBm]")
+        plt.ylabel("Probability of power < $X$")
+        plt.grid() 
+
         plt.tight_layout()
         plt.show()
         
