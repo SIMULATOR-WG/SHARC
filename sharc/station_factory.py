@@ -25,7 +25,7 @@ class StationFactory(object):
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
         imt_base_stations.active = np.ones(num_bs, dtype=bool)
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
-        imt_base_stations.rx_interference = -500*np.ones(num_bs)
+        imt_base_stations.rx_interference = -500*np.ones(param.ue_k)
         imt_base_stations.tx_antenna = \
             np.array([Antenna(param.bs_tx_antenna_gain) for i in range(num_bs)])
         imt_base_stations.rx_antenna = \
