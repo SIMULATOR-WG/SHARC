@@ -58,8 +58,7 @@ class AntennaImt(Antenna):
     @property
     def g_max(self):
         return self.__g_max
-    
-        
+     
     @property
     def phi_3db(self):
         return self.__phi_3db

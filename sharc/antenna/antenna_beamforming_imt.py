@@ -12,7 +12,7 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
 class AntennaBeamformingImt(AntennaImt):
     """
-    Implements a an antenna array
+    Implements an antenna array
     
     Attributes
     ----------
@@ -137,7 +137,7 @@ class AntennaBeamformingImt(AntennaImt):
         return array_g
         
     
-    def beam_gain(self,phi: float, theta: float, phi_scan: float, theta_tilt: float) -> np.array:
+    def beam_gain(self,phi: float, theta: float, phi_scan: float, theta_tilt: float) -> float:
         """
         Calculates gain for a single beam in a given direction.
         
