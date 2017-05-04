@@ -5,17 +5,14 @@ Created on Fri Apr 14 14:13:58 2017
 @author: Calil
 """
 
-from sharc.antenna.antenna import Antenna
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
-class AntennaImt(Antenna):
+class AntennaElementImt(object):
     """
-    Implements a sector antenna, which corresponds to a single element of 
-    an antenna array.
+    Implements a single element of an IMT antenna array.
     
     Attributes
     ----------
-        gain (float): calculated antenna gain in given direction
         g_max (float): maximum gain of element
         theta_3db (float): vertical 3dB beamwidth of single element [degrees]
         phi_3db (float): horizontal 3dB beamwidth of single element [degrees]
@@ -25,7 +22,7 @@ class AntennaImt(Antenna):
     
     def __init__(self,param: ParametersAntennaImt, station_type: str):
         """
-        Constructs an AntennaImt object.
+        Constructs an AntennaElementImt object.
         
         Parameters
         ---------
@@ -47,9 +44,6 @@ class AntennaImt(Antenna):
             self.__theta_3db = param.ue_element_theta_3db
             self.__am = param.ue_element_am
             self.__sla_v = param.ue_element_sla_v
-        
-        # Call for super class constructor 
-        super().__init__()
     
     @property
     def station_type(self):
@@ -118,6 +112,6 @@ class AntennaImt(Antenna):
         """
         att = -1.0*(self.horizontal_pattern(phi) + \
                     self.vertical_pattern(theta))
-        self.gain = self.g_max - min(att,self.am)
+        gain = self.g_max - min(att,self.am)
         
-        return self.gain
+        return gain

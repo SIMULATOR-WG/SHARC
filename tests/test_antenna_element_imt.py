@@ -7,7 +7,7 @@ Created on Fri Apr 14 14:19:38 2017
 
 import unittest
 
-from sharc.antenna.antenna_imt import AntennaImt
+from sharc.antenna.antenna_element_imt import AntennaElementImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
 class AntennaImtTest(unittest.TestCase):
@@ -27,13 +27,8 @@ class AntennaImtTest(unittest.TestCase):
         self.param.ue_element_sla_v = 35
         
         # Create antenna IMT objects
-        self.antenna1 = AntennaImt(self.param,"BS")
-        self.antenna2 = AntennaImt(self.param,"UE")
-        self.antenna2.gain = 15
-        
-    def test_gain(self):
-        self.assertEqual(self.antenna1.gain,0)
-        self.assertEqual(self.antenna2.gain,15)
+        self.antenna1 = AntennaElementImt(self.param,"BS")
+        self.antenna2 = AntennaElementImt(self.param,"UE")
         
     def test_station_type(self):
         self.assertTrue(self.antenna1.station_type == "BS")
@@ -58,52 +53,6 @@ class AntennaImtTest(unittest.TestCase):
     def test_sla_v(self):
         self.assertEqual(self.antenna1.sla_v,30)
         self.assertEqual(self.antenna2.sla_v,35)
-        
-    def test_add(self):
-        self.assertEqual(self.antenna1 + 2, 2)
-    
-    def test_radd(self):
-        self.assertEqual(2 + self.antenna1, 2)
-        self.assertEqual(self.antenna1 + self.antenna2, 15)
-        
-    def test_sub(self):
-        self.assertEqual(self.antenna1 - 1, -1)
-    
-    def test_rsub(self):
-        self.assertEqual(9 - self.antenna1, 9)
-        self.assertEqual(self.antenna2 - self.antenna1, 15)
-     
-    def test_lt(self):
-        self.assertTrue(self.antenna1 < 5)
-        self.assertFalse(self.antenna1 < -3)
-        self.assertTrue(self.antenna1 < self.antenna2)
-        
-    def test_le(self):
-        self.assertTrue(self.antenna1 <= 5)
-        self.assertTrue(self.antenna1 <= 0)
-        self.assertFalse(self.antenna1 <= -2)
-        self.assertTrue(self.antenna1 <= self.antenna2)
-
-    def test_gt(self):
-        self.assertFalse(self.antenna1 > 5)
-        self.assertTrue(self.antenna1 > -2)
-        self.assertFalse(self.antenna1 > self.antenna2)
-        
-    def test_ge(self):
-        self.assertTrue(self.antenna1 >= 0)
-        self.assertTrue(self.antenna1 >= -3)
-        self.assertFalse(self.antenna1 >= 3)
-        self.assertFalse(self.antenna1 >= self.antenna2)
-        
-    def test_eq(self):
-        self.assertTrue(self.antenna1 == 0)
-        self.assertFalse(self.antenna1 == 7)
-        self.assertFalse(self.antenna1 == self.antenna2)
-        
-    def test_ne(self):
-        self.assertTrue(self.antenna1 != 1)
-        self.assertFalse(self.antenna1 != 0)
-        self.assertTrue(self.antenna1 != self.antenna2)
         
     def test_horizontal_pattern(self):  
         # phi = 0 results in zero gain
@@ -147,21 +96,16 @@ class AntennaImtTest(unittest.TestCase):
         self.assertEqual(e_gain,5.0)
         self.assertEqual(e_gain,self.antenna1.g_max)
         
-        # Check for gain update
-        self.assertTrue(self.antenna1 == 5.0)
-        
         phi = 80
         theta = 150
         e_gain = self.antenna1.element_pattern(phi,theta)
         self.assertEqual(e_gain,-19.0)
-        self.assertTrue(self.antenna1 == -19.0)
         
         phi = 150
         theta = 210
         e_gain = self.antenna1.element_pattern(phi,theta)
         self.assertEqual(e_gain,-25.0)
         self.assertEqual(e_gain,self.antenna1.g_max - self.antenna1.am)
-        self.assertTrue(self.antenna1 == -25.0)
         
 if __name__ == '__main__':
     unittest.main()
