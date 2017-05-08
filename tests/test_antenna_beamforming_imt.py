@@ -16,37 +16,36 @@ class AntennaBeamformingImtTest(unittest.TestCase):
     def setUp(self):
         #Array parameters
         self.param = ParametersAntennaImt()
-        self.param.bs_element_max_g = 5
-        self.param.bs_element_phi_3db = 80
-        self.param.bs_element_theta_3db = 60
-        self.param.bs_element_am = 30
-        self.param.bs_element_sla_v = 30
-        self.param.bs_n_rows = 16
-        self.param.bs_n_columns = 16
-        self.param.bs_element_horiz_spacing = 1
-        self.param.bs_element_vert_spacing = 1
-        self.param.ue_element_max_g = 10
-        self.param.ue_element_phi_3db = 75
-        self.param.ue_element_theta_3db = 65
-        self.param.ue_element_am = 25
-        self.param.ue_element_sla_v = 35
-        self.param.ue_n_rows = 2
-        self.param.ue_n_columns = 2
-        self.param.ue_element_horiz_spacing = 0.5
-        self.param.ue_element_vert_spacing = 0.5
+        self.param.bs_rx_element_max_g = 5
+        self.param.bs_rx_element_phi_3db = 80
+        self.param.bs_rx_element_theta_3db = 60
+        self.param.bs_rx_element_am = 30
+        self.param.bs_rx_element_sla_v = 30
+        self.param.bs_rx_n_rows = 16
+        self.param.bs_rx_n_columns = 16
+        self.param.bs_rx_element_horiz_spacing = 1
+        self.param.bs_rx_element_vert_spacing = 1
+        self.param.ue_tx_element_max_g = 10
+        self.param.ue_tx_element_phi_3db = 75
+        self.param.ue_tx_element_theta_3db = 65
+        self.param.ue_tx_element_am = 25
+        self.param.ue_tx_element_sla_v = 35
+        self.param.ue_tx_n_rows = 2
+        self.param.ue_tx_n_columns = 2
+        self.param.ue_tx_element_horiz_spacing = 0.5
+        self.param.ue_tx_element_vert_spacing = 0.5
         
         # Create antenna objects
-        self.antenna1 = AntennaBeamformingImt(self.param,"BS")
-        self.antenna2 = AntennaBeamformingImt(self.param,"UE")
-        self.antenna2.gain = 15
-        
-    def test_gain(self):
-        self.assertEqual(self.antenna1.gain,0)
-        self.assertEqual(self.antenna2.gain,15)
+        self.antenna1 = AntennaBeamformingImt(self.param,"BS","RX")
+        self.antenna2 = AntennaBeamformingImt(self.param,"UE","TX")
         
     def test_station_type(self):
         self.assertTrue(self.antenna1.station_type == "BS")
         self.assertTrue(self.antenna2.station_type == "UE")
+        
+    def test_tx_or_rx(self):
+        self.assertTrue(self.antenna1.tx_or_rx == "RX")
+        self.assertTrue(self.antenna2.tx_or_rx == "TX")
         
     def test_g_max(self):
         self.assertEqual(self.antenna1.g_max,5)
@@ -83,52 +82,6 @@ class AntennaBeamformingImtTest(unittest.TestCase):
     def test_dv(self):
         self.assertEqual(self.antenna1.dv,1)
         self.assertEqual(self.antenna2.dv,0.5)
-        
-    def test_add(self):
-        self.assertEqual(self.antenna1 + 2, 2)
-    
-    def test_radd(self):
-        self.assertEqual(2 + self.antenna1, 2)
-        self.assertEqual(self.antenna1 + self.antenna2, 15)
-        
-    def test_sub(self):
-        self.assertEqual(self.antenna1 - 1, -1)
-    
-    def test_rsub(self):
-        self.assertEqual(9 - self.antenna1, 9)
-        self.assertEqual(self.antenna2 - self.antenna1, 15)
-     
-    def test_lt(self):
-        self.assertTrue(self.antenna1 < 5)
-        self.assertFalse(self.antenna1 < -3)
-        self.assertTrue(self.antenna1 < self.antenna2)
-        
-    def test_le(self):
-        self.assertTrue(self.antenna1 <= 5)
-        self.assertTrue(self.antenna1 <= 0)
-        self.assertFalse(self.antenna1 <= -2)
-        self.assertTrue(self.antenna1 <= self.antenna2)
-
-    def test_gt(self):
-        self.assertFalse(self.antenna1 > 5)
-        self.assertTrue(self.antenna1 > -2)
-        self.assertFalse(self.antenna1 > self.antenna2)
-        
-    def test_ge(self):
-        self.assertTrue(self.antenna1 >= 0)
-        self.assertTrue(self.antenna1 >= -3)
-        self.assertFalse(self.antenna1 >= 3)
-        self.assertFalse(self.antenna1 >= self.antenna2)
-        
-    def test_eq(self):
-        self.assertTrue(self.antenna1 == 0)
-        self.assertFalse(self.antenna1 == 7)
-        self.assertFalse(self.antenna1 == self.antenna2)
-        
-    def test_ne(self):
-        self.assertTrue(self.antenna1 != 1)
-        self.assertFalse(self.antenna1 != 0)
-        self.assertTrue(self.antenna1 != self.antenna2)
         
     def test_horizontal_pattern(self):  
         # phi = 0 results in zero gain
@@ -172,21 +125,16 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(e_gain,5.0)
         self.assertEqual(e_gain,self.antenna1.g_max)
         
-        # Check for gain update
-        self.assertTrue(self.antenna1 == 5.0)
-        
         phi = 80
         theta = 150
         e_gain = self.antenna1.element_pattern(phi,theta)
         self.assertEqual(e_gain,-19.0)
-        self.assertTrue(self.antenna1 == -19.0)
         
         phi = 150
         theta = 210
         e_gain = self.antenna1.element_pattern(phi,theta)
         self.assertEqual(e_gain,-25.0)
         self.assertEqual(e_gain,self.antenna1.g_max - self.antenna1.am)
-        self.assertTrue(self.antenna1 == -25.0)
         
     def test_super_position_vector(self):
         # Error margin
@@ -327,7 +275,6 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta_tilt = 45
         beam_g = self.antenna2.beam_gain(phi,theta,phi_scan,theta_tilt)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
-        self.assertEqual(beam_g,self.antenna2.gain)
         
         # Test 1
         phi = 0
@@ -336,7 +283,6 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta_tilt = 90
         beam_g = self.antenna2.beam_gain(phi,theta,phi_scan,theta_tilt)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
-        self.assertEqual(beam_g,self.antenna2.gain)
         
 if __name__ == '__main__':
     unittest.main()

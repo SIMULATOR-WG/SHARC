@@ -7,10 +7,10 @@ Created on Sat Apr 15 15:35:51 2017
 
 import numpy as np
 
-from sharc.antenna.antenna_imt import AntennaImt
+from sharc.antenna.antenna_element_imt import AntennaElementImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
-class AntennaBeamformingImt(AntennaImt):
+class AntennaBeamformingImt(AntennaElementImt):
     """
     Implements an antenna array
     
@@ -28,7 +28,7 @@ class AntennaBeamformingImt(AntennaImt):
         dv (float): vertical element spacing over wavelenght (d/lambda)
     """
     
-    def __init__(self,param: ParametersAntennaImt, station_type: str):
+    def __init__(self,param: ParametersAntennaImt, station_type: str, txrx: str):
         """
         Constructs an AntennaBeamformingImt object.
         
@@ -38,18 +38,12 @@ class AntennaBeamformingImt(AntennaImt):
             station_type (srt): type of station. Possible values are "BS" and
                 "UE"
         """
-        super().__init__(param, station_type)
+        super().__init__(param, station_type, txrx)
         
-        if station_type == "BS":
-            self.__n_rows =param.bs_n_rows
-            self.__n_cols =param.bs_n_columns
-            self.__dh =param.bs_element_horiz_spacing
-            self.__dv = param.bs_element_vert_spacing
-        elif station_type == "UE":
-            self.__n_rows =param.ue_n_rows
-            self.__n_cols =param.ue_n_columns
-            self.__dh =param.ue_element_horiz_spacing
-            self.__dv = param.ue_element_vert_spacing
+        self.__n_rows =self.param.n_rows
+        self.__n_cols =self.param.n_columns
+        self.__dh =self.param.element_horiz_spacing
+        self.__dv = self.param.element_vert_spacing
     
     @property
     def n_rows(self):
