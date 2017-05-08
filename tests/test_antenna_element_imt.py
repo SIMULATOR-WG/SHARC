@@ -31,14 +31,6 @@ class AntennaImtTest(unittest.TestCase):
         self.antenna1 = AntennaElementImt(self.param,"BS","TX")
         self.antenna2 = AntennaElementImt(self.param,"UE","RX")
         
-    def test_station_type(self):
-        self.assertTrue(self.antenna1.station_type == "BS")
-        self.assertTrue(self.antenna2.station_type == "UE")
-        
-    def test_tx_or_rx(self):
-        self.assertTrue(self.antenna1.tx_or_rx == "TX")
-        self.assertTrue(self.antenna2.tx_or_rx == "RX")
-        
     def test_g_max(self):
         self.assertEqual(self.antenna1.g_max,5)
         self.assertEqual(self.antenna2.g_max,10)

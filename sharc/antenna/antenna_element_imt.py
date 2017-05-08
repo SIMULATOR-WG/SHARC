@@ -33,17 +33,14 @@ class AntennaElementImt(object):
                 "UE"
             txrx (srt): indicates whether it is a transmissio or reception 
                 antenna. Possible values are "TX" and "RX"
-        """
-        self.__station_type = station_type
-        self.__tx_or_rx = txrx
-        
-        self.param = param.get_antenna_parameters(station_type,txrx)
+        """        
+        par = param.get_antenna_parameters(station_type,txrx)
     
-        self.__g_max = self.param.element_max_g
-        self.__phi_3db = self.param.element_phi_3db
-        self.__theta_3db = self.param.element_theta_3db
-        self.__am = self.param.element_am
-        self.__sla_v = self.param.element_sla_v
+        self.__g_max = par.element_max_g
+        self.__phi_3db = par.element_phi_3db
+        self.__theta_3db = par.element_theta_3db
+        self.__am = par.element_am
+        self.__sla_v = par.element_sla_v
     
     @property
     def station_type(self):
