@@ -101,21 +101,21 @@ class AntennaElementImt(object):
         """
         return -1.0*np.minimum(12*((theta-90.0)/self.theta_3db)**2,self.sla_v)
         
-    def element_pattern(self, phi: float, theta: float) -> float:
+    def element_pattern(self, phi: np.array, theta: np.array) -> np.array:
         """
         Calculates the element radiation pattern gain.
         
         Parameters
         ----------
-            theta (float): elevation angle [degrees]
-            phi (float): azimuth angle [degrees]
+            theta (np.array): elevation angle [degrees]
+            phi (np.array): azimuth angle [degrees]
             
         Returns
         -------
-            gain (float): element radiation pattern gain value
+            gain (np.array): element radiation pattern gain value
         """
         att = -1.0*(self.horizontal_pattern(phi) + \
                     self.vertical_pattern(theta))
-        gain = self.g_max - min(att,self.am)
+        gain = self.g_max - np.minimum(att,self.am)
         
         return gain

@@ -103,24 +103,30 @@ class AntennaImtTest(unittest.TestCase):
         v_att = self.antenna1.vertical_pattern(theta)
         self.assertTrue(np.all(v_att == np.array([0.0,-27.0,-30.0])))
         
-#    def test_element_pattern(self):
-#        # theta = 0 and phi = 90 result in maximum gain
-#        phi = 0
-#        theta = 90
-#        e_gain = self.antenna1.element_pattern(phi,theta)
-#        self.assertEqual(e_gain,5.0)
-#        self.assertEqual(e_gain,self.antenna1.g_max)
-#        
-#        phi = 80
-#        theta = 150
-#        e_gain = self.antenna1.element_pattern(phi,theta)
-#        self.assertEqual(e_gain,-19.0)
-#        
-#        phi = 150
-#        theta = 210
-#        e_gain = self.antenna1.element_pattern(phi,theta)
-#        self.assertEqual(e_gain,-25.0)
-#        self.assertEqual(e_gain,self.antenna1.g_max - self.antenna1.am)
+    def test_element_pattern(self):
+        # theta = 0 and phi = 90 result in maximum gain
+        phi = 0
+        theta = 90
+        e_gain = self.antenna1.element_pattern(phi,theta)
+        self.assertEqual(e_gain,5.0)
+        self.assertEqual(e_gain,self.antenna1.g_max)
+        
+        phi = 80
+        theta = 150
+        e_gain = self.antenna1.element_pattern(phi,theta)
+        self.assertEqual(e_gain,-19.0)
+        
+        phi = 150
+        theta = 210
+        e_gain = self.antenna1.element_pattern(phi,theta)
+        self.assertEqual(e_gain,-25.0)
+        self.assertEqual(e_gain,self.antenna1.g_max - self.antenna1.am)
+        
+        # Test vector
+        phi = np.array([0,80,150])
+        theta = np.array([90,150,210])
+        e_gain = self.antenna1.element_pattern(phi,theta)
+        self.assertTrue(np.all(e_gain == np.array([5.0,-19.0,-25.0])))
         
 if __name__ == '__main__':
     unittest.main()
