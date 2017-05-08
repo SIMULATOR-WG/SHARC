@@ -15,24 +15,28 @@ class AntennaImtTest(unittest.TestCase):
     def setUp(self):
         #Element parameters
         self.param = ParametersAntennaImt()
-        self.param.bs_element_max_g = 5
-        self.param.bs_element_phi_3db = 80
-        self.param.bs_element_theta_3db = 60
-        self.param.bs_element_am = 30
-        self.param.bs_element_sla_v = 30
-        self.param.ue_element_max_g = 10
-        self.param.ue_element_phi_3db = 75
-        self.param.ue_element_theta_3db = 65
-        self.param.ue_element_am = 25
-        self.param.ue_element_sla_v = 35
+        self.param.bs_tx_element_max_g = 5
+        self.param.bs_tx_element_phi_3db = 80
+        self.param.bs_tx_element_theta_3db = 60
+        self.param.bs_tx_element_am = 30
+        self.param.bs_tx_element_sla_v = 30
+        self.param.ue_rx_element_max_g = 10
+        self.param.ue_rx_element_phi_3db = 75
+        self.param.ue_rx_element_theta_3db = 65
+        self.param.ue_rx_element_am = 25
+        self.param.ue_rx_element_sla_v = 35
         
         # Create antenna IMT objects
-        self.antenna1 = AntennaElementImt(self.param,"BS")
-        self.antenna2 = AntennaElementImt(self.param,"UE")
+        self.antenna1 = AntennaElementImt(self.param,"BS","TX")
+        self.antenna2 = AntennaElementImt(self.param,"UE","RX")
         
     def test_station_type(self):
         self.assertTrue(self.antenna1.station_type == "BS")
         self.assertTrue(self.antenna2.station_type == "UE")
+        
+    def test_tx_or_rx(self):
+        self.assertTrue(self.antenna1.tx_or_rx == "TX")
+        self.assertTrue(self.antenna2.tx_or_rx == "RX")
         
     def test_g_max(self):
         self.assertEqual(self.antenna1.g_max,5)

@@ -20,7 +20,7 @@ class AntennaElementImt(object):
         sla_v (float): element vertical sidelobe attenuation
     """
     
-    def __init__(self,param: ParametersAntennaImt, station_type: str):
+    def __init__(self,param: ParametersAntennaImt, station_type: str, txrx: str):
         """
         Constructs an AntennaElementImt object.
         
@@ -31,8 +31,9 @@ class AntennaElementImt(object):
                 "UE"
         """
         self.__station_type = station_type
+        self.__tx_or_rx = txrx
         
-        self.param = param.get_antenna_parameters(station_type)
+        self.param = param.get_antenna_parameters(station_type,txrx)
     
         self.__g_max = self.param.element_max_g
         self.__phi_3db = self.param.element_phi_3db
@@ -43,6 +44,10 @@ class AntennaElementImt(object):
     @property
     def station_type(self):
         return self.__station_type
+    
+    @property
+    def tx_or_rx(self):
+        return self.__tx_or_rx
     
     @property
     def g_max(self):
