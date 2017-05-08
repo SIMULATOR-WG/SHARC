@@ -8,20 +8,16 @@ Created on Sat Apr 15 15:35:51 2017
 import numpy as np
 
 from sharc.antenna.antenna_element_imt import AntennaElementImt
+from sharc.antenna.antenna import Antenna
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
-class AntennaBeamformingImt(AntennaElementImt):
+class AntennaBeamformingImt(Antenna):
     """
     Implements an antenna array
     
     Attributes
     ----------
-        gain (float): calculated antenna gain in given direction
-        g_max (float): maximum gain of element
-        theta_3db (float): vertical 3dB bandwidth of single element [degrees]
-        phi_3db (float): horizontal 3dB bandwidth of single element [degrees]
-        am (float): front-to-back ratio
-        sla_v (float): element vertical sidelobe attenuation
+        element (AntennaElementImt): antenna element
         n_rows (int): number of rows in array
         n_cols (int): number of columns in array
         dh (float): horizontal element spacing over wavelenght (d/lambda)
@@ -42,15 +38,17 @@ class AntennaBeamformingImt(AntennaElementImt):
             txrx (srt): indicates whether it is a transmissio or reception 
                 antenna. Possible values are "TX" and "RX"
         """
-        super().__init__(param, station_type, txrx)
+        self.element = AntennaElementImt(param, station_type, txrx)
         
         self.__azimuth = azimuth
         self.__elevation = elevation
         
-        self.__n_rows =self.param.n_rows
-        self.__n_cols =self.param.n_columns
-        self.__dh =self.param.element_horiz_spacing
-        self.__dv = self.param.element_vert_spacing
+        par = param.get_antenna_parameters(station_type,txrx)
+        
+        self.__n_rows = par.n_rows
+        self.__n_cols = par.n_columns
+        self.__dh = par.element_horiz_spacing
+        self.__dv = par.element_vert_spacing
         
     @property
     def azimuth(self):
@@ -161,7 +159,7 @@ class AntennaBeamformingImt(AntennaElementImt):
         -------
             gain (float): beam gain [dBi]
         """
-        element_g = self.element_pattern(phi,theta)
+        element_g = self.element.element_pattern(phi,theta)
         
         v_vec = self.super_position_vector(phi,theta)
         w_vec = self.weight_vector(phi_scan,theta_tilt)
@@ -171,3 +169,18 @@ class AntennaBeamformingImt(AntennaElementImt):
         self.gain = element_g + array_g
         
         return self.gain
+    
+    def calculate_gain(self,directions: np.array) -> np.array:
+        """
+        Calculates the gain in the given direction.
+        
+        Parameters
+        ----------
+        directions (np.array): array of tuples, each containing the aximuth 
+            (phi) and elevation (theta) angles to which the gain is calculated.
+            
+        Returns
+        -------
+        gains (np.array): gain corresponding to each of the given directions.
+        """
+        pass
