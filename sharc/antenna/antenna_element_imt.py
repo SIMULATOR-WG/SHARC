@@ -32,18 +32,13 @@ class AntennaElementImt(object):
         """
         self.__station_type = station_type
         
-        if station_type == "BS":
-            self.__g_max = param.bs_element_max_g
-            self.__phi_3db = param.bs_element_phi_3db
-            self.__theta_3db = param.bs_element_theta_3db
-            self.__am = param.bs_element_am
-            self.__sla_v = param.bs_element_sla_v
-        elif station_type == "UE":
-            self.__g_max = param.ue_element_max_g
-            self.__phi_3db = param.ue_element_phi_3db
-            self.__theta_3db = param.ue_element_theta_3db
-            self.__am = param.ue_element_am
-            self.__sla_v = param.ue_element_sla_v
+        self.param = param.get_antenna_parameters(station_type)
+    
+        self.__g_max = self.param.element_max_g
+        self.__phi_3db = self.param.element_phi_3db
+        self.__theta_3db = self.param.element_theta_3db
+        self.__am = self.param.element_am
+        self.__sla_v = self.param.element_sla_v
     
     @property
     def station_type(self):

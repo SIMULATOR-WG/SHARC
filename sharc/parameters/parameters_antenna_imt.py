@@ -5,6 +5,8 @@ Created on Sat Apr 15 16:29:36 2017
 @author: Calil
 """
 
+from collections import namedtuple
+
 class ParametersAntennaImt(object):
     """
     Defines parameters for antenna array.
@@ -92,4 +94,32 @@ class ParametersAntennaImt(object):
     ###########################################################################
     # UE array vertical element spacing (d/lambda)
     ue_element_vert_spacing = 0.5
+    
+    ###########################################################################
+    # Named tuples which contain antenna types
+    AntennaType = namedtuple("AntennaType","element_max_g element_phi_3db element_theta_3db element_am element_sla_v n_rows n_columns element_horiz_spacing element_vert_spacing")
+    
+    def get_antenna_parameters(self,sta_type: str)-> AntennaType:
+        if sta_type == "BS":
+            bs = self.AntennaType(self.bs_element_max_g,\
+                                  self.bs_element_phi_3db,\
+                                  self.bs_element_theta_3db,\
+                                  self.bs_element_am,\
+                                  self.bs_element_sla_v,\
+                                  self.bs_n_rows,\
+                                  self.bs_n_columns,\
+                                  self.bs_element_horiz_spacing,\
+                                  self.bs_element_vert_spacing)
+            return bs
+        elif sta_type == "UE":
+            ue = self.AntennaType(self.ue_element_max_g,\
+                                  self.ue_element_phi_3db,\
+                                  self.ue_element_theta_3db,\
+                                  self.ue_element_am,\
+                                  self.ue_element_sla_v,\
+                                  self.ue_n_rows,\
+                                  self.ue_n_columns,\
+                                  self.ue_element_horiz_spacing,\
+                                  self.ue_element_vert_spacing)
+            return ue
     
