@@ -5,6 +5,8 @@ Created on Fri Apr 14 14:13:58 2017
 @author: Calil
 """
 
+import numpy as np
+
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
 class AntennaElementImt(object):
@@ -29,6 +31,8 @@ class AntennaElementImt(object):
             param (ParametersAntennaImt): antenna IMT parameters
             station_type (srt): type of station. Possible values are "BS" and
                 "UE"
+            txrx (srt): indicates whether it is a transmissio or reception 
+                antenna. Possible values are "TX" and "RX"
         """
         self.__station_type = station_type
         self.__tx_or_rx = txrx
@@ -69,7 +73,7 @@ class AntennaElementImt(object):
     def sla_v(self):
         return self.__sla_v
     
-    def horizontal_pattern(self,phi: float) -> float:
+    def horizontal_pattern(self,phi: np.array) -> np.array:
         """
         Calculates the horizontal radiation pattern.
         
@@ -81,7 +85,7 @@ class AntennaElementImt(object):
         -------
             a_h (float): horizontal radiation pattern gain value
         """
-        return -1.0*min(12*(phi/self.phi_3db)**2,self.am)
+        return -1.0*np.minimum(12*(phi/self.phi_3db)**2,self.am)
     
     def vertical_pattern(self,theta: float) -> float:
         """

@@ -5,6 +5,7 @@ Created on Fri Apr 14 14:19:38 2017
 @author: Calil
 """
 
+import numpy as np
 import unittest
 
 from sharc.antenna.antenna_element_imt import AntennaElementImt
@@ -75,6 +76,11 @@ class AntennaImtTest(unittest.TestCase):
         self.assertEqual(h_att,-30)
         self.assertEqual(h_att,-1.0*self.antenna1.am)
         
+        # Test vector
+        phi = np.array([0, 120, 150])
+        h_att = self.antenna1.horizontal_pattern(phi)
+        self.assertTrue(np.all(h_att == np.array([0.0,-27.0,-30.0])))
+        
     def test_vertical_pattern(self):
         # theta = 90 results in zero gain
         theta = 90
@@ -92,24 +98,24 @@ class AntennaImtTest(unittest.TestCase):
         self.assertEqual(v_att,-30)
         self.assertEqual(v_att,-1.0*self.antenna1.sla_v)
         
-    def test_element_pattern(self):
-        # theta = 0 and phi = 90 result in maximum gain
-        phi = 0
-        theta = 90
-        e_gain = self.antenna1.element_pattern(phi,theta)
-        self.assertEqual(e_gain,5.0)
-        self.assertEqual(e_gain,self.antenna1.g_max)
-        
-        phi = 80
-        theta = 150
-        e_gain = self.antenna1.element_pattern(phi,theta)
-        self.assertEqual(e_gain,-19.0)
-        
-        phi = 150
-        theta = 210
-        e_gain = self.antenna1.element_pattern(phi,theta)
-        self.assertEqual(e_gain,-25.0)
-        self.assertEqual(e_gain,self.antenna1.g_max - self.antenna1.am)
+#    def test_element_pattern(self):
+#        # theta = 0 and phi = 90 result in maximum gain
+#        phi = 0
+#        theta = 90
+#        e_gain = self.antenna1.element_pattern(phi,theta)
+#        self.assertEqual(e_gain,5.0)
+#        self.assertEqual(e_gain,self.antenna1.g_max)
+#        
+#        phi = 80
+#        theta = 150
+#        e_gain = self.antenna1.element_pattern(phi,theta)
+#        self.assertEqual(e_gain,-19.0)
+#        
+#        phi = 150
+#        theta = 210
+#        e_gain = self.antenna1.element_pattern(phi,theta)
+#        self.assertEqual(e_gain,-25.0)
+#        self.assertEqual(e_gain,self.antenna1.g_max - self.antenna1.am)
         
 if __name__ == '__main__':
     unittest.main()
