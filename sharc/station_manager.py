@@ -8,7 +8,7 @@ Created on Fri Feb  3 15:29:48 2017
 import numpy as np
 
 from sharc.station import Station
-from sharc.antenna.antenna import Antenna
+from sharc.antenna.antenna_omni import AntennaOmni
 
 class StationManager(object):
     """
@@ -26,8 +26,8 @@ class StationManager(object):
         self.__tx_power = np.empty(n)
         self.__rx_power = np.empty(n)
         self.__rx_interference = np.empty(n)
-        self.__tx_antenna = np.array([Antenna() for i in range(n)])
-        self.__rx_antenna = np.array([Antenna() for i in range(n)])
+        self.__tx_antenna = np.array([AntennaOmni() for i in range(n)])
+        self.__rx_antenna = np.array([AntennaOmni() for i in range(n)])
         self.__bandwidth = np.empty(n)
         self.__noise_figure = np.empty(n)
         self.__noise_temperature = np.empty(n)

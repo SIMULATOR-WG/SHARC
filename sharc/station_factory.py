@@ -10,7 +10,7 @@ import numpy as np
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_manager import StationManager
-from sharc.antenna.antenna import Antenna
+from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.topology.topology import Topology
 
 class StationFactory(object):
@@ -27,9 +27,9 @@ class StationFactory(object):
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
         imt_base_stations.rx_interference = -500*np.ones(num_bs)
         imt_base_stations.tx_antenna = \
-            np.array([Antenna(param.bs_tx_antenna_gain) for i in range(num_bs)])
+            np.array([AntennaOmni(param.bs_tx_antenna_gain) for i in range(num_bs)])
         imt_base_stations.rx_antenna = \
-            np.array([Antenna(param.bs_rx_antenna_gain) for i in range(num_bs)])
+            np.array([AntennaOmni(param.bs_rx_antenna_gain) for i in range(num_bs)])
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.is_satellite = False
@@ -59,9 +59,9 @@ class StationFactory(object):
         imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.tx_antenna = \
-            np.array([Antenna(param.ue_tx_antenna_gain) for i in range(num_ue)])
+            np.array([AntennaOmni(param.ue_tx_antenna_gain) for i in range(num_ue)])
         imt_ue.rx_antenna = \
-            np.array([Antenna(param.ue_rx_antenna_gain) for i in range(num_ue)])
+            np.array([AntennaOmni(param.ue_rx_antenna_gain) for i in range(num_ue)])
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         imt_ue.is_satellite = False
@@ -95,7 +95,7 @@ class StationFactory(object):
         satellite_stations.height = param.sat_altitude
         satellite_stations.active = True
         satellite_stations.rx_antenna = \
-            np.array([Antenna(param.sat_rx_antenna_gain)])
+            np.array([AntennaOmni(param.sat_rx_antenna_gain)])
         satellite_stations.bandwidth = param.sat_bandwidth
         satellite_stations.noise_temperature = param.sat_noise_temperature
         satellite_stations.rx_interference = -500

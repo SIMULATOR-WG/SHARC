@@ -11,7 +11,7 @@ import numpy.testing as npt
 
 from sharc.simulation_downlink import SimulationDownlink
 from sharc.parameters.parameters_imt import ParametersImt
-from sharc.antenna.antenna import Antenna
+from sharc.antenna.antenna_omni import AntennaOmni
 
 class SimulationDownlinkTest(unittest.TestCase):
 
@@ -214,8 +214,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation_downlink.receiver.y = np.array([0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 2)
 
-        self.simulation_downlink.transmitter.tx_antenna = [Antenna(0), Antenna(1)]
-        self.simulation_downlink.receiver.rx_antenna = [Antenna(2), Antenna(3)]
+        self.simulation_downlink.transmitter.tx_antenna = [AntennaOmni(0), AntennaOmni(1)]
+        self.simulation_downlink.receiver.rx_antenna = [AntennaOmni(2), AntennaOmni(3)]
 
         # let's calculate coupling loss
         self.simulation_downlink.calculate_coupling_loss()
@@ -269,8 +269,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation_downlink.receiver.y = np.array([0, 0, 0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 4)
 
-        self.simulation_downlink.transmitter.tx_antenna = [Antenna(0), Antenna(1)]
-        self.simulation_downlink.receiver.rx_antenna = [Antenna(2), Antenna(3), Antenna(4), Antenna(5)]
+        self.simulation_downlink.transmitter.tx_antenna = [AntennaOmni(0), AntennaOmni(1)]
+        self.simulation_downlink.receiver.rx_antenna = [AntennaOmni(2), AntennaOmni(3), AntennaOmni(4), AntennaOmni(5)]
 
         # let's calculate coupling loss
         self.simulation_downlink.calculate_coupling_loss()
