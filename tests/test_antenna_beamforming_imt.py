@@ -36,8 +36,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.ue_tx_element_vert_spacing = 0.5
         
         # Create antenna objects
-        self.antenna1 = AntennaBeamformingImt(self.param,"BS","RX")
-        self.antenna2 = AntennaBeamformingImt(self.param,"UE","TX")
+        self.antenna1 = AntennaBeamformingImt(self.param,60,-10,"BS","RX")
+        self.antenna2 = AntennaBeamformingImt(self.param,-33.21,-5.31,"UE","TX")
         
     def test_station_type(self):
         self.assertTrue(self.antenna1.station_type == "BS")
@@ -46,6 +46,14 @@ class AntennaBeamformingImtTest(unittest.TestCase):
     def test_tx_or_rx(self):
         self.assertTrue(self.antenna1.tx_or_rx == "RX")
         self.assertTrue(self.antenna2.tx_or_rx == "TX")
+        
+    def test_azimuth(self):
+        self.assertEqual(self.antenna1.azimuth,60)
+        self.assertEqual(self.antenna2.azimuth,-33.21)
+        
+    def test_elevation(self):
+        self.assertEqual(self.antenna1.elevation,-10)
+        self.assertEqual(self.antenna2.elevation,-5.31)
         
     def test_g_max(self):
         self.assertEqual(self.antenna1.g_max,5)

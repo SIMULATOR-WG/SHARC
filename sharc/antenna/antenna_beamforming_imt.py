@@ -28,22 +28,37 @@ class AntennaBeamformingImt(AntennaElementImt):
         dv (float): vertical element spacing over wavelenght (d/lambda)
     """
     
-    def __init__(self,param: ParametersAntennaImt, station_type: str, txrx: str):
+    def __init__(self,param: ParametersAntennaImt, azimuth: float, elevation: float, station_type: str, txrx: str):
         """
         Constructs an AntennaBeamformingImt object.
         
         Parameters
         ---------
             param (ParametersAntennaImt): antenna IMT parameters
+            azimuth (float): antenna's physical azimuth inclination
+            elevation (float): antenna's physical elevation inclination
             station_type (srt): type of station. Possible values are "BS" and
                 "UE"
+            txrx (srt): indicates whether it is a transmissio or reception 
+                antenna. Possible values are "TX" and "RX"
         """
         super().__init__(param, station_type, txrx)
+        
+        self.__azimuth = azimuth
+        self.__elevation = elevation
         
         self.__n_rows =self.param.n_rows
         self.__n_cols =self.param.n_columns
         self.__dh =self.param.element_horiz_spacing
         self.__dv = self.param.element_vert_spacing
+        
+    @property
+    def azimuth(self):
+        return self.__azimuth
+    
+    @property
+    def elevation(self):
+        return self.__elevation
     
     @property
     def n_rows(self):
