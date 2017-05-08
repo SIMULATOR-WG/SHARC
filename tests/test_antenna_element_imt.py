@@ -98,6 +98,11 @@ class AntennaImtTest(unittest.TestCase):
         self.assertEqual(v_att,-30)
         self.assertEqual(v_att,-1.0*self.antenna1.sla_v)
         
+        # Test vector
+        theta = np.array([90, 180, 210])
+        v_att = self.antenna1.vertical_pattern(theta)
+        self.assertTrue(np.all(v_att == np.array([0.0,-27.0,-30.0])))
+        
 #    def test_element_pattern(self):
 #        # theta = 0 and phi = 90 result in maximum gain
 #        phi = 0

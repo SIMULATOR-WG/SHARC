@@ -79,27 +79,27 @@ class AntennaElementImt(object):
         
         Parameters
         ----------
-            phi (float): azimuth angle [degrees]
+            phi (np.array): azimuth angle [degrees]
             
         Returns
         -------
-            a_h (float): horizontal radiation pattern gain value
+            a_h (np.array): horizontal radiation pattern gain value
         """
         return -1.0*np.minimum(12*(phi/self.phi_3db)**2,self.am)
     
-    def vertical_pattern(self,theta: float) -> float:
+    def vertical_pattern(self,theta: np.array) -> np.array:
         """
         Calculates the vertical radiation pattern.
         
         Parameters
         ----------
-            theta (float): elevation angle [degrees]
+            theta (np.array): elevation angle [degrees]
             
         Returns
         -------
-            a_v (float): vertical radiation pattern gain value
+            a_v (np.array): vertical radiation pattern gain value
         """
-        return -1.0*min(12*((theta-90.0)/self.theta_3db)**2,self.sla_v)
+        return -1.0*np.minimum(12*((theta-90.0)/self.theta_3db)**2,self.sla_v)
         
     def element_pattern(self, phi: float, theta: float) -> float:
         """
