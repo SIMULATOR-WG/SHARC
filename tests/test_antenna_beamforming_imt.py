@@ -269,16 +269,16 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         eps = 1e-5
         
         # Add first beam
-        phi_scan = 45 + self.antenna2.azimuth
-        theta_tilt = 30 + self.antenna2.elevation + 90
+        phi_scan = 11.79
+        theta_tilt = 54.69
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),1)
         self.assertEqual(len(self.antenna2.w_vec_list),1)
         
         # Add second beam
-        phi_scan = 90 + self.antenna2.azimuth
-        theta_tilt = 90 + self.antenna2.elevation + 90
+        phi_scan = 56.79
+        theta_tilt = -5.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),2)
@@ -341,21 +341,37 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi = 45
         theta = 45
         beam = 0
-        phi_scan = 45 + self.antenna2.azimuth
-        theta_tilt = 45 + self.antenna2.elevation + 90
+        phi_scan = 11.79
+        theta_tilt = 39.69
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2.beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
         
-        # Test 1
+        # Test 2
         phi = 0
         theta = 60
         beam = 1
-        phi_scan = 0 + self.antenna2.azimuth
-        theta_tilt = 90 + self.antenna2.elevation + 90
+        phi_scan = 11.79
+        theta_tilt = -5.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2.beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
+        
+    def test_max_beam_gain(self):
+        # Error margin
+        eps = 1e-4
+        
+        # Test 1
+        phi = 45
+        theta = 45
+        beam_g = self.antenna2.max_beam_gain(phi,theta)
+        self.assertAlmostEqual(beam_g,1.594268,delta = eps)
+        
+        # Test 2
+        phi = 32.5
+        theta = 115.2
+        beam_g = self.antenna2.max_beam_gain(phi,theta)
+        self.assertAlmostEqual(beam_g,-0.7617,delta = eps)
         
 if __name__ == '__main__':
     unittest.main()

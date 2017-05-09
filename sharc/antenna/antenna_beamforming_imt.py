@@ -28,6 +28,7 @@ class AntennaBeamformingImt(Antenna):
     def __init__(self,param: ParametersAntennaImt, azimuth: float, elevation: float, station_type: str, txrx: str):
         """
         Constructs an AntennaBeamformingImt object.
+        Does not receive angles in local coordinate system.
         
         Parameters
         ---------
@@ -89,6 +90,7 @@ class AntennaBeamformingImt(Antenna):
     def add_beam(self, phi_etilt: float, theta_etilt: float):
         """
         Add new beam to antenna.
+        Does not receive angles in local coordinate system.
         
         Parameters
         ----------
@@ -96,12 +98,13 @@ class AntennaBeamformingImt(Antenna):
             theta_etilt (float): elevation electrical tilt angle [degrees]
         """
         phi, theta = self.to_local_coord(phi_etilt,theta_etilt)
-        self.__beams_list.append((phi,theta - 90))
-        self.__w_vec_list.append(self.weight_vector(phi,theta - 90))
+        self.__beams_list.append((phi,90 - theta))
+        self.__w_vec_list.append(self.weight_vector(phi,90 - theta))
     
     def super_position_vector(self,phi: float, theta: float) -> np.array:
         """
         Calculates super position vector.
+        Angles are in the local coordinate system.
         
         Parameters
         ----------
@@ -128,6 +131,7 @@ class AntennaBeamformingImt(Antenna):
     def weight_vector(self, phi_tilt: float, theta_tilt: float) -> np.array:
         """
         Calculates super position vector.
+        Angles are in the local coordinate system.
         
         Parameters
         ----------
@@ -196,7 +200,8 @@ class AntennaBeamformingImt(Antenna):
     
     def max_beam_gain(self, phi: float, theta: float) -> float:
         """
-        Calculates maximum possible beam gain in a given direction
+        Calculates maximum possible beam gain in a given direction.
+        Angles are in the local coordinate system.
         
         Parameters
         ----------
@@ -210,7 +215,7 @@ class AntennaBeamformingImt(Antenna):
         element_g = self.element.element_pattern(phi,theta)
         
         v_vec = self.super_position_vector(phi,theta)
-        w_vec = self.weight_vector(phi,theta)
+        w_vec = self.weight_vector(phi,90-theta)
         
         array_g = self.array_gain(v_vec,w_vec)
         
