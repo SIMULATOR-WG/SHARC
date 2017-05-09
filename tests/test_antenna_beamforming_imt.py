@@ -340,17 +340,21 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 1
         phi = 45
         theta = 45
+        beam = 0
         phi_scan = 45
         theta_tilt = 45
-        beam_g = self.antenna2.beam_gain(phi,theta,phi_scan,theta_tilt)
+        self.antenna2.add_beam(phi_scan,theta_tilt)
+        beam_g = self.antenna2.beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
         
         # Test 1
         phi = 0
         theta = 60
+        beam = 1
         phi_scan = 0
         theta_tilt = 90
-        beam_g = self.antenna2.beam_gain(phi,theta,phi_scan,theta_tilt)
+        self.antenna2.add_beam(phi_scan,theta_tilt)
+        beam_g = self.antenna2.beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
         
 if __name__ == '__main__':

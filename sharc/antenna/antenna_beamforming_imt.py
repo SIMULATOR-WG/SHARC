@@ -168,7 +168,7 @@ class AntennaBeamformingImt(Antenna):
         return array_g
         
     
-    def beam_gain(self,phi: float, theta: float, phi_scan: float, theta_tilt: float) -> float:
+    def beam_gain(self,phi: float, theta: float, beam: int) -> float:
         """
         Calculates gain for a single beam in a given direction.
         
@@ -186,9 +186,8 @@ class AntennaBeamformingImt(Antenna):
         element_g = self.element.element_pattern(phi,theta)
         
         v_vec = self.super_position_vector(phi,theta)
-        w_vec = self.weight_vector(phi_scan,theta_tilt)
         
-        array_g = self.array_gain(v_vec,w_vec)
+        array_g = self.array_gain(v_vec,self.__w_vec_list[beam])
         
         gain = element_g + array_g
         
