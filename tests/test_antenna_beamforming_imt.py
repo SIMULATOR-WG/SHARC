@@ -269,16 +269,16 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         eps = 1e-5
         
         # Add first beam
-        phi_scan = 45
-        theta_tilt = 30
+        phi_scan = 45 + self.antenna2.azimuth
+        theta_tilt = 30 + self.antenna2.elevation + 90
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),1)
         self.assertEqual(len(self.antenna2.w_vec_list),1)
         
         # Add second beam
-        phi_scan = 90
-        theta_tilt = 90
+        phi_scan = 90 + self.antenna2.azimuth
+        theta_tilt = 90 + self.antenna2.elevation + 90
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),2)
@@ -341,8 +341,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi = 45
         theta = 45
         beam = 0
-        phi_scan = 45
-        theta_tilt = 45
+        phi_scan = 45 + self.antenna2.azimuth
+        theta_tilt = 45 + self.antenna2.elevation + 90
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2.beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
@@ -351,8 +351,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi = 0
         theta = 60
         beam = 1
-        phi_scan = 0
-        theta_tilt = 90
+        phi_scan = 0 + self.antenna2.azimuth
+        theta_tilt = 90 + self.antenna2.elevation + 90
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2.beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
