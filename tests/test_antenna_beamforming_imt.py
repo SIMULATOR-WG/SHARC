@@ -83,6 +83,14 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(self.antenna1.dv,1)
         self.assertEqual(self.antenna2.dv,0.5)
         
+    def test_beams_list(self):
+        self.assertEqual(len(self.antenna1.beams_list),0)
+        self.assertEqual(len(self.antenna2.beams_list),0)
+        
+    def w_vec_list(self):
+        self.assertEqual(len(self.antenna1.w_vec_list),0)
+        self.assertEqual(len(self.antenna2.w_vec_list),0)
+        
     def test_horizontal_pattern(self):  
         # phi = 0 results in zero gain
         phi = 0
@@ -100,6 +108,11 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(h_att,-30)
         self.assertEqual(h_att,-1.0*self.antenna1.element.am)
         
+        # Test vector
+        phi = np.array([0, 120, 150])
+        h_att = self.antenna1.element.horizontal_pattern(phi)
+        self.assertTrue(np.all(h_att == np.array([0.0,-27.0,-30.0])))
+        
     def test_vertical_pattern(self):
         # theta = 90 results in zero gain
         theta = 90
@@ -116,6 +129,11 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         v_att = self.antenna1.element.vertical_pattern(theta)
         self.assertEqual(v_att,-30)
         self.assertEqual(v_att,-1.0*self.antenna1.element.sla_v)
+        
+        # Test vector
+        theta = np.array([90, 180, 210])
+        v_att = self.antenna1.element.vertical_pattern(theta)
+        self.assertTrue(np.all(v_att == np.array([0.0,-27.0,-30.0])))
         
     def test_element_pattern(self):
         # theta = 0 and phi = 90 result in maximum gain
@@ -136,6 +154,12 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(e_gain,-25.0)
         self.assertEqual(e_gain,self.antenna1.element.g_max - \
                          self.antenna1.element.am)
+        
+        # Test vector
+        phi = np.array([0,80,150])
+        theta = np.array([90,150,210])
+        e_gain = self.antenna1.element.element_pattern(phi,theta)
+        self.assertTrue(np.all(e_gain == np.array([5.0,-19.0,-25.0])))
         
     def test_super_position_vector(self):
         # Error margin

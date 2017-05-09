@@ -22,6 +22,7 @@ class AntennaBeamformingImt(Antenna):
         n_cols (int): number of columns in array
         dh (float): horizontal element spacing over wavelenght (d/lambda)
         dv (float): vertical element spacing over wavelenght (d/lambda)
+        beams (list): vertical and horizontal tilts of beams
     """
     
     def __init__(self,param: ParametersAntennaImt, azimuth: float, elevation: float, station_type: str, txrx: str):
@@ -50,6 +51,9 @@ class AntennaBeamformingImt(Antenna):
         self.__dh = par.element_horiz_spacing
         self.__dv = par.element_vert_spacing
         
+        self.__beams_list = []
+        self.__w_vec_list = []
+        
     @property
     def azimuth(self):
         return self.__azimuth
@@ -73,6 +77,14 @@ class AntennaBeamformingImt(Antenna):
     @property
     def dv(self):
         return self.__dv
+    
+    @property
+    def beams_list(self):
+        return self.__beams_list
+    
+    @property
+    def w_vec_list(self):
+        return self.__w_vec_list
     
     def super_position_vector(self,phi: float, theta: float) -> np.array:
         """
@@ -166,11 +178,11 @@ class AntennaBeamformingImt(Antenna):
         
         array_g = self.array_gain(v_vec,w_vec)
         
-        self.gain = element_g + array_g
+        gain = element_g + array_g
         
-        return self.gain
+        return gain
     
-    def calculate_gain(self,directions: np.array) -> np.array:
+    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array) -> np.array:
         """
         Calculates the gain in the given direction.
         
