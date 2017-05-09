@@ -86,6 +86,18 @@ class AntennaBeamformingImt(Antenna):
     def w_vec_list(self):
         return self.__w_vec_list
     
+    def add_beam(self, phi_etilt: float, theta_etilt: float):
+        """
+        Add new beam to antenna.
+        
+        Parameters
+        ----------
+            phi_etilt (float): azimuth electrical tilt angle [degrees]
+            theta_etilt (float): elevation electrical tilt angle [degrees]
+        """
+        self.__beams_list.append((phi_etilt,theta_etilt))
+        self.__w_vec_list.append(self.weight_vector(phi_etilt,theta_etilt))
+    
     def super_position_vector(self,phi: float, theta: float) -> np.array:
         """
         Calculates super position vector.
@@ -112,20 +124,20 @@ class AntennaBeamformingImt(Antenna):
         
         return v_vec
         
-    def weight_vector(self, phi_scan: float, theta_tilt: float) -> np.array:
+    def weight_vector(self, phi_tilt: float, theta_tilt: float) -> np.array:
         """
         Calculates super position vector.
         
         Parameters
         ----------
-            phi_scan (float): electrical horizontal steering [degrees]
+            phi_tilt (float): electrical horizontal steering [degrees]
             theta_tilt (float): electrical down-tilt steering [degrees]
             
         Returns
         -------
             w_vec (np.array): weighting vector
         """
-        r_phi = np.deg2rad(phi_scan)
+        r_phi = np.deg2rad(phi_tilt)
         r_theta = np.deg2rad(theta_tilt)
         
         n = np.arange(self.n_rows) + 1

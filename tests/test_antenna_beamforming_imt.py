@@ -263,6 +263,50 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertTrue(np.allclose(np.imag(w_vec),\
                                     np.imag(expected_w_vec),rtol = eps))
         
+            
+    def test_add_beam(self):
+        # Error margin
+        eps = 1e-5
+        
+        # Add first beam
+        phi_scan = 45
+        theta_tilt = 30
+        self.antenna2.add_beam(phi_scan,theta_tilt)
+        
+        self.assertEqual(len(self.antenna2.beams_list),1)
+        self.assertEqual(len(self.antenna2.w_vec_list),1)
+        
+        # Add second beam
+        phi_scan = 90
+        theta_tilt = 90
+        self.antenna2.add_beam(phi_scan,theta_tilt)
+        
+        self.assertEqual(len(self.antenna2.beams_list),2)
+        self.assertEqual(len(self.antenna2.w_vec_list),2)
+        
+        # Test first beam
+        self.assertEqual(self.antenna2.beams_list[0][0],45)
+        self.assertEqual(self.antenna2.beams_list[0][1],30)
+        
+        w_vec = self.antenna2.w_vec_list[0]
+        expected_w_vec = np.array([[0.5 + 0.0j, -0.172870 - 0.469169j],\
+                                   [0.0 + 0.5j,  0.469165 - 0.172870j]])
+        self.assertTrue(np.allclose(np.real(w_vec),\
+                                    np.real(expected_w_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(w_vec),\
+                                    np.imag(expected_w_vec),rtol = eps))
+        
+        # Test second beam
+        self.assertEqual(self.antenna2.beams_list[1][0],90)
+        self.assertEqual(self.antenna2.beams_list[1][1],90)
+        
+        w_vec = self.antenna2.w_vec_list[1]
+        expected_w_vec = np.array([[0.5, 0.5],[-0.5, -0.5]])
+        self.assertTrue(np.allclose(np.real(w_vec),\
+                                    np.real(expected_w_vec),rtol = eps))
+        self.assertTrue(np.allclose(np.imag(w_vec),\
+                                    np.imag(expected_w_vec),rtol = eps))
+        
     def test_array_gain(self):
         # Error margin
         eps = 1e-5
