@@ -7,6 +7,7 @@ Created on Sat Apr 15 15:36:22 2017
 
 import unittest
 import numpy as np
+import numpy.testing as npt
 
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
@@ -346,6 +347,32 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta = 115.2
         beam_g = self.antenna2.max_beam_gain(phi,theta)
         self.assertAlmostEqual(beam_g,-0.7617,delta = eps)
+        
+    def test_calculate_gain(self):
+        # Error margin
+        eps = 1e-4
+        
+        # Test 1
+        phi_vec = np.array([45, 32.5])
+        theta_vec = np.array([45, 115.2])
+        gains = self.antenna2.calculate_gain(phi_vec,theta_vec,max_g=True)
+        npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
+        
+#        # Test 2
+#        phi_vec = np.array([45,0])
+#        theta_vec = np.array([45,60])
+#        
+#        # Add two beams
+#        phi_scan = 11.79
+#        theta_tilt = 39.69
+#        self.antenna2.add_beam(phi_scan,theta_tilt)
+#        phi_scan = 11.79
+#        theta_tilt = -5.31
+#        self.antenna2.add_beam(phi_scan,theta_tilt)
+#        
+#        gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
+#        expected = np.array([1.594268 + ,+ 10.454087])
+#        npt.assert_allclose(gains,expected,atol=eps)
         
 if __name__ == '__main__':
     unittest.main()
