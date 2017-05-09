@@ -154,24 +154,7 @@ class AntennaBeamformingImt(Antenna):
         w_vec = (1/np.sqrt(self.n_rows*self.n_cols))*\
                 np.exp(2*np.pi*1.0j*exp_arg)
         
-        return w_vec
-    
-    def array_gain(self, v_vec: np.array, w_vec: np.array) -> float:
-        """
-        Calculates the array gain. Does not consider element gain,
-        
-        Parameters
-        ----------
-            v_vec (np.array): superposition vector
-            w_vec (np.array): weighting vector
-            
-        Returns
-        -------
-            array_g (float): array gain
-        """
-        array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
-        return array_g
-        
+        return w_vec        
     
     def beam_gain(self,phi: float, theta: float, beam: int) -> float:
         """
@@ -192,7 +175,8 @@ class AntennaBeamformingImt(Antenna):
         
         v_vec = self.super_position_vector(phi,theta)
         
-        array_g = self.array_gain(v_vec,self.__w_vec_list[beam])
+        array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,\
+                                            self.__w_vec_list[beam])))**2)
         
         gain = element_g + array_g
         
@@ -217,12 +201,14 @@ class AntennaBeamformingImt(Antenna):
         v_vec = self.super_position_vector(phi,theta)
         w_vec = self.weight_vector(phi,90-theta)
         
-        array_g = self.array_gain(v_vec,w_vec)
+        array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
         
         gain = element_g + array_g
         
-        return gain
-        
+        return gain       
+    
+    def to_local_coord(self,phi: float, theta: float) -> tuple:
+        return phi - self.azimuth, theta - self.elevation
     
     def calculate_gain(self,phi_vec: np.array, theta_vec: np.array) -> np.array:
         """
@@ -238,6 +224,3 @@ class AntennaBeamformingImt(Antenna):
         gains (np.array): gain corresponding to each of the given directions.
         """
         pass
-    
-    def to_local_coord(self,phi: float, theta: float) -> tuple:
-        return phi - self.azimuth, theta - self.elevation
