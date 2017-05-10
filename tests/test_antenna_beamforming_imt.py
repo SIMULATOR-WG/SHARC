@@ -310,7 +310,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
     def test_beam_gain(self):
         # Error margin
-        eps = 1e-5
+        eps = 1e-4
         
         # Test 1
         phi = 45
@@ -332,20 +332,16 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         beam_g = self.antenna2.beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
         
-    def test_max_beam_gain(self):
-        # Error margin
-        eps = 1e-4
-        
-        # Test 1
+        # Test 3
         phi = 45
         theta = 45
-        beam_g = self.antenna2.max_beam_gain(phi,theta)
+        beam_g = self.antenna2.beam_gain(phi,theta)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
         
-        # Test 2
+        # Test 4
         phi = 32.5
         theta = 115.2
-        beam_g = self.antenna2.max_beam_gain(phi,theta)
+        beam_g = self.antenna2.beam_gain(phi,theta)
         self.assertAlmostEqual(beam_g,-0.7617,delta = eps)
         
     def test_calculate_gain(self):
@@ -355,7 +351,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 1
         phi_vec = np.array([45, 32.5])
         theta_vec = np.array([45, 115.2])
-        gains = self.antenna2.calculate_gain(phi_vec,theta_vec,max_g=True)
+        gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
         npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
         
 #        # Test 2

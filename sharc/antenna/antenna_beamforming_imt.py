@@ -56,7 +56,7 @@ class AntennaBeamformingImt(Antenna):
         self.__w_vec_list = []
         
         
-    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, max_g = False) -> np.array:
+    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, beam = -1) -> np.array:
         """
         Calculates the gain in the given direction.
         
@@ -64,7 +64,8 @@ class AntennaBeamformingImt(Antenna):
         ----------
         phi_vec (np.array): azimuth angles [degrees]
         theta_vec (np.array): elevation angles [degrees]
-        max_g (bool): if True, max beam gain in direction will be given.
+        beam (int): Optional, beam index. If not provided, maximum gain is 
+                calculated
             
         Returns
         -------
@@ -75,12 +76,8 @@ class AntennaBeamformingImt(Antenna):
         gains = np.zeros(n_direct)
         
         for g in range(n_direct):
-            if(max_g):
-                gains[g] = self.max_beam_gain(phi_vec[g],theta_vec[g])
-            else:
-                for b in range(len(self.__beams_list)):
-                    gains[g] = gains[g] + self.beam_gain(phi_vec[g],\
-                         theta_vec[g],b)
+                gains[g] = gains[g] + self.beam_gain(phi_vec[g],\
+                         theta_vec[g],beam)
         return gains
         
     @property
@@ -184,7 +181,7 @@ class AntennaBeamformingImt(Antenna):
         
         return w_vec        
     
-    def beam_gain(self,phi: float, theta: float, beam: int) -> float:
+    def beam_gain(self,phi: float, theta: float, beam = -1) -> float:
         """
         Calculates gain for a single beam in a given direction.
         
@@ -192,8 +189,8 @@ class AntennaBeamformingImt(Antenna):
         ----------
             phi (float): azimuth angle [degrees]
             theta (float): elevation angle [degrees]
-            phi_scan (float): electrical horizontal steering [degrees]
-            theta_tilt (float): electrical down-tilt steering [degrees]
+            beam (int): Optional, beam index. If not provided, maximum gain is 
+                calculated
             
         Returns
         -------
@@ -203,37 +200,16 @@ class AntennaBeamformingImt(Antenna):
         
         v_vec = self.super_position_vector(phi,theta)
         
-        array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,\
+        if(beam == -1):
+            w_vec = self.weight_vector(phi,90-theta)
+            array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
+        else:
+            array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,\
                                             self.__w_vec_list[beam])))**2)
         
         gain = element_g + array_g
         
-        return gain
-    
-    def max_beam_gain(self, phi: float, theta: float) -> float:
-        """
-        Calculates maximum possible beam gain in a given direction.
-        Angles are in the local coordinate system.
-        
-        Parameters
-        ----------
-            phi (float): azimuth angle [degrees]
-            theta (float): elevation angle [degrees]
-            
-        Returns
-        -------
-            gain (float): beam gain [dBi]
-        """
-        element_g = self.element.element_pattern(phi,theta)
-        
-        v_vec = self.super_position_vector(phi,theta)
-        w_vec = self.weight_vector(phi,90-theta)
-        
-        array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
-        
-        gain = element_g + array_g
-        
-        return gain       
+        return gain      
     
     def to_local_coord(self,phi: float, theta: float) -> tuple:
         return phi - self.azimuth, theta - self.elevation
