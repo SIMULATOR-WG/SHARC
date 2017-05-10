@@ -54,12 +54,25 @@ class AntennaBeamformingImt(Antenna):
         
         self.__beams_list = []
         self.__w_vec_list = []
+    
+    def add_beam(self, phi_etilt: float, theta_etilt: float):
+        """
+        Add new beam to antenna.
+        Does not receive angles in local coordinate system.
         
+        Parameters
+        ----------
+            phi_etilt (float): azimuth electrical tilt angle [degrees]
+            theta_etilt (float): elevation electrical tilt angle [degrees]
+        """
+        phi, theta = self.to_local_coord(phi_etilt,theta_etilt)
+        self.__beams_list.append((phi,90 - theta))
+        self.__w_vec_list.append(self._weight_vector(phi,90 - theta))
         
     def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, beam = -1) -> np.array:
         """
         Calculates the gain in the given direction.
-        Angles are not in the local coordinate system.
+        Does not receive angles in local coordinate system.
         
         Parameters
         ----------
@@ -79,7 +92,7 @@ class AntennaBeamformingImt(Antenna):
         gains = np.zeros(n_direct)
         
         for g in range(n_direct):
-                gains[g] = self.beam_gain(lo_phi_vec[g],lo_theta_vec[g],beam)
+                gains[g] = self._beam_gain(lo_phi_vec[g],lo_theta_vec[g],beam)
                 
         return gains
         
@@ -115,21 +128,7 @@ class AntennaBeamformingImt(Antenna):
     def w_vec_list(self):
         return self.__w_vec_list
     
-    def add_beam(self, phi_etilt: float, theta_etilt: float):
-        """
-        Add new beam to antenna.
-        Does not receive angles in local coordinate system.
-        
-        Parameters
-        ----------
-            phi_etilt (float): azimuth electrical tilt angle [degrees]
-            theta_etilt (float): elevation electrical tilt angle [degrees]
-        """
-        phi, theta = self.to_local_coord(phi_etilt,theta_etilt)
-        self.__beams_list.append((phi,90 - theta))
-        self.__w_vec_list.append(self.weight_vector(phi,90 - theta))
-    
-    def super_position_vector(self,phi: float, theta: float) -> np.array:
+    def _super_position_vector(self,phi: float, theta: float) -> np.array:
         """
         Calculates super position vector.
         Angles are in the local coordinate system.
@@ -156,7 +155,7 @@ class AntennaBeamformingImt(Antenna):
         
         return v_vec
         
-    def weight_vector(self, phi_tilt: float, theta_tilt: float) -> np.array:
+    def _weight_vector(self, phi_tilt: float, theta_tilt: float) -> np.array:
         """
         Calculates super position vector.
         Angles are in the local coordinate system.
@@ -184,7 +183,7 @@ class AntennaBeamformingImt(Antenna):
         
         return w_vec        
     
-    def beam_gain(self,phi: float, theta: float, beam = -1) -> float:
+    def _beam_gain(self,phi: float, theta: float, beam = -1) -> float:
         """
         Calculates gain for a single beam in a given direction.
         Angles are in the local coordinate system.
@@ -202,10 +201,10 @@ class AntennaBeamformingImt(Antenna):
         """
         element_g = self.element.element_pattern(phi,theta)
         
-        v_vec = self.super_position_vector(phi,theta)
+        v_vec = self._super_position_vector(phi,theta)
         
         if(beam == -1):
-            w_vec = self.weight_vector(phi,90-theta)
+            w_vec = self._weight_vector(phi,90-theta)
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
         else:
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,\
