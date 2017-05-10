@@ -59,6 +59,7 @@ class AntennaBeamformingImt(Antenna):
     def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, beam = -1) -> np.array:
         """
         Calculates the gain in the given direction.
+        Angles are not in the local coordinate system.
         
         Parameters
         ----------
@@ -71,13 +72,15 @@ class AntennaBeamformingImt(Antenna):
         -------
         gains (np.array): gain corresponding to each of the given directions.
         """
-        n_direct = len(theta_vec)
+        lo_phi_vec, lo_theta_vec = self.to_local_coord(phi_vec,theta_vec)
+        
+        n_direct = len(lo_theta_vec)
         
         gains = np.zeros(n_direct)
         
         for g in range(n_direct):
-                gains[g] = gains[g] + self.beam_gain(phi_vec[g],\
-                         theta_vec[g],beam)
+                gains[g] = self.beam_gain(lo_phi_vec[g],lo_theta_vec[g],beam)
+                
         return gains
         
     @property
@@ -184,6 +187,7 @@ class AntennaBeamformingImt(Antenna):
     def beam_gain(self,phi: float, theta: float, beam = -1) -> float:
         """
         Calculates gain for a single beam in a given direction.
+        Angles are in the local coordinate system.
         
         Parameters
         ----------

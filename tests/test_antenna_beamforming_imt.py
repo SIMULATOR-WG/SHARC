@@ -349,26 +349,10 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         eps = 1e-4
         
         # Test 1
-        phi_vec = np.array([45, 32.5])
-        theta_vec = np.array([45, 115.2])
+        phi_vec = np.array([11.79, -0.71])
+        theta_vec = np.array([39.69, 109.89])
         gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
         npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
-        
-#        # Test 2
-#        phi_vec = np.array([45,0])
-#        theta_vec = np.array([45,60])
-#        
-#        # Add two beams
-#        phi_scan = 11.79
-#        theta_tilt = 39.69
-#        self.antenna2.add_beam(phi_scan,theta_tilt)
-#        phi_scan = 11.79
-#        theta_tilt = -5.31
-#        self.antenna2.add_beam(phi_scan,theta_tilt)
-#        
-#        gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
-#        expected = np.array([1.594268 + ,+ 10.454087])
-#        npt.assert_allclose(gains,expected,atol=eps)
         
 if __name__ == '__main__':
     unittest.main()
