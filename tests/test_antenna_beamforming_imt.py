@@ -169,7 +169,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 1
         phi = 0
         theta = 0
-        v_vec = self.antenna2.super_position_vector(phi, theta)
+        v_vec = self.antenna2._super_position_vector(phi, theta)
         expected_v_vec = np.array([[1.0, 1.0],[-1.0, -1.0]])
         self.assertTrue(np.allclose(np.real(v_vec),\
                                     np.real(expected_v_vec),rtol = eps))
@@ -179,7 +179,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 2
         phi = 90
         theta = 90
-        v_vec = self.antenna2.super_position_vector(phi, theta)
+        v_vec = self.antenna2._super_position_vector(phi, theta)
         expected_v_vec = np.array([[1.0, -1.0],[1.0, -1.0]])
         self.assertTrue(np.allclose(np.real(v_vec),\
                                     np.real(expected_v_vec),rtol = eps))
@@ -189,7 +189,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 3
         phi = 45
         theta = 45
-        v_vec = self.antenna2.super_position_vector(phi, theta)
+        v_vec = self.antenna2._super_position_vector(phi, theta)
         expected_v_vec = np.array([[1.0 + 0.0j, 0.0 + 1.0j],\
                     [-0.6056998+0.7956932j, -0.7956932-0.6056998j]])
         self.assertTrue(np.allclose(np.real(v_vec),\
@@ -200,7 +200,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 4
         phi = 60
         theta = 90
-        v_vec = self.antenna2.super_position_vector(phi, theta)
+        v_vec = self.antenna2._super_position_vector(phi, theta)
         expected_v_vec = np.array([[1.0 + 0.0j, -0.912724 + 0.408576j],\
                     [1.0 + 0.0j, -0.912724 + 0.408576j]])
         self.assertTrue(np.allclose(np.real(v_vec),\
@@ -215,7 +215,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 1
         phi_scan = 0
         theta_tilt = 0
-        w_vec = self.antenna2.weight_vector(phi_scan, theta_tilt)
+        w_vec = self.antenna2._weight_vector(phi_scan, theta_tilt)
         expected_w_vec = np.array([[0.5, 0.5],[0.5, 0.5]])
         self.assertTrue(np.allclose(np.real(w_vec),\
                                     np.real(expected_w_vec),rtol = eps))
@@ -225,7 +225,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 2
         phi_scan = 90
         theta_tilt = 90
-        w_vec = self.antenna2.weight_vector(phi_scan, theta_tilt)
+        w_vec = self.antenna2._weight_vector(phi_scan, theta_tilt)
         expected_w_vec = np.array([[0.5, 0.5],[-0.5, -0.5]])
         self.assertTrue(np.allclose(np.real(w_vec),\
                                     np.real(expected_w_vec),rtol = eps))
@@ -235,7 +235,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 3
         phi_scan = 45
         theta_tilt = 45
-        w_vec = self.antenna2.weight_vector(phi_scan, theta_tilt)
+        w_vec = self.antenna2._weight_vector(phi_scan, theta_tilt)
         expected_w_vec = np.array([[0.5 + 0.0j, 0.0 - 0.5j],\
                     [-0.3028499+0.3978466j, 0.3978466+0.3028499j]])
         self.assertTrue(np.allclose(np.real(w_vec),\
@@ -246,7 +246,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 4
         phi_scan = 0
         theta_tilt = 90
-        w_vec = self.antenna2.weight_vector(phi_scan, theta_tilt)
+        w_vec = self.antenna2._weight_vector(phi_scan, theta_tilt)
         expected_w_vec = np.array([[0.5, 0.5],[-0.5, -0.5]])
         self.assertTrue(np.allclose(np.real(w_vec),\
                                     np.real(expected_w_vec),rtol = eps))
@@ -256,7 +256,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 5
         phi_scan = 45
         theta_tilt = 30
-        w_vec = self.antenna2.weight_vector(phi_scan, theta_tilt)
+        w_vec = self.antenna2._weight_vector(phi_scan, theta_tilt)
         expected_w_vec = np.array([[0.5 + 0.0j, -0.172870 - 0.469169j],\
                                    [0.0 + 0.5j,  0.469165 - 0.172870j]])
         self.assertTrue(np.allclose(np.real(w_vec),\
@@ -319,7 +319,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi_scan = 11.79
         theta_tilt = 39.69
         self.antenna2.add_beam(phi_scan,theta_tilt)
-        beam_g = self.antenna2.beam_gain(phi,theta,beam)
+        beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
         
         # Test 2
@@ -329,19 +329,19 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi_scan = 11.79
         theta_tilt = -5.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
-        beam_g = self.antenna2.beam_gain(phi,theta,beam)
+        beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
         
         # Test 3
         phi = 45
         theta = 45
-        beam_g = self.antenna2.beam_gain(phi,theta)
+        beam_g = self.antenna2._beam_gain(phi,theta)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
         
         # Test 4
         phi = 32.5
         theta = 115.2
-        beam_g = self.antenna2.beam_gain(phi,theta)
+        beam_g = self.antenna2._beam_gain(phi,theta)
         self.assertAlmostEqual(beam_g,-0.7617,delta = eps)
         
     def test_calculate_gain(self):
