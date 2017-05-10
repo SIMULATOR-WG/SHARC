@@ -19,19 +19,20 @@ class PlotAntennaPattern(object):
     def __init__(self,figs_dir):
         self.figs_dir = figs_dir
     
-    def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, plot_type: str):
+    def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, antenna_type: str, plot_type: str):
         
         phi_escan = 0
-        theta_tilt = 0
+        theta_tilt = 90
         
         # Plot horizontal pattern
         phi = np.linspace(-180,180, num = 360)
-        theta = 90 + theta_tilt
+        theta = theta_tilt*np.ones(np.size(phi))
 
         if plot_type == "ELEMENT":
-            gain = np.array([antenna.element_pattern(p,theta) for p in phi])
+            gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
-            gain = np.array([antenna.beam_gain(p,theta,phi_escan,theta_tilt) for p in phi])
+            antenna.add_beam(phi_escan,theta_tilt)
+            gain = antenna.calculate_gain(phi,theta,beam=0)
 
         fig = plt.figure(figsize=(20,10))
         ax1 = fig.add_subplot(121)
@@ -49,13 +50,13 @@ class PlotAntennaPattern(object):
         ax1.set_xlim(-180, 180)
 
         # Plot vertical pattern
-        phi = 0 + phi_escan
         theta = np.linspace(0,180, num = 360)
+        phi = (0 + phi_escan)*np.ones(np.size(theta))
 
         if plot_type == "ELEMENT":
-            gain = np.array([antenna.element_pattern(phi,t) for t in theta])
+            gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
-            gain = np.array([antenna.beam_gain(phi,t,phi_escan,theta_tilt) for t in theta])
+            gain = antenna.calculate_gain(phi,theta,beam=0)
 
         ax2 = fig.add_subplot(122, sharey = ax1)
 
@@ -78,30 +79,43 @@ class PlotAntennaPattern(object):
         elif sta_type == "UE":
             file_name = self.figs_dir + "ue_"
             
+        if antenna_type == "TX":
+            file_name = file_name + "tx_"
+        elif antenna_type == "RX":
+            file_name = file_name + "rx_"
+            
         if plot_type == "ELEMENT":
             file_name = file_name + "element_pattern.png"
         elif plot_type == "ARRAY":
             file_name = file_name + "array_pattern.png"
         
-        self.save_file(file_name)
-        
-    def save_file(self,file_name: str):
         plt.savefig(file_name)
+        
         
 if __name__ == '__main__':
     
-    figs_dir = ""
+    figs_dir = "figs/"
 
     param = ParametersAntennaImt()
     plot = PlotAntennaPattern(figs_dir)
 
-    # Plot BS radiation patterns
-    bs_array = AntennaBeamformingImt(param,"BS")
-    plot.plot_element_pattern(bs_array,"BS","ELEMENT")
-    plot.plot_element_pattern(bs_array,"BS","ARRAY")
+    # Plot BS TX radiation patterns
+    bs_array = AntennaBeamformingImt(param,0,0,"BS","TX")
+    plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
+    plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
     
-    # Plot UE radiation patterns
-    ue_array = AntennaBeamformingImt(param,"UE")
-    plot.plot_element_pattern(ue_array,"UE","ELEMENT")
-    plot.plot_element_pattern(ue_array,"UE","ARRAY")
+    # Plot UE TX radiation patterns
+    ue_array = AntennaBeamformingImt(param,0,0,"UE","TX")
+    plot.plot_element_pattern(ue_array,"UE","TX","ELEMENT")
+    plot.plot_element_pattern(ue_array,"UE","TX","ARRAY")
+    
+    # Plot BS RX radiation patterns
+    bs_array = AntennaBeamformingImt(param,0,0,"BS","RX")
+    plot.plot_element_pattern(bs_array,"BS","RX","ELEMENT")
+    plot.plot_element_pattern(bs_array,"BS","RX","ARRAY")
+    
+    # Plot UE RX radiation patterns
+    ue_array = AntennaBeamformingImt(param,0,0,"UE","RX")
+    plot.plot_element_pattern(ue_array,"UE","RX","ELEMENT")
+    plot.plot_element_pattern(ue_array,"UE","RX","ARRAY")
     
