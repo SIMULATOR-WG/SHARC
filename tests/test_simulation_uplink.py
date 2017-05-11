@@ -106,6 +106,46 @@ class SimulationUplinkTest(unittest.TestCase):
 #        self.simulation_uplink.calculate_external_interference()   
 #        self.assertAlmostEqual(self.simulation_uplink.system.inr, 1.02, places=2)
         
+
+    def test_calculate_gains(self):
+        self.param.num_base_stations = 1
+        self.param.num_clusters = 2
+        self.param.ue_k = 2
+        self.param.ue_k_m = 1
+        self.simulation_uplink = SimulationUplink(self.param)
+        
+        # after object instatiation, transmitter and receiver are only arrays
+        self.assertEqual(len(self.simulation_uplink.ue), 4)
+        self.assertEqual(len(self.simulation_uplink.bs), 2)
+        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (2,4))
+        
+        # after initialize(), receivers (base stations) must be created
+        self.simulation_uplink.initialize()
+        self.assertEqual(self.simulation_uplink.bs.num_stations, 2)
+        
+        # it is time to create user equipments
+        self.simulation_uplink.create_ue()
+        self.simulation_uplink.ue.x = np.array([-2000, -500, 400, 1500])
+        self.simulation_uplink.ue.y = np.array([0, 0, 0, 0])
+        self.assertEqual(self.simulation_uplink.ue.num_stations, 4)
+
+        self.simulation_uplink.bs.rx_antenna = [AntennaOmni(0), AntennaOmni(1)]
+        self.simulation_uplink.ue.tx_antenna = [AntennaOmni(2), AntennaOmni(3),\
+                                                AntennaOmni(4), AntennaOmni(5)]
+        
+        # Now we calculate the gain matrix
+        gains = self.simulation_uplink.calculate_gains(self.simulation_uplink.ue,\
+                                                       self.simulation_uplink.bs,\
+                                                       "TX")
+        npt.assert_equal(gains,np.array([[2, 2],
+                                         [3, 3],
+                                         [4, 4],
+                                         [5, 5]]))
+        gains = self.simulation_uplink.calculate_gains(self.simulation_uplink.bs,\
+                                                       self.simulation_uplink.ue,\
+                                                       "RX")
+        npt.assert_equal(gains,np.array([[0, 0, 0, 0],
+                                         [1, 1, 1, 1]]))
                 
 if __name__ == '__main__':
     unittest.main()

@@ -315,3 +315,31 @@ class SimulationUplink(Simulation):
 #        self.results.add_sinr_dl(self.bs.sinr[ids].tolist())
 #        self.results.add_snr_dl(self.bs.snr[ids].tolist())
 
+    def calculate_gains(self,
+                        station_a: StationManager,
+                        station_b: StationManager,
+                        antenna_txrx: str) -> np.array:
+        """
+        Calculates the gains of antennas in station_a in the direction of
+        station_b
+        """
+        point_vec_x = station_a.x[:,np.newaxis] - station_b.x
+        point_vec_y = station_a.y[:,np.newaxis] - station_b.y
+        point_vec_z = station_a.height[:,np.newaxis] - station_b.height
+        dist = station_a.get_3d_distance_to(station_b)
+        
+        phi = np.arctan2(point_vec_y,point_vec_x)
+        theta = np.arccos(point_vec_z/dist)
+        
+        gains = np.zeros_like(phi)
+        if(antenna_txrx == "TX"):
+            for k in range(station_a.num_stations):
+                gains[k,:] = station_a.tx_antenna[k].calculate_gain(phi[k,:],\
+                     theta[k,:])
+        elif(antenna_txrx == "RX"):
+            for k in range(station_a.num_stations):
+                gains[k,:] = station_a.rx_antenna[k].calculate_gain(phi[k,:],\
+                     theta[k,:])
+                
+        return gains
+
