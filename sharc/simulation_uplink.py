@@ -158,11 +158,9 @@ class SimulationUplink(Simulation):
                                              earth_to_space = True)
         else:
             self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
-        antenna_a = station_a.tx_antenna.astype('float')
-        antenna_b = station_b.rx_antenna.astype('float')
-        # replicate columns to have the appropriate size
-        gain_a = np.transpose(np.tile(antenna_a, (station_b.num_stations, 1)))
-        gain_b = np.tile(antenna_b, (station_a.num_stations, 1))
+        # define antenna gains
+        gain_a = self.calculate_gains(station_a,station_b,"TX")
+        gain_b = np.transpose(self.calculate_gains(station_b,station_a,"RX"))
         # calculate coupling loss
         return self.path_loss - gain_a - gain_b
 #        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain,
