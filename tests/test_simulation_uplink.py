@@ -11,6 +11,7 @@ import numpy.testing as npt
 
 from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.antenna.antenna_omni import AntennaOmni
 
 class SimulationUplinkTest(unittest.TestCase):
@@ -49,12 +50,18 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.ue_feed_loss = 3
         self.param.channel_model = "FSPL"
         
+        self.param_ant = ParametersAntennaImt()
+        self.param_ant.bs_tx_antenna_type = "OMNI"
+        self.param_ant.bs_rx_antenna_type = "OMNI"
+        self.param_ant.ue_tx_antenna_type = "OMNI"
+        self.param_ant.ue_rx_antenna_type = "OMNI"
+        
     def test_simulation_2bs_4ue(self):
         self.param.num_base_stations = 1
         self.param.num_clusters = 2
         self.param.ue_k = 2
         self.param.ue_k_m = 1
-        self.simulation_uplink = SimulationUplink(self.param)
+        self.simulation_uplink = SimulationUplink(self.param,self.param_ant)
         
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_uplink.ue), 4)
@@ -112,7 +119,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.num_clusters = 2
         self.param.ue_k = 2
         self.param.ue_k_m = 1
-        self.simulation_uplink = SimulationUplink(self.param)
+        self.simulation_uplink = SimulationUplink(self.param,self.param_ant)
         
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_uplink.ue), 4)

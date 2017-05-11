@@ -24,12 +24,12 @@ class SimulationDownlink(Simulation):
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, param: ParametersImt):
+    def __init__(self, param: ParametersImt, param_ant: ParametersAntennaImt):
         super(SimulationDownlink, self).__init__()
         np.random.seed(0)
 
         self.param = param
-        self.param_imt_antenna = ParametersAntennaImt()
+        self.param_imt_antenna = param_ant
 
         self.topology = TopologyFactory.createTopology(self.param)
 

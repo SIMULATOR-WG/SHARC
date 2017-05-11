@@ -31,11 +31,11 @@ class SimulationUplink(Simulation):
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, param: ParametersImt):
+    def __init__(self, param: ParametersImt, param_ant: ParametersAntennaImt):
         super(SimulationUplink, self).__init__()
         self.param = param
+        self.param_imt_antenna = param_ant
         self.param_system = ParametersFss()
-        self.param_imt_antenna = ParametersAntennaImt()
 
         self.topology = TopologyFactory.createTopology(self.param)
 
