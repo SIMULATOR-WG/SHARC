@@ -24,6 +24,42 @@ class ParametersAntennaImt(object):
         return ParametersAntennaImt.__instance
     
     ###########################################################################
+    # BS transmit antenna type. Possible values are "OMNI", "BEAMFORMING"
+    bs_tx_antenna_type = "OMNI"
+    
+    ###########################################################################
+    # BS receive antenna type. Possible values are "OMNI", "BEAMFORMING"
+    bs_rx_antenna_type = "OMNI"
+    
+    ###########################################################################
+    # UE transmit antenna type. Possible values are "OMNI", "BEAMFORMING"
+    ue_tx_antenna_type = "OMNI"
+    
+    ###########################################################################
+    # UE receive antenna type. Possible values are "OMNI", "BEAMFORMING"
+    ue_rx_antenna_type = "OMNI"
+    
+    ###########################################################################
+    # OMNIDIRECTIONAL ANTENNA PARAMETERS
+    ###########################################################################
+    # Base station transmit antenna gain [dBi]
+    bs_tx_omni_antenna_gain = 0
+
+    ###########################################################################
+    # Base station receive antenna gain [dBi]
+    bs_rx_omni_antenna_gain = 0
+
+    ###########################################################################
+    # UE transmit antenna gain [dBi]
+    ue_tx_omni_antenna_gain = 0
+
+    ###########################################################################
+    # UE receive antenna gain [dBi]
+    ue_rx_omni_antenna_gain = 0
+    
+    ###########################################################################
+    # BEAMFORMING PARAMETERS
+    ###########################################################################
     # Base station maximum transmit element gain [dBi]
     bs_tx_element_max_g = 5
     

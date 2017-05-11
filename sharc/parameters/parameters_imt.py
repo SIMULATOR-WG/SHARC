@@ -88,14 +88,6 @@ class ParametersImt(object):
     bs_height = 10
 
     ###########################################################################
-    # Base station transmit antenna gain [dBi]
-    bs_tx_antenna_gain = 0
-
-    ###########################################################################
-    # Base station receive antenna gain [dBi]
-    bs_rx_antenna_gain = 0
-
-    ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
     bs_aclr = 40
 
@@ -150,14 +142,6 @@ class ParametersImt(object):
     ###########################################################################
     # UE height [m]
     ue_height = 1.5
-
-    ###########################################################################
-    # UE transmit antenna gain [dBi]
-    ue_tx_antenna_gain = 0
-
-    ###########################################################################
-    # UE receive antenna gain [dBi]
-    ue_rx_antenna_gain = 0
 
     ###########################################################################
     # Adjacent channel leakage power Ratio of the user equipment [dB]

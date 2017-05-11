@@ -8,6 +8,7 @@ Created on Thu Mar 23 16:37:32 2017
 import numpy as np
 
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna_omni import AntennaOmni
@@ -16,7 +17,9 @@ from sharc.topology.topology import Topology
 class StationFactory(object):
 
     @staticmethod
-    def generate_imt_base_stations(param: ParametersImt, topology: Topology):
+    def generate_imt_base_stations(param: ParametersImt, 
+                                   param_ant: ParametersAntennaImt,
+                                   topology: Topology):
         num_bs = param.num_clusters*param.num_base_stations
         imt_base_stations = StationManager(num_bs)
         # now we set the coordinates
@@ -26,17 +29,30 @@ class StationFactory(object):
         imt_base_stations.active = np.ones(num_bs)
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
         imt_base_stations.rx_interference = -500*np.ones(num_bs)
-        imt_base_stations.tx_antenna = \
-            np.array([AntennaOmni(param.bs_tx_antenna_gain) for i in range(num_bs)])
-        imt_base_stations.rx_antenna = \
-            np.array([AntennaOmni(param.bs_rx_antenna_gain) for i in range(num_bs)])
+        
+        if(param_ant.bs_tx_antenna_type == "OMNI"):
+            imt_base_stations.tx_antenna = \
+                np.array([AntennaOmni(param.bs_tx_antenna_gain) \
+                          for i in range(num_bs)])
+        elif(param_ant.bs_tx_antenna_type == "BEAMFORMING"):
+            return NotImplemented
+        
+        if(param_ant.bs_rx_antenna_type == "OMNI"):
+            imt_base_stations.rx_antenna = \
+                np.array([AntennaOmni(param.bs_rx_antenna_gain) \
+                          for i in range(num_bs)])
+        elif(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+            return NotImplemented
+            
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.is_satellite = False
         return imt_base_stations
 
     @staticmethod
-    def generate_imt_ue(param: ParametersImt, topology: Topology):
+    def generate_imt_ue(param: ParametersImt, 
+                        param_ant: ParametersAntennaImt,
+                        topology: Topology):
         num_ue = param.num_clusters*param.num_base_stations*param.ue_k*param.ue_k_m
         imt_ue = StationManager(num_ue)
         #imt_ue.x = (topology.x_max - topology.x_min)*np.random.random(num_ue) + topology.x_min
@@ -58,10 +74,21 @@ class StationFactory(object):
         imt_ue.height = param.ue_height*np.ones(num_ue)
         imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
-        imt_ue.tx_antenna = \
-            np.array([AntennaOmni(param.ue_tx_antenna_gain) for i in range(num_ue)])
-        imt_ue.rx_antenna = \
-            np.array([AntennaOmni(param.ue_rx_antenna_gain) for i in range(num_ue)])
+        
+        if(param_ant.ue_tx_antenna_type == "OMNI"):
+            imt_ue.tx_antenna = \
+            np.array([AntennaOmni(param.ue_tx_antenna_gain) \
+                      for i in range(num_ue)])
+        elif(param_ant.bs_tx_antenna_type == "BEAMFORMING"):
+            return NotImplemented
+        
+        if(param_ant.ue_rx_antenna_type == "OMNI"):
+            imt_ue.rx_antenna = \
+            np.array([AntennaOmni(param.ue_rx_antenna_gain) \
+                      for i in range(num_ue)])
+        elif(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+            return NotImplemented
+            
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         imt_ue.is_satellite = False

@@ -12,6 +12,7 @@ import sys
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_factory import StationFactory
 from sharc.station_manager import StationManager
@@ -34,6 +35,7 @@ class SimulationUplink(Simulation):
         super(SimulationUplink, self).__init__()
         self.param = param
         self.param_system = ParametersFss()
+        self.param_imt_antenna = ParametersAntennaImt()
 
         self.topology = TopologyFactory.createTopology(self.param)
 
@@ -94,6 +96,7 @@ class SimulationUplink(Simulation):
 
     def initialize(self, *args, **kwargs):
         self.bs = StationFactory.generate_imt_base_stations(self.param,
+                                                            self.param_imt_antenna,
                                                             self.topology)
 
     def snapshot(self, *args, **kwargs):
@@ -130,7 +133,9 @@ class SimulationUplink(Simulation):
         self.notify_observers(source=__name__, results=self.results)
 
     def create_ue(self):
-        self.ue = StationFactory.generate_imt_ue(self.param, self.topology)
+        self.ue = StationFactory.generate_imt_ue(self.param, \
+                                                 self.param_imt_antenna,\
+                                                 self.topology)
 
     def update_bs(self):
         self.bs.active = np.random.rand(self.bs.num_stations) < self.bs_load_prob
