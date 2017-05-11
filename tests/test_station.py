@@ -86,7 +86,7 @@ class StationTest(unittest.TestCase):
         self.assertTrue(self.station2 != self.station3)
         
         
-        
+       
 if __name__ == '__main__':
     unittest.main()
         
