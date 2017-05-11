@@ -41,7 +41,7 @@ class StationTest(unittest.TestCase):
         self.station3.tx_power = 20
         self.station3.rx_power = -3
         self.station3.tx_antenna = AntennaOmni(30)
-        self.station3.rx_antenna = AntennaOmni(35)   
+        self.station3.rx_antenna = AntennaOmni(35)
         
     def test_id(self):
         self.assertEqual(self.station.id, 1)

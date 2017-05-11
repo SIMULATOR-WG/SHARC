@@ -5,7 +5,7 @@ Created on Mon Feb  6 10:51:19 2017
 @author: edgar
 """
 
-from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna import Antenna
 
 class Station(object):
     
@@ -16,8 +16,8 @@ class Station(object):
         self.__height = 0
         self.__tx_power = 0
         self.__rx_power = 0
-        self.__tx_antenna = AntennaOmni()
-        self.__rx_antenna = AntennaOmni()
+        self.__tx_antenna = Antenna()
+        self.__rx_antenna = Antenna()
         # test attributes below
         self.__active = False
         self.__acs = 0
