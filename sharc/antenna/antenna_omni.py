@@ -16,11 +16,11 @@ class AntennaOmni(Antenna):
     def __init__(self, gain: float = 0):
         self.gain = gain
     
-    def calculate_gain(self,directions: np.array) -> np.array:
+    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array) -> np.array:
         """
         Calculates the gain, which is the same for all the directions
         """
-        return self.gain*np.ones(len(directions))
+        return self.gain*np.ones(len(phi_vec))
     
     def __float__(self):
         return float(self.gain)
