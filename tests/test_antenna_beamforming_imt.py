@@ -37,8 +37,10 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.ue_tx_element_vert_spacing = 0.5
         
         # Create antenna objects
-        self.antenna1 = AntennaBeamformingImt(self.param,60,-10,"BS","RX")
-        self.antenna2 = AntennaBeamformingImt(self.param,-33.21,-5.31,"UE","TX")
+        par = self.param.get_antenna_parameters("BS","RX")
+        self.antenna1 = AntennaBeamformingImt(par,60,-10)
+        par = self.param.get_antenna_parameters("UE","TX")
+        self.antenna2 = AntennaBeamformingImt(par,-33.21,-5.31)
         
     def test_azimuth(self):
         self.assertEqual(self.antenna1.azimuth,60)

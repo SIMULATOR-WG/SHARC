@@ -9,7 +9,7 @@ import numpy as np
 
 from sharc.antenna.antenna_element_imt import AntennaElementImt
 from sharc.antenna.antenna import Antenna
-from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.support.named_tuples import AntennaPar
 
 class AntennaBeamformingImt(Antenna):
     """
@@ -25,7 +25,7 @@ class AntennaBeamformingImt(Antenna):
         beams (list): vertical and horizontal tilts of beams
     """
     
-    def __init__(self,param: ParametersAntennaImt, azimuth: float, elevation: float, station_type: str, txrx: str):
+    def __init__(self,par: AntennaPar, azimuth: float, elevation: float):
         """
         Constructs an AntennaBeamformingImt object.
         Does not receive angles in local coordinate system.
@@ -40,12 +40,12 @@ class AntennaBeamformingImt(Antenna):
             txrx (srt): indicates whether it is a transmissio or reception 
                 antenna. Possible values are "TX" and "RX"
         """
-        self.element = AntennaElementImt(param, station_type, txrx)
+        self.param = par
+        
+        self.element = AntennaElementImt(par)
         
         self.__azimuth = azimuth
         self.__elevation = elevation
-        
-        par = param.get_antenna_parameters(station_type,txrx)
         
         self.__n_rows = par.n_rows
         self.__n_cols = par.n_columns

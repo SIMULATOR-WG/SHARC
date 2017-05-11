@@ -28,8 +28,10 @@ class AntennaImtTest(unittest.TestCase):
         self.param.ue_rx_element_sla_v = 35
         
         # Create antenna IMT objects
-        self.antenna1 = AntennaElementImt(self.param,"BS","TX")
-        self.antenna2 = AntennaElementImt(self.param,"UE","RX")
+        par = self.param.get_antenna_parameters("BS","TX")
+        self.antenna1 = AntennaElementImt(par)
+        par = self.param.get_antenna_parameters("UE","RX")
+        self.antenna2 = AntennaElementImt(par)
         
     def test_g_max(self):
         self.assertEqual(self.antenna1.g_max,5)

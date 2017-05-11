@@ -5,7 +5,7 @@ Created on Sat Apr 15 16:29:36 2017
 @author: Calil
 """
 
-from collections import namedtuple
+from sharc.support.named_tuples import AntennaPar
 
 class ParametersAntennaImt(object):
     """
@@ -169,12 +169,11 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # Named tuples which contain antenna types
-    AntennaType = namedtuple("AntennaType","element_max_g element_phi_3db element_theta_3db element_am element_sla_v n_rows n_columns element_horiz_spacing element_vert_spacing")
     
-    def get_antenna_parameters(self,sta_type: str, txrx: str)-> AntennaType:
+    def get_antenna_parameters(self,sta_type: str, txrx: str)-> AntennaPar:
         if sta_type == "BS":
             if txrx == "TX":
-                tpl = self.AntennaType(self.bs_tx_element_max_g,\
+                tpl = AntennaPar(self.bs_tx_element_max_g,\
                                        self.bs_tx_element_phi_3db,\
                                        self.bs_tx_element_theta_3db,\
                                        self.bs_tx_element_am,\
@@ -184,7 +183,7 @@ class ParametersAntennaImt(object):
                                        self.bs_tx_element_horiz_spacing,\
                                        self.bs_tx_element_vert_spacing)
             elif txrx == "RX":
-                tpl = self.AntennaType(self.bs_rx_element_max_g,\
+                tpl = AntennaPar(self.bs_rx_element_max_g,\
                                        self.bs_rx_element_phi_3db,\
                                        self.bs_rx_element_theta_3db,\
                                        self.bs_rx_element_am,\
@@ -195,7 +194,7 @@ class ParametersAntennaImt(object):
                                        self.bs_rx_element_vert_spacing)
         elif sta_type == "UE":
             if txrx == "TX":
-                tpl = self.AntennaType(self.ue_tx_element_max_g,\
+                tpl = AntennaPar(self.ue_tx_element_max_g,\
                                        self.ue_tx_element_phi_3db,\
                                        self.ue_tx_element_theta_3db,\
                                        self.ue_tx_element_am,\
@@ -205,7 +204,7 @@ class ParametersAntennaImt(object):
                                        self.ue_tx_element_horiz_spacing,\
                                        self.ue_tx_element_vert_spacing)
             elif txrx == "RX":
-                tpl = self.AntennaType(self.ue_rx_element_max_g,\
+                tpl = AntennaPar(self.ue_rx_element_max_g,\
                                        self.ue_rx_element_phi_3db,\
                                        self.ue_rx_element_theta_3db,\
                                        self.ue_rx_element_am,\
