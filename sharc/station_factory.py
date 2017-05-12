@@ -21,11 +21,19 @@ class StationFactory(object):
                                    param_ant: ParametersAntennaImt,
                                    topology: Topology):
         num_bs = param.num_clusters*param.num_base_stations
+        if(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+            num_bs = 3*num_bs
         imt_base_stations = StationManager(num_bs)
+        
         # now we set the coordinates
-        imt_base_stations.x = topology.x
-        imt_base_stations.y = topology.y
+        if(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+            imt_base_stations.x = np.repeat(topology.x,3)
+            imt_base_stations.y = np.repeat(topology.y,3)
+        else:
+            imt_base_stations.x = topology.x
+            imt_base_stations.y = topology.y    
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
+        
         imt_base_stations.active = np.ones(num_bs)
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
         imt_base_stations.rx_interference = -500*np.ones(num_bs)
@@ -35,14 +43,20 @@ class StationFactory(object):
                 np.array([AntennaOmni(param.bs_tx_antenna_gain) \
                           for i in range(num_bs)])
         elif(param_ant.bs_tx_antenna_type == "BEAMFORMING"):
-            return NotImplemented
+            imt_base_stations.tx_antenna = \
+                np.array([AntennaOmni(param.bs_tx_antenna_gain) \
+                          for i in range(num_bs)])
+#            return NotImplemented
         
         if(param_ant.bs_rx_antenna_type == "OMNI"):
             imt_base_stations.rx_antenna = \
                 np.array([AntennaOmni(param.bs_rx_antenna_gain) \
                           for i in range(num_bs)])
         elif(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
-            return NotImplemented
+            imt_base_stations.rx_antenna = \
+                np.array([AntennaOmni(param.bs_rx_antenna_gain) \
+                          for i in range(num_bs)])
+#            return NotImplemented
             
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
@@ -79,15 +93,21 @@ class StationFactory(object):
             imt_ue.tx_antenna = \
             np.array([AntennaOmni(param.ue_tx_antenna_gain) \
                       for i in range(num_ue)])
-        elif(param_ant.bs_tx_antenna_type == "BEAMFORMING"):
-            return NotImplemented
+        elif(param_ant.ue_tx_antenna_type == "BEAMFORMING"):
+            imt_ue.tx_antenna = \
+            np.array([AntennaOmni(param.ue_tx_antenna_gain) \
+                      for i in range(num_ue)])
+#            return NotImplemented
         
         if(param_ant.ue_rx_antenna_type == "OMNI"):
             imt_ue.rx_antenna = \
             np.array([AntennaOmni(param.ue_rx_antenna_gain) \
                       for i in range(num_ue)])
-        elif(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
-            return NotImplemented
+        elif(param_ant.ue_rx_antenna_type == "BEAMFORMING"):
+            imt_ue.rx_antenna = \
+            np.array([AntennaOmni(param.ue_rx_antenna_gain) \
+                      for i in range(num_ue)])
+#            return NotImplemented
             
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)

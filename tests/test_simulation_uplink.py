@@ -51,16 +51,16 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.channel_model = "FSPL"
         
         self.param_ant = ParametersAntennaImt()
-        self.param_ant.bs_tx_antenna_type = "OMNI"
-        self.param_ant.bs_rx_antenna_type = "OMNI"
-        self.param_ant.ue_tx_antenna_type = "OMNI"
-        self.param_ant.ue_rx_antenna_type = "OMNI"
         
-    def test_simulation_2bs_4ue(self):
+    def test_simulation_2bs_4ue_omni(self):
         self.param.num_base_stations = 1
         self.param.num_clusters = 2
         self.param.ue_k = 2
         self.param.ue_k_m = 1
+        self.param_ant.bs_tx_antenna_type = "OMNI"
+        self.param_ant.bs_rx_antenna_type = "OMNI"
+        self.param_ant.ue_tx_antenna_type = "OMNI"
+        self.param_ant.ue_rx_antenna_type = "OMNI"
         self.simulation_uplink = SimulationUplink(self.param,self.param_ant)
         
         # after object instatiation, transmitter and receiver are only arrays
@@ -112,13 +112,66 @@ class SimulationUplinkTest(unittest.TestCase):
 
 #        self.simulation_uplink.calculate_external_interference()   
 #        self.assertAlmostEqual(self.simulation_uplink.system.inr, 1.02, places=2)
+
+    def test_simulation_2bs_4ue_beamforming(self):
+        self.param.num_base_stations = 1
+        self.param.num_clusters = 1
+        self.param.ue_k = 2
+        self.param.ue_k_m = 1
+        self.param_ant.bs_tx_antenna_type = "BEAMFORMING"
+        self.param_ant.bs_rx_antenna_type = "BEAMFORMING"
+        self.param_ant.ue_tx_antenna_type = "BEAMFORMING"
+        self.param_ant.ue_rx_antenna_type = "BEAMFORMING"
+        self.param_ant.bs_rx_element_max_g = 5
+        self.param_ant.bs_rx_element_phi_3db = 80
+        self.param_ant.bs_rx_element_theta_3db = 60
+        self.param_ant.bs_rx_element_am = 30
+        self.param_ant.bs_rx_element_sla_v = 30
+        self.param_ant.bs_rx_n_rows = 2
+        self.param_ant.bs_rx_n_columns = 2
+        self.param_ant.bs_rx_element_horiz_spacing = 1
+        self.param_ant.bs_rx_element_vert_spacing = 1
+        self.param_ant.ue_tx_element_max_g = 10
+        self.param_ant.ue_tx_element_phi_3db = 75
+        self.param_ant.ue_tx_element_theta_3db = 65
+        self.param_ant.ue_tx_element_am = 25
+        self.param_ant.ue_tx_element_sla_v = 35
+        self.param_ant.ue_tx_n_rows = 2
+        self.param_ant.ue_tx_n_columns = 2
+        self.param_ant.ue_tx_element_horiz_spacing = 0.5
+        self.param_ant.ue_tx_element_vert_spacing = 0.5
         
+        self.simulation_uplink = SimulationUplink(self.param,self.param_ant)
+        
+        # after object instatiation, transmitter and receiver are only arrays
+        self.assertEqual(len(self.simulation_uplink.ue), 2)
+        self.assertEqual(len(self.simulation_uplink.bs), 3*1)
+        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (3*1,2))
+        
+        # after initialize(), receivers (base stations) must be created
+        self.simulation_uplink.initialize()
+        self.assertEqual(self.simulation_uplink.bs.num_stations, 3*1)
+        
+        # create FSS system
+        self.simulation_uplink.create_system()
+        
+        # it is time to create user equipments
+        self.simulation_uplink.create_ue()
+        self.simulation_uplink.ue.x = np.array([-2000, 1500])
+        self.simulation_uplink.ue.y = np.array([0, 0])
+        self.assertEqual(self.simulation_uplink.ue.num_stations, 2)
+
+        # and test all antenna creations        
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
         self.param.num_clusters = 2
         self.param.ue_k = 2
         self.param.ue_k_m = 1
+        self.param_ant.bs_tx_antenna_type = "OMNI"
+        self.param_ant.bs_rx_antenna_type = "OMNI"
+        self.param_ant.ue_tx_antenna_type = "OMNI"
+        self.param_ant.ue_rx_antenna_type = "OMNI"
         self.simulation_uplink = SimulationUplink(self.param,self.param_ant)
         
         # after object instatiation, transmitter and receiver are only arrays
@@ -132,8 +185,6 @@ class SimulationUplinkTest(unittest.TestCase):
         
         # it is time to create user equipments
         self.simulation_uplink.create_ue()
-        self.simulation_uplink.ue.x = np.array([-2000, -500, 400, 1500])
-        self.simulation_uplink.ue.y = np.array([0, 0, 0, 0])
         self.assertEqual(self.simulation_uplink.ue.num_stations, 4)
 
         self.simulation_uplink.bs.rx_antenna = [AntennaOmni(0), AntennaOmni(1)]
