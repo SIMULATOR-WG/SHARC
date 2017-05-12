@@ -113,7 +113,7 @@ class SimulationUplinkTest(unittest.TestCase):
 #        self.simulation_uplink.calculate_external_interference()   
 #        self.assertAlmostEqual(self.simulation_uplink.system.inr, 1.02, places=2)
 
-    def test_simulation_2bs_4ue_beamforming(self):
+    def test_simulation_1bs_2ue_beamforming(self):
         self.param.num_base_stations = 1
         self.param.num_clusters = 1
         self.param.ue_k = 2
@@ -122,6 +122,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param_ant.bs_rx_antenna_type = "BEAMFORMING"
         self.param_ant.ue_tx_antenna_type = "BEAMFORMING"
         self.param_ant.ue_rx_antenna_type = "BEAMFORMING"
+        self.param_ant.bs_rx_azimuth = [60, 180, 300]
+        self.param_ant.bs_rx_elevation = -10
         self.param_ant.bs_rx_element_max_g = 5
         self.param_ant.bs_rx_element_phi_3db = 80
         self.param_ant.bs_rx_element_theta_3db = 60
@@ -145,12 +147,22 @@ class SimulationUplinkTest(unittest.TestCase):
         
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_uplink.ue), 2)
-        self.assertEqual(len(self.simulation_uplink.bs), 3*1)
-        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (3*1,2))
+        self.assertEqual(len(self.simulation_uplink.bs), 3)
+        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (3,2))
         
         # after initialize(), receivers (base stations) must be created
         self.simulation_uplink.initialize()
-        self.assertEqual(self.simulation_uplink.bs.num_stations, 3*1)
+        self.assertEqual(self.simulation_uplink.bs.num_stations, 3)
+        self.assertEqual(len(self.simulation_uplink.bs.x),3)
+        self.assertEqual(len(self.simulation_uplink.bs.y),3)
+        
+        # test BS antennas
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[0].azimuth, 60)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[1].azimuth, 180)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[2].azimuth, 300)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[0].elevation, -10)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[1].elevation, -10)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[2].elevation, -10)
         
         # create FSS system
         self.simulation_uplink.create_system()
@@ -161,7 +173,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation_uplink.ue.y = np.array([0, 0])
         self.assertEqual(self.simulation_uplink.ue.num_stations, 2)
 
-        # and test all antenna creations        
+        # and test UE antenna creations        
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1

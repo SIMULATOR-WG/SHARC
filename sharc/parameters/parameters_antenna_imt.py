@@ -60,6 +60,14 @@ class ParametersAntennaImt(object):
     ###########################################################################
     # BEAMFORMING PARAMETERS
     ###########################################################################
+    # BS sector azimuth angle [degrees]
+    bs_tx_azimuth = [60, 180, 300]
+    
+    ###########################################################################
+    # BS sector elevation angle [degrees]
+    bs_tx_elevation = -10
+    
+    ###########################################################################
     # Base station maximum transmit element gain [dBi]
     bs_tx_element_max_g = 5
     
@@ -94,6 +102,14 @@ class ParametersAntennaImt(object):
     ###########################################################################
     # Base station array vertical transmit element spacing (d/lambda)
     bs_tx_element_vert_spacing = 0.5
+    
+    ###########################################################################
+    # BS sector azimuth angle [degrees]
+    bs_rx_azimuth = [60, 180, 300]
+    
+    ###########################################################################
+    # BS sector elevation angle [degrees]
+    bs_rx_elevation = -10
     
     ###########################################################################
     # Base station maximum receive element gain [dBi]
@@ -132,6 +148,18 @@ class ParametersAntennaImt(object):
     bs_rx_element_vert_spacing = 0.5
     
     ###########################################################################
+    # UE pointing type. Possible values are "FIXED" and "RANDOM".
+    ue_tx_pointing = "FIXED"
+    
+    ###########################################################################
+    # UEs azimuth angle, if fixed [degrees]
+    ue_tx_azimuth = 0
+    
+    ###########################################################################
+    # UEs elevation angle, if fixed [degrees]
+    ue_tx_elevation = 0
+    
+    ###########################################################################
     # UE maximum transmit element gain [dBi]
     ue_tx_element_max_g = 5
     
@@ -166,6 +194,18 @@ class ParametersAntennaImt(object):
     ###########################################################################
     # UE array vertical transmit element spacing (d/lambda)
     ue_tx_element_vert_spacing = 0.5
+    
+    ###########################################################################
+    # UE pointing type. Possible values are "FIXED" and "RANDOM".
+    ue_rx_pointing = "FIXED"
+    
+    ###########################################################################
+    # UEs azimuth angle, if fixed [degrees]
+    ue_rx_azimuth = 0
+    
+    ###########################################################################
+    # UEs elevation angle, if fixed [degrees]
+    ue_rx_elevation = 0
     
     ###########################################################################
     # UE maximum receive element gain [dBi]

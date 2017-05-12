@@ -12,6 +12,7 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 
 class StationFactory(object):
@@ -21,7 +22,8 @@ class StationFactory(object):
                                    param_ant: ParametersAntennaImt,
                                    topology: Topology):
         num_bs = param.num_clusters*param.num_base_stations
-        if(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+        if(param_ant.bs_tx_antenna_type == "BEAMFORMING" or \
+           param_ant.bs_rx_antenna_type == "BEAMFORMING"):
             num_bs = 3*num_bs
         imt_base_stations = StationManager(num_bs)
         
@@ -43,20 +45,24 @@ class StationFactory(object):
                 np.array([AntennaOmni(param.bs_tx_antenna_gain) \
                           for i in range(num_bs)])
         elif(param_ant.bs_tx_antenna_type == "BEAMFORMING"):
-            imt_base_stations.tx_antenna = \
-                np.array([AntennaOmni(param.bs_tx_antenna_gain) \
-                          for i in range(num_bs)])
-#            return NotImplemented
+            imt_base_stations.tx_antenna = np.empty(num_bs,dtype=AntennaBeamformingImt)
+            par = param_ant.get_antenna_parameters("BS","TX")
+            for i in range(num_bs):
+                imt_base_stations.rx_antenna[i] = \
+                AntennaBeamformingImt(par,param_ant.bs_tx_azimuth[i%3],\
+                                      param_ant.bs_tx_elevation)
         
         if(param_ant.bs_rx_antenna_type == "OMNI"):
             imt_base_stations.rx_antenna = \
                 np.array([AntennaOmni(param.bs_rx_antenna_gain) \
                           for i in range(num_bs)])
         elif(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
-            imt_base_stations.rx_antenna = \
-                np.array([AntennaOmni(param.bs_rx_antenna_gain) \
-                          for i in range(num_bs)])
-#            return NotImplemented
+            imt_base_stations.rx_antenna = np.empty(num_bs,dtype=AntennaBeamformingImt)
+            par = param_ant.get_antenna_parameters("BS","RX")
+            for i in range(num_bs):
+                imt_base_stations.rx_antenna[i] = \
+                AntennaBeamformingImt(par,param_ant.bs_rx_azimuth[i%3],\
+                                      param_ant.bs_rx_elevation)
             
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
