@@ -68,6 +68,7 @@ class SimulationUplink(Simulation):
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
 
+
         self.path_loss = np.empty(num_ue)
 
         self.ue = np.empty(num_ue)
@@ -79,7 +80,6 @@ class SimulationUplink(Simulation):
         self.ue_tx_power_control = param.ue_tx_power_control
         self.ue_tx_power_target = param.ue_tx_power_target
         self.ue_tx_power_alfa = param. ue_tx_power_alfa
-
         # this attribute indicates the list of UE's that are connected to each
         # base station. The position the the list indicates the resource block
         # group that is allocated to the given UE
@@ -211,11 +211,13 @@ class SimulationUplink(Simulation):
         """
         Apply uplink power control algorithm
         """
+
         if self.ue_tx_power_control == "OFF":
             self.ue.tx_power = self.param.ue_tx_power*np.ones(self.ue.num_stations)
         else:
             power_aux =  10*np.log10(self.num_rb_per_ue) + self.ue_tx_power_target
             for bs in range(self.bs.num_stations):
+
                 power2 = self.path_loss[self.link[bs], bs]
                 self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
                 self.ue_tx_power_alfa*power2+power_aux)
@@ -310,7 +312,8 @@ class SimulationUplink(Simulation):
         self.results.imt_ul_coupling_loss.extend( \
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
         self.results.system_inr.extend([self.system.inr.tolist()])
-
+        normalized_interference = self.interference_ue/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6)
+        self.results.add_interf_power_ul(normalized_interference.tolist())
         bs_active = np.where( self.bs.active )[0]
 
         for bs in bs_active:

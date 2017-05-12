@@ -137,7 +137,7 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 10
+    ue_k_m = 3
 
     ###########################################################################
     # Power control algorithm
@@ -158,7 +158,6 @@ class ParametersImt(object):
     ###########################################################################
     # UE maximum transmit power [dBm]
     ue_tx_power = 23
-
     ###########################################################################
     # UE height [m]
     ue_height = 1.5
