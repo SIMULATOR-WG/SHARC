@@ -68,6 +68,7 @@ class StationFactory(object):
             
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
+        imt_base_stations.thermal_noise = -500*np.ones(num_bs)
         imt_base_stations.is_satellite = False
         return imt_base_stations
 
