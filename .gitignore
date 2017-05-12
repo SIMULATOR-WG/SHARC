@@ -1,4 +1,7 @@
 /sharc/logfile.log
+/sharc/output/*.txt
+/sharc/output/*.png
+
 __pycache__
 .spyproject
 
