@@ -97,7 +97,7 @@ class SimulationUplink(Simulation):
         self.bs = StationFactory.generate_imt_base_stations(self.param,
                                                             self.topology)
 
-    def snapshot(self, *args, **kwargs):
+    def snapshot(self, write_to_file, snapshot_number, *args, **kwargs):
         self.create_system()
         self.update_bs()
         self.create_ue()
@@ -125,10 +125,11 @@ class SimulationUplink(Simulation):
             self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass
-        self.collect_results()
+        
+        self.collect_results(write_to_file, snapshot_number)
 
-    def finalize(self, *args, **kwargs):
-        self.results.write_files()
+    def finalize(self, snapshot_number, *args, **kwargs):
+        self.results.write_files(snapshot_number)
         self.notify_observers(source=__name__, results=self.results)
 
     def create_ue(self):
@@ -215,28 +216,31 @@ class SimulationUplink(Simulation):
         else:
             power_aux =  10*np.log10(self.num_rb_per_ue) + self.ue_tx_power_target
             for bs in range(self.bs.num_stations):
-                    power2 = self.path_loss[self.link[bs], bs]
-                    self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
-                    self.ue_tx_power_alfa*power2+power_aux)
+                power2 = self.path_loss[self.link[bs], bs]
+                self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
+                self.ue_tx_power_alfa*power2+power_aux)
 
     def calculate_sinr(self):
         """
         Calculates the uplink SINR for each UE. This is useful only in the
         cases when IMT system is interfered by other system
         """
-        bs_all = [b for b in range(self.bs.num_stations)]
-        self.bs.rx_power = dict([(bs,[-500] * len(self.link[bs])) for bs in range(self.bs.num_stations)])
-        self.bs.rx_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
-        self.bs.total_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
-        self.bs.snr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
-        self.bs.sinr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in range(self.bs.num_stations)])
+        #bs_all = [b for b in range(self.bs.num_stations)]
+        bs_active = np.where( self.bs.active )[0]
 
-        # calculate uplink received power for each BS
-        for bs, ue_list in self.link.items():
-            self.bs.rx_power[bs] = np.array(self.ue.tx_power[ue_list]) \
-                                    - np.array(self.coupling_loss[bs,ue_list])
+        self.bs.rx_power = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.rx_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.total_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.snr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.sinr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+
+
+        # calculate uplink received power for each active BS
+        for bs in bs_active:
+            ue_list = self.link[bs]
+            self.bs.rx_power[bs] = self.ue.tx_power[ue_list] - self.coupling_loss[bs,ue_list]
             # create a list of BSs that serve the interfering UEs
-            bs_interf = [b for b in bs_all if b not in [bs]]
+            bs_interf = [b for b in bs_active if b not in [bs]]
 
             # calculate intra system interference
             for bi in bs_interf:
@@ -246,10 +250,10 @@ class SimulationUplink(Simulation):
                     np.power(10, 0.1*self.bs.rx_interference[bs])
                     + np.power(10, 0.1*interference))
 
-            self.bs.thermal_noise = \
+            self.bs.thermal_noise[bs] = \
                 10*np.log10(self.param.BOLTZMANN_CONSTANT*self.param.noise_temperature) + \
                 10*np.log10(self.num_rb_per_ue*self.param.rb_bandwidth * 1e6) + \
-                self.bs.noise_figure
+                self.bs.noise_figure[bs]
     
             self.bs.total_interference[bs] = \
                 10*np.log10(np.power(10, 0.1*self.bs.rx_interference[bs]) + \
@@ -302,19 +306,37 @@ class SimulationUplink(Simulation):
         self.system.inr = self.system.rx_interference - self.system.thermal_noise
 
 
-    def collect_results(self):
-        self.results.add_coupling_loss_ul( \
+    def collect_results(self, write_to_file: bool, snapshot_number: int):
+        self.results.imt_ul_coupling_loss.extend( \
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
-        self.results.add_coupling_loss_bs_sat(self.coupling_loss_bs_sat.tolist())
-        self.results.add_coupling_loss_ue_sat(self.coupling_loss_ue_sat.tolist())
-        normalized_interference = self.interference_ue/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6)
-        self.results.add_interf_power_ul(normalized_interference.tolist())
-        self.results.add_inr([self.system.inr.tolist()])
+        self.results.system_inr.extend([self.system.inr.tolist()])
 
-        for bs in range(self.bs.num_stations):
+        bs_active = np.where( self.bs.active )[0]
+
+        for bs in bs_active:
             ue_list = self.link[bs]
+            tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])
+            self.results.imt_ul_tput.extend(tput.tolist())
+            imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue_list])/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6))
+            self.results.imt_ul_tx_power_density.extend(imt_ul_tx_power_density.tolist())
+            self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
+            self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
             
-            self.results.add_tx_power_ul(self.ue.tx_power[ue_list].tolist())
-            self.results.add_sinr_ul(self.bs.sinr[bs].tolist())
-            self.results.add_snr_ul(self.bs.snr[bs].tolist())
+        if write_to_file:
+            self.results.write_files(snapshot_number)
 
+    def calculate_imt_ul_tput(self, sinr: np.array) -> np.array:
+        tput_min = 0
+        tput_max = self.param.ul_attenuation_factor*math.log2(1+math.pow(10, 0.1*self.param.ul_sinr_max))
+        
+        tput = self.param.ul_attenuation_factor*np.log2(1+np.power(10, 0.1*sinr))
+        
+        id_min = np.where(sinr<self.param.ul_sinr_min)[0]
+        id_max = np.where(sinr>self.param.ul_sinr_max)[0]
+
+        if len(id_min) > 0:
+            tput[id_min] = tput_min
+        if len(id_max) > 0:
+            tput[id_max] = tput_max
+
+        return tput
