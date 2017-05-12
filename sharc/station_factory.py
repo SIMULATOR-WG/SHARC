@@ -47,6 +47,7 @@ class StationFactory(object):
         elif(param_ant.bs_tx_antenna_type == "BEAMFORMING"):
             imt_base_stations.tx_antenna = np.empty(num_bs,dtype=AntennaBeamformingImt)
             par = param_ant.get_antenna_parameters("BS","TX")
+            
             for i in range(num_bs):
                 imt_base_stations.rx_antenna[i] = \
                 AntennaBeamformingImt(par,param_ant.bs_tx_azimuth[i%3],\
@@ -59,6 +60,7 @@ class StationFactory(object):
         elif(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
             imt_base_stations.rx_antenna = np.empty(num_bs,dtype=AntennaBeamformingImt)
             par = param_ant.get_antenna_parameters("BS","RX")
+            
             for i in range(num_bs):
                 imt_base_stations.rx_antenna[i] = \
                 AntennaBeamformingImt(par,param_ant.bs_rx_azimuth[i%3],\
@@ -94,26 +96,44 @@ class StationFactory(object):
         imt_ue.height = param.ue_height*np.ones(num_ue)
         imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
-        
+
         if(param_ant.ue_tx_antenna_type == "OMNI"):
             imt_ue.tx_antenna = \
-            np.array([AntennaOmni(param.ue_tx_antenna_gain) \
-                      for i in range(num_ue)])
+                np.array([AntennaOmni(param.ue_tx_antenna_gain) \
+                          for i in range(num_ue)])
         elif(param_ant.ue_tx_antenna_type == "BEAMFORMING"):
-            imt_ue.tx_antenna = \
-            np.array([AntennaOmni(param.ue_tx_antenna_gain) \
-                      for i in range(num_ue)])
-#            return NotImplemented
-        
+            imt_ue.tx_antenna = np.empty(num_ue,dtype=AntennaBeamformingImt)
+            par = param_ant.get_antenna_parameters("UE","TX")
+            
+            if(param_ant.ue_tx_pointing == "FIXED"):
+                azi = param_ant.ue_tx_azimuth
+                ele = param_ant.ue_tx_elevation
+            elif(param_ant.ue_tx_pointing == "RANDOM"):
+                azi = np.random.uniform(-180,180)
+                ele = np.random.uniform(0,180)
+                
+            for i in range(num_ue):
+                imt_ue.tx_antenna[i] = \
+                AntennaBeamformingImt(par,azi,ele)
+                
         if(param_ant.ue_rx_antenna_type == "OMNI"):
             imt_ue.rx_antenna = \
-            np.array([AntennaOmni(param.ue_rx_antenna_gain) \
-                      for i in range(num_ue)])
+                np.array([AntennaOmni(param.ue_rx_antenna_gain) \
+                          for i in range(num_ue)])
         elif(param_ant.ue_rx_antenna_type == "BEAMFORMING"):
-            imt_ue.rx_antenna = \
-            np.array([AntennaOmni(param.ue_rx_antenna_gain) \
-                      for i in range(num_ue)])
-#            return NotImplemented
+            imt_ue.rx_antenna = np.empty(num_ue,dtype=AntennaBeamformingImt)
+            par = param_ant.get_antenna_parameters("UE","RX")
+            
+            if(param_ant.ue_rx_pointing == "FIXED"):
+                azi = param_ant.ue_rx_azimuth
+                ele = param_ant.ue_rx_elevation
+            elif(param_ant.ue_rx_pointing == "RANDOM"):
+                azi = np.random.uniform(-180,180)
+                ele = np.random.uniform(0,180)
+                
+            for i in range(num_ue):
+                imt_ue.rx_antenna[i] = \
+                AntennaBeamformingImt(par,azi,ele)
             
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)

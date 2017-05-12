@@ -133,6 +133,9 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param_ant.bs_rx_n_columns = 2
         self.param_ant.bs_rx_element_horiz_spacing = 1
         self.param_ant.bs_rx_element_vert_spacing = 1
+        self.param_ant.ue_tx_pointing = "FIXED"
+        self.param_ant.ue_tx_azimuth = 0
+        self.param_ant.ue_tx_elevation = 0
         self.param_ant.ue_tx_element_max_g = 10
         self.param_ant.ue_tx_element_phi_3db = 75
         self.param_ant.ue_tx_element_theta_3db = 65
@@ -169,11 +172,15 @@ class SimulationUplinkTest(unittest.TestCase):
         
         # it is time to create user equipments
         self.simulation_uplink.create_ue()
-        self.simulation_uplink.ue.x = np.array([-2000, 1500])
+        self.simulation_uplink.ue.x = np.array([-1500, 1500])
         self.simulation_uplink.ue.y = np.array([0, 0])
         self.assertEqual(self.simulation_uplink.ue.num_stations, 2)
 
-        # and test UE antenna creations        
+        # and test UE antenna creations
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[0].azimuth, 0)
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[1].azimuth, 0)
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[0].elevation, 0)
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[1].elevation, 0)      
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
