@@ -35,6 +35,7 @@ class AntennaBeamformingImt(Antenna):
             param (ParametersAntennaImt): antenna IMT parameters
             azimuth (float): antenna's physical azimuth inclination
             elevation (float): antenna's physical elevation inclination
+                referenced in the x axis
             station_type (srt): type of station. Possible values are "BS" and
                 "UE"
             txrx (srt): indicates whether it is a transmissio or reception 
@@ -215,4 +216,4 @@ class AntennaBeamformingImt(Antenna):
         return gain      
     
     def to_local_coord(self,phi: float, theta: float) -> tuple:
-        return phi - self.azimuth, theta - self.elevation
+        return phi - self.azimuth, theta + self.elevation

@@ -273,7 +273,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
         # Add first beam
         phi_scan = 11.79
-        theta_tilt = 54.69
+        theta_tilt = 65.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),1)
@@ -281,7 +281,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
         # Add second beam
         phi_scan = 56.79
-        theta_tilt = -5.31
+        theta_tilt = 5.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),2)
@@ -319,7 +319,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta = 45
         beam = 0
         phi_scan = 11.79
-        theta_tilt = 39.69
+        theta_tilt = 50.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
@@ -329,18 +329,12 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta = 60
         beam = 1
         phi_scan = 11.79
-        theta_tilt = -5.31
+        theta_tilt = 5.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
         
         # Test 3
-        phi = 45
-        theta = 45
-        beam_g = self.antenna2._beam_gain(phi,theta)
-        self.assertAlmostEqual(beam_g,1.594268,delta = eps)
-        
-        # Test 4
         phi = 32.5
         theta = 115.2
         beam_g = self.antenna2._beam_gain(phi,theta)
@@ -352,7 +346,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
         # Test 1
         phi_vec = np.array([11.79, -0.71])
-        theta_vec = np.array([39.69, 109.89])
+        theta_vec = np.array([50.31, 120.51])
         gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
         npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
         
