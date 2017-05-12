@@ -100,22 +100,26 @@ if __name__ == '__main__':
     plot = PlotAntennaPattern(figs_dir)
 
     # Plot BS TX radiation patterns
-    bs_array = AntennaBeamformingImt(param,0,0,"BS","TX")
+    par = param.get_antenna_parameters("BS","TX")
+    bs_array = AntennaBeamformingImt(par,0,0)
     plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
     plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
     
     # Plot UE TX radiation patterns
-    ue_array = AntennaBeamformingImt(param,0,0,"UE","TX")
+    par = param.get_antenna_parameters("UE","TX")
+    ue_array = AntennaBeamformingImt(par,0,0)
     plot.plot_element_pattern(ue_array,"UE","TX","ELEMENT")
     plot.plot_element_pattern(ue_array,"UE","TX","ARRAY")
     
     # Plot BS RX radiation patterns
-    bs_array = AntennaBeamformingImt(param,0,0,"BS","RX")
+    par = param.get_antenna_parameters("BS","RX")
+    bs_array = AntennaBeamformingImt(par,0,0)
     plot.plot_element_pattern(bs_array,"BS","RX","ELEMENT")
     plot.plot_element_pattern(bs_array,"BS","RX","ARRAY")
     
     # Plot UE RX radiation patterns
-    ue_array = AntennaBeamformingImt(param,0,0,"UE","RX")
+    par = param.get_antenna_parameters("UE","RX")
+    ue_array = AntennaBeamformingImt(par,0,0)
     plot.plot_element_pattern(ue_array,"UE","RX","ELEMENT")
     plot.plot_element_pattern(ue_array,"UE","RX","ARRAY")
     
