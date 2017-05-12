@@ -126,21 +126,21 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param_ant.bs_rx_elevation = -10
         self.param_ant.bs_rx_element_max_g = 5
         self.param_ant.bs_rx_element_phi_3db = 80
-        self.param_ant.bs_rx_element_theta_3db = 60
+        self.param_ant.bs_rx_element_theta_3db = 65
         self.param_ant.bs_rx_element_am = 30
         self.param_ant.bs_rx_element_sla_v = 30
-        self.param_ant.bs_rx_n_rows = 2
-        self.param_ant.bs_rx_n_columns = 2
-        self.param_ant.bs_rx_element_horiz_spacing = 1
-        self.param_ant.bs_rx_element_vert_spacing = 1
+        self.param_ant.bs_rx_n_rows = 3
+        self.param_ant.bs_rx_n_columns = 1
+        self.param_ant.bs_rx_element_horiz_spacing = 0.5
+        self.param_ant.bs_rx_element_vert_spacing = 0.5
         self.param_ant.ue_tx_pointing = "FIXED"
         self.param_ant.ue_tx_azimuth = 0
         self.param_ant.ue_tx_elevation = 0
-        self.param_ant.ue_tx_element_max_g = 10
-        self.param_ant.ue_tx_element_phi_3db = 75
+        self.param_ant.ue_tx_element_max_g = 5
+        self.param_ant.ue_tx_element_phi_3db = 80
         self.param_ant.ue_tx_element_theta_3db = 65
-        self.param_ant.ue_tx_element_am = 25
-        self.param_ant.ue_tx_element_sla_v = 35
+        self.param_ant.ue_tx_element_am = 30
+        self.param_ant.ue_tx_element_sla_v = 30
         self.param_ant.ue_tx_n_rows = 2
         self.param_ant.ue_tx_n_columns = 2
         self.param_ant.ue_tx_element_horiz_spacing = 0.5
@@ -172,15 +172,26 @@ class SimulationUplinkTest(unittest.TestCase):
         
         # it is time to create user equipments
         self.simulation_uplink.create_ue()
-        self.simulation_uplink.ue.x = np.array([-1500, 1500])
-        self.simulation_uplink.ue.y = np.array([0, 0])
+        self.simulation_uplink.ue.x = np.array([500, -1000])
+        self.simulation_uplink.ue.y = np.array([866.025404, 0])
         self.assertEqual(self.simulation_uplink.ue.num_stations, 2)
 
         # and test UE antenna creations
         self.assertEqual(self.simulation_uplink.ue.tx_antenna[0].azimuth, 0)
         self.assertEqual(self.simulation_uplink.ue.tx_antenna[1].azimuth, 0)
         self.assertEqual(self.simulation_uplink.ue.tx_antenna[0].elevation, 0)
-        self.assertEqual(self.simulation_uplink.ue.tx_antenna[1].elevation, 0)      
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[1].elevation, 0)
+        
+        # test antenna gains
+        gain_bs = self.simulation_uplink.calculate_gains(self.simulation_uplink.bs,
+                                                         self.simulation_uplink.ue,
+                                                         "RX")
+        print("gain_bs = ",gain_bs)
+        
+        gain_ue = self.simulation_uplink.calculate_gains(self.simulation_uplink.ue,
+                                                         self.simulation_uplink.bs,
+                                                         "TX")
+        print("gain_ue = ",gain_ue)
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
@@ -225,5 +236,9 @@ class SimulationUplinkTest(unittest.TestCase):
                                          [1, 1, 1, 1]]))
                 
 if __name__ == '__main__':
-    unittest.main()
-          
+#    unittest.main()
+    
+    suite = unittest.TestSuite()
+    suite.addTest(SimulationUplinkTest("test_simulation_1bs_2ue_beamforming"))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)

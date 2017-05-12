@@ -29,6 +29,7 @@ class AntennaBeamformingImt(Antenna):
         """
         Constructs an AntennaBeamformingImt object.
         Does not receive angles in local coordinate system.
+        Elevation taken with x axis as reference.
         
         Parameters
         ---------
@@ -60,6 +61,7 @@ class AntennaBeamformingImt(Antenna):
         """
         Add new beam to antenna.
         Does not receive angles in local coordinate system.
+        Theta taken with z axis as reference.
         
         Parameters
         ----------
@@ -74,6 +76,7 @@ class AntennaBeamformingImt(Antenna):
         """
         Calculates the gain in the given direction.
         Does not receive angles in local coordinate system.
+        Theta taken with z axis as reference.
         
         Parameters
         ----------
@@ -216,4 +219,13 @@ class AntennaBeamformingImt(Antenna):
         return gain      
     
     def to_local_coord(self,phi: float, theta: float) -> tuple:
-        return phi - self.azimuth, theta + self.elevation
+        lo_theta = theta + self.elevation
+        lo_phi = phi - self.azimuth
+        
+#        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
+#        lo_theta[ofb_theta] = -1*lo_theta[ofb_theta]
+#        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
+#        
+#        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
+        
+        return lo_phi, lo_theta

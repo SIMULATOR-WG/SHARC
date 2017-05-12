@@ -38,12 +38,12 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
         # Create antenna objects
         par = self.param.get_antenna_parameters("BS","RX")
-        self.antenna1 = AntennaBeamformingImt(par,60,-10)
+        self.antenna1 = AntennaBeamformingImt(par,300,-10)
         par = self.param.get_antenna_parameters("UE","TX")
         self.antenna2 = AntennaBeamformingImt(par,-33.21,-5.31)
         
     def test_azimuth(self):
-        self.assertEqual(self.antenna1.azimuth,60)
+        self.assertEqual(self.antenna1.azimuth,300)
         self.assertEqual(self.antenna2.azimuth,-33.21)
         
     def test_elevation(self):
@@ -350,5 +350,23 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
         npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
         
+    def test_to_local_coord(self):
+        # Error margin
+        eps = 1e-4 
+        
+        # Angles to be converted
+        phi = np.array([60, 180, 0])
+        theta = np.array([90, 30, 0])
+        
+        # Convert to local coordinates
+        lo_phi, lo_theta = self.antenna1.to_local_coord(phi,theta)
+        print("lo_phi = ",lo_phi)
+        print("lo_theta = ",lo_theta)
+        
 if __name__ == '__main__':
     unittest.main()
+    
+#    suite = unittest.TestSuite()
+#    suite.addTest(AntennaBeamformingImtTest("test_to_local_coord"))
+#    runner = unittest.TextTestRunner()
+#    runner.run(suite)

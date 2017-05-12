@@ -330,13 +330,13 @@ class SimulationUplink(Simulation):
         Calculates the gains of antennas in station_a in the direction of
         station_b
         """
-        point_vec_x = station_a.x[:,np.newaxis] - station_b.x
-        point_vec_y = station_a.y[:,np.newaxis] - station_b.y
-        point_vec_z = station_a.height[:,np.newaxis] - station_b.height
+        point_vec_x = station_b.x- station_a.x[:,np.newaxis] 
+        point_vec_y = station_b.y - station_a.y[:,np.newaxis]
+        point_vec_z = station_b.height - station_a.height[:,np.newaxis]
         dist = station_a.get_3d_distance_to(station_b)
         
-        phi = np.arctan2(point_vec_y,point_vec_x)
-        theta = np.arccos(point_vec_z/dist)
+        phi = np.rad2deg(np.arctan2(point_vec_y,point_vec_x))
+        theta = np.rad2deg(np.arccos(point_vec_z/dist))
         
         gains = np.zeros_like(phi)
         if(antenna_txrx == "TX"):
