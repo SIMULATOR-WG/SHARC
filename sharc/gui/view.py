@@ -10,8 +10,11 @@ from sharc.support.observer import Observer
 from sharc.support.enumerations import Action, State
 from sharc.gui.thread_safe_scrolled_text import ThreadSafeScrolledText
 from sharc.results import Results
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+import os
 import queue
 import logging
 import tkinter
@@ -127,117 +130,26 @@ class View(tkinter.Tk, Observer):
         self.__popup("Copied to clipboard.")
 
     def __plot_results(self, results: Results):
-        n_bins = 500
-
-        plt.figure(figsize=(16,10), facecolor='w', edgecolor='k')
-        plt.subplot(2, 2, 1)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.coupling_loss_ul, n_bins, normed=True, 
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        plt.title("CDF of IMT coupling loss [dB]")
-        plt.xlabel("IMT coupling loss [dB]")
-        plt.ylabel("Probability of IMT coupling loss < $X$")
-        plt.grid()
-
-        plt.subplot(2, 2, 2)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.coupling_loss_ue_sat, n_bins, normed=True,
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        #plt.xlim((150, 170))
-        plt.title("CDF of UE-satellite coupling loss [dB]")
-        plt.xlabel("Coupling loss [dB]")
-        plt.ylabel("Probability of coupling loss < $X$")
-        plt.grid()
-
-        plt.subplot(2, 2, 3)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.inr, normed=True,
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        #plt.xlim((-20, 5))
-        plt.title("CDF of satellite interference to noise ratio [dB]")
-        plt.xlabel("$I/N$ [dB]")
-        plt.ylabel("Probability $I/N < X$")
-        plt.grid()
-
-        print("I/N max = " + str(max(results.inr)))
-
-        plt.subplot(2, 2, 4)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.coupling_loss_bs_sat, n_bins, normed=True,
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        #plt.xlim((150, 170))
-        plt.title("CDF of BS-satellite coupling loss [dB]")
-        plt.xlabel("Coupling loss [dB]")
-        plt.ylabel("Probability of coupling loss < $X$")
-        plt.grid()
-
-#        plt.subplot(2, 2, 2)
-#        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-#        plt.hist(results.snr_dl, n_bins, normed=True,
-#                 histtype='step', cumulative=True )
-#        plt.ylim((0, 1))
-#        plt.title("CDF of $C/N$ [dB]")
-#        plt.xlabel("$C/N$ [dB]")
-#        plt.ylabel("Probability $C/N < X$")
-#        plt.grid()
-#
-#        plt.subplot(2, 2, 3)
-#        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-#        plt.hist(results.tx_power_dl, n_bins, normed=True,
-#                 histtype='step', cumulative=True )
-#        plt.ylim((0, 1))
-#        plt.title("CDF of base station transmit power [dB]")
-#        plt.xlabel("Base station transmit power [dBm]")
-#        plt.ylabel("Probability of transmit power < $X$")
-#        plt.grid()
-
-        plt.figure(figsize=(16,10), facecolor='w', edgecolor='k')
-        plt.subplot(2, 2, 1)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.snr_ul, n_bins, normed=True, 
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        plt.title("CDF of $C/N$ [dB]")
-        plt.xlabel("$C/N$ [dB]")
-        plt.ylabel("Probability $C/N < X$")
-        plt.grid()    
+        file_extension = ".png"
+        transparent_figure = False
         
-        plt.subplot(2, 2, 2)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.sinr_ul, n_bins, normed=True, 
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        plt.title("CDF of $C/(N+I)$ [dB]")
-        plt.xlabel("$C/(N+I)$ [dB]")
-        plt.ylabel("Probability $C/(N+I) < X$")
-        plt.grid()    
+        for plot in results.plot_list:
+            plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+            plt.plot(plot.x, plot.y)        
+            plt.title(plot.title)
+            plt.xlabel(plot.x_label)
+            plt.ylabel(plot.y_label)
+            if not plot.x_lim is None:
+                plt.xlim(plot.x_lim)
+            if not plot.y_lim is None:
+                plt.ylim(plot.y_lim)                
+            plt.grid()
+            plt.tight_layout()
+            plt.savefig(os.path.join("output", plot.file_name + file_extension), 
+                        transparent=transparent_figure)        
 
-        plt.subplot(2, 2, 3)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.tx_power_ul, n_bins, normed=True, 
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        plt.title("CDF of user equipment transmit power [dB]")
-        plt.xlabel("User equipment transmit power [dBm]")
-        plt.ylabel("Probability of transmit power < $X$")
-        plt.grid() 
-        
-        plt.subplot(2, 2, 4)
-        #plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-        plt.hist(results.interf_power_ul, n_bins, normed=True, 
-                 histtype='step', cumulative=True )
-        plt.ylim((0, 1))
-        plt.title("CDF of received interference at space station [dBm]")
-        plt.xlabel("received interference power [dBm]")
-        plt.ylabel("Probability of power < $X$")
-        plt.grid() 
-
-        plt.tight_layout()
-        plt.show()
+        #plt.show()
+        self.__popup("Plots successfully created! Check output directory.")
 
     def __insert_text(self, source: str, text: str):
         """
@@ -336,7 +248,7 @@ class View(tkinter.Tk, Observer):
         empty_top_label = tkinter.Label(top_level, height=1, bg='#FFFFFF')
         empty_top_label.pack()
 
-        label = tkinter.Label(top_level, text=message, height=0, width=35,
+        label = tkinter.Label(top_level, text=message, height=0, width=50,
                               bg='#FFFFFF')
         label.pack()
 
