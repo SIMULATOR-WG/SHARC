@@ -116,6 +116,18 @@ class ParametersImt(object):
     bs_feed_loss = 3
 
     ###########################################################################
+    # Uplink attenuation factor used in link-to-system mapping
+    ul_attenuation_factor = 0.4
+    
+    ###########################################################################
+    # Uplink minimum SINR of the code set [dB]
+    ul_sinr_min = -10
+
+    ###########################################################################
+    # Uplink maximum SINR of the code set [dB]
+    ul_sinr_max = 22
+    
+    ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
     ue_k = 5
@@ -175,6 +187,17 @@ class ParametersImt(object):
     # User equipment feed loss [dB]
     ue_feed_loss = 3
 
+    ###########################################################################
+    # Downlink attenuation factor used in link-to-system mapping
+    dl_attenuation_factor = 0.6
+    
+    ###########################################################################
+    # Downlink minimum SINR of the code set [dB]
+    dl_sinr_min = -10
+
+    ###########################################################################
+    # Downlink maximum SINR of the code set [dB]
+    dl_sinr_max = 30
 
     ###########################################################################
     # Channel parameters
