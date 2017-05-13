@@ -350,23 +350,15 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
         npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
         
-    def test_to_local_coord(self):
-        # Error margin
-        eps = 1e-4 
-        
+    def test_to_local_coord(self):        
         # Angles to be converted
-        phi = np.array([60, 180, 0])
-        theta = np.array([90, 30, 0])
+        phi = np.array([60, 190, 500, 0])
+        theta = np.array([90, 200, -30, 0])
         
         # Convert to local coordinates
         lo_phi, lo_theta = self.antenna1.to_local_coord(phi,theta)
-        print("lo_phi = ",lo_phi)
-        print("lo_theta = ",lo_theta)
+        npt.assert_equal(lo_phi,np.array([120, 70, 20, -120]))
+        npt.assert_equal(lo_theta,np.array([80, 170, 40, 10]))
         
 if __name__ == '__main__':
     unittest.main()
-    
-#    suite = unittest.TestSuite()
-#    suite.addTest(AntennaBeamformingImtTest("test_to_local_coord"))
-#    runner = unittest.TextTestRunner()
-#    runner.run(suite)

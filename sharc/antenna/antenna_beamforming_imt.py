@@ -219,13 +219,16 @@ class AntennaBeamformingImt(Antenna):
         return gain      
     
     def to_local_coord(self,phi: float, theta: float) -> tuple:
-        lo_theta = theta + self.elevation
-        lo_phi = phi - self.azimuth
+        lo_theta = np.ravel(np.array([theta + self.elevation]))
+        lo_phi = np.ravel(np.array([phi - self.azimuth]))
         
-#        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
-#        lo_theta[ofb_theta] = -1*lo_theta[ofb_theta]
-#        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
-#        
-#        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
+        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
+        lo_theta[ofb_theta] = np.mod((360 - lo_theta[ofb_theta]),180)
+        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
+        
+        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
+        lo_phi[ofb_phi] = np.mod(lo_phi[ofb_phi],360)
+        ofb_phi = np.where(lo_phi > 180)
+        lo_phi[ofb_phi] = lo_phi[ofb_phi] - 360
         
         return lo_phi, lo_theta
