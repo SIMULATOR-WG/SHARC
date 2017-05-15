@@ -13,6 +13,7 @@ from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.parameters.parameters_fss import ParametersFss
 
 class Model(Observable):
     """
@@ -22,8 +23,8 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        #self.simulation = SimulationDownlink(ParametersImt(),ParametersAntennaImt())
-        self.simulation = SimulationUplink(ParametersImt(),ParametersAntennaImt())
+        #self.simulation = SimulationDownlink(ParametersImt(), ParametersFss(), ParametersAntennaImt())
+        self.simulation = SimulationUplink(ParametersImt(), ParametersFss(), ParametersAntennaImt())
 
     def add_observer(self, observer):
         Observable.add_observer(self, observer)
