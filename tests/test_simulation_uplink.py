@@ -209,6 +209,11 @@ class SimulationUplinkTest(unittest.TestCase):
                             np.array([[ 131.1620, 131.1620],
                                       [ 158.1620, 104.1620],
                                       [ 158.1620, 131.1620]]),atol=1e-3)
+    
+        #test connections and beam creations
+        self.simulation_uplink.connect_ue_to_bs()
+        self.assertEqual(self.simulation_uplink.link, {0: [0], 1: [1], 2: []})
+        
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
