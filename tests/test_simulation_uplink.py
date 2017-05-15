@@ -196,6 +196,19 @@ class SimulationUplinkTest(unittest.TestCase):
         npt.assert_allclose(gain_ue,np.array([[-15.9832, -15.9832, -15.9832],
                                               [ 11.0168,  11.0168,  11.0168]]),
                                                 atol=1e-3)
+    
+        #now, calculate the coupling loss between BSs and UEs
+        self.simulation_uplink.coupling_loss =  np.transpose( \
+            self.simulation_uplink.calculate_coupling_loss(self.simulation_uplink.ue,
+                                                           self.simulation_uplink.bs,
+                                                           self.simulation_uplink.propagation_imt))
+        npt.assert_allclose(self.simulation_uplink.path_loss,
+                            np.array([[ 121.2367, 121.2367, 121.2367],
+                                      [ 121.2367, 121.2367, 121.2367]]),atol=1e-3)
+        npt.assert_allclose(self.simulation_uplink.coupling_loss,
+                            np.array([[ 131.1620, 131.1620],
+                                      [ 158.1620, 104.1620],
+                                      [ 158.1620, 131.1620]]),atol=1e-3)
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
@@ -240,9 +253,9 @@ class SimulationUplinkTest(unittest.TestCase):
                                          [1, 1, 1, 1]]))
                 
 if __name__ == '__main__':
-#    unittest.main()
+    unittest.main()
     
-    suite = unittest.TestSuite()
-    suite.addTest(SimulationUplinkTest("test_simulation_1bs_2ue_beamforming"))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+#    suite = unittest.TestSuite()
+#    suite.addTest(SimulationUplinkTest("test_simulation_1bs_2ue_beamforming"))
+#    runner = unittest.TextTestRunner()
+#    runner.run(suite)
