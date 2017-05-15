@@ -73,6 +73,8 @@ class SimulationUplink(Simulation):
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
 
+        self.phi = np.empty([num_bs, num_ue])
+        self.theta = np.empty([num_bs, num_ue])
         self.path_loss = np.empty(num_ue)
 
         self.ue = np.empty(num_ue)
@@ -187,7 +189,11 @@ class SimulationUplink(Simulation):
             bs = np.random.choice(bs_all)
             self.link[bs].append(ue)
             # add beam to antennas
-            
+            if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+                self.bs.rx_antenna[bs].add_beam(self.phi[bs,ue],self.theta[bs,ue])
+            if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
+                self.ue.tx_antenna[ue].add_beam(self.phi[bs,ue] - 180,\
+                                  180 - self.theta[bs,ue])
 
     def select_ue(self):
         """
@@ -337,18 +343,18 @@ class SimulationUplink(Simulation):
         point_vec_z = station_b.height - station_a.height[:,np.newaxis]
         dist = station_a.get_3d_distance_to(station_b)
         
-        phi = np.rad2deg(np.arctan2(point_vec_y,point_vec_x))
-        theta = np.rad2deg(np.arccos(point_vec_z/dist))
+        self.phi = np.rad2deg(np.arctan2(point_vec_y,point_vec_x))
+        self.theta = np.rad2deg(np.arccos(point_vec_z/dist))
         
-        gains = np.zeros_like(phi)
+        gains = np.zeros_like(self.phi)
         if(antenna_txrx == "TX"):
             for k in range(station_a.num_stations):
-                gains[k,:] = station_a.tx_antenna[k].calculate_gain(phi[k,:],\
-                     theta[k,:])
+                gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
+                     self.theta[k,:])
         elif(antenna_txrx == "RX"):
             for k in range(station_a.num_stations):
-                gains[k,:] = station_a.rx_antenna[k].calculate_gain(phi[k,:],\
-                     theta[k,:])
+                gains[k,:] = station_a.rx_antenna[k].calculate_gain(self.phi[k,:],\
+                     self.theta[k,:])
                 
         return gains
 

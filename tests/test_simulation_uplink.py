@@ -202,6 +202,14 @@ class SimulationUplinkTest(unittest.TestCase):
             self.simulation_uplink.calculate_coupling_loss(self.simulation_uplink.ue,
                                                            self.simulation_uplink.bs,
                                                            self.simulation_uplink.propagation_imt))
+        npt.assert_allclose(self.simulation_uplink.phi,
+                            np.array([[60, 180],
+                                      [60, 180],
+                                      [60, 180]]),atol=1e-3)
+        npt.assert_allclose(self.simulation_uplink.theta,
+                            np.array([[90.487, 90.487],
+                                      [90.487, 90.487],
+                                      [90.487, 90.487]]),atol=1e-3)
         npt.assert_allclose(self.simulation_uplink.path_loss,
                             np.array([[ 121.2367, 121.2367, 121.2367],
                                       [ 121.2367, 121.2367, 121.2367]]),atol=1e-3)
@@ -213,7 +221,15 @@ class SimulationUplinkTest(unittest.TestCase):
         #test connections and beam creations
         self.simulation_uplink.connect_ue_to_bs()
         self.assertEqual(self.simulation_uplink.link, {0: [0], 1: [1], 2: []})
-        
+        npt.assert_almost_equal(self.simulation_uplink.bs.rx_antenna[0].beams_list,
+                             [(np.array([0.0]), np.array([9.5130]))],decimal=3)
+        npt.assert_almost_equal(self.simulation_uplink.bs.rx_antenna[1].beams_list,
+                             [(np.array([0.0]), np.array([9.5130]))],decimal=3)
+        npt.assert_equal(self.simulation_uplink.bs.rx_antenna[2].beams_list,[])
+        npt.assert_almost_equal(self.simulation_uplink.ue.tx_antenna[0].beams_list,
+                             [(np.array([-120.0]), np.array([0.487]))],decimal=3)
+        npt.assert_almost_equal(self.simulation_uplink.ue.tx_antenna[1].beams_list,
+                             [(np.array([0.0]), np.array([0.487]))],decimal=3)
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
