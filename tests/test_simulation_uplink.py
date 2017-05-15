@@ -230,6 +230,13 @@ class SimulationUplinkTest(unittest.TestCase):
                              [(np.array([-120.0]), np.array([0.487]))],decimal=3)
         npt.assert_almost_equal(self.simulation_uplink.ue.tx_antenna[1].beams_list,
                              [(np.array([0.0]), np.array([0.487]))],decimal=3)
+        
+        self.simulation_uplink.select_ue()
+        
+        # Scheduling algorirhm
+        self.simulation_uplink.scheduler()
+        npt.assert_equal(self.simulation_uplink.ue.bandwidth,
+                         45*np.ones(2))
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
