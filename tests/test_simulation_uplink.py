@@ -186,12 +186,16 @@ class SimulationUplinkTest(unittest.TestCase):
         gain_bs = self.simulation_uplink.calculate_gains(self.simulation_uplink.bs,
                                                          self.simulation_uplink.ue,
                                                          "RX")
-        print("gain_bs = ",gain_bs)
+        npt.assert_allclose(gain_bs,np.array([[6.0579,  -20.9421],
+                                               [-20.9421,  6.0579],
+                                               [-20.9421,-20.9421]]),atol=1e-3)
         
         gain_ue = self.simulation_uplink.calculate_gains(self.simulation_uplink.ue,
                                                          self.simulation_uplink.bs,
                                                          "TX")
-        print("gain_ue = ",gain_ue)
+        npt.assert_allclose(gain_ue,np.array([[-15.9832, -15.9832, -15.9832],
+                                              [ 11.0168,  11.0168,  11.0168]]),
+                                                atol=1e-3)
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
