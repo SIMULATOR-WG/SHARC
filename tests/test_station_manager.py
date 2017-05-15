@@ -23,7 +23,7 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager.height = [1, 2, 3]
         # this is for downlink
         self.station_manager.tx_power = dict({0: [27, 30], 1: [35], 2: [40]})
-        self.station_manager.rx_power = [-50, -35, -10]
+        self.station_manager.rx_power = np.array([-50, -35, -10])
         self.station_manager.tx_antenna = [AntennaOmni(10), AntennaOmni(25), AntennaOmni(30)]
         self.station_manager.rx_antenna = [AntennaOmni(5), AntennaOmni(15), AntennaOmni(20)]
         
@@ -33,7 +33,7 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager2.height = [4, 5]
         # this is for downlink
         self.station_manager2.tx_power = dict({0: [25], 1: [28,35]})
-        self.station_manager2.rx_power = [-50, -35]
+        self.station_manager2.rx_power = np.array([-50, -35])
         self.station_manager2.tx_antenna = [AntennaOmni(10), AntennaOmni(25)]
         self.station_manager2.rx_antenna = [AntennaOmni(5), AntennaOmni(15)]      
         
@@ -43,7 +43,7 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager3.height = [2]
         # this is for uplink
         self.station_manager3.tx_power = 22
-        self.station_manager3.rx_power = [-50,-35]
+        self.station_manager3.rx_power = np.array([-50,-35])
         self.station_manager3.tx_antenna = [AntennaOmni(10), AntennaOmni(25)]
         self.station_manager3.rx_antenna = [AntennaOmni(5), AntennaOmni(15)]
         
