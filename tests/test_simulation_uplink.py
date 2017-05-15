@@ -11,12 +11,14 @@ import numpy.testing as npt
 
 from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_fss import ParametersFss
 from sharc.antenna.antenna import Antenna
 
 class SimulationUplinkTest(unittest.TestCase):
     
     def setUp(self):
         self.param = ParametersImt()
+        self.param.channel_model = "FSPL"
         self.param.topology = "SINGLE_BS"
         self.param.num_base_stations = 1
         self.param.num_clusters = 1
@@ -39,6 +41,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.ue_k = 1
         self.param.ue_k_m = 1
         self.param.ue_tx_power = 22
+        self.param.ue_tx_power_control = "OFF"
         self.param.ue_height = 1.5
         self.param.ue_tx_antenna_gain = 0
         self.param.ue_rx_antenna_gain = 0
@@ -47,12 +50,15 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.ue_noise_figure = 9    
         self.param.ue_feed_loss = 3
         
+        self.param_system = ParametersFss()
+        self.param_system.channel_model = "FSPL"
+        
     def test_simulation_2bs_4ue(self):
         self.param.num_base_stations = 1
         self.param.num_clusters = 2
         self.param.ue_k = 2
         self.param.ue_k_m = 1
-        self.simulation_uplink = SimulationUplink(self.param)
+        self.simulation_uplink = SimulationUplink(self.param, self.param_system)
         
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_uplink.ue), 4)
@@ -102,7 +108,7 @@ class SimulationUplinkTest(unittest.TestCase):
                             atol=1e-2)
 
         self.simulation_uplink.calculate_external_interference()   
-        self.assertAlmostEqual(self.simulation_uplink.system.inr, 1.02, places=2)
+        npt.assert_allclose(self.simulation_uplink.system.inr, -23.46, atol=1e-2)
         
                 
 if __name__ == '__main__':
