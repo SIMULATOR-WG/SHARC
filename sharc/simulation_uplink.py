@@ -30,10 +30,10 @@ class SimulationUplink(Simulation):
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, param: ParametersImt):
+    def __init__(self, param: ParametersImt, param_system: ParametersFss):
         super(SimulationUplink, self).__init__()
         self.param = param
-        self.param_system = ParametersFss()
+        self.param_system = param_system
 
         self.topology = TopologyFactory.createTopology(self.param)
 
@@ -272,34 +272,22 @@ class SimulationUplink(Simulation):
         self.coupling_loss_ue_sat = np.array(np.transpose(
                                 self.calculate_coupling_loss(self.ue, self.system,
                                             self.propagation_system)).tolist()[0])
-        self.coupling_loss_bs_sat = np.array(np.transpose(
-                                self.calculate_coupling_loss(self.bs, self.system,
-                                            self.propagation_system)).tolist()[0])
 
         ue_bandwidth = self.num_rb_per_ue * self.param.rb_bandwidth
-        #bs_bandwidth = self.num_rb_per_bs * self.param.rb_bandwidth
 
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
         # calculate interference only from active UE's
-        ue_active = np.where(self.ue.active)
-        self.interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
+        ue_active = np.where(self.ue.active)[0]
+        interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
                             + 10*math.log10(ue_bandwidth/self.param_system.sat_bandwidth)
 
-        # assume BS transmits with full power (no power control) in the whole bandwidth
-        #bs_active = np.where(self.bs.active)
-        #interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
-        interference_bs = -500
-
-        self.system.rx_interference = 10*math.log10( \
-                        math.pow(10, 0.1*self.system.rx_interference)
-                        + np.sum(np.power(10, 0.1*self.interference_ue)) \
-                        + np.sum(np.power(10, 0.1*interference_bs)))
+        self.system.rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference_ue)))
 
         self.system.thermal_noise = \
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
                           self.param_system.sat_noise_temperature) + \
-                          10*np.log10(self.param_system.sat_bandwidth * 1e6)
+                          10*math.log10(self.param_system.sat_bandwidth * 1e6)
 
         self.system.total_interference = \
             10*np.log10(np.power(10, 0.1*self.system.rx_interference) + \
@@ -311,11 +299,9 @@ class SimulationUplink(Simulation):
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         self.results.imt_ul_coupling_loss.extend( \
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
-        self.results.system_inr.extend([self.system.inr.tolist()])
-        normalized_interference = self.interference_ue/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6)
-        self.results.add_interf_power_ul(normalized_interference.tolist())
-        bs_active = np.where( self.bs.active )[0]
-
+        self.results.system_inr.extend([self.system.inr])
+        
+        bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue_list = self.link[bs]
             tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])
