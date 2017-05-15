@@ -18,24 +18,24 @@ class StationManager(object):
     """
 
     def __init__(self, n):
-        self.__num_stations = n
-        self.__x = np.empty(n)
-        self.__y = np.empty(n)
-        self.__height = np.empty(n)
-        self.__active = np.ones(n, dtype=bool)
-        self.__tx_power = np.empty(n)
-        self.__rx_power = np.empty(n)
-        self.__rx_interference = np.empty(n)
-        self.__tx_antenna = np.array([Antenna() for i in range(n)])
-        self.__rx_antenna = np.array([Antenna() for i in range(n)])
-        self.__bandwidth = np.empty(n)
-        self.__noise_figure = np.empty(n)
-        self.__noise_temperature = np.empty(n)
-        self.__thermal_noise = np.empty(n)
-        self.__total_interference = np.empty(n)
-        self.__snr = np.empty(n)
-        self.__sinr = np.empty(n)
-        self.__inr = np.empty(n)
+        self.num_stations = n
+        self.x = np.empty(n)
+        self.y = np.empty(n)
+        self.height = np.empty(n)
+        self.active = np.ones(n, dtype=bool)
+        self.tx_power = np.empty(n)
+        self.rx_power = np.empty(n)
+        self.rx_interference = np.empty(n)
+        self.tx_antenna = np.array([Antenna() for i in range(n)])
+        self.rx_antenna = np.array([Antenna() for i in range(n)])
+        self.bandwidth = np.empty(n)
+        self.noise_figure = np.empty(n)
+        self.noise_temperature = np.empty(n)
+        self.thermal_noise = np.empty(n)
+        self.total_interference = np.empty(n)
+        self.snr = np.empty(n)
+        self.sinr = np.empty(n)
+        self.inr = np.empty(n)
 
     def get_station_list(self,id=None) -> list:
         if(id is None):
@@ -102,147 +102,3 @@ class StationManager(object):
 
         return{'free_space': free_space_angle, 'apparent': angle}
 
-
-    @property
-    def num_stations(self):
-        return self.__num_stations
-
-    @num_stations.setter
-    def num_stations(self, value):
-        self.__num_stations = value
-
-    @property
-    def x(self):
-        return self.__x
-
-    @x.setter
-    def x(self, value):
-        self.__x = np.array(value)
-
-    @property
-    def y(self):
-        return self.__y
-
-    @y.setter
-    def y(self, value):
-        self.__y = np.array(value)
-
-    @property
-    def height(self):
-        return self.__height
-
-    @height.setter
-    def height(self, value):
-        self.__height = np.array(value)
-
-    @property
-    def active(self):
-        return self.__active
-
-    @active.setter
-    def active(self, value):
-        self.__active = np.array(value)
-
-    @property
-    def tx_power(self):
-        return self.__tx_power
-
-    @tx_power.setter
-    def tx_power(self, value):
-        self.__tx_power = value
-
-    @property
-    def rx_power(self):
-        return self.__rx_power
-
-    @rx_power.setter
-    def rx_power(self, value):
-        self.__rx_power = value
-
-    @property
-    def rx_interference(self):
-        return self.__rx_interference
-
-    @rx_interference.setter
-    def rx_interference(self, value):
-        self.__rx_interference = value
-
-    @property
-    def tx_antenna(self):
-        return self.__tx_antenna
-
-    @tx_antenna.setter
-    def tx_antenna(self, value):
-        self.__tx_antenna = np.array(value)
-
-    @property
-    def rx_antenna(self):
-        return self.__rx_antenna
-
-    @rx_antenna.setter
-    def rx_antenna(self, value):
-        self.__rx_antenna = np.array(value)
-
-    @property
-    def bandwidth(self):
-        return self.__bandwidth
-
-    @bandwidth.setter
-    def bandwidth(self, value):
-        self.__bandwidth = np.array(value)
-
-    @property
-    def noise_figure(self):
-        return self.__noise_figure
-
-    @noise_figure.setter
-    def noise_figure(self, value):
-        self.__noise_figure = np.array(value)
-
-    @property
-    def noise_temperature(self):
-        return self.__noise_temperature
-
-    @noise_temperature.setter
-    def noise_temperature(self, value):
-        self.__noise_temperature = np.array(value)
-
-    @property
-    def thermal_noise(self):
-        return self.__thermal_noise
-
-    @thermal_noise.setter
-    def thermal_noise(self, value):
-        self.__thermal_noise = value
-
-    @property
-    def total_interference(self):
-        return self.__total_interference
-
-    @total_interference.setter
-    def total_interference(self, value):
-        self.__total_interference = value
-
-    @property
-    def sinr(self):
-        return self.__sinr
-
-    @sinr.setter
-    def sinr(self, value):
-        self.__sinr = value
-
-    @property
-    def snr(self):
-        return self.__snr
-
-    @snr.setter
-    def snr(self, value):
-        self.__snr = value
-
-    @property
-    def inr(self):
-        return self.__inr
-
-    @inr.setter
-    def inr(self, value):
-        self.__inr = np.array(value)
