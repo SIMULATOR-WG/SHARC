@@ -110,14 +110,14 @@ class ParametersImt(object):
     ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 5
+    ue_k = 1
 
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 10
+    ue_k_m = 2
 
     ###########################################################################
     # Power control algorithm
