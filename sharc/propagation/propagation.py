@@ -18,3 +18,7 @@ class Propagation(object):
     @abstractmethod
     def get_loss(self, *args, **kwargs) -> np.array:
         pass
+    
+    @abstractmethod
+    def get_loss_Ag(self, *args, **kwargs) -> np.array:
+        pass

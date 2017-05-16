@@ -14,10 +14,10 @@ class PropagationGasesAttenuation(Propagation):
     Basic transmission loss due to free-space propagation and attenuation by atmospheric gases
     """
     
-    def get_loss(self, *args, **kwargs) -> np.array:
+    def get_loss_Ag(self, *args, **kwargs) -> np.array:
        
         d = np.asarray(kwargs["distance"])
-        f = np.asarray(kwargs["frequency"])*(1e-3)
+        f = np.asarray(kwargs["frequency"])
         Ph = np.asarray(kwargs["atmospheric_pressure"])
         T = np.asarray(kwargs["air_temperature"])
         ro = np.asarray(kwargs["water_vapour"])
@@ -58,10 +58,10 @@ class PropagationGasesAttenuation(Propagation):
     
         N2f = sum(Fio*Sio)+sum(Fiw*Siw)+ N2Df
          
-        #gases_att = (0.1820*f*N2f)*np.array(d);
         gases_att = (0.1820*f*N2f);
                      
-        loss = 20*np.log10(d) + 20*np.log10(f/(1e-3)) - 27.55 + gases_att*d
+        #loss = 20*np.log10(d) + 20*np.log10(f/(1e-3)) - 27.55 + gases_att*d
+        loss = gases_att*d
                                
         return loss
 
