@@ -90,79 +90,15 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(len(self.antenna1.beams_list),0)
         self.assertEqual(len(self.antenna2.beams_list),0)
         
-    def w_vec_list(self):
+    def test_w_vec_list(self):
         self.assertEqual(len(self.antenna1.w_vec_list),0)
         self.assertEqual(len(self.antenna2.w_vec_list),0)
         
-    def test_horizontal_pattern(self):  
-        # phi = 0 results in zero gain
-        phi = 0
-        h_att = self.antenna1.element.horizontal_pattern(phi)
-        self.assertEqual(h_att,0.0)
-        
-        # phi = 120 implies horizontal gain of of -27 dB
-        phi = 120
-        h_att = self.antenna1.element.horizontal_pattern(phi)
-        self.assertEqual(h_att,-27.0)
-        
-        # phi = 150, horizontal attenuation equals to the front-to-back ratio
-        phi = 150
-        h_att = self.antenna1.element.horizontal_pattern(phi)
-        self.assertEqual(h_att,-30)
-        self.assertEqual(h_att,-1.0*self.antenna1.element.am)
-        
-        # Test vector
-        phi = np.array([0, 120, 150])
-        h_att = self.antenna1.element.horizontal_pattern(phi)
-        self.assertTrue(np.all(h_att == np.array([0.0,-27.0,-30.0])))
-        
-    def test_vertical_pattern(self):
-        # theta = 90 results in zero gain
-        theta = 90
-        v_att = self.antenna1.element.vertical_pattern(theta)
-        self.assertEqual(v_att,0.0)
-        
-        # theta = 180 implies vertical gain of -27 dB
-        theta = 180
-        v_att = self.antenna1.element.vertical_pattern(theta)
-        self.assertEqual(v_att,-27.0)
-        
-        # theta = 210, vertical attenuation equals vertical sidelobe attenuation
-        theta = 210
-        v_att = self.antenna1.element.vertical_pattern(theta)
-        self.assertEqual(v_att,-30)
-        self.assertEqual(v_att,-1.0*self.antenna1.element.sla_v)
-        
-        # Test vector
-        theta = np.array([90, 180, 210])
-        v_att = self.antenna1.element.vertical_pattern(theta)
-        self.assertTrue(np.all(v_att == np.array([0.0,-27.0,-30.0])))
-        
-    def test_element_pattern(self):
-        # theta = 0 and phi = 90 result in maximum gain
-        phi = 0
-        theta = 90
-        e_gain = self.antenna1.element.element_pattern(phi,theta)
-        self.assertEqual(e_gain,5.0)
-        self.assertEqual(e_gain,self.antenna1.element.g_max)
-        
-        phi = 80
-        theta = 150
-        e_gain = self.antenna1.element.element_pattern(phi,theta)
-        self.assertEqual(e_gain,-19.0)
-        
-        phi = 150
-        theta = 210
-        e_gain = self.antenna1.element.element_pattern(phi,theta)
-        self.assertEqual(e_gain,-25.0)
-        self.assertEqual(e_gain,self.antenna1.element.g_max - \
-                         self.antenna1.element.am)
-        
-        # Test vector
-        phi = np.array([0,80,150])
-        theta = np.array([90,150,210])
-        e_gain = self.antenna1.element.element_pattern(phi,theta)
-        self.assertTrue(np.all(e_gain == np.array([5.0,-19.0,-25.0])))
+    def test_current_beam(self):
+        self.assertEqual(self.antenna1.current_beam,-1)
+        self.assertEqual(self.antenna2.current_beam,-1)
+        self.antenna2.current_beam = 0
+        self.assertEqual(self.antenna2.current_beam,0)
         
     def test_super_position_vector(self):
         # Error margin
@@ -355,6 +291,16 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
         npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
         
+        # Test 2
+        phi = -33.21
+        theta = 65.31
+        phi_scan = 11.79
+        theta_tilt = 5.31
+        self.antenna2.add_beam(phi_scan,theta_tilt)
+        self.assertEqual(self.antenna2.current_beam,0)
+        gains = self.antenna2.calculate_gain(phi,theta)
+        npt.assert_allclose(gains,np.array([10.454087]),atol=eps)
+        
     def test_to_local_coord(self):        
         # Angles to be converted
         phi = np.array([60, 190, 500, 0])
@@ -367,3 +313,4 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
+    

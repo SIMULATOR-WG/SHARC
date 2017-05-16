@@ -56,6 +56,8 @@ class AntennaBeamformingImt(Antenna):
         
         self.__beams_list = []
         self.__w_vec_list = []
+        
+        self.__current_beam = -1
     
     def add_beam(self, phi_etilt: float, theta_etilt: float):
         """
@@ -71,8 +73,9 @@ class AntennaBeamformingImt(Antenna):
         phi, theta = self.to_local_coord(phi_etilt,theta_etilt)
         self.__beams_list.append((phi,90 - theta))
         self.__w_vec_list.append(self._weight_vector(phi,90 - theta))
+        self.__current_beam = len(self.__beams_list) - 1
         
-    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, beam = -1) -> np.array:
+    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array) -> np.array:
         """
         Calculates the gain in the given direction.
         Does not receive angles in local coordinate system.
@@ -96,13 +99,15 @@ class AntennaBeamformingImt(Antenna):
         gains = np.zeros(n_direct)
         
         for g in range(n_direct):
-                gains[g] = self._beam_gain(lo_phi_vec[g],lo_theta_vec[g],beam)
+                gains[g] = self._beam_gain(lo_phi_vec[g],lo_theta_vec[g],\
+                     self.__current_beam)
                 
         return gains
     
     def reset_beams(self):
         self.__beams_list = []
         self.__w_vec_list = []
+        self.__current_beam = -1
         
     @property
     def azimuth(self):
@@ -135,6 +140,14 @@ class AntennaBeamformingImt(Antenna):
     @property
     def w_vec_list(self):
         return self.__w_vec_list
+    
+    @property
+    def current_beam(self):
+        return self.__current_beam
+    
+    @current_beam.setter
+    def current_beam(self,beam):
+        self.__current_beam = beam
     
     def _super_position_vector(self,phi: float, theta: float) -> np.array:
         """
