@@ -61,10 +61,6 @@ class ParametersImt(object):
     guard_band_ratio = 0.1
 
     ###########################################################################
-    # Minimum Coupling Loss (MCL) [dB]
-    mcl = 98
-
-    ###########################################################################
     # Handover margin [dB]
     ho_margin = 3
 
@@ -81,11 +77,11 @@ class ParametersImt(object):
 
     ###########################################################################
     # Maximum base station transmit power [dBm]
-    bs_tx_power = 40
+    bs_tx_power = 46
 
     ###########################################################################
     # Base station height [m]
-    bs_height = 10
+    bs_height = 15
 
     ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
@@ -122,7 +118,7 @@ class ParametersImt(object):
     ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 1
+    ue_k = 3
 
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
@@ -140,7 +136,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Power per RB used as target value in dBm
-    ue_tx_power_target = -80
+    ue_tx_power_target = -95
 
     ###########################################################################
     # Alfa is the balacing factor for UEs with bad channel
@@ -149,7 +145,8 @@ class ParametersImt(object):
 
     ###########################################################################
     # UE maximum transmit power [dBm]
-    ue_tx_power = 23
+    ue_tx_power = 22
+    
 
     ###########################################################################
     # UE height [m]
