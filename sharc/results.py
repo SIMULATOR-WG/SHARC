@@ -24,6 +24,7 @@ class Results(object):
         self.coupling_loss_bs_sat = list()
         
         self.imt_ul_tx_power_density = list()
+        self.imt_ul_tx_power = list()
         self.imt_ul_sinr = list()
         self.imt_ul_snr = list()
         self.imt_ul_tput = list()
@@ -58,6 +59,17 @@ class Results(object):
             x_label = "UL transmit power density [dBm/Hz]"
             y_label = "Probability of UL transmit power density < $X$"
             title = "[IMT] CDF of UL transmit power density"
+            file_name = title
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_ul_tx_power) > 0:
+            values, base = np.histogram(self.imt_ul_tx_power, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "UL transmit power [dBm]"
+            y_label = "Probability of UL transmit power < $X$"
+            title = "[IMT] CDF of UL transmit power"
             file_name = title
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))

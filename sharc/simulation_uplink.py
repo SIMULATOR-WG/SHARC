@@ -326,6 +326,7 @@ class SimulationUplink(Simulation):
             ue_list = self.link[bs]
             tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])
             self.results.imt_ul_tput.extend(tput.tolist())
+            self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue_list].tolist())
             imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue_list])/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6))
             self.results.imt_ul_tx_power_density.extend(imt_ul_tx_power_density.tolist())
             self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
