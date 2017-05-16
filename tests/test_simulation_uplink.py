@@ -231,12 +231,29 @@ class SimulationUplinkTest(unittest.TestCase):
         npt.assert_almost_equal(self.simulation_uplink.ue.tx_antenna[1].beams_list,
                              [(np.array([0.0]), np.array([0.487]))],decimal=3)
         
+        # assert beams
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[0].current_beam,0)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[1].current_beam,0)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[2].current_beam,-1)
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[0].current_beam,0)
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[1].current_beam,0)
+        
         self.simulation_uplink.select_ue()
         
         # Scheduling algorirhm
         self.simulation_uplink.scheduler()
         npt.assert_equal(self.simulation_uplink.ue.bandwidth,
                          45*np.ones(2))
+        
+        # Test gains to satellite
+        gain_ue_sat = self.simulation_uplink.calculate_gains(self.simulation_uplink.ue,
+                                                         self.simulation_uplink.system,
+                                                         "TX")
+        npt.assert_almost_equal(gain_ue_sat,np.array([[-12.6491],[-19.1344]]),decimal=3)
+        gain_sat_ue = self.simulation_uplink.calculate_gains(self.simulation_uplink.system,
+                                                         self.simulation_uplink.ue,
+                                                         "RX")
+        npt.assert_equal(gain_sat_ue,np.array([51.0, 51.0]))
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1

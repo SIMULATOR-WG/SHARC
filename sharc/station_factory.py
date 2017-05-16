@@ -160,12 +160,12 @@ class StationFactory(object):
 
         # calculate coordinates with origin at IMT system
         imt_lat_rad = param.imt_lat_deg * np.pi / 180.
-        satellite_stations.x = x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)
-        satellite_stations.y = y1
-        satellite_stations.height = (z1 * np.sin(imt_lat_rad) + x1 * np.cos(imt_lat_rad)
-                                     - dist_imt_centre_earth)
+        satellite_stations.x = [x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)]
+        satellite_stations.y = [y1]
+        satellite_stations.height = [(z1 * np.sin(imt_lat_rad) + x1 * np.cos(imt_lat_rad)
+                                     - dist_imt_centre_earth)]
 
-        satellite_stations.height = param.sat_altitude
+        satellite_stations.height = [param.sat_altitude]
         satellite_stations.active = True
         satellite_stations.rx_antenna = \
             np.array([AntennaOmni(param.sat_rx_antenna_gain)])
