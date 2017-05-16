@@ -42,7 +42,7 @@ class StationFactory(object):
         
         if(param_ant.bs_tx_antenna_type == "OMNI"):
             imt_base_stations.tx_antenna = \
-                np.array([AntennaOmni(param.bs_tx_antenna_gain) \
+                np.array([AntennaOmni(param_ant.bs_tx_omni_antenna_gain) \
                           for i in range(num_bs)])
         elif(param_ant.bs_tx_antenna_type == "BEAMFORMING"):
             imt_base_stations.tx_antenna = np.empty(num_bs,dtype=AntennaBeamformingImt)
@@ -55,7 +55,7 @@ class StationFactory(object):
         
         if(param_ant.bs_rx_antenna_type == "OMNI"):
             imt_base_stations.rx_antenna = \
-                np.array([AntennaOmni(param.bs_rx_antenna_gain) \
+                np.array([AntennaOmni(param_ant.bs_rx_omni_antenna_gain) \
                           for i in range(num_bs)])
         elif(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
             imt_base_stations.rx_antenna = np.empty(num_bs,dtype=AntennaBeamformingImt)
@@ -99,7 +99,7 @@ class StationFactory(object):
 
         if(param_ant.ue_tx_antenna_type == "OMNI"):
             imt_ue.tx_antenna = \
-                np.array([AntennaOmni(param.ue_tx_antenna_gain) \
+                np.array([AntennaOmni(param_ant.ue_tx_omni_antenna_gain) \
                           for i in range(num_ue)])
         elif(param_ant.ue_tx_antenna_type == "BEAMFORMING"):
             imt_ue.tx_antenna = np.empty(num_ue,dtype=AntennaBeamformingImt)
@@ -118,7 +118,7 @@ class StationFactory(object):
                 
         if(param_ant.ue_rx_antenna_type == "OMNI"):
             imt_ue.rx_antenna = \
-                np.array([AntennaOmni(param.ue_rx_antenna_gain) \
+                np.array([AntennaOmni(param_ant.ue_rx_omni_antenna_gain) \
                           for i in range(num_ue)])
         elif(param_ant.ue_rx_antenna_type == "BEAMFORMING"):
             imt_ue.rx_antenna = np.empty(num_ue,dtype=AntennaBeamformingImt)
