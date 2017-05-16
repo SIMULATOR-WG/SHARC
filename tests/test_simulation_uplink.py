@@ -254,6 +254,21 @@ class SimulationUplinkTest(unittest.TestCase):
                                                          self.simulation_uplink.ue,
                                                          "RX")
         npt.assert_equal(gain_sat_ue,np.array([51.0, 51.0]))
+        
+        # test interference
+        
+        #reset antennas
+        self.simulation_uplink.reset_antennas()
+        npt.assert_equal(self.simulation_uplink.bs.rx_antenna[0].beams_list,[])
+        npt.assert_equal(self.simulation_uplink.bs.rx_antenna[1].beams_list,[])
+        npt.assert_equal(self.simulation_uplink.bs.rx_antenna[2].beams_list,[])
+        npt.assert_equal(self.simulation_uplink.ue.tx_antenna[0].beams_list,[])
+        npt.assert_equal(self.simulation_uplink.ue.tx_antenna[1].beams_list,[])
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[0].current_beam,-1)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[1].current_beam,-1)
+        self.assertEqual(self.simulation_uplink.bs.rx_antenna[2].current_beam,-1)
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[0].current_beam,-1)
+        self.assertEqual(self.simulation_uplink.ue.tx_antenna[1].current_beam,-1)
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1

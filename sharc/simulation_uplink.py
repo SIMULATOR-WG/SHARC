@@ -133,7 +133,7 @@ class SimulationUplink(Simulation):
             #self.calculate_external_degradation()
             pass
         self.collect_results()
-        self.reset_antennae()
+        self.reset_antennas()
 
     def finalize(self, *args, **kwargs):
         self.results.write_files()
@@ -371,6 +371,11 @@ class SimulationUplink(Simulation):
                 
         return gains
     
-    def reset_antenae(self):
-        pass
+    def reset_antennas(self):
+        if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+            for bs in range(self.bs.num_stations):
+                self.bs.rx_antenna[bs].reset_beams()
+        if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
+            for ue in range(self.ue.num_stations):
+                self.ue.tx_antenna[ue].reset_beams()
 
