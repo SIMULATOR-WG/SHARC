@@ -99,6 +99,10 @@ class AntennaBeamformingImt(Antenna):
                 gains[g] = self._beam_gain(lo_phi_vec[g],lo_theta_vec[g],beam)
                 
         return gains
+    
+    def reset_beams(self):
+        self.__beams_list = []
+        self.__w_vec_list = []
         
     @property
     def azimuth(self):

@@ -310,6 +310,11 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertTrue(np.allclose(np.imag(w_vec),\
                                     np.imag(expected_w_vec),rtol = eps))
         
+        # Reset beams and test
+        self.antenna2.reset_beams()
+        self.assertEqual(len(self.antenna2.beams_list),0)
+        self.assertEqual(len(self.antenna2.w_vec_list),0)
+        
     def test_beam_gain(self):
         # Error margin
         eps = 1e-4
