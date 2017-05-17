@@ -135,7 +135,4 @@ class ParametersPropagation(object):
     coeff_x = -3
     coeff_y = 4.5
     coeff_z = -2
-    
-    ###########################################################################
-    #Distance in km
-    dist = 10
+  

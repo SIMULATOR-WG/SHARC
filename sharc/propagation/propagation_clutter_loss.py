@@ -6,23 +6,19 @@ Created on Mon May 15 12:51:48 2017
 """
 
 from sharc.propagation.propagation import Propagation 
-from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_propagation import ParametersPropagation
 
 import numpy as np
  
 import scipy
-import math
-from scipy.stats import norm
-from scipy.special import erf
+
 
 class PropagationClutterLoss(Propagation):
  
   def get_loss(self, *args, **kwargs) -> np.array:
       
-      f = np.asarray(kwargs["frequency"])
-      p = np.asarray(kwargs["percentage_p"])
-      d = np.asarray(kwargs["dist"])
+      f = np.asarray(kwargs["frequency"])*(1e-3) #GHz
+      p = np.asarray(kwargs["percentage_p"]) #%
+      d = np.asarray(kwargs["distance"])*(1e-3) #Km
       theta = np.asarray(kwargs["elevation_angle_facade"])
       P = np.asarray(kwargs["probability_loss_notExceeded"])
       r = np.asarray(kwargs["coeff_r"])
@@ -51,8 +47,7 @@ class PropagationClutterLoss(Propagation):
  
                              
       Lbel = 10*np.log10(10**(0.1*Ap) +10**(0.1*Bp) + (10**(0.1*C)))
-      
-      
+
       
       #Clutter Loss item 3.1 
       Lt = 23.5 + 9.6*np.log10(f)

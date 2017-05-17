@@ -8,7 +8,6 @@ Created on Mon Apr 17 15:35:00 2017
 from sharc.propagation.propagation import Propagation
 
 import numpy as np
-import sys
 
 class PropagationP619(Propagation):
     """

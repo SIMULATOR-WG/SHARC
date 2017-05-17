@@ -16,8 +16,8 @@ class PropagationGasesAttenuation(Propagation):
     
     def get_loss_Ag(self, *args, **kwargs) -> np.array:
        
-        d = np.asarray(kwargs["distance"])
-        f = np.asarray(kwargs["frequency"])
+        d = np.asarray(kwargs["distance"]) #Km
+        f = np.asarray(kwargs["frequency"]) #GHz
         Ph = np.asarray(kwargs["atmospheric_pressure"])
         T = np.asarray(kwargs["air_temperature"])
         ro = np.asarray(kwargs["water_vapour"])
@@ -60,7 +60,7 @@ class PropagationGasesAttenuation(Propagation):
          
         gases_att = (0.1820*f*N2f);
                      
-        #loss = 20*np.log10(d) + 20*np.log10(f/(1e-3)) - 27.55 + gases_att*d
+      
         loss = gases_att*d
                                
         return loss

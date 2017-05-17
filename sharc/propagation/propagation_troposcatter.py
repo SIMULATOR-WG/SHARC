@@ -4,13 +4,9 @@ Created on Tue Mai 08 12:05:38 2017
 @author: LeticiaValle_Mac
 """
 from sharc.propagation.propagation import Propagation 
-from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_propagation import ParametersPropagation
-from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
 
 import numpy as np
-import os
  
 class PropagationTropScatter(Propagation):
     """
@@ -30,8 +26,8 @@ class PropagationTropScatter(Propagation):
     def get_loss(self, *args, **kwargs) -> np.array:
         #loss = self.propagation.get_loss(distance=d, frequency=self.param.frequency)
        
-        d = np.asarray(kwargs["distance"])
-        f = np.asarray(kwargs["frequency"])
+        d = np.asarray(kwargs["distance"])*(1e-3)   #Km
+        f = np.asarray(kwargs["frequency"])*(1e-3)  #GHz
         Ph = np.asarray(kwargs["atmospheric_pressure"])
         T = np.asarray(kwargs["air_temperature"])
         ro = np.asarray(kwargs["water_vapour"])
@@ -57,6 +53,4 @@ class PropagationTropScatter(Propagation):
     
         loss = 190 + Lf + 20*np.log10(d) +0.573*teta - 0.15*No + Lc + loss_Ag - 10.1*(-np.log10(p/50))**0.7
          
-        print(loss_Ag)
-        print(loss)
         return loss

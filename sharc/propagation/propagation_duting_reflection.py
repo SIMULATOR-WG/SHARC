@@ -28,8 +28,8 @@ class PropagationDutingReflection(Propagation):
         
     def get_loss(self, *args, **kwargs) -> np.array:
        
-        d = np.asarray(kwargs["distance"])
-        f = np.asarray(kwargs["frequency"])
+        d = np.asarray(kwargs["distance"])*(1e-3) #Km
+        f = np.asarray(kwargs["frequency"])*(1e-3) #GHz
         Ph = np.asarray(kwargs["atmospheric_pressure"])
         T = np.asarray(kwargs["air_temperature"])
         ro = np.asarray(kwargs["water_vapour"])
@@ -57,7 +57,7 @@ class PropagationDutingReflection(Propagation):
         hm = np.asarray(kwargs["hm"])
         
       
-        #β0 (%), the time percentage for which refractive index lapse-rates exceeding
+           #β0 (%), the time percentage for which refractive index lapse-rates exceeding
         #100 N-units/km can be expected in the first 100 m of the lower atmosphere,    
         tau = 1 - np.exp(-(4.12*(10**-4)*dlm**2.41))
         alpha = -0.6 - epsilon*(10**-9)*(d**3.1)*tau
@@ -69,8 +69,8 @@ class PropagationDutingReflection(Propagation):
         mu1 = (10**(-dtm/(16 - 6.6*tau)) + (10**-(0.496 + 0.354*tau))**5)**0.2
         
         mu2 = ((500/Ae)*((d**2)/((np.sqrt(Hte)+np.sqrt(Hre))**2)))**alpha
-    
-        print(mu2)      
+        
+             
     
         if (hm <= 10):
             mu3 = 1
@@ -85,9 +85,9 @@ class PropagationDutingReflection(Propagation):
               
                
         if (abs(phi)<=70):
-            B0 = (10**(-0.015*abs(phi)+ 1.67)*mu1*mu4)*100
+            B0 = (10**(-0.015*abs(phi)+ 1.67)*mu1*mu4)
         else:
-            B0 = (4.17*mu1*mu4)*100
+            B0 = (4.17*mu1*mu4)
          
         if (f<0.5):
             Alf = 45.375 - 137*f + 92.5*f**2
@@ -143,16 +143,17 @@ class PropagationDutingReflection(Propagation):
         teta_line = d*(10**3)/Ae +thetaT_oneline + thetaR_oneline
         
         beta = (B0*mu2*mu3)
+        oi = (2.0058-np.log10(beta))**1.012
         
-        Gama = (1076/(2.0058-np.log10(beta))**1.012)*np.exp(-((9.51-4.8*np.log10(beta))+ 0.198*(np.log10(beta))**2)*10**-6*d**1.13)       
-        Ap = -12 + (1.2 + 3.7*(10**-3)*d)*np.log10(p/beta) + 12*(p/beta)**Gama
-                          
+        Gama = (1.076/((2.0058-np.log10(beta))**1.0))*np.exp(-((9.51-4.8*np.log10(beta))+ 0.198*(np.log10(beta))**2)*10**-6*d**1.13)       
+        Ap = -12 + (1.2 + 3.7*(10**-3)*d)*np.log10(p/beta) + 12*(p/beta)**Gama                  
         #Time percentage and time percentage and angular-distance dependent losses 
         Ad = Yd*teta_line + Ap
-        
+       
         #Atmospheric gases attenuation         
-        loss_Ag = self.propagation.get_loss_Ag(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)   
-    
-        loss = Af + Ad + loss_Ag*d 
+        loss_Ag = self.propagation.get_loss_Ag(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
+        
+        
+        loss = Af + Ad + loss_Ag
         
         return loss

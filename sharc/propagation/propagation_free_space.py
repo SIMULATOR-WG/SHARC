@@ -15,7 +15,11 @@ class PropagationFreeSpace(Propagation):
     """
     
     def get_loss(self, *args, **kwargs) -> np.array:
-        d = np.asarray(kwargs["distance"])
-        f = np.asarray(kwargs["frequency"])
+        
+        d = np.asarray(kwargs["distance"])   #m
+        f = np.asarray(kwargs["frequency"])  #MHz
+       
+        
         loss = 20*np.log10(d) + 20*np.log10(f) - 27.55
+        
         return loss

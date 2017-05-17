@@ -1,6 +1,5 @@
 
 import unittest
-import numpy as np
 
 import numpy.testing as npt
 
@@ -14,9 +13,9 @@ class PropagationDutingReflectionTest(unittest.TestCase):
     def test_loss(self):
        
 
-        f = 27          #Frequency in GHz
+        f = 27000          #Frequency in GHz
         p = 40          #percentage p
-        d = 100         #distance in m
+        d = 10000         #distance in km
         Dlt = 30        #distance from the transmit antennas to their respective horizons (km)
         Dlr = 10        #distance from the receive antennas to their respective horizons (km)
         Dct = 10        #Distance over land from the transmit and receive antennas to the coast (km)
@@ -39,21 +38,19 @@ class PropagationDutingReflectionTest(unittest.TestCase):
         T = 288
         ro = 3
         
-        npt.assert_allclose(1.335547788801878e+112, 
+        npt.assert_allclose(307.403, 
                          self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm),atol=1e-3)
 
+        f = 40000
+        d = 20000
+        npt.assert_allclose( 333.586, 
+                         self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm),atol=1e-3)
 
-#        d = [[10, 20, 30],[40, 50, 60]]
-#        f = [ 10000 ]
-#        Ph = 1013 
-#        T = 288
-#        ro = 7.5
-#        self.assertTrue(np.all(np.isclose([ 72.590,  78.610,  82.132],
-#                    [ 84.631,  86.569,  88.153], self.__gasAtt.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro), atol=1e-2)))   
-#   
-    
-    
-    
+#        d = [ 10000, 2000]
+#        f = [ 27000, 40000 ]
+#        self.assertTrue(np.all(np.equal([307.403, 333.586], 
+#                         self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm))))
+
 if __name__ == '__main__':
     unittest.main()
        
