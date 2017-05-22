@@ -49,7 +49,7 @@ class StationFactory(object):
             par = param_ant.get_antenna_parameters("BS","TX")
             
             for i in range(num_bs):
-                imt_base_stations.rx_antenna[i] = \
+                imt_base_stations.tx_antenna[i] = \
                 AntennaBeamformingImt(par,param_ant.bs_tx_azimuth[i%3],\
                                       param_ant.bs_tx_elevation)
         
