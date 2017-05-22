@@ -89,11 +89,11 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # Base station number of rows in transmit array
-    bs_tx_n_rows = 16
+    bs_tx_n_rows = 8
     
     ###########################################################################
     # Base station number of columns in transmit array
-    bs_tx_n_columns = 16
+    bs_tx_n_columns = 8
     
     ###########################################################################
     # Base station array horizontal transmit element spacing (d/lambda)
@@ -133,11 +133,11 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # Base station number of rows in receive array
-    bs_rx_n_rows = 16
+    bs_rx_n_rows = 8
     
     ###########################################################################
     # Base station number of columns in receive array
-    bs_rx_n_columns = 16
+    bs_rx_n_columns = 8
     
     ###########################################################################
     # Base station array horizontal receive element spacing (d/lambda)
@@ -185,7 +185,7 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE number of columns in transmit array
-    ue_tx_n_columns = 2
+    ue_tx_n_columns = 4
     
     ###########################################################################
     # UE array horizontal transmit element spacing (d/lambda)
@@ -233,7 +233,7 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE number of columns in receive array
-    ue_rx_n_columns = 2
+    ue_rx_n_columns = 4
     
     ###########################################################################
     # UE array horizontal receive element spacing (d/lambda)
