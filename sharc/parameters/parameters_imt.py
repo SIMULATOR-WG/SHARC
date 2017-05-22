@@ -36,7 +36,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 150
+    intersite_distance = 226
 
     ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
@@ -117,7 +117,7 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 2
+    ue_k_m = 10
 
     ###########################################################################
     # Power control algorithm
@@ -164,7 +164,7 @@ class ParametersImt(object):
     # Channel parameters
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "CI" (close-in FS reference distance)
-    channel_model = "CI"
+    channel_model = "FSPL"
     line_of_sight_prob = 0.75 # probability of line-of-sight (not for FSPL)
 
     ###########################################################################

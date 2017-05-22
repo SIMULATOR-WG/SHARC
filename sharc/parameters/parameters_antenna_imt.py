@@ -43,19 +43,19 @@ class ParametersAntennaImt(object):
     # OMNIDIRECTIONAL ANTENNA PARAMETERS
     ###########################################################################
     # Base station transmit antenna gain [dBi]
-    bs_tx_omni_antenna_gain = 0
+    bs_tx_omni_antenna_gain = 29.1
 
     ###########################################################################
     # Base station receive antenna gain [dBi]
-    bs_rx_omni_antenna_gain = 0
+    bs_rx_omni_antenna_gain = 29.1
 
     ###########################################################################
     # UE transmit antenna gain [dBi]
-    ue_tx_omni_antenna_gain = 0
+    ue_tx_omni_antenna_gain = 14
 
     ###########################################################################
     # UE receive antenna gain [dBi]
-    ue_rx_omni_antenna_gain = 0
+    ue_rx_omni_antenna_gain = 14
     
     ###########################################################################
     # BEAMFORMING PARAMETERS
