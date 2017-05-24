@@ -22,18 +22,18 @@ class StationFactory(object):
                                    param_ant: ParametersAntennaImt,
                                    topology: Topology):
         num_bs = param.num_clusters*param.num_base_stations
-        if(param_ant.bs_tx_antenna_type == "BEAMFORMING" or \
-           param_ant.bs_rx_antenna_type == "BEAMFORMING"):
-            num_bs = 3*num_bs
+#        if(param_ant.bs_tx_antenna_type == "BEAMFORMING" or \
+#           param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+        num_bs = 3*num_bs
         imt_base_stations = StationManager(num_bs)
         
         # now we set the coordinates
-        if(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
-            imt_base_stations.x = np.repeat(topology.x,3)
-            imt_base_stations.y = np.repeat(topology.y,3)
-        else:
-            imt_base_stations.x = topology.x
-            imt_base_stations.y = topology.y    
+#        if(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+        imt_base_stations.x = np.repeat(topology.x,3)
+        imt_base_stations.y = np.repeat(topology.y,3)
+#        else:
+#            imt_base_stations.x = topology.x
+#            imt_base_stations.y = topology.y    
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
         
         imt_base_stations.active = np.ones(num_bs)

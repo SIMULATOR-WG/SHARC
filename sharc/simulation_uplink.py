@@ -66,8 +66,8 @@ class SimulationUplink(Simulation):
         num_bs = self.param.num_clusters*self.param.num_base_stations
         
         # Emulate 3 cells per site by multiplying the number of BSs by 3
-        if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
-            num_bs = 3*num_bs
+#        if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+        num_bs = 3*num_bs
 
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)

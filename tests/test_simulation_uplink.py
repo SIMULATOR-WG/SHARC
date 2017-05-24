@@ -65,12 +65,12 @@ class SimulationUplinkTest(unittest.TestCase):
         
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_uplink.ue), 4)
-        self.assertEqual(len(self.simulation_uplink.bs), 2)
-        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (2,4))
+        self.assertEqual(len(self.simulation_uplink.bs), 6)
+        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (6,4))
         
         # after initialize(), receivers (base stations) must be created
         self.simulation_uplink.initialize()
-        self.assertEqual(self.simulation_uplink.bs.num_stations, 2)
+        self.assertEqual(self.simulation_uplink.bs.num_stations, 6)
         
         # create FSS system
         self.simulation_uplink.create_system()
@@ -81,7 +81,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation_uplink.ue.y = np.array([0, 0, 0, 0])
         self.assertEqual(self.simulation_uplink.ue.num_stations, 4)
 
-        self.simulation_uplink.bs.rx_antenna = [AntennaOmni(0), AntennaOmni(1)]
+        self.simulation_uplink.bs.rx_antenna = [AntennaOmni(0), AntennaOmni(0), AntennaOmni(0), AntennaOmni(1), AntennaOmni(1), AntennaOmni(1)]
         self.simulation_uplink.ue.tx_antenna = [AntennaOmni(2), AntennaOmni(3), AntennaOmni(4), AntennaOmni(5)]
         
         # let's calculate coupling loss
@@ -90,12 +90,24 @@ class SimulationUplinkTest(unittest.TestCase):
                                                            self.simulation_uplink.bs,
                                                            self.simulation_uplink.propagation_imt) )
         npt.assert_allclose(self.simulation_uplink.coupling_loss, 
-                            np.array([[119.23,  112.21,  120.15,  124.19], [127.77,  120.75,  111.80,  109.21]]), 
+                            np.array([[119.23,  112.21,  120.15,  124.19],\
+                                      [119.23,  112.21,  120.15,  124.19],\
+                                      [119.23,  112.21,  120.15,  124.19],\
+                                      [127.77,  120.75,  111.80,  109.21],\
+                                      [127.77,  120.75,  111.80,  109.21],\
+                                      [127.77,  120.75,  111.80,  109.21]]), 
                             atol=1e-2)
         
         # Now we connect base stations to user equipments
         self.simulation_uplink.connect_ue_to_bs()
-        self.assertEqual(self.simulation_uplink.link, {0: [0,1], 1: [2,3]})
+        for k in range(3):
+            if(len(self.simulation_uplink.link[k]) > 0):
+                self.assertTrue(min(self.simulation_uplink.link[k]) >= 0)
+                self.assertTrue(max(self.simulation_uplink.link[k]) <= 1)
+        for k in range(3,6):
+            if(len(self.simulation_uplink.link[k]) > 0):
+                self.assertTrue(min(self.simulation_uplink.link[k]) >= 2)
+                self.assertTrue(max(self.simulation_uplink.link[k]) <= 3)
         
         self.simulation_uplink.select_ue()
         
@@ -457,18 +469,18 @@ class SimulationUplinkTest(unittest.TestCase):
         
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_uplink.ue), 4)
-        self.assertEqual(len(self.simulation_uplink.bs), 2)
-        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (2,4))
+        self.assertEqual(len(self.simulation_uplink.bs), 6)
+        self.assertEqual(self.simulation_uplink.coupling_loss.shape, (6,4))
         
         # after initialize(), receivers (base stations) must be created
         self.simulation_uplink.initialize()
-        self.assertEqual(self.simulation_uplink.bs.num_stations, 2)
+        self.assertEqual(self.simulation_uplink.bs.num_stations, 6)
         
         # it is time to create user equipments
         self.simulation_uplink.create_ue()
         self.assertEqual(self.simulation_uplink.ue.num_stations, 4)
 
-        self.simulation_uplink.bs.rx_antenna = [AntennaOmni(0), AntennaOmni(1)]
+        self.simulation_uplink.bs.rx_antenna = [AntennaOmni(0), AntennaOmni(0), AntennaOmni(0), AntennaOmni(1), AntennaOmni(1), AntennaOmni(1)]
         self.simulation_uplink.ue.tx_antenna = [AntennaOmni(2), AntennaOmni(3),\
                                                 AntennaOmni(4), AntennaOmni(5)]
         
@@ -476,20 +488,24 @@ class SimulationUplinkTest(unittest.TestCase):
         gains = self.simulation_uplink.calculate_gains(self.simulation_uplink.ue,\
                                                        self.simulation_uplink.bs,\
                                                        "TX")
-        npt.assert_equal(gains,np.array([[2, 2],
-                                         [3, 3],
-                                         [4, 4],
-                                         [5, 5]]))
+        npt.assert_equal(gains,np.array([[2, 2, 2, 2, 2, 2],
+                                         [3, 3, 3, 3, 3, 3],
+                                         [4, 4, 4, 4, 4, 4],
+                                         [5, 5, 5, 5, 5, 5]]))
         gains = self.simulation_uplink.calculate_gains(self.simulation_uplink.bs,\
                                                        self.simulation_uplink.ue,\
                                                        "RX")
         npt.assert_equal(gains,np.array([[0, 0, 0, 0],
-                                         [1, 1, 1, 1]]))
+                                         [0, 0, 0, 0],
+                                         [0, 0, 0, 0],
+                                         [1, 1, 1, 1],
+                                         [1, 1, 1, 1],
+                                         [1, 1, 1, 1],]))
                 
 if __name__ == '__main__':
     unittest.main()
     
 #    suite = unittest.TestSuite()
-#    suite.addTest(SimulationUplinkTest("test_simulation_1bs_2ue_beamforming"))
+#    suite.addTest(SimulationUplinkTest("test_simulation_2bs_4ue_omni"))
 #    runner = unittest.TextTestRunner()
 #    runner.run(suite)
