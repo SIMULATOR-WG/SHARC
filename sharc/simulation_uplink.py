@@ -172,9 +172,13 @@ class SimulationUplink(Simulation):
             self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
         # define antenna gains
         gain_a = self.calculate_gains(station_a,station_b,"TX")
-        gain_b = np.transpose(self.calculate_gains(station_b,station_a,"RX"))
+        gain_b = self.calculate_gains(station_b,station_a,"RX")
+        if(station_b.num_stations > 1):
+            gain_b_t = np.transpose(gain_b)
+        else:
+            gain_b_t = gain_b[:,np.newaxis]
         # calculate coupling loss
-        return self.path_loss - gain_a - gain_b
+        return self.path_loss - gain_a - gain_b_t
 #        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain,
 #                                          ParametersImt.mcl)
 
