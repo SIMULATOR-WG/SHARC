@@ -75,7 +75,7 @@ class StationFactory(object):
     def generate_imt_ue(param: ParametersImt, 
                         param_ant: ParametersAntennaImt,
                         topology: Topology):
-        num_ue = param.num_clusters*param.num_base_stations*param.ue_k*param.ue_k_m
+        num_ue = 3*param.num_clusters*param.num_base_stations*param.ue_k*param.ue_k_m
         imt_ue = StationManager(num_ue)
         #imt_ue.x = (topology.x_max - topology.x_min)*np.random.random(num_ue) + topology.x_min
         #imt_ue.y = (topology.y_max - topology.y_min)*np.random.random(num_ue) + topology.y_min
@@ -86,8 +86,8 @@ class StationFactory(object):
             x_max = topology.x[bs] + topology.cell_radius
             y_min = topology.y[bs] - topology.cell_radius
             y_max = topology.y[bs] + topology.cell_radius
-            x = (x_max - x_min)*np.random.random(param.ue_k*param.ue_k_m) + x_min
-            y = (y_max - y_min)*np.random.random(param.ue_k*param.ue_k_m) + y_min
+            x = (x_max - x_min)*np.random.random(3*param.ue_k*param.ue_k_m) + x_min
+            y = (y_max - y_min)*np.random.random(3*param.ue_k*param.ue_k_m) + y_min
             ue_x.extend(x)
             ue_y.extend(y)
         imt_ue.x = np.array(ue_x)
