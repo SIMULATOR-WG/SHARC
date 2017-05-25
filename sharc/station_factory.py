@@ -22,18 +22,18 @@ class StationFactory(object):
                                    param_ant: ParametersAntennaImt,
                                    topology: Topology):
         num_bs = param.num_clusters*param.num_base_stations
-#        if(param_ant.bs_tx_antenna_type == "BEAMFORMING" or \
-#           param_ant.bs_rx_antenna_type == "BEAMFORMING"):
-        num_bs = 3*num_bs
+        if(param_ant.bs_tx_antenna_type == "BEAMFORMING" or \
+           param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+            num_bs = 3*num_bs
         imt_base_stations = StationManager(num_bs)
         
         # now we set the coordinates
-#        if(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
-        imt_base_stations.x = np.repeat(topology.x,3)
-        imt_base_stations.y = np.repeat(topology.y,3)
-#        else:
-#            imt_base_stations.x = topology.x
-#            imt_base_stations.y = topology.y    
+        if(param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+            imt_base_stations.x = np.repeat(topology.x,3)
+            imt_base_stations.y = np.repeat(topology.y,3)
+        else:
+            imt_base_stations.x = topology.x
+            imt_base_stations.y = topology.y    
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
         
         imt_base_stations.active = np.ones(num_bs)
@@ -75,7 +75,7 @@ class StationFactory(object):
     def generate_imt_ue(param: ParametersImt, 
                         param_ant: ParametersAntennaImt,
                         topology: Topology):
-        num_ue = 3*param.num_clusters*param.num_base_stations*param.ue_k*param.ue_k_m
+        num_ue = param.num_clusters*param.num_base_stations*param.ue_k*param.ue_k_m
         imt_ue = StationManager(num_ue)
         #imt_ue.x = (topology.x_max - topology.x_min)*np.random.random(num_ue) + topology.x_min
         #imt_ue.y = (topology.y_max - topology.y_min)*np.random.random(num_ue) + topology.y_min
@@ -86,8 +86,8 @@ class StationFactory(object):
             x_max = topology.x[bs] + topology.cell_radius
             y_min = topology.y[bs] - topology.cell_radius
             y_max = topology.y[bs] + topology.cell_radius
-            x = (x_max - x_min)*np.random.random(3*param.ue_k*param.ue_k_m) + x_min
-            y = (y_max - y_min)*np.random.random(3*param.ue_k*param.ue_k_m) + y_min
+            x = (x_max - x_min)*np.random.random(param.ue_k*param.ue_k_m) + x_min
+            y = (y_max - y_min)*np.random.random(param.ue_k*param.ue_k_m) + y_min
             ue_x.extend(x)
             ue_y.extend(y)
         imt_ue.x = np.array(ue_x)
