@@ -104,10 +104,10 @@ class StationFactory(object):
             if(beamforming):
                 i = bs%3
                 ang = np.deg2rad(90+i*120)
-                x_min = bs_x[bs] + np.sin(ang) - cell_r
-                x_max = bs_x[bs] + np.sin(ang) + cell_r
-                y_min = bs_y[bs] + np.cos(ang) - cell_r
-                y_max = bs_y[bs] + np.cos(ang) + cell_r
+                x_min = bs_x[bs] + cell_r*np.sin(ang) - cell_r
+                x_max = bs_x[bs] + cell_r*np.sin(ang) + cell_r
+                y_min = bs_y[bs] + cell_r*np.cos(ang) - cell_r
+                y_max = bs_y[bs] + cell_r*np.cos(ang) + cell_r
             else:
                 x_min = bs_x[bs] - cell_r
                 x_max = bs_x[bs] + cell_r
