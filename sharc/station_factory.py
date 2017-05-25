@@ -76,18 +76,24 @@ class StationFactory(object):
                         param_ant: ParametersAntennaImt,
                         topology: Topology):
         num_ue = param.num_clusters*param.num_base_stations*param.ue_k*param.ue_k_m
+        if(param_ant.ue_tx_antenna_type == "BEAMFORMING" or \
+           param_ant.ue_rx_antenna_type == "BEAMFORMING"):
+            num_ue = 3*num_ue
         imt_ue = StationManager(num_ue)
         #imt_ue.x = (topology.x_max - topology.x_min)*np.random.random(num_ue) + topology.x_min
         #imt_ue.y = (topology.y_max - topology.y_min)*np.random.random(num_ue) + topology.y_min
         ue_x = list()
         ue_y = list()
         for bs in range(topology.x.size):
+            num_ue_per_bs = param.ue_k*param.ue_k_m
+            if(param_ant.ue_tx_antenna_type == "BEAMFORMING" or param_ant.ue_rx_antenna_type == "BEAMFORMING"):
+                num_ue_per_bs = 3*num_ue_per_bs
             x_min = topology.x[bs] - topology.cell_radius
             x_max = topology.x[bs] + topology.cell_radius
             y_min = topology.y[bs] - topology.cell_radius
             y_max = topology.y[bs] + topology.cell_radius
-            x = (x_max - x_min)*np.random.random(param.ue_k*param.ue_k_m) + x_min
-            y = (y_max - y_min)*np.random.random(param.ue_k*param.ue_k_m) + y_min
+            x = (x_max - x_min)*np.random.random(num_ue_per_bs) + x_min
+            y = (y_max - y_min)*np.random.random(num_ue_per_bs) + y_min
             ue_x.extend(x)
             ue_y.extend(y)
         imt_ue.x = np.array(ue_x)
