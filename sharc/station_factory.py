@@ -84,14 +84,35 @@ class StationFactory(object):
         #imt_ue.y = (topology.y_max - topology.y_min)*np.random.random(num_ue) + topology.y_min
         ue_x = list()
         ue_y = list()
-        for bs in range(topology.x.size):
+
+        if(param_ant.bs_rx_antenna_type == "BEAMFORMING" or param_ant.bs_rx_antenna_type == "BEAMFORMING"):
+            beamforming = True
+            num_ue_per_bs = 3*param.ue_k*param.ue_k_m
+            cell_r = topology.cell_radius/2
+            num_bs = 3*topology.x.size
+            bs_x = np.repeat(topology.x,3)
+            bs_y = np.repeat(topology.y,3)
+        else:
+            beamforming = False
             num_ue_per_bs = param.ue_k*param.ue_k_m
-            if(param_ant.ue_tx_antenna_type == "BEAMFORMING" or param_ant.ue_rx_antenna_type == "BEAMFORMING"):
-                num_ue_per_bs = 3*num_ue_per_bs
-            x_min = topology.x[bs] - topology.cell_radius
-            x_max = topology.x[bs] + topology.cell_radius
-            y_min = topology.y[bs] - topology.cell_radius
-            y_max = topology.y[bs] + topology.cell_radius
+            cell_r = topology.cell_radius
+            num_bs = topology.x.size
+            bs_x = topology.x
+            bs_y = topology.y
+            
+        for bs in range(num_bs):
+            if(beamforming):
+                i = bs%3
+                ang = np.deg2rad(90+i*120)
+                x_min = bs_x[bs] + np.sin(ang) - cell_r
+                x_max = bs_x[bs] + np.sin(ang) + cell_r
+                y_min = bs_y[bs] + np.cos(ang) - cell_r
+                y_max = bs_y[bs] + np.cos(ang) + cell_r
+            else:
+                x_min = bs_x[bs] - cell_r
+                x_max = bs_x[bs] + cell_r
+                y_min = bs_y[bs] - cell_r
+                y_max = bs_y[bs] + cell_r
             x = (x_max - x_min)*np.random.random(num_ue_per_bs) + x_min
             y = (y_max - y_min)*np.random.random(num_ue_per_bs) + y_min
             ue_x.extend(x)
