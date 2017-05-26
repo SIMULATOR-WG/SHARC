@@ -117,7 +117,7 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 10
+    ue_k_m = 5
 
     ###########################################################################
     # Power control algorithm
