@@ -33,6 +33,6 @@ class PropagationLineOfSight(Propagation):
         ro = np.asarray(kwargs["water_vapour"])
         
         loss_Ag = self.propagation.get_loss_Ag(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
-        loss = 20*np.log10(d) + 20*np.log10(f) +92.5  + loss_Ag
+        loss = 20*np.log10(d) + 20*np.log10(f) + 92.5  + loss_Ag
                           
         return loss

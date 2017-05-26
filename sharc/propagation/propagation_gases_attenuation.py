@@ -22,7 +22,6 @@ class PropagationGasesAttenuation(Propagation):
         T = np.asarray(kwargs["air_temperature"])
         ro = np.asarray(kwargs["water_vapour"])
         
-        
         P=Ph
         theta=300/T
         e=ro*T/216.7
@@ -41,12 +40,10 @@ class PropagationGasesAttenuation(Propagation):
     
         deltafo=np.array(a3)*(1e-4)*(p*theta**(0.8-np.array(a4))+1.1*e*theta)
         deltafw=np.array(b3)*(1e-4)*(p*theta**np.array(b4)+np.array(b5)*e*theta**np.array(b6))
-                          
-       
+                                
         part1Fio=(deltafo-deltao*(fo-f))/((fo-f)**2+deltafo**2) 
         part2Fio=(deltafo-deltao*(fo+f))/((fo+f)**2+deltafo**2)                
-        Fio=(f/fo)*(part1Fio+part2Fio)
-        
+        Fio=(f/fo)*(part1Fio+part2Fio)      
 
         part1Fiw=(deltafw-deltaw*(fwv-f))/((fwv-f)**2+deltafw**2)
         part2Fiw=(deltafw-deltaw*(fwv+f))/((fwv+f)**2+deltafw**2)
@@ -59,8 +56,7 @@ class PropagationGasesAttenuation(Propagation):
         N2f = sum(Fio*Sio)+sum(Fiw*Siw)+ N2Df
          
         gases_att = (0.1820*f*N2f);
-                     
-      
+                          
         loss = gases_att*d
                                
         return loss

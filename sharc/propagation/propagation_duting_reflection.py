@@ -45,7 +45,7 @@ class PropagationDutingReflection(Propagation):
         Hre = np.asarray(kwargs["Hre"])
         thetaT = np.asarray(kwargs["theta_tx"])
         thetaR = np.asarray(kwargs["theta_rx"])
-        No = np.asarray(kwargs["N0"])
+        N0 = np.asarray(kwargs["N0"])
         deltaN = np.asarray(kwargs["delta_N"])
         p = np.asarray(kwargs["percentage_p"])
        
@@ -57,7 +57,7 @@ class PropagationDutingReflection(Propagation):
         hm = np.asarray(kwargs["hm"])
         
       
-           #β0 (%), the time percentage for which refractive index lapse-rates exceeding
+        #β0 (%), the time percentage for which refractive index lapse-rates exceeding
         #100 N-units/km can be expected in the first 100 m of the lower atmosphere,    
         tau = 1 - np.exp(-(4.12*(10**-4)*dlm**2.41))
         alpha = -0.6 - epsilon*(10**-9)*(d**3.1)*tau

@@ -135,4 +135,38 @@ class ParametersPropagation(object):
     coeff_x = -3
     coeff_y = 4.5
     coeff_z = -2
-  
+    
+    ###########################################################################
+    #Coeficients for the Approximation to the inverse cumulative normal distribution function
+    C0 = 2.515516698
+    C1 = 0.802853
+    C2 = 0.010328
+    D1 = 1.432788
+    D2 = 0.189269 
+    D3 = 0.001308
+    
+    ###########################################################################
+    #adjustable parameter currently set to 0.3 mrad
+    thetaJ = 0.3 
+    
+    ###########################################################################
+    #adjustable parameter currently set to 0.8
+    par_ep = 0.8
+    
+    ###########################################################################
+    #fixed parameters
+    dsw = 20    
+    k = 0.5  
+    eta = 2.5
+    ###########################################################################
+    #The distance of the i-th profile point 
+    dist_di = 2      
+    
+    ###########################################################################
+    #Height of the i-th profile point
+    hight_hi = 6 
+
+    ###########################################################################
+    #Additional losses to account for clutter shielding the transmitter and receiver   
+    Aht = 0
+    Ahr = 0

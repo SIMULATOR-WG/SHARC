@@ -31,7 +31,11 @@ class PropagationClutterLoss(Propagation):
       y = np.asarray(kwargs["coeff_y"])
       z = np.asarray(kwargs["coeff_z"])
       
-     #Building Entry Loss   
+      
+      item = 0 # Terrestrial terminal within the clutter
+      #item = 1 # One terminal is within the clutter and the other is a a platform above the surface of the Earth.
+      
+      #Building Entry Loss   
       Lh = r + s*np.log10(f) + t*(np.log10(f))**2
       Le = 0.212*abs(theta)  
     
@@ -45,18 +49,30 @@ class PropagationClutterLoss(Propagation):
       Ap = scipy.stats.norm.ppf(P)*sig1 + mu1
       Bp = scipy.stats.norm.ppf(P)*sig2 + mu2
  
-                             
       Lbel = 10*np.log10(10**(0.1*Ap) +10**(0.1*Bp) + (10**(0.1*C)))
 
-      
-      #Clutter Loss item 3.1 
-      Lt = 23.5 + 9.6*np.log10(f)
-      Ls = 32.98 + 23.9*np.log10(d) + 3*np.log10(f)
-
-      Q = (scipy.stats.norm.ppf(p/100))**-1
+      if (item == 0):
+         #Clutter Loss item 3.2 
+          Lt = 23.5 + 9.6*np.log10(f)
+          Ls = 32.98 + 23.9*np.log10(d) + 3*np.log10(f)
+        
+          Q = np.sqrt(2)*scipy.special.erfcinv(2*(p/100))
+        
+          Lctt = -5*np.log10(10**(-0.2*Lt)+ 10**(-0.2*Ls)) - 6*Q 
+                         
+      if (item == 1):
+         #Clutter Loss item 3.3 
+          k1 = 93*f**0.175
+          A1 = 0.05
     
-      Lctt = -5*np.log10(10**(-0.2*Lt)+ 10**(-0.2*Ls)) - 6*Q
-     
+          y =np.sin(A1*(1 - (theta/90))+ math.pi*(theta/180))
+          y1=np.cos(A1*(1 - (theta/90))+ math.pi*(theta/180))
+    
+          cot = (y1/y)                  
+          Q = np.sqrt(2)*scipy.special.erfcinv(2*(p/100))
+          Lctt = (-k1*(np.log(1 - p/100))*cot)**(0.5*(90 - theta)/90) - 1 - 0.6*Q
+        
+        
       return (Lbel + Lctt)     
  
   

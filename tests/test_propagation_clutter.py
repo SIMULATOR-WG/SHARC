@@ -21,7 +21,7 @@ class PropagationClutterLossTest(unittest.TestCase):
        
         f = 27000    #GHz
         theta = 0
-        per_p =100
+        per_p =50
         d = 10000
         P = 0.9
         dist = 10
