@@ -6,7 +6,7 @@ import numpy as np
 
 import numpy.testing as npt
 
-from sharc.propagation.propagation_line_of_sight import PropagationLineOfSight
+from sharc.propagation.P452.propagation_line_of_sight import PropagationLineOfSight
 
 class PropagationLineOfSightTest(unittest.TestCase):
     

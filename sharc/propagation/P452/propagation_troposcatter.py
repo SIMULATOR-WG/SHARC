@@ -4,7 +4,7 @@ Created on Tue Mai 08 12:05:38 2017
 @author: LeticiaValle_Mac
 """
 from sharc.propagation.propagation import Propagation 
-from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
+from sharc.propagation.P452.propagation_gases_attenuation import PropagationGasesAttenuation
 
 import numpy as np
  

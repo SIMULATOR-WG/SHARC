@@ -12,9 +12,10 @@ Created on Mon May 22 15:10:11 2017
 @author: LeticiaValle_Mac
 """
 from sharc.propagation.propagation import Propagation 
-from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
-from sharc.propagation.propagation_duting_reflection import PropagationDutingReflection
-from sharc.propagation.propagation_troposcatter import PropagationTropScatter
+from sharc.propagation.P452.propagation_gases_attenuation import PropagationGasesAttenuation
+from sharc.propagation.P452.propagation_duting_reflection import PropagationDutingReflection
+from sharc.propagation.P452.propagation_troposcatter import PropagationTropScatter
+from sharc.propagation.P452.propagation_diffraction import PropagationDiffraction
 
 import numpy as np
  
@@ -29,7 +30,8 @@ class PropagationClearAir(Propagation):
         self.propagationAg = PropagationGasesAttenuation()
         self.propagationDuting = PropagationDutingReflection()
         self.propagationTropoScatter = PropagationTropScatter()
-   
+        self.propagationDiffraction = PropagationDiffraction()
+        
     def get_loss_Ag(self, *args, **kwargs) -> np.array:
     
         d = np.asarray(kwargs["distance"])*(1e-3)   #Km
@@ -126,8 +128,11 @@ class PropagationClearAir(Propagation):
         Lb0p = Lbfsg + Esp
         Lb0beta = Lbfsg + Esbeta
         
-        Ld50 = 0        #Difraction Loss not implemented
-        Ldbeta = 0      #Difraction Loss not implemented
+        Ld50 = self.propagationDiffraction.get_loss(distance=d, frequency=f,ap_val = 'p')        #Difraction Loss not implemented
+        Ldbeta = self.propagationDiffraction.get_loss(distance=d, frequency=f,ap_val = 'b')      #Difraction Loss not implemented
+        
+        print(Ld50)
+        print(Ldbeta)
         
         Lbd50 = Lbfsg + Ld50
         Ldp = Ld50 + Fi*(Ldbeta - Ld50)

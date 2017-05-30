@@ -22,3 +22,20 @@ class Propagation(object):
     @abstractmethod
     def get_loss_Ag(self, *args, **kwargs) -> np.array:
         pass
+    
+    @abstractmethod
+    def func_Gt(K,Bdft,Yt):
+        pass
+    
+    @abstractmethod
+    def func_Gr(K,Bdft,Yr):
+        pass
+    
+    @abstractmethod
+    def Jfunction(v):
+        pass
+   
+    @abstractmethod
+    def Ld_difraction(self, d,f,a):
+        pass
+    

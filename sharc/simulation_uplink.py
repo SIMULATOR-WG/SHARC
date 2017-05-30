@@ -19,7 +19,7 @@ from sharc.topology.topology_factory import TopologyFactory
 from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_close_in import PropagationCloseIn
-from sharc.propagation.propagation_troposcatter import PropagationTropScatter
+from sharc.propagation.P452.propagation_troposcatter import PropagationTropScatter
 from sharc.propagation.propagation_p619 import PropagationP619
 from sharc.propagation.propagation_sat_simple import PropagationSatSimple
 

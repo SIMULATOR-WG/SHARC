@@ -3,7 +3,7 @@ import unittest
 
 import numpy.testing as npt
 
-from sharc.propagation.propagation_troposcatter import PropagationTropScatter
+from sharc.propagation.P452.propagation_troposcatter import PropagationTropScatter
 
 class PropagationTropScatterTest(unittest.TestCase):
     

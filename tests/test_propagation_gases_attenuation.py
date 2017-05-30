@@ -10,7 +10,7 @@ import numpy as np
 
 import numpy.testing as npt
 
-from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
+from sharc.propagation.P452.propagation_gases_attenuation import PropagationGasesAttenuation
 
 class PropagationGasesAttenuationTest(unittest.TestCase):
     

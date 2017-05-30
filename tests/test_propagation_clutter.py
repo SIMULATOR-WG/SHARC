@@ -10,7 +10,7 @@ import unittest
 import numpy.testing as npt
 
 
-from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
+from sharc.propagation.P452.propagation_clutter_loss import PropagationClutterLoss
 
 class PropagationClutterLossTest(unittest.TestCase):
     

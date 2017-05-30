@@ -3,7 +3,7 @@ import unittest
 
 import numpy.testing as npt
 
-from sharc.propagation.propagation_duting_reflection import PropagationDutingReflection
+from sharc.propagation.P452.propagation_duting_reflection import PropagationDutingReflection
 
 class PropagationDutingReflectionTest(unittest.TestCase):
     
@@ -38,12 +38,12 @@ class PropagationDutingReflectionTest(unittest.TestCase):
         T = 288
         ro = 3
         
-        npt.assert_allclose(307.403, 
+        npt.assert_allclose(307.170, 
                          self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm),atol=1e-3)
 
         f = 40000
         d = 20000
-        npt.assert_allclose( 333.586, 
+        npt.assert_allclose(332.832, 
                          self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm),atol=1e-3)
 
 #        d = [ 10000, 2000]

@@ -7,7 +7,7 @@ Created on Tue Wen 17 10:15:31 2017
 """
 
 
-from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
+from sharc.propagation.P452.propagation_gases_attenuation import PropagationGasesAttenuation
 from sharc.propagation.propagation import Propagation 
 
 import numpy as np

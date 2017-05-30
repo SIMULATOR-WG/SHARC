@@ -4,12 +4,9 @@ Created on Tue Mai 08 12:05:38 2017
 @author: LeticiaValle_Mac
 """
 from sharc.propagation.propagation import Propagation 
-from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_propagation import ParametersPropagation
-from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
+from sharc.propagation.P452.propagation_gases_attenuation import PropagationGasesAttenuation
 
 import numpy as np
-import os
  
 class PropagationDutingReflection(Propagation):
     """
@@ -45,7 +42,6 @@ class PropagationDutingReflection(Propagation):
         Hre = np.asarray(kwargs["Hre"])
         thetaT = np.asarray(kwargs["theta_tx"])
         thetaR = np.asarray(kwargs["theta_rx"])
-        N0 = np.asarray(kwargs["N0"])
         deltaN = np.asarray(kwargs["delta_N"])
         p = np.asarray(kwargs["percentage_p"])
        
@@ -143,9 +139,8 @@ class PropagationDutingReflection(Propagation):
         teta_line = d*(10**3)/Ae +thetaT_oneline + thetaR_oneline
         
         beta = (B0*mu2*mu3)
-        oi = (2.0058-np.log10(beta))**1.012
-        
-        Gama = (1.076/((2.0058-np.log10(beta))**1.0))*np.exp(-((9.51-4.8*np.log10(beta))+ 0.198*(np.log10(beta))**2)*10**-6*d**1.13)       
+    
+        Gama = (1.076/((2.0058-np.log10(beta))**1.012))*np.exp(-((9.51-4.8*np.log10(beta))+ 0.198*(np.log10(beta))**2)*10**-6*d**1.13)       
         Ap = -12 + (1.2 + 3.7*(10**-3)*d)*np.log10(p/beta) + 12*(p/beta)**Gama                  
         #Time percentage and time percentage and angular-distance dependent losses 
         Ad = Yd*teta_line + Ap

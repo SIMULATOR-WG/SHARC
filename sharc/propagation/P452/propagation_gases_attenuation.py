@@ -27,8 +27,8 @@ class PropagationGasesAttenuation(Propagation):
         e=ro*T/216.7
         p=P-e
         
-        fo,a1,a2,a3,a4,a5,a6 = np.genfromtxt(os.path.join("..", "sharc", "propagation", "data_oxygen.txt"), skip_header=1, unpack=True)
-        fwv,b1,b2,b3,b4,b5,b6 = np.genfromtxt(os.path.join("..", "sharc", "propagation", "data_water-vapour.txt"), skip_header=1, unpack=True)
+        fo,a1,a2,a3,a4,a5,a6 = np.genfromtxt(os.path.join("..", "sharc", "propagation","p452", "data_oxygen.txt"), skip_header=1, unpack=True)
+        fwv,b1,b2,b3,b4,b5,b6 = np.genfromtxt(os.path.join("..", "sharc", "propagation","p452", "data_water-vapour.txt"), skip_header=1, unpack=True)
        
         #Line strength Si
         Sio = np.array(a1)*(1e-7)*p*(theta**3.0)*np.exp(np.array(a2)*(1-theta))

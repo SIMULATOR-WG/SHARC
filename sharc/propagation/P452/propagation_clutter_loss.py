@@ -8,8 +8,9 @@ Created on Mon May 15 12:51:48 2017
 from sharc.propagation.propagation import Propagation 
 
 import numpy as np
- 
 import scipy
+import math
+from scipy.stats import norm
 
 
 class PropagationClutterLoss(Propagation):
