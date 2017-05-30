@@ -7,7 +7,7 @@ Created on Mon Feb  6 17:59:07 2017
 
 import unittest
 
-from sharc.antenna.antenna import Antenna
+from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.station import Station
 
 class StationTest(unittest.TestCase):
@@ -20,8 +20,8 @@ class StationTest(unittest.TestCase):
         self.station.height = 6
         self.station.tx_power = 20
         self.station.rx_power = -3
-        self.station.tx_antenna = Antenna(30)
-        self.station.rx_antenna = Antenna(35)
+        self.station.tx_antenna = AntennaOmni(30)
+        self.station.rx_antenna = AntennaOmni(35)
         
         self.station2 = Station()
         self.station2.id = 1
@@ -30,8 +30,8 @@ class StationTest(unittest.TestCase):
         self.station2.height = 6
         self.station2.tx_power = 17
         self.station2.rx_power = 9
-        self.station2.tx_antenna = Antenna(10)
-        self.station2.rx_antenna = Antenna(12)
+        self.station2.tx_antenna = AntennaOmni(10)
+        self.station2.rx_antenna = AntennaOmni(12)
         
         self.station3 = Station()
         self.station3.id = 2
@@ -40,8 +40,8 @@ class StationTest(unittest.TestCase):
         self.station3.height = 6
         self.station3.tx_power = 20
         self.station3.rx_power = -3
-        self.station3.tx_antenna = Antenna(30)
-        self.station3.rx_antenna = Antenna(35)   
+        self.station3.tx_antenna = AntennaOmni(30)
+        self.station3.rx_antenna = AntennaOmni(35)
         
     def test_id(self):
         self.assertEqual(self.station.id, 1)
@@ -86,7 +86,7 @@ class StationTest(unittest.TestCase):
         self.assertTrue(self.station2 != self.station3)
         
         
-        
+       
 if __name__ == '__main__':
     unittest.main()
         

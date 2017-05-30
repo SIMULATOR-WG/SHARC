@@ -12,6 +12,7 @@ import sys
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.station_factory import StationFactory
 from sharc.station_manager import StationManager
@@ -30,9 +31,10 @@ class SimulationUplink(Simulation):
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, param: ParametersImt):
+    def __init__(self, param: ParametersImt, param_ant: ParametersAntennaImt):
         super(SimulationUplink, self).__init__()
         self.param = param
+        self.param_imt_antenna = param_ant
         self.param_system = ParametersFss()
 
         self.topology = TopologyFactory.createTopology(self.param)
@@ -62,11 +64,19 @@ class SimulationUplink(Simulation):
         num_ue = self.param.num_clusters*self.param.num_base_stations \
                                  *self.param.ue_k*self.param.ue_k_m
         num_bs = self.param.num_clusters*self.param.num_base_stations
+        
+        # Emulate 3 cells per site by multiplying the number of BSs by 3
+        if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+            num_bs = 3*num_bs
+        if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
+            num_ue = 3*num_ue
 
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
 
+        self.phi = np.empty([num_bs, num_ue])
+        self.theta = np.empty([num_bs, num_ue])
         self.path_loss = np.empty(num_ue)
 
         self.ue = np.empty(num_ue)
@@ -94,6 +104,7 @@ class SimulationUplink(Simulation):
 
     def initialize(self, *args, **kwargs):
         self.bs = StationFactory.generate_imt_base_stations(self.param,
+                                                            self.param_imt_antenna,
                                                             self.topology)
 
     def snapshot(self, *args, **kwargs):
@@ -124,13 +135,16 @@ class SimulationUplink(Simulation):
             #self.calculate_external_degradation()
             pass
         self.collect_results()
+        self.reset_antennas()
 
     def finalize(self, *args, **kwargs):
         self.results.write_files()
         self.notify_observers(source=__name__, results=self.results)
 
     def create_ue(self):
-        self.ue = StationFactory.generate_imt_ue(self.param, self.topology)
+        self.ue = StationFactory.generate_imt_ue(self.param, \
+                                                 self.param_imt_antenna,\
+                                                 self.topology)
 
     def update_bs(self):
         self.bs.active = np.random.rand(self.bs.num_stations) < self.bs_load_prob
@@ -158,13 +172,15 @@ class SimulationUplink(Simulation):
                                              earth_to_space = True)
         else:
             self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
-        antenna_a = station_a.tx_antenna.astype('float')
-        antenna_b = station_b.rx_antenna.astype('float')
-        # replicate columns to have the appropriate size
-        gain_a = np.transpose(np.tile(antenna_a, (station_b.num_stations, 1)))
-        gain_b = np.tile(antenna_b, (station_a.num_stations, 1))
+        # define antenna gains
+        gain_a = self.calculate_gains(station_a,station_b,"TX")
+        gain_b = self.calculate_gains(station_b,station_a,"RX")
+        if(station_b.num_stations > 1):
+            gain_b_t = np.transpose(gain_b)
+        else:
+            gain_b_t = gain_b[:,np.newaxis]
         # calculate coupling loss
-        return self.path_loss - gain_a - gain_b
+        return self.path_loss - gain_a - gain_b_t
 #        self.coupling_loss = np.maximum(path_loss - tx_gain - rx_gain,
 #                                          ParametersImt.mcl)
 
@@ -179,6 +195,12 @@ class SimulationUplink(Simulation):
             bs_all = np.where(self.coupling_loss[:,ue] < minimum_coupling_loss + self.param.ho_margin)[0]
             bs = np.random.choice(bs_all)
             self.link[bs].append(ue)
+            # add beam to antennas
+            if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+                self.bs.rx_antenna[bs].add_beam(self.phi[bs,ue],self.theta[bs,ue])
+            if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
+                self.ue.tx_antenna[ue].add_beam(self.phi[bs,ue] - 180,\
+                                  180 - self.theta[bs,ue])
 
     def select_ue(self):
         """
@@ -314,4 +336,52 @@ class SimulationUplink(Simulation):
 #
 #        self.results.add_sinr_dl(self.bs.sinr[ids].tolist())
 #        self.results.add_snr_dl(self.bs.snr[ids].tolist())
+
+    def calculate_gains(self,
+                        station_a: StationManager,
+                        station_b: StationManager,
+                        antenna_txrx: str) -> np.array:
+        """
+        Calculates the gains of antennas in station_a in the direction of
+        station_b
+        """
+        if(station_a.num_stations > 1):
+            point_vec_x = station_b.x- station_a.x[:,np.newaxis]
+            point_vec_y = station_b.y - station_a.y[:,np.newaxis]
+            point_vec_z = station_b.height - station_a.height[:,np.newaxis]
+        else:
+            point_vec_x = station_b.x- station_a.x
+            point_vec_y = station_b.y - station_a.y
+            point_vec_z = station_b.height - station_a.height
+            
+        dist = station_a.get_3d_distance_to(station_b)
+        
+        self.phi = np.rad2deg(np.arctan2(point_vec_y,point_vec_x))
+        self.theta = np.rad2deg(np.arccos(point_vec_z/dist))
+        
+        gains = np.zeros_like(self.phi)
+        if(antenna_txrx == "TX"):
+            if(len(np.shape(gains)) != 1):
+                for k in range(station_a.num_stations):
+                    gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
+                         self.theta[k,:])
+            else:
+                gains = station_a.tx_antenna[0].calculate_gain(self.phi,self.theta)
+        elif(antenna_txrx == "RX"):
+            if(len(np.shape(gains)) != 1):
+                for k in range(station_a.num_stations):
+                    gains[k,:] = station_a.rx_antenna[k].calculate_gain(self.phi[k,:],\
+                         self.theta[k,:])
+            else:
+                gains = station_a.rx_antenna[0].calculate_gain(self.phi,self.theta)
+                
+        return gains
+    
+    def reset_antennas(self):
+        if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+            for bs in range(self.bs.num_stations):
+                self.bs.rx_antenna[bs].reset_beams()
+        if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
+            for ue in range(self.ue.num_stations):
+                self.ue.tx_antenna[ue].reset_beams()
 

@@ -36,7 +36,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 150
+    intersite_distance = 226
 
     ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
@@ -88,14 +88,6 @@ class ParametersImt(object):
     bs_height = 10
 
     ###########################################################################
-    # Base station transmit antenna gain [dBi]
-    bs_tx_antenna_gain = 0
-
-    ###########################################################################
-    # Base station receive antenna gain [dBi]
-    bs_rx_antenna_gain = 0
-
-    ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
     bs_aclr = 40
 
@@ -118,14 +110,14 @@ class ParametersImt(object):
     ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 5
+    ue_k = 1
 
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 10
+    ue_k_m = 5
 
     ###########################################################################
     # Power control algorithm
@@ -152,14 +144,6 @@ class ParametersImt(object):
     ue_height = 1.5
 
     ###########################################################################
-    # UE transmit antenna gain [dBi]
-    ue_tx_antenna_gain = 0
-
-    ###########################################################################
-    # UE receive antenna gain [dBi]
-    ue_rx_antenna_gain = 0
-
-    ###########################################################################
     # Adjacent channel leakage power Ratio of the user equipment [dB]
     ue_aclr = 35
 
@@ -180,7 +164,7 @@ class ParametersImt(object):
     # Channel parameters
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "CI" (close-in FS reference distance)
-    channel_model = "CI"
+    channel_model = "FSPL"
     line_of_sight_prob = 0.75 # probability of line-of-sight (not for FSPL)
 
     ###########################################################################
