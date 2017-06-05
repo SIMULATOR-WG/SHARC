@@ -244,6 +244,9 @@ class SimulationUplinkTest(unittest.TestCase):
         npt.assert_almost_equal(self.simulation_uplink.ue.tx_antenna[2].beams_list,
                              [(np.array([120]), np.array([0.487]))],decimal=3)
         
+        # Test beams list after connection
+        npt.assert_equal(self.simulation_uplink.beams_idx,np.array([0, 0, 0]))
+        
         self.simulation_uplink.select_ue()
         
         # Scheduling algorirhm

@@ -206,6 +206,7 @@ class SimulationUplink(Simulation):
             # add beam to antennas
             if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
                 self.bs.rx_antenna[bs].add_beam(self.phi[bs,ue],self.theta[bs,ue])
+                self.beams_idx[ue] = len(self.bs.rx_antenna[bs].beams_list)-1
             if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
                 self.ue.tx_antenna[ue].add_beam(self.phi[bs,ue] - 180,\
                                   180 - self.theta[bs,ue])
