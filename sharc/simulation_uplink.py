@@ -70,6 +70,8 @@ class SimulationUplink(Simulation):
             num_bs = 3*num_bs
         if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
             num_ue = 3*num_ue
+            
+        self.beams_idx = -1*np.ones(num_ue,dtype=int)
 
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)
@@ -122,6 +124,8 @@ class SimulationUplink(Simulation):
         self.select_ue()
         self.scheduler()
         self.power_control()
+        
+        self.beams_idx = np.zeros_like(self.beams_idx,dtype=int)
 
         if not self.param.static_base_stations:
             # TODO: include support for randomly located base stations by
@@ -287,9 +291,9 @@ class SimulationUplink(Simulation):
         self.coupling_loss_ue_sat = np.array(np.transpose(
                                 self.calculate_coupling_loss(self.ue, self.system,
                                             self.propagation_system)).tolist()[0])
-        self.coupling_loss_bs_sat = np.array(np.transpose(
-                                self.calculate_coupling_loss(self.bs, self.system,
-                                            self.propagation_system)).tolist()[0])
+#        self.coupling_loss_bs_sat = np.array(np.transpose(
+#                                self.calculate_coupling_loss(self.bs, self.system,
+#                                            self.propagation_system)).tolist()[0])
 
         ue_bandwidth = self.num_rb_per_ue * self.param.rb_bandwidth
         #bs_bandwidth = self.num_rb_per_bs * self.param.rb_bandwidth
@@ -371,16 +375,17 @@ class SimulationUplink(Simulation):
             if(len(np.shape(gains)) != 1):
                 for k in range(station_a.num_stations):
                     gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
-                         self.theta[k,:])
+                         self.theta[k,:],self.beams_idx)
             else:
                 gains = station_a.tx_antenna[0].calculate_gain(self.phi,self.theta)
         elif(antenna_txrx == "RX"):
             if(len(np.shape(gains)) != 1):
                 for k in range(station_a.num_stations):
                     gains[k,:] = station_a.rx_antenna[k].calculate_gain(self.phi[k,:],\
-                         self.theta[k,:])
+                         self.theta[k,:],self.beams_idx)
             else:
-                gains = station_a.rx_antenna[0].calculate_gain(self.phi,self.theta)
+                gains = station_a.rx_antenna[0].calculate_gain(self.phi,self.theta,\
+                                            self.beams_idx)
                 
         return gains
     
