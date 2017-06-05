@@ -115,6 +115,10 @@ class SimulationUplink(Simulation):
                              self.calculate_coupling_loss(self.ue, self.bs,
                                                           self.propagation_imt))
         self.connect_ue_to_bs()
+        
+#        self.coupling_loss = np.transpose( \
+#                             self.calculate_coupling_loss(self.ue, self.bs,
+#                                                          self.propagation_imt))
         self.select_ue()
         self.scheduler()
         self.power_control()
@@ -344,6 +348,9 @@ class SimulationUplink(Simulation):
         """
         Calculates the gains of antennas in station_a in the direction of
         station_b
+        
+        TODO: change antenna_txrx to an enum variable
+        
         """
         if(station_a.num_stations > 1):
             point_vec_x = station_b.x- station_a.x[:,np.newaxis]
