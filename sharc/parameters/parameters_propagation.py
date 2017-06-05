@@ -85,6 +85,22 @@ class ParametersPropagation(object):
     Hrs = 244
     
     ###########################################################################
+    #Height of the smooth-Earth surface (amsl) at the interfering station location (m)
+    Hst = 48
+    
+    ###########################################################################
+    #Height of the smooth-Earth surface (amsl) at the interfered-with station location (m)
+    Hsr = 45
+    
+    ###########################################################################
+    #Ground height of interfering station
+    H0 = 15
+    
+    ###########################################################################
+    #Ground height of interfered-with station
+    Hn = 17
+    
+    ###########################################################################
     ##Effective height of interfering antenna (m)
     Hte = 50   
     
@@ -160,13 +176,17 @@ class ParametersPropagation(object):
     eta = 2.5
     ###########################################################################
     #The distance of the i-th profile point 
-    dist_di = 2      
+    dist_di = [1,1,1]      
     
     ###########################################################################
     #Height of the i-th profile point
-    hight_hi = 6 
+    hight_hi = [2,4,6] 
 
     ###########################################################################
     #Additional losses to account for clutter shielding the transmitter and receiver   
     Aht = 0
     Ahr = 0
+    
+    ###########################################################################
+    #Calculate using equation (2) P.452  
+    Beta_0 = 60

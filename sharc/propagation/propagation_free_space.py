@@ -20,5 +20,5 @@ class PropagationFreeSpace(Propagation):
         f = np.asarray(kwargs["frequency"])  #MHz   
         
         loss = 20*np.log10(d) + 20*np.log10(f) - 27.55
-        
+   
         return loss
