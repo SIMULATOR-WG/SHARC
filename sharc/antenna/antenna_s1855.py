@@ -21,7 +21,7 @@ class AntennaS1855(Antenna):
     Attributes
     ----------
         gain (float): calculated antenna gain in given direction
-        diameter (float): diamteer of earth station antenna [m]
+        diameter (float): diameter of earth station antenna [m]
         frequency (float): frequency of operation [MHz]
     """
     
@@ -88,7 +88,7 @@ class AntennaS1855(Antenna):
         
         if d_to_wavel >= 46.8:
             if   phi < phimin:
-                gain = self.peak_gain
+                gain = self.__peak_gain
             elif phi >= phimin and phi <= 7:
                 gain = 29 + 3 * np.power(np.sin(theta * math.pi / 180) , 2) - 25 * np.log10(phi)
             elif phi > 7 and phi <= 9.2:
@@ -99,7 +99,7 @@ class AntennaS1855(Antenna):
                 return -10  
         elif d_to_wavel < 46.8 and d_to_wavel >= 15:
             if   phi < phimin:
-                gain = self.peak_gain            
+                gain = self.__peak_gain            
             elif phi >= phimin and phi <= 7:
                 gain = 29 + 3 * np.pow(np.sin(theta * np.pi / 180),2) - 25 * np.log10(phi)
             elif phi > 7 and phi <= 9.2: 
