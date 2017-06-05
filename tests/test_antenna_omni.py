@@ -31,15 +31,15 @@ class AntennaOmniTest(unittest.TestCase):
         theta = [15, 45, 60, 75]
         directions = list(zip(phi,theta))
         # Test antenna1
-        gains = self.antenna1.calculate_gain(phi,theta)
+        gains = self.antenna1.calculate_gain(phi,theta,[])
         self.assertEqual(len(gains),len(directions))
         self.assertTrue(np.all(gains == self.antenna1.gain))
         # Test antenna2
-        gains = self.antenna2.calculate_gain(phi,theta)
+        gains = self.antenna2.calculate_gain(phi,theta,[])
         self.assertEqual(len(gains),len(directions))
         self.assertTrue(np.all(gains == self.antenna2))
         # Test antenna3
-        gains = self.antenna3.calculate_gain(phi,theta)
+        gains = self.antenna3.calculate_gain(phi,theta,[])
         self.assertEqual(len(gains),len(directions))
         self.assertTrue(np.all(gains == float(self.antenna3)))
         
