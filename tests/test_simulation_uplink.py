@@ -305,6 +305,7 @@ class SimulationUplinkTest(unittest.TestCase):
         npt.assert_equal(self.simulation_uplink.ue.tx_antenna[0].beams_list,[])
         npt.assert_equal(self.simulation_uplink.ue.tx_antenna[1].beams_list,[])
         npt.assert_equal(self.simulation_uplink.ue.tx_antenna[2].beams_list,[])
+        npt.assert_equal(self.simulation_uplink.beams_idx,-1*np.ones(3,dtype=int))
 
     def test_calculate_gains(self):
         self.param.num_base_stations = 1
