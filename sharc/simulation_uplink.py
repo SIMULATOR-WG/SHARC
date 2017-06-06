@@ -118,16 +118,16 @@ class SimulationUplink(Simulation):
                              self.calculate_coupling_loss(self.ue, self.bs,
                                                           self.propagation_imt))
         self.connect_ue_to_bs()
+        self.select_ue()
         
         # Calculate couling loss after beams are defined
         self.coupling_loss = np.transpose( \
                              self.calculate_coupling_loss(self.ue, self.bs,
                                                           self.propagation_imt))
-        self.select_ue()
         self.scheduler()
         self.power_control()
         
-        self.beams_idx = np.zeros(self.ue.num_station,dtype=int)
+        self.beams_idx = np.zeros(self.ue.num_stations,dtype=int)
         if not self.param.static_base_stations:
             # TODO: include support for randomly located base stations by
             # creating the RandomTopology(Topology) class
@@ -204,13 +204,13 @@ class SimulationUplink(Simulation):
             bs_all = np.where(self.coupling_loss[:,ue] < minimum_coupling_loss + self.param.ho_margin)[0]
             bs = np.random.choice(bs_all)
             self.link[bs].append(ue)
-            # add beam to antennas
-            if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
-                self.bs.rx_antenna[bs].add_beam(self.phi[bs,ue],self.theta[bs,ue])
-                self.beams_idx[ue] = len(self.bs.rx_antenna[bs].beams_list)-1
-            if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
-                self.ue.tx_antenna[ue].add_beam(self.phi[bs,ue] - 180,\
-                                  180 - self.theta[bs,ue])
+#            # add beam to antennas
+#            if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+#                self.bs.rx_antenna[bs].add_beam(self.phi[bs,ue],self.theta[bs,ue])
+#                self.beams_idx[ue] = len(self.bs.rx_antenna[bs].beams_list)-1
+#            if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
+#                self.ue.tx_antenna[ue].add_beam(self.phi[bs,ue] - 180,\
+#                                  180 - self.theta[bs,ue])
 
     def select_ue(self):
         """
@@ -226,6 +226,14 @@ class SimulationUplink(Simulation):
             # Activate the selected UE's
             if self.bs.active[bs]:
                 self.ue.active[self.link[bs]] = np.ones(K, dtype=bool)
+            for ue in self.link[bs]:
+                # add beam to antennas
+                if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
+                    self.bs.rx_antenna[bs].add_beam(self.phi[bs,ue],self.theta[bs,ue])
+                    self.beams_idx[ue] = len(self.bs.rx_antenna[bs].beams_list)-1
+                if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
+                    self.ue.tx_antenna[ue].add_beam(self.phi[bs,ue] - 180,\
+                                  180 - self.theta[bs,ue])
 
     def scheduler(self):
         """

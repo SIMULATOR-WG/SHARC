@@ -231,6 +231,10 @@ class SimulationUplinkTest(unittest.TestCase):
         #test connections and beam creations
         self.simulation_uplink.connect_ue_to_bs()
         self.assertEqual(self.simulation_uplink.link, {0: [0], 1: [1], 2: [2]})
+        
+        # Test beams list after connection
+        self.simulation_uplink.select_ue()
+        npt.assert_equal(self.simulation_uplink.beams_idx,np.array([0, 0, 0]))
         npt.assert_almost_equal(self.simulation_uplink.bs.rx_antenna[0].beams_list,
                              [(np.array([0.0]), np.array([9.5130]))],decimal=3)
         npt.assert_almost_equal(self.simulation_uplink.bs.rx_antenna[1].beams_list,
@@ -243,9 +247,6 @@ class SimulationUplinkTest(unittest.TestCase):
                              [(np.array([0.0]), np.array([0.487]))],decimal=3)
         npt.assert_almost_equal(self.simulation_uplink.ue.tx_antenna[2].beams_list,
                              [(np.array([120]), np.array([0.487]))],decimal=3)
-        
-        # Test beams list after connection
-        npt.assert_equal(self.simulation_uplink.beams_idx,np.array([0, 0, 0]))
         
         # Retest antenna gains
         gain_bs = self.simulation_uplink.calculate_gains(self.simulation_uplink.bs,
@@ -272,8 +273,6 @@ class SimulationUplinkTest(unittest.TestCase):
                             np.array([[ 121.815,  139.949,  166.949],
                                       [ 166.949,   94.815,  166.949],
                                       [ 166.949, 139.949, 121.815]]),atol=1e-3)
-        
-        self.simulation_uplink.select_ue()
         
         # Scheduling algorirhm
         self.simulation_uplink.scheduler()
