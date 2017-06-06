@@ -208,6 +208,9 @@ class AntennaBeamformingImt(Antenna):
         -------
             gain (float): beam gain [dBi]
         """
+        if(beam > len(self.__beams_list) - 1):
+            beam = -1
+        
         element_g = self.element.element_pattern(phi,theta)
         
         v_vec = self._super_position_vector(phi,theta)

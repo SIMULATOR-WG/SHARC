@@ -33,7 +33,7 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE transmit antenna type. Possible values are "OMNI", "BEAMFORMING"
-    ue_tx_antenna_type = "BEAMFORMING"
+    ue_tx_antenna_type ="BEAMFORMING"
     
     ###########################################################################
     # UE receive antenna type. Possible values are "OMNI", "BEAMFORMING"
