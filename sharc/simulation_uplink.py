@@ -113,20 +113,21 @@ class SimulationUplink(Simulation):
         self.create_system()
         self.update_bs()
         self.create_ue()
+        
         self.coupling_loss = np.transpose( \
                              self.calculate_coupling_loss(self.ue, self.bs,
                                                           self.propagation_imt))
         self.connect_ue_to_bs()
         
-#        self.coupling_loss = np.transpose( \
-#                             self.calculate_coupling_loss(self.ue, self.bs,
-#                                                          self.propagation_imt))
+        # Calculate couling loss after beams are defined
+        self.coupling_loss = np.transpose( \
+                             self.calculate_coupling_loss(self.ue, self.bs,
+                                                          self.propagation_imt))
         self.select_ue()
         self.scheduler()
         self.power_control()
         
-        self.beams_idx = np.zeros_like(self.beams_idx,dtype=int)
-
+        self.beams_idx = np.zeros(self.ue.num_station,dtype=int)
         if not self.param.static_base_stations:
             # TODO: include support for randomly located base stations by
             # creating the RandomTopology(Topology) class
@@ -292,9 +293,10 @@ class SimulationUplink(Simulation):
         self.coupling_loss_ue_sat = np.array(np.transpose(
                                 self.calculate_coupling_loss(self.ue, self.system,
                                             self.propagation_system)).tolist()[0])
-#        self.coupling_loss_bs_sat = np.array(np.transpose(
-#                                self.calculate_coupling_loss(self.bs, self.system,
-#                                            self.propagation_system)).tolist()[0])
+        self.beams_idx = -1*np.ones(self.ue.num_stations,dtype=int)
+        self.coupling_loss_bs_sat = np.array(np.transpose(
+                                self.calculate_coupling_loss(self.bs, self.system,
+                                            self.propagation_system)).tolist()[0])
 
         ue_bandwidth = self.num_rb_per_ue * self.param.rb_bandwidth
         #bs_bandwidth = self.num_rb_per_bs * self.param.rb_bandwidth
@@ -397,4 +399,5 @@ class SimulationUplink(Simulation):
         if(self.param_imt_antenna.ue_tx_antenna_type == "BEAMFORMING"):
             for ue in range(self.ue.num_stations):
                 self.ue.tx_antenna[ue].reset_beams()
+        self.beams_idx = -1*np.ones(self.ue.num_stations,dtype=int)
 
