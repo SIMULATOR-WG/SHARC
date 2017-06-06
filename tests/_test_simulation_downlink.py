@@ -11,7 +11,8 @@ import numpy.testing as npt
 
 from sharc.simulation_downlink import SimulationDownlink
 from sharc.parameters.parameters_imt import ParametersImt
-from sharc.antenna.antenna import Antenna
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.antenna.antenna_omni import AntennaOmni
 
 class SimulationDownlinkTest(unittest.TestCase):
 
@@ -48,9 +49,15 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.ue_noise_figure = 9
         self.param.ue_feed_loss = 3
         self.param.channel_model = "FSPL"
+        
+        self.param_ant = ParametersAntennaImt()
+        self.param_ant.bs_tx_antenna_type = "OMNI"
+        self.param_ant.bs_rx_antenna_type = "OMNI"
+        self.param_ant.ue_tx_antenna_type = "OMNI"
+        self.param_ant.ue_rx_antenna_type = "OMNI"
 
     def test_simulation_1bs_1ue(self):
-        self.simulation_downlink = SimulationDownlink(self.param)
+        self.simulation_downlink = SimulationDownlink(self.param,self.param_ant)
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_downlink.transmitter), 1)
         self.assertEqual(len(self.simulation_downlink.receiver), 1)
@@ -94,7 +101,7 @@ class SimulationDownlinkTest(unittest.TestCase):
 
     def test_simulation_1bs_2ue(self):
         self.param.ue_k = 2
-        self.simulation_downlink = SimulationDownlink(self.param)
+        self.simulation_downlink = SimulationDownlink(self.param,self.param_ant)
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_downlink.transmitter), 1)
         self.assertEqual(len(self.simulation_downlink.receiver), 2)
@@ -140,7 +147,7 @@ class SimulationDownlinkTest(unittest.TestCase):
     def test_simulation_1bs_4ue(self):
         self.param.ue_k = 4
         self.param.ue_k_m = 1
-        self.simulation_downlink = SimulationDownlink(self.param)
+        self.simulation_downlink = SimulationDownlink(self.param,self.param_ant)
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_downlink.transmitter), 1)
         self.assertEqual(len(self.simulation_downlink.receiver), 4)
@@ -198,7 +205,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.num_clusters = 2
         self.param.mcl = 127
 
-        self.simulation_downlink = SimulationDownlink(self.param)
+        self.simulation_downlink = SimulationDownlink(self.param,self.param_ant)
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_downlink.transmitter), 2)
         self.assertEqual(len(self.simulation_downlink.receiver), 2)
@@ -214,8 +221,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation_downlink.receiver.y = np.array([0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 2)
 
-        self.simulation_downlink.transmitter.tx_antenna = [Antenna(0), Antenna(1)]
-        self.simulation_downlink.receiver.rx_antenna = [Antenna(2), Antenna(3)]
+        self.simulation_downlink.transmitter.tx_antenna = [AntennaOmni(0), AntennaOmni(1)]
+        self.simulation_downlink.receiver.rx_antenna = [AntennaOmni(2), AntennaOmni(3)]
 
         # let's calculate coupling loss
         self.simulation_downlink.calculate_coupling_loss()
@@ -252,7 +259,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.ue_k_m = 1
         self.param.mcl = 122
         self.param.ho_margin = 3
-        self.simulation_downlink = SimulationDownlink(self.param)
+        self.simulation_downlink = SimulationDownlink(self.param,self.param_ant)
 
         # after object instatiation, transmitter and receiver are only arrays
         self.assertEqual(len(self.simulation_downlink.transmitter), 2)
@@ -269,8 +276,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation_downlink.receiver.y = np.array([0, 0, 0, 0])
         self.assertEqual(self.simulation_downlink.receiver.num_stations, 4)
 
-        self.simulation_downlink.transmitter.tx_antenna = [Antenna(0), Antenna(1)]
-        self.simulation_downlink.receiver.rx_antenna = [Antenna(2), Antenna(3), Antenna(4), Antenna(5)]
+        self.simulation_downlink.transmitter.tx_antenna = [AntennaOmni(0), AntennaOmni(1)]
+        self.simulation_downlink.receiver.rx_antenna = [AntennaOmni(2), AntennaOmni(3), AntennaOmni(4), AntennaOmni(5)]
 
         # let's calculate coupling loss
         self.simulation_downlink.calculate_coupling_loss()

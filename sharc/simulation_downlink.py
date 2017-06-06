@@ -12,6 +12,7 @@ import sys
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
+from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.station_factory import StationFactory
 from sharc.topology.topology_factory import TopologyFactory
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
@@ -23,11 +24,12 @@ class SimulationDownlink(Simulation):
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, param: ParametersImt):
+    def __init__(self, param: ParametersImt, param_ant: ParametersAntennaImt):
         super(SimulationDownlink, self).__init__()
         np.random.seed(0)
 
         self.param = param
+        self.param_imt_antenna = param_ant
 
         self.topology = TopologyFactory.createTopology(self.param)
 
@@ -55,6 +57,7 @@ class SimulationDownlink(Simulation):
         pass
         self.transmitter = \
             StationFactory.generate_imt_base_stations(self.param,
+                                                      self.param_imt_antenna,
                                                       self.topology)
 
     def snapshot(self, *args, **kwargs):
@@ -88,7 +91,8 @@ class SimulationDownlink(Simulation):
 
     def create_ue(self):
         self.receiver = StationFactory.generate_imt_ue(self.param,
-                                                         self.topology)
+                                                       self.param_imt_antenna,
+                                                       self.topology)
 
     def calculate_coupling_loss(self):
         # Calculate distance from transmitters to receivers. The result is a
