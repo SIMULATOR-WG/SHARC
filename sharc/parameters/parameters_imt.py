@@ -81,7 +81,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Base station height [m]
-    bs_height = 15
+    bs_height = 25
 
     ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
@@ -125,7 +125,7 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 5
+    ue_k_m = 4
 
     ###########################################################################
     # Power control algorithm
@@ -184,7 +184,8 @@ class ParametersImt(object):
     # Channel parameters
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "CI" (close-in FS reference distance)
-    channel_model = "FSPL"
+    #                                    "UMa" (Urban Macro - 3GPP)
+    channel_model = "UMa"
     line_of_sight_prob = 0.75 # probability of line-of-sight (not for FSPL)
 
     ###########################################################################
