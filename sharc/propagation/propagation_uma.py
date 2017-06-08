@@ -10,7 +10,6 @@ from sharc.propagation.propagation import Propagation
 import numpy as np
 import matplotlib.pyplot as plt
 from cycler import cycler
-import math
  
 class PropagationUMa(Propagation):
     """
@@ -99,10 +98,10 @@ class PropagationUMa(Propagation):
         breakpoint_distance = self.get_breakpoint_distance(frequency, h_bs, h_ue, h_e)
         
         # get index where distance if less than breakpoint
-        idl = np.where(distance_2D < breakpoint_distance)[:2]
+        idl = np.where(distance_2D < breakpoint_distance)
 
         # get index where distance if greater than breakpoint
-        idg = np.where(distance_2D >= breakpoint_distance)[:2]
+        idg = np.where(distance_2D >= breakpoint_distance)
 
         loss = np.empty(distance_2D.shape)
 
@@ -141,7 +140,7 @@ class PropagationUMa(Propagation):
         loss_nlos = -46.46 + 39.08*np.log10(distance_3D) + 20*np.log10(frequency) \
                         - 0.6*(h_ue - 1.5)
 
-        idl = np.where(distance_2D < 5000)[:2]
+        idl = np.where(distance_2D < 5000)
         if len(idl[0]):
             loss_los = self.get_loss_los(distance_2D, distance_3D,
                  frequency, h_bs, h_ue, h_e, 0)
@@ -197,7 +196,7 @@ class PropagationUMa(Propagation):
         return los_condition
         
         
-    def get_los_probability(self, distance_2D: np.array, h_ue: float) -> np.array:
+    def get_los_probability(self, distance_2D: np.array, h_ue: np.array) -> np.array:
         """
         Returns the line-of-sight (LOS) probability
         
@@ -216,10 +215,10 @@ class PropagationUMa(Propagation):
         idc = np.where(h_ue > 13)[0]
         
         if len(idc):
-            c_prime[:,idc] = math.pow((h_ue[idc] - 13)/10, 1.5)
+            c_prime[:,idc] = np.power((h_ue[idc] - 13)/10, 1.5)
         
         p_los = np.ones(distance_2D.shape)
-        idl = np.where(distance_2D > 18)[:2]
+        idl = np.where(distance_2D > 18)
         p_los[idl] = (18/distance_2D[idl] + np.exp(-distance_2D[idl]/63)*(1-18/distance_2D[idl])) \
             *(1 + 1.25*c_prime[idl]*np.power(distance_2D[idl]/100, 3)*np.exp(-distance_2D[idl]/150))
 
@@ -230,30 +229,31 @@ if __name__ == '__main__':
     
     ###########################################################################
     # Print LOS probability
-    distance_2D = np.linspace(1, 1000, num=1000)
-    h_ue = np.array([1.5, 18, 23])
+    distance_2D = np.column_stack((np.linspace(1, 10000, num=10000)[:,np.newaxis],
+                                   np.linspace(1, 10000, num=10000)[:,np.newaxis],
+                                   np.linspace(1, 10000, num=10000)[:,np.newaxis]))
+    h_ue = np.array([1.5, 17, 23])
     uma = PropagationUMa()
 
-    los_probability = np.empty([len(h_ue), len(distance_2D)])
+    los_probability = np.empty(distance_2D.shape)
     name = list()
     
-    for h in range(len(h_ue)):
-        los_probability[h] = uma.get_los_probability(distance_2D, h_ue[h])
-        name.append("$h_u = {:4.1f}$ $m$".format(h_ue[h]))
+    los_probability = uma.get_los_probability(distance_2D, h_ue)
         
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
     for h in range(len(h_ue)):
-        ax.plot(distance_2D, los_probability[h], label=name[h])
+        name.append("$h_u = {:4.1f}$ $m$".format(h_ue[h]))
+        ax.loglog(distance_2D[:,h], los_probability[:,h], label=name[h])
         
     plt.title("UMa - LOS probability")
     plt.xlabel("distance [m]")
-    plt.ylabel("probability [m]")
-    plt.xlim((0, distance_2D[-1]))
+    plt.ylabel("probability")
+    plt.xlim((0, distance_2D[-1,0]))
     plt.ylim((0, 1.1))                
-    plt.legend(loc="upper right")
+    plt.legend(loc="lower left")
     plt.tight_layout()    
     plt.grid()
         
@@ -261,12 +261,12 @@ if __name__ == '__main__':
     # Print path loss for UMa-LOS, UMa-NLOS and Free Space
     from propagation_free_space import PropagationFreeSpace
     shadowing_std = 0
-    distance_2D = np.linspace(1, 1000, num=1000)
-    freq = 27000*np.ones(len(distance_2D))
-    h_bs = 25*np.ones(len(distance_2D))
-    h_ue = 1.5*np.ones(len(distance_2D))
-    h_e = np.zeros(len(distance_2D))
-    distance_3D = np.sqrt(distance_2D**2 + (h_bs - h_ue)**2)
+    distance_2D = np.linspace(1, 10000, num=10000)[:,np.newaxis]
+    freq = 27000*np.ones(distance_2D.shape)
+    h_bs = 25*np.ones(len(distance_2D[:,0]))
+    h_ue = 1.5*np.ones(len(distance_2D[0,:]))
+    h_e = np.zeros(distance_2D.shape)
+    distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
     
     loss_los = uma.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     loss_nlos = uma.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
@@ -283,7 +283,7 @@ if __name__ == '__main__':
     plt.title("UMa - path loss")
     plt.xlabel("distance [m]")
     plt.ylabel("path loss [dB]")
-    plt.xlim((0, distance_2D[-1]))
+    plt.xlim((0, distance_2D[-1,0]))
     #plt.ylim((0, 1.1))                
     plt.legend(loc="upper left")
     plt.tight_layout()    
