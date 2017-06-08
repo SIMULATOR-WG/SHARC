@@ -88,7 +88,7 @@ class StationFactory(object):
 
         if(param_ant.bs_rx_antenna_type == "BEAMFORMING" or param_ant.bs_rx_antenna_type == "BEAMFORMING"):
             beamforming = True
-            cell_r = topology.cell_radius/2
+            cell_r = topology.intersite_distance/3
             num_bs = 3*topology.x.size
             bs_x = np.repeat(topology.x,3)
             bs_y = np.repeat(topology.y,3)
@@ -102,18 +102,39 @@ class StationFactory(object):
         for bs in range(num_bs):
             if(beamforming):
                 i = bs%3
-                ang = np.deg2rad(90+i*120)
-                x_min = bs_x[bs] + cell_r*np.sin(ang) - cell_r
-                x_max = bs_x[bs] + cell_r*np.sin(ang) + cell_r
-                y_min = bs_y[bs] + cell_r*np.cos(ang) - cell_r
-                y_max = bs_y[bs] + cell_r*np.cos(ang) + cell_r
+                ang = np.deg2rad(60+i*120)
+                x_center = cell_r*np.cos(ang) + bs_x[bs]
+                y_center = cell_r*np.sin(ang) + bs_y[bs]
+                # TODO: change this to a parameter that represents the minimum 
+
+                # UE's are generated inside a inscribed circle of a regular hexagon (sector)
+                r_max = cell_r*np.sqrt(3)/2
+                x_min = x_center - r_max
+                x_max = x_center + r_max
+                y_min = y_center - r_max
+                y_max = y_center + r_max                
+                scale = 10
+                x = (x_max - x_min)*np.random.random(scale*param.ue_k*param.ue_k_m) + x_min
+                y = (y_max - y_min)*np.random.random(scale*param.ue_k*param.ue_k_m) + y_min
+            
+                r = np.sqrt((x - x_center)**2 + (y - y_center)**2)
+
+                # 2D separation distance between BS and UE
+                r_sep_min = param.minimum_separation_distance_bs_ue
+                r_sep = np.sqrt((x - bs_x[bs])**2 + (y - bs_y[bs])**2)
+                
+                idx = np.where((r < r_max) & (r_sep > r_sep_min))[0]
+                i = idx[:param.ue_k*param.ue_k_m]
+                x = x[i]
+                y = y[i]
+    
             else:
                 x_min = bs_x[bs] - cell_r
                 x_max = bs_x[bs] + cell_r
                 y_min = bs_y[bs] - cell_r
                 y_max = bs_y[bs] + cell_r
-            x = (x_max - x_min)*np.random.random(param.ue_k*param.ue_k_m) + x_min
-            y = (y_max - y_min)*np.random.random(param.ue_k*param.ue_k_m) + y_min
+                x = (x_max - x_min)*np.random.random(param.ue_k*param.ue_k_m) + x_min
+                y = (y_max - y_min)*np.random.random(param.ue_k*param.ue_k_m) + y_min
             ue_x.extend(x)
             ue_y.extend(y)
         imt_ue.x = np.array(ue_x)
