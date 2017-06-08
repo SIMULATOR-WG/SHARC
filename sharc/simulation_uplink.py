@@ -9,6 +9,7 @@ import numpy as np
 import random
 import math
 import sys
+import matplotlib.pyplot as plt
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
@@ -22,6 +23,7 @@ from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_close_in import PropagationCloseIn
 from sharc.propagation.propagation_p619 import PropagationP619
 from sharc.propagation.propagation_sat_simple import PropagationSatSimple
+from sharc.propagation.propagation_uma import PropagationUMa
 
 
 from sharc.results import Results
@@ -41,6 +43,8 @@ class SimulationUplink(Simulation):
 
         if self.param.channel_model == "FSPL":
             self.propagation_imt = PropagationFreeSpace()
+        elif self.param.channel_model == "UMa":
+            self.propagation_imt = PropagationUMa()
         elif self.param.channel_model == "CI":
             self.propagation_imt = PropagationCloseIn(self.param.topology,
                                                       self.param.line_of_sight_prob)
@@ -148,6 +152,8 @@ class SimulationUplink(Simulation):
         self.ue = StationFactory.generate_imt_ue(self.param, \
                                                  self.param_imt_antenna,\
                                                  self.topology)
+        #self.plot_scenario(self.topology.intersite_distance/3, self.bs.x, self.bs.y, self.ue.x, self.ue.y)
+        #sys.exit(1)
 
     def update_bs(self):
         self.bs.active = np.random.rand(self.bs.num_stations) < self.bs_load_prob
@@ -161,20 +167,26 @@ class SimulationUplink(Simulation):
                                 station_b: StationManager,
                                 propagation: Propagation) -> np.array:
         """
-        Calculates the path coupling loss from each stationA to all stationB.
+        Calculates the path coupling loss from each station_a to all station_b.
         Result is returned as a numpy array with dimensions num_a x num_b
         """
         # Calculate distance from transmitters to receivers. The result is a
         # num_bs x num_ue array
-        d = station_a.get_3d_distance_to(station_b)
+        d_2D = station_a.get_distance_to(station_b)
+        d_3D = station_a.get_3d_distance_to(station_b)
 
         if station_b.is_satellite:
             elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
-            self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency,
+            self.path_loss = propagation.get_loss(distance=d_3D, frequency=self.param.frequency,
                                              elevation=elevation_angles, sat_params = self.param_system,
                                              earth_to_space = True)
         else:
-            self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
+            self.path_loss = propagation.get_loss(distance=np.transpose(d_3D), 
+                                                  distance_2D=np.transpose(d_2D), 
+                                                  frequency=self.param.frequency*np.ones(np.transpose(d_3D).shape),
+                                                  bs_height=station_b.height,
+                                                  ue_height=station_a.height,
+                                                  shadowing=False)
         # define antenna gains
         gain_a = self.calculate_gains(station_a,station_b,"TX")
         gain_b = self.calculate_gains(station_b,station_a,"RX")
@@ -398,3 +410,84 @@ class SimulationUplink(Simulation):
             tput[id_max] = tput_max
 
         return tput
+        
+    def plot_scenario(self, cell_radius, bs_x, bs_y, ue_x, ue_y):
+        psi = np.radians([60, 120, 240, 300])
+    
+        fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
+        ax = fig.gca()
+        
+        r = cell_radius
+        for x, y in zip(bs_x, bs_y):
+            se = list([[x,y]])
+            se.extend([[se[-1][0] + r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[0]), se[-1][1] + r*math.sin(psi[0])]])
+            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
+            se.extend([[se[-1][0] - r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)
+    
+            se = list([[x,y]])
+            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
+            se.extend([[se[-1][0] - r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
+            se.extend([[se[-1][0] + r*math.cos(psi[3]), se[-1][1] + r*math.sin(psi[3])]])
+            se.extend([[se[-1][0] + r, se[-1][1]]])
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)
+            
+            se = list([[x,y]])
+            se.extend([[se[-1][0] + r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[3]), se[-1][1] + r*math.sin(psi[3])]])
+            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
+            se.extend([[se[-1][0] - r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)       
+            
+    
+        # plot hotspot centers
+        #plt.scatter(topology.hotspot_x, topology.hotspot_y, color='k', edgecolor="w", linewidth=0.5)
+        
+        # plot small cells
+        #plt.scatter(topology.x, topology.y, color='r', edgecolor="w", linewidth=0.5, label="Small cell")
+        
+        # plot hotspots coverage area
+#        for hx, hy in zip(topology.hotspot_x, topology.hotspot_y):
+#            circ = plt.Circle((hx, hy), radius=50, color='g', fill=False, linewidth=0.5)
+#            ax.add_patch(circ)
+        
+        # macro cell base stations
+        plt.scatter(bs_x, bs_y, color='k', edgecolor="k", linewidth=4, label="BS")
+
+        # UE
+        plt.scatter(ue_x, ue_y, color='r', edgecolor="w", linewidth=0.5, label="UE")
+        
+        # sector centers
+        #plt.scatter(-sector_y, sector_x, color='g', edgecolor="g")
+        
+        # plot macro cell coverage area
+        #ax = fig.gca()
+    #    for mx, my in zip(topology.topology_macrocell.x, topology.topology_macrocell.y):
+    #        circ = plt.Circle((mx, my), radius=666.667*math.sqrt(3)/2-70, color='b', fill=False, linewidth=0.5)
+    #        ax.add_patch(circ)  
+    
+        # plot separation radius
+        for mx, my in zip(bs_x, bs_y):
+            circ = plt.Circle((mx, my), radius=10, color='g', fill=False, linewidth=0.5)
+            ax.add_patch(circ)  
+        
+    
+    
+        
+        plt.axis('image') 
+        plt.title("Macro cell topology")
+        plt.xlabel("x-coordinate [m]")
+        plt.ylabel("y-coordinate [m]")
+        #plt.xlim((-3000, 3000))
+        #plt.ylim((-3000, 3000))                
+        plt.legend(loc="upper left", scatterpoints=1)
+        plt.tight_layout()    
+        plt.show()
+            
