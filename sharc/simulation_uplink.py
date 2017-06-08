@@ -93,7 +93,6 @@ class SimulationUplink(Simulation):
         self.ue_tx_power_control = param.ue_tx_power_control
         self.ue_tx_power_target = param.ue_tx_power_target
         self.ue_tx_power_alfa = param. ue_tx_power_alfa
-
         # this attribute indicates the list of UE's that are connected to each
         # base station. The position the the list indicates the resource block
         # group that is allocated to the given UE
@@ -245,11 +244,16 @@ class SimulationUplink(Simulation):
         """
         Apply uplink power control algorithm
         """
+
         if self.ue_tx_power_control == "OFF":
             self.ue.tx_power = self.param.ue_tx_power*np.ones(self.ue.num_stations)
         else:
             power_aux =  10*np.log10(self.num_rb_per_ue) + self.ue_tx_power_target
             for bs in range(self.bs.num_stations):
+                power2 = self.path_loss[self.link[bs], bs]
+                self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
+                self.ue_tx_power_alfa*power2+power_aux)
+
                 power2 = self.path_loss[self.link[bs], bs]
                 self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
                 self.ue_tx_power_alfa*power2+power_aux)

@@ -151,7 +151,6 @@ class ParametersImt(object):
     # UE maximum transmit power [dBm]
     ue_tx_power = 22
     
-
     ###########################################################################
     # UE height [m]
     ue_height = 1.5
