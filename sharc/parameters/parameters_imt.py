@@ -39,6 +39,10 @@ class ParametersImt(object):
     intersite_distance = 226
 
     ###########################################################################
+    # Minimum 2D separation distance from BS to UE
+    minimum_separation_distance_bs_ue = 10
+    
+    ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
     interfered_with = False
 
