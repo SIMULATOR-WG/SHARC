@@ -33,7 +33,7 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE transmit antenna type. Possible values are "OMNI", "BEAMFORMING"
-    ue_tx_antenna_type = "BEAMFORMING"
+    ue_tx_antenna_type ="BEAMFORMING"
     
     ###########################################################################
     # UE receive antenna type. Possible values are "OMNI", "BEAMFORMING"
@@ -89,11 +89,11 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # Base station number of rows in transmit array
-    bs_tx_n_rows = 8
+    bs_tx_n_rows = 16
     
     ###########################################################################
     # Base station number of columns in transmit array
-    bs_tx_n_columns = 8
+    bs_tx_n_columns = 16
     
     ###########################################################################
     # Base station array horizontal transmit element spacing (d/lambda)
@@ -185,7 +185,7 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE number of columns in transmit array
-    ue_tx_n_columns = 4
+    ue_tx_n_columns = 2
     
     ###########################################################################
     # UE array horizontal transmit element spacing (d/lambda)

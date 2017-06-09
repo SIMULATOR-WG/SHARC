@@ -94,12 +94,6 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(len(self.antenna1.w_vec_list),0)
         self.assertEqual(len(self.antenna2.w_vec_list),0)
         
-    def test_current_beam(self):
-        self.assertEqual(self.antenna1.current_beam,-1)
-        self.assertEqual(self.antenna2.current_beam,-1)
-        self.antenna2.current_beam = 0
-        self.assertEqual(self.antenna2.current_beam,0)
-        
     def test_super_position_vector(self):
         # Error margin
         eps = 1e-5
@@ -288,7 +282,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 1
         phi_vec = np.array([11.79, -0.71])
         theta_vec = np.array([50.31, 120.51])
-        gains = self.antenna2.calculate_gain(phi_vec,theta_vec)
+        beams_l = -1*np.ones_like(phi_vec,dtype=int)
+        gains = self.antenna2.calculate_gain(phi_vec,theta_vec,beams_l)
         npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
         
         # Test 2
@@ -297,8 +292,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi_scan = 11.79
         theta_tilt = 5.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
-        self.assertEqual(self.antenna2.current_beam,0)
-        gains = self.antenna2.calculate_gain(phi,theta)
+        beams_l = np.zeros_like(phi_vec,dtype=int)
+        gains = self.antenna2.calculate_gain(phi,theta,beams_l)
         npt.assert_allclose(gains,np.array([10.454087]),atol=eps)
         
     def test_to_local_coord(self):        
