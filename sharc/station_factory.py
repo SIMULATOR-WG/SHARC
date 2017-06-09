@@ -105,7 +105,6 @@ class StationFactory(object):
                 ang = np.deg2rad(60+i*120)
                 x_center = cell_r*np.cos(ang) + bs_x[bs]
                 y_center = cell_r*np.sin(ang) + bs_y[bs]
-                # TODO: change this to a parameter that represents the minimum 
 
                 # UE's are generated inside a inscribed circle of a regular hexagon (sector)
                 r_max = cell_r*np.sqrt(3)/2
