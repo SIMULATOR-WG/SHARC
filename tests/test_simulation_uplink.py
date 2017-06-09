@@ -18,6 +18,7 @@ class SimulationUplinkTest(unittest.TestCase):
     
     def setUp(self):
         self.param = ParametersImt()
+        self.param.channel_model = "FSPL"
         self.param.topology = "SINGLE_BS"
         self.param.num_base_stations = 1
         self.param.num_clusters = 1
@@ -41,6 +42,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.ue_k_m = 1
         self.param.ue_tx_power_control = "OFF"
         self.param.ue_tx_power = 22
+        self.param.ue_tx_power_control = "OFF"
         self.param.ue_height = 1.5
         self.param.ue_tx_antenna_gain = 0
         self.param.ue_rx_antenna_gain = 0

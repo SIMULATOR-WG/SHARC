@@ -13,6 +13,7 @@ from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.parameters.parameters_fss import ParametersFss
 
 class Model(Observable):
     """
@@ -22,8 +23,8 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        #self.simulation = SimulationDownlink(ParametersImt(),ParametersAntennaImt())
-        self.simulation = SimulationUplink(ParametersImt(),ParametersAntennaImt())
+        #self.simulation = SimulationDownlink(ParametersImt(), ParametersFss(), ParametersAntennaImt())
+        self.simulation = SimulationUplink(ParametersImt(), ParametersFss(), ParametersAntennaImt())
 
     def add_observer(self, observer):
         Observable.add_observer(self, observer)
@@ -36,19 +37,22 @@ class Model(Observable):
         self.notify_observers(source=__name__,
                               message="Simulation is running...",
                               state=State.RUNNING )
-        self.current_snapshot = 1
+        self.current_snapshot = 0
         self.simulation.initialize()
         
-    def step(self):
+    def snapshot(self):
         """
         Performs one simulation step and collects the results
         """
+        write_to_file = False
+        self.current_snapshot += 1
+
         if not self.current_snapshot % 10:
+            write_to_file = True
             self.notify_observers(source=__name__,
                                   message="Snapshot #" + str(self.current_snapshot))
-        #time.sleep(1)
-        self.simulation.snapshot()
-        self.current_snapshot += 1
+
+        self.simulation.snapshot(write_to_file, self.current_snapshot)
             
     def is_finished(self) -> bool:
         """
@@ -59,7 +63,7 @@ class Model(Observable):
         -------
             True if simulation is finished; False otherwise.
         """
-        if self.current_snapshot <= ParametersGeneral.num_snapshots:
+        if self.current_snapshot < ParametersGeneral.num_snapshots:
             return False
         else:
             return True
@@ -68,7 +72,7 @@ class Model(Observable):
         """
         Finalizes the simulation and performs all post-simulation tasks
         """
-        self.simulation.finalize()
+        self.simulation.finalize(self.current_snapshot)
         self.notify_observers(source=__name__, 
                               message="FINISHED!", state=State.FINISHED)
         

@@ -39,6 +39,10 @@ class ParametersImt(object):
     intersite_distance = 226
 
     ###########################################################################
+    # Minimum 2D separation distance from BS to UE
+    minimum_separation_distance_bs_ue = 10
+    
+    ###########################################################################
     # Defines if IMT service is the interferer or interfered-with service
     interfered_with = False
 
@@ -61,10 +65,6 @@ class ParametersImt(object):
     guard_band_ratio = 0.1
 
     ###########################################################################
-    # Minimum Coupling Loss (MCL) [dB]
-    mcl = 98
-
-    ###########################################################################
     # Handover margin [dB]
     ho_margin = 3
 
@@ -81,11 +81,11 @@ class ParametersImt(object):
 
     ###########################################################################
     # Maximum base station transmit power [dBm]
-    bs_tx_power = 40
+    bs_tx_power = 46
 
     ###########################################################################
     # Base station height [m]
-    bs_height = 10
+    bs_height = 25
 
     ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
@@ -108,9 +108,21 @@ class ParametersImt(object):
     bs_feed_loss = 3
 
     ###########################################################################
+    # Uplink attenuation factor used in link-to-system mapping
+    ul_attenuation_factor = 0.4
+    
+    ###########################################################################
+    # Uplink minimum SINR of the code set [dB]
+    ul_sinr_min = -10
+
+    ###########################################################################
+    # Uplink maximum SINR of the code set [dB]
+    ul_sinr_max = 22
+    
+    ###########################################################################
     # Number of UE that is allocated to each cell within to handover margin.
     # Remenber that in macrocell network each base station has 3 cells (sectors)
-    ue_k = 1
+    ue_k = 3
 
     ###########################################################################
     # Multiplication factor that is used to ensure that the sufficient number
@@ -128,7 +140,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Power per RB used as target value in dBm
-    ue_tx_power_target = -80
+    ue_tx_power_target = -95
 
     ###########################################################################
     # Alfa is the balacing factor for UEs with bad channel
@@ -137,8 +149,8 @@ class ParametersImt(object):
 
     ###########################################################################
     # UE maximum transmit power [dBm]
-    ue_tx_power = 23
-
+    ue_tx_power = 22
+    
     ###########################################################################
     # UE height [m]
     ue_height = 1.5
@@ -159,12 +171,24 @@ class ParametersImt(object):
     # User equipment feed loss [dB]
     ue_feed_loss = 3
 
+    ###########################################################################
+    # Downlink attenuation factor used in link-to-system mapping
+    dl_attenuation_factor = 0.6
+    
+    ###########################################################################
+    # Downlink minimum SINR of the code set [dB]
+    dl_sinr_min = -10
+
+    ###########################################################################
+    # Downlink maximum SINR of the code set [dB]
+    dl_sinr_max = 30
 
     ###########################################################################
     # Channel parameters
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "CI" (close-in FS reference distance)
-    channel_model = "FSPL"
+    #                                    "UMa" (Urban Macro - 3GPP)
+    channel_model = "UMa"
     line_of_sight_prob = 0.75 # probability of line-of-sight (not for FSPL)
 
     ###########################################################################

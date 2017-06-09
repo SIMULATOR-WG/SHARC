@@ -14,6 +14,9 @@ class PropagationFreeSpace(Propagation):
     Implements the Free Space propagation model
     """
     
+    def __init__(self):
+        super(Propagation, self).__init__()
+    
     def get_loss(self, *args, **kwargs) -> np.array:
         d = np.asarray(kwargs["distance"])
         f = np.asarray(kwargs["frequency"])

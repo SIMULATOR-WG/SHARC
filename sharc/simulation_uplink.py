@@ -9,6 +9,7 @@ import numpy as np
 import random
 import math
 import sys
+import matplotlib.pyplot as plt
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
@@ -22,6 +23,7 @@ from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_close_in import PropagationCloseIn
 from sharc.propagation.propagation_p619 import PropagationP619
 from sharc.propagation.propagation_sat_simple import PropagationSatSimple
+from sharc.propagation.propagation_uma import PropagationUMa
 
 
 from sharc.results import Results
@@ -31,16 +33,18 @@ class SimulationUplink(Simulation):
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, param: ParametersImt, param_ant: ParametersAntennaImt):
+    def __init__(self, param: ParametersImt, param_system: ParametersFss, param_ant: ParametersAntennaImt):
         super(SimulationUplink, self).__init__()
         self.param = param
         self.param_imt_antenna = param_ant
-        self.param_system = ParametersFss()
+        self.param_system = param_system
 
         self.topology = TopologyFactory.createTopology(self.param)
 
         if self.param.channel_model == "FSPL":
             self.propagation_imt = PropagationFreeSpace()
+        elif self.param.channel_model == "UMa":
+            self.propagation_imt = PropagationUMa()
         elif self.param.channel_model == "CI":
             self.propagation_imt = PropagationCloseIn(self.param.topology,
                                                       self.param.line_of_sight_prob)
@@ -73,6 +77,7 @@ class SimulationUplink(Simulation):
             
         self.beams_idx = -1*np.ones(num_ue,dtype=int)
 
+        self.interference_ue = np.empty(num_ue)
         self.coupling_loss = np.empty([num_bs, num_ue])
         self.coupling_loss_ue_sat = np.empty(num_ue)
         self.coupling_loss_bs_sat = np.empty(num_bs)
@@ -90,7 +95,6 @@ class SimulationUplink(Simulation):
         self.ue_tx_power_control = param.ue_tx_power_control
         self.ue_tx_power_target = param.ue_tx_power_target
         self.ue_tx_power_alfa = param. ue_tx_power_alfa
-
         # this attribute indicates the list of UE's that are connected to each
         # base station. The position the the list indicates the resource block
         # group that is allocated to the given UE
@@ -109,7 +113,7 @@ class SimulationUplink(Simulation):
                                                             self.param_imt_antenna,
                                                             self.topology)
 
-    def snapshot(self, *args, **kwargs):
+    def snapshot(self, write_to_file, snapshot_number, *args, **kwargs):
         self.create_system()
         self.update_bs()
         self.create_ue()
@@ -140,20 +144,24 @@ class SimulationUplink(Simulation):
             #self.recalculate_sinr()
             #self.calculate_imt_degradation()
         else:
+            self.calculate_sinr()
             self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass
-        self.collect_results()
+        
+        self.collect_results(write_to_file, snapshot_number)
         self.reset_antennas()
 
-    def finalize(self, *args, **kwargs):
-        self.results.write_files()
+    def finalize(self, snapshot_number, *args, **kwargs):
+        self.results.write_files(snapshot_number)
         self.notify_observers(source=__name__, results=self.results)
 
     def create_ue(self):
         self.ue = StationFactory.generate_imt_ue(self.param, \
                                                  self.param_imt_antenna,\
                                                  self.topology)
+        #self.plot_scenario(self.topology.intersite_distance/3, self.bs.x, self.bs.y, self.ue.x, self.ue.y)
+        #sys.exit(1)
 
     def update_bs(self):
         self.bs.active = np.random.rand(self.bs.num_stations) < self.bs_load_prob
@@ -167,20 +175,26 @@ class SimulationUplink(Simulation):
                                 station_b: StationManager,
                                 propagation: Propagation) -> np.array:
         """
-        Calculates the path coupling loss from each stationA to all stationB.
+        Calculates the path coupling loss from each station_a to all station_b.
         Result is returned as a numpy array with dimensions num_a x num_b
         """
         # Calculate distance from transmitters to receivers. The result is a
         # num_bs x num_ue array
-        d = station_a.get_3d_distance_to(station_b)
+        d_2D = station_a.get_distance_to(station_b)
+        d_3D = station_a.get_3d_distance_to(station_b)
 
         if station_b.is_satellite:
             elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
-            self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency,
+            self.path_loss = propagation.get_loss(distance=d_3D, frequency=self.param.frequency,
                                              elevation=elevation_angles, sat_params = self.param_system,
                                              earth_to_space = True)
         else:
-            self.path_loss = propagation.get_loss(distance=d, frequency=self.param.frequency)
+            self.path_loss = propagation.get_loss(distance=np.transpose(d_3D), 
+                                                  distance_2D=np.transpose(d_2D), 
+                                                  frequency=self.param.frequency*np.ones(np.transpose(d_3D).shape),
+                                                  bs_height=station_b.height,
+                                                  ue_height=station_a.height,
+                                                  shadowing=False)
         # define antenna gains
         gain_a = self.calculate_gains(station_a,station_b,"TX")
         gain_b = self.calculate_gains(station_b,station_a,"RX")
@@ -248,50 +262,61 @@ class SimulationUplink(Simulation):
         """
         Apply uplink power control algorithm
         """
+
         if self.ue_tx_power_control == "OFF":
             self.ue.tx_power = self.param.ue_tx_power*np.ones(self.ue.num_stations)
         else:
             power_aux =  10*np.log10(self.num_rb_per_ue) + self.ue_tx_power_target
             for bs in range(self.bs.num_stations):
-                    power2 = self.path_loss[self.link[bs], bs]
-                    self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
-                    self.ue_tx_power_alfa*power2+power_aux)
+                power2 = self.path_loss[self.link[bs], bs]
+                self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
+                self.ue_tx_power_alfa*power2+power_aux)
+
+                power2 = self.path_loss[self.link[bs], bs]
+                self.ue.tx_power[self.link[bs]] = np.minimum(self.param.ue_tx_power,\
+                self.ue_tx_power_alfa*power2+power_aux)
 
     def calculate_sinr(self):
         """
         Calculates the uplink SINR for each UE. This is useful only in the
         cases when IMT system is interfered by other system
-        TODO: not working yet
         """
-        pass
-#        bs_all = [b for b in range(self.bs.num_stations)]
-#        self.bs.rx_power = dict([(bs,[-300] * len(self.link[bs])) for bs in range(self.bs.num_stations)])
-#
-#        # calculate uplink received power for each BS
-#        for bs, ue_list in self.link.items():
-#            self.bs.rx_power[bs] = np.array(self.ue.tx_power[ue_list]) \
-#                                    - np.array(self.coupling_loss[bs,ue_list])
-#            # create a list with base stations that generate interference in ue_list
-#            bs_interf = [b for b in bs_all if b not in [bs]]
-#
-#            # calculate intra system interference
-#            for bi in bs_interf:
-#                ui = self.link[bi]
-#                interference = self.ue.tx_power[ui] - self.coupling_loss[bi,ui]
-#                self.bs.rx_interference[ue] = 10*math.log10( \
-#                    math.pow(10, 0.1*self.bs.rx_interference[ue])
-#                    + np.sum(np.power(10, 0.1*interference)))
-#
-#        self.bs.thermal_noise = \
-#            10*math.log10(self.param.BOLTZMANN_CONSTANT*self.param.noise_temperature) + \
-#            10*np.log10(self.bs.bandwidth * 1e6) + \
-#            self.bs.noise_figure
-#
-#        self.bs.total_interference = \
-#            10*np.log10(np.power(10, 0.1*self.bs.rx_interference) + \
-#                        np.power(10, 0.1*self.bs.thermal_noise))
-#        self.bs.sinr = self.bs.rx_power - self.bs.total_interference
-#        self.bs.snr = self.bs.rx_power - self.bs.thermal_noise
+        #bs_all = [b for b in range(self.bs.num_stations)]
+        bs_active = np.where( self.bs.active )[0]
+
+        self.bs.rx_power = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.rx_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.total_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.snr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        self.bs.sinr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+
+
+        # calculate uplink received power for each active BS
+        for bs in bs_active:
+            ue_list = self.link[bs]
+            self.bs.rx_power[bs] = self.ue.tx_power[ue_list] - self.coupling_loss[bs,ue_list]
+            # create a list of BSs that serve the interfering UEs
+            bs_interf = [b for b in bs_active if b not in [bs]]
+
+            # calculate intra system interference
+            for bi in bs_interf:
+                ui_list = self.link[bi]
+                interference = self.ue.tx_power[ui_list] - self.coupling_loss[bs,ui_list]
+                self.bs.rx_interference[bs] = 10*np.log10( \
+                    np.power(10, 0.1*self.bs.rx_interference[bs])
+                    + np.power(10, 0.1*interference))
+
+            self.bs.thermal_noise[bs] = \
+                10*np.log10(self.param.BOLTZMANN_CONSTANT*self.param.noise_temperature) + \
+                10*np.log10(self.num_rb_per_ue*self.param.rb_bandwidth * 1e6) + \
+                self.bs.noise_figure[bs]
+    
+            self.bs.total_interference[bs] = \
+                10*np.log10(np.power(10, 0.1*self.bs.rx_interference[bs]) + \
+                            np.power(10, 0.1*self.bs.thermal_noise[bs]))
+                
+            self.bs.sinr[bs] = self.bs.rx_power[bs] - self.bs.total_interference[bs]
+            self.bs.snr[bs] = self.bs.rx_power[bs] - self.bs.thermal_noise[bs]
 
     def calculate_external_interference(self):
         """
@@ -307,29 +332,20 @@ class SimulationUplink(Simulation):
                                             self.propagation_system)).tolist()[0])
 
         ue_bandwidth = self.num_rb_per_ue * self.param.rb_bandwidth
-        #bs_bandwidth = self.num_rb_per_bs * self.param.rb_bandwidth
 
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
         # calculate interference only from active UE's
-        ue_active = np.where(self.ue.active)
+        ue_active = np.where(self.ue.active)[0]
         interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
                             + 10*math.log10(ue_bandwidth/self.param_system.sat_bandwidth)
 
-        # assume BS transmits with full power (no power control) in the whole bandwidth
-        bs_active = np.where(self.bs.active)
-        #interference_bs = self.param.bs_tx_power - self.coupling_loss_bs_sat[bs_active]
-        interference_bs = -500
-
-        self.system.rx_interference = 10*math.log10( \
-                        math.pow(10, 0.1*self.system.rx_interference)
-                        + np.sum(np.power(10, 0.1*interference_ue)) \
-                        + np.sum(np.power(10, 0.1*interference_bs)))
+        self.system.rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference_ue)))
 
         self.system.thermal_noise = \
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
                           self.param_system.sat_noise_temperature) + \
-                          10*np.log10(self.param_system.sat_bandwidth * 1e6)
+                          10*math.log10(self.param_system.sat_bandwidth * 1e6)
 
         self.system.total_interference = \
             10*np.log10(np.power(10, 0.1*self.system.rx_interference) + \
@@ -338,23 +354,24 @@ class SimulationUplink(Simulation):
         self.system.inr = self.system.rx_interference - self.system.thermal_noise
 
 
-    def collect_results(self):
-        self.results.add_coupling_loss_dl( \
+    def collect_results(self, write_to_file: bool, snapshot_number: int):
+        self.results.imt_ul_coupling_loss.extend( \
             np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
-        self.results.add_coupling_loss_bs_sat(self.coupling_loss_bs_sat.tolist())
-        self.results.add_coupling_loss_ue_sat(self.coupling_loss_ue_sat.tolist())
-
-        self.results.add_inr([self.system.inr.tolist()])
-
-        # NOT COLLECTING POWER STATISTICS FOR THE MOMENT
-#        for bs in range(self.bs.num_stations):
-#            self.results.add_tx_power_dl(self.ue.tx_power[bs])
-#
-#        # select the active stations
-#        ids = np.where(self.bs.active)
-#
-#        self.results.add_sinr_dl(self.bs.sinr[ids].tolist())
-#        self.results.add_snr_dl(self.bs.snr[ids].tolist())
+        self.results.system_inr.extend([self.system.inr])
+        
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
+            ue_list = self.link[bs]
+            tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])
+            self.results.imt_ul_tput.extend(tput.tolist())
+            self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue_list].tolist())
+            imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue_list])/(self.num_rb_per_ue*self.param.rb_bandwidth*1e6))
+            self.results.imt_ul_tx_power_density.extend(imt_ul_tx_power_density.tolist())
+            self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
+            self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
+            
+        if write_to_file:
+            self.results.write_files(snapshot_number)
 
     def calculate_gains(self,
                         station_a: StationManager,
@@ -409,3 +426,99 @@ class SimulationUplink(Simulation):
                 self.ue.tx_antenna[ue].reset_beams()
         self.beams_idx = -1*np.ones(self.ue.num_stations,dtype=int)
 
+    def calculate_imt_ul_tput(self, sinr: np.array) -> np.array:
+        tput_min = 0
+        tput_max = self.param.ul_attenuation_factor*math.log2(1+math.pow(10, 0.1*self.param.ul_sinr_max))
+        
+        tput = self.param.ul_attenuation_factor*np.log2(1+np.power(10, 0.1*sinr))
+        
+        id_min = np.where(sinr<self.param.ul_sinr_min)[0]
+        id_max = np.where(sinr>self.param.ul_sinr_max)[0]
+
+        if len(id_min) > 0:
+            tput[id_min] = tput_min
+        if len(id_max) > 0:
+            tput[id_max] = tput_max
+
+        return tput
+        
+    def plot_scenario(self, cell_radius, bs_x, bs_y, ue_x, ue_y):
+        psi = np.radians([60, 120, 240, 300])
+    
+        fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
+        ax = fig.gca()
+        
+        r = cell_radius
+        for x, y in zip(bs_x, bs_y):
+            se = list([[x,y]])
+            se.extend([[se[-1][0] + r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[0]), se[-1][1] + r*math.sin(psi[0])]])
+            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
+            se.extend([[se[-1][0] - r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)
+    
+            se = list([[x,y]])
+            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
+            se.extend([[se[-1][0] - r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
+            se.extend([[se[-1][0] + r*math.cos(psi[3]), se[-1][1] + r*math.sin(psi[3])]])
+            se.extend([[se[-1][0] + r, se[-1][1]]])
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)
+            
+            se = list([[x,y]])
+            se.extend([[se[-1][0] + r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[3]), se[-1][1] + r*math.sin(psi[3])]])
+            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
+            se.extend([[se[-1][0] - r, se[-1][1]]])
+            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)       
+            
+    
+        # plot hotspot centers
+        #plt.scatter(topology.hotspot_x, topology.hotspot_y, color='k', edgecolor="w", linewidth=0.5)
+        
+        # plot small cells
+        #plt.scatter(topology.x, topology.y, color='r', edgecolor="w", linewidth=0.5, label="Small cell")
+        
+        # plot hotspots coverage area
+#        for hx, hy in zip(topology.hotspot_x, topology.hotspot_y):
+#            circ = plt.Circle((hx, hy), radius=50, color='g', fill=False, linewidth=0.5)
+#            ax.add_patch(circ)
+        
+        # macro cell base stations
+        plt.scatter(bs_x, bs_y, color='k', edgecolor="k", linewidth=4, label="BS")
+
+        # UE
+        plt.scatter(ue_x, ue_y, color='r', edgecolor="w", linewidth=0.5, label="UE")
+        
+        # sector centers
+        #plt.scatter(-sector_y, sector_x, color='g', edgecolor="g")
+        
+        # plot macro cell coverage area
+        #ax = fig.gca()
+    #    for mx, my in zip(topology.topology_macrocell.x, topology.topology_macrocell.y):
+    #        circ = plt.Circle((mx, my), radius=666.667*math.sqrt(3)/2-70, color='b', fill=False, linewidth=0.5)
+    #        ax.add_patch(circ)  
+    
+        # plot separation radius
+        for mx, my in zip(bs_x, bs_y):
+            circ = plt.Circle((mx, my), radius=10, color='g', fill=False, linewidth=0.5)
+            ax.add_patch(circ)  
+        
+    
+    
+        
+        plt.axis('image') 
+        plt.title("Macro cell topology")
+        plt.xlabel("x-coordinate [m]")
+        plt.ylabel("y-coordinate [m]")
+        #plt.xlim((-3000, 3000))
+        #plt.ylim((-3000, 3000))                
+        plt.legend(loc="upper left", scatterpoints=1)
+        plt.tight_layout()    
+        plt.show()
+            
