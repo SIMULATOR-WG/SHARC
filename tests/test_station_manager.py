@@ -18,34 +18,34 @@ class StationManagerTest(unittest.TestCase):
     
     def setUp(self):
         self.station_manager = StationManager(3)
-        self.station_manager.x = [10, 20, 30]
-        self.station_manager.y = [15, 25, 35]
-        self.station_manager.height = [1, 2, 3]
+        self.station_manager.x = np.array([10, 20, 30])
+        self.station_manager.y = np.array([15, 25, 35])
+        self.station_manager.height = np.array([1, 2, 3])
         # this is for downlink
         self.station_manager.tx_power = dict({0: [27, 30], 1: [35], 2: [40]})
         self.station_manager.rx_power = np.array([-50, -35, -10])
-        self.station_manager.tx_antenna = [AntennaOmni(10), AntennaOmni(25), AntennaOmni(30)]
-        self.station_manager.rx_antenna = [AntennaOmni(5), AntennaOmni(15), AntennaOmni(20)]
+        self.station_manager.tx_antenna = np.array([AntennaOmni(10), AntennaOmni(25), AntennaOmni(30)])
+        self.station_manager.rx_antenna = np.array([AntennaOmni(5), AntennaOmni(15), AntennaOmni(20)])
         
         self.station_manager2 = StationManager(2)
-        self.station_manager2.x = [100, 200]
-        self.station_manager2.y = [105, 250]
-        self.station_manager2.height = [4, 5]
+        self.station_manager2.x = np.array([100, 200])
+        self.station_manager2.y = np.array([105, 250])
+        self.station_manager2.height = np.array([4, 5])
         # this is for downlink
         self.station_manager2.tx_power = dict({0: [25], 1: [28,35]})
         self.station_manager2.rx_power = np.array([-50, -35])
-        self.station_manager2.tx_antenna = [AntennaOmni(10), AntennaOmni(25)]
-        self.station_manager2.rx_antenna = [AntennaOmni(5), AntennaOmni(15)]      
+        self.station_manager2.tx_antenna = np.array([AntennaOmni(10), AntennaOmni(25)])
+        self.station_manager2.rx_antenna = np.array([AntennaOmni(5), AntennaOmni(15)])      
         
         self.station_manager3 = StationManager(1)
-        self.station_manager3.x = [300]
-        self.station_manager3.y = [400]
-        self.station_manager3.height = [2]
+        self.station_manager3.x = np.array([300])
+        self.station_manager3.y = np.array([400])
+        self.station_manager3.height = np.array([2])
         # this is for uplink
         self.station_manager3.tx_power = 22
         self.station_manager3.rx_power = np.array([-50,-35])
-        self.station_manager3.tx_antenna = [AntennaOmni(10), AntennaOmni(25)]
-        self.station_manager3.rx_antenna = [AntennaOmni(5), AntennaOmni(15)]
+        self.station_manager3.tx_antenna = np.array([AntennaOmni(10), AntennaOmni(25)])
+        self.station_manager3.rx_antenna = np.array([AntennaOmni(5), AntennaOmni(15)])
         
         self.station = Station()
         self.station.id = 0
