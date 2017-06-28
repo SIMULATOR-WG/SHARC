@@ -67,17 +67,18 @@ class PropagationDiffractionTest(unittest.TestCase):
             if (n==1):
                 f = 10000
                     
-                for d in range(1, 100000,1000):
+                for d in range(1000, 100100,1000):
         
                     Ld50, Ldbeta,Ldp, Ldb  = self.__Diffraction.get_loss(beta = Beta, distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=hrs, Hts=hts, Hte=hte,
                                                                          Hre=hre, Hsr=hsr, Hst=hst, H0=h0, Hn=hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=dlt ,Dlr=dlr, percentage_p=p,C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
                     data1.append(Ldb)
                     eixo_x.append(d/1000)
                     
+                    
             if (n==2):
                 f = 20000
                     
-                for d in range(1, 100000,1000):
+                for d in range(1000, 100100,1000):
                      Ld50, Ldbeta,Ldp, Ldb  = self.__Diffraction.get_loss(beta = Beta, distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=hrs, Hts=hts, Hte=hte,
                                                                          Hre=hre, Hsr=hsr, Hst=hst, H0=h0, Hn=hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=dlt ,Dlr=dlr, percentage_p=p,C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
                      data2.append(Ldb)
@@ -85,7 +86,7 @@ class PropagationDiffractionTest(unittest.TestCase):
             if (n==3):
                 f = 30000
                     
-                for d in range(1, 100000,1000):
+                for d in range(1000, 100100,1000):
                      Ld50, Ldbeta,Ldp, Ldb  = self.__Diffraction.get_loss(beta = Beta, distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=hrs, Hts=hts, Hte=hte,
                                                                          Hre=hre, Hsr=hsr, Hst=hst, H0=h0, Hn=hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=dlt ,Dlr=dlr, percentage_p=p,C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
                      data3.append(Ldb)
@@ -93,7 +94,7 @@ class PropagationDiffractionTest(unittest.TestCase):
             if (n==4):
                 f = 40000
                     
-                for d in range(1, 100000,1000):
+                for d in range(1000, 100100,1000):
                      Ld50, Ldbeta,Ldp, Ldb  = self.__Diffraction.get_loss(beta = Beta, distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=hrs, Hts=hts, Hte=hte,
                                                                          Hre=hre, Hsr=hsr, Hst=hst, H0=h0, Hn=hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=dlt ,Dlr=dlr, percentage_p=p,C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
                      data4.append(Ldb)
@@ -102,7 +103,7 @@ class PropagationDiffractionTest(unittest.TestCase):
             if (n==5):
                 f = 50000
                     
-                for d in range(1, 100000,1000):
+                for d in range(1000, 100100,1000):
                      Ld50, Ldbeta,Ldp, Ldb  = self.__Diffraction.get_loss(beta = Beta, distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=hrs, Hts=hts, Hte=hte,
                                                                          Hre=hre, Hsr=hsr, Hst=hst, H0=h0, Hn=hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=dlt ,Dlr=dlr, percentage_p=p,C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
                      data5.append(Ldb)

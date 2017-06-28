@@ -164,7 +164,7 @@ class PropagationClearAir(Propagation):
     
         Loss = Lb - Gt - Gr
         
-        
-        return Loss
+        #print(Lb)
+        return Lb
     
     

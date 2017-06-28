@@ -176,11 +176,11 @@ class ParametersPropagation(object):
     eta = 2.5
     ###########################################################################
     #The distance of the i-th profile point 
-    dist_di = [1,1,1]      
+    dist_di = [0,0,0]      
     
     ###########################################################################
     #Height of the i-th profile point
-    hight_hi = [2,4,6] 
+    hight_hi = [2.2,4.3,6.4] 
 
     ###########################################################################
     #Additional losses to account for clutter shielding the transmitter and receiver   

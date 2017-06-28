@@ -94,7 +94,12 @@ class PropagationDiffraction(Propagation):
         for i in range(0, val_hi,1):
             Hi[i] = hi[i] - (hts*(d - di[i]) + hrs*di[i])/d
             aobt_1[i] = (Hi[i]/di[i])
-            aobr_1[i] = (Hi[i]/(di[i]-d))
+            
+            if (di[i]-d == 0):
+                aobr_1[i] = Hi[i]
+            else:
+                
+                aobr_1[i] = (Hi[i]/(di[i]-d))
             
         hobs = max(Hi)
         aobt = max(aobt_1)
@@ -141,8 +146,13 @@ class PropagationDiffraction(Propagation):
              
             if (Stim_max<Str):  #the path is LoS.
                for i in range(0, val_hi,1):
-        
-                   vmax_i = (hi[i] + 500*Ce*di[i]*(d-di[i])- ((hts*(d - di[i]) + hrs*di[i])/d))*(np.sqrt((0.002*d)/(lamb*di[i]*(d - di[i]))))
+                   
+                   if(d-di[i]==0):
+                        vmax_i = (hi[i] + 500*Ce*di[i] - ((hts + hrs*di[i])/d))*(np.sqrt((0.002*d)/(lamb*di[i])))
+                   else:
+                       
+                        vmax_i = (hi[i] + 500*Ce*di[i]*(d-di[i])- ((hts*(d - di[i]) + hrs*di[i])/d))*(np.sqrt((0.002*d)/(lamb*di[i]*(d - di[i]))))
+                   
                    if vmax_i>vmax:
                        vmax = vmax_i
                    
@@ -153,7 +163,11 @@ class PropagationDiffraction(Propagation):
                
                    Srim_max = ((hi[i] + 500*Ce*di[i]*(d - di[i]) - hrs)/(d - di[i]))
                    Dbp = (hrs - hts + Srim_max*d)/Stim_max +Srim_max
-                   vb = (hts + Stim_max*Dbp - ((hts*(d - Dbp) + hrs*Dbp)/d))*(np.sqrt((0.002*d)/(lamb*Dbp*(d - Dbp))))
+                   
+                   if (d<1):
+                      vb = (hts + Stim_max*Dbp - ((hts*(d - Dbp) + hrs*Dbp)/d))*(np.sqrt((0.002)/(lamb*Dbp*(d - Dbp))))
+                   else:
+                      vb = (hts + Stim_max*Dbp - ((hts*(d - Dbp) + hrs*Dbp)/d))*(np.sqrt((0.002*d)/(lamb*Dbp*(d - Dbp))))
                
                    if vb>vb_max:
                       vb_max = vb

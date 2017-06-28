@@ -82,7 +82,7 @@ class PropagationClearAirTest(unittest.TestCase):
             if (n==1):
                 f = 10000
                     
-                for d in range(1000, 100000,1000):
+                for d in range(1000, 100100,1000):
            
                     Loss = self.__ClearAir.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro,Dlt=Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr,
                                                                     Hts=Hts,Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx=thetaT, theta_rx=thetaR, N0=N0, delta_N=deltaN, percentage_p=p,
@@ -90,13 +90,13 @@ class PropagationClearAirTest(unittest.TestCase):
                                                                     thetaJ=thetaJ, par_ep=ep, dsw=dsw, k=k, dist_di=di, hight_hi=hi, eta=n, Aht=Aht, Ahr=Ahr, C0=C0,C1=C1, C2=C2, D1=D1, D2=D2, D3=D3)
                                                                     
                     data1.append(Loss)
-                    print(Loss)
+                    
                     eixo_x.append(d/1000)
                     
             if (n==2):
                 f = 20000
                     
-                for d in range(1000, 100000,1000):
+                for d in range(1000, 100100,1000):
                     Loss = self.__ClearAir.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro,Dlt=Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr,
                                                                     Hts=Hts,Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx=thetaT, theta_rx=thetaR, N0=N0, delta_N=deltaN, percentage_p=p,
                                                                     omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm, tx_gain=Gt, rx_gain=Gr, Hsr=Hsr, Hst=Hst, H0=H0, Hn=Hn,
@@ -106,7 +106,7 @@ class PropagationClearAirTest(unittest.TestCase):
             if (n==3):
                 f = 30000
                     
-                for d in range(1000, 100000,1000):
+                for d in range(1000, 100100,1000):
                     Loss = self.__ClearAir.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro,Dlt=Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr,
                                                                     Hts=Hts,Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx=thetaT, theta_rx=thetaR, N0=N0, delta_N=deltaN, percentage_p=p,
                                                                     omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm, tx_gain=Gt, rx_gain=Gr, Hsr=Hsr, Hst=Hst, H0=H0, Hn=Hn,
@@ -116,7 +116,7 @@ class PropagationClearAirTest(unittest.TestCase):
             if (n==4):
                 f = 40000
                     
-                for d in range(1000, 100000,1000):
+                for d in range(1000, 100100,1000):
                     Loss = self.__ClearAir.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro,Dlt=Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr,
                                                                     Hts=Hts,Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx=thetaT, theta_rx=thetaR, N0=N0, delta_N=deltaN, percentage_p=p,
                                                                     omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm, tx_gain=Gt, rx_gain=Gr, Hsr=Hsr, Hst=Hst, H0=H0, Hn=Hn,
@@ -127,7 +127,7 @@ class PropagationClearAirTest(unittest.TestCase):
             if (n==5):
                 f = 50000
                     
-                for d in range(1000, 100000,1000):
+                for d in range(1000, 100100,1000):
                     Loss = self.__ClearAir.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro,Dlt=Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr,
                                                                     Hts=Hts,Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx=thetaT, theta_rx=thetaR, N0=N0, delta_N=deltaN, percentage_p=p,
                                                                     omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm, tx_gain=Gt, rx_gain=Gr, Hsr=Hsr, Hst=Hst, H0=H0, Hn=Hn,
@@ -146,11 +146,11 @@ class PropagationClearAirTest(unittest.TestCase):
         
         # Add legend, title and axis labels
         lgd = ax.legend( [ 'f = ' + str(lag) for lag in f], loc='upper center', bbox_to_anchor=(0.16, 1))
-        ax.set_title('Clear air attenuation')
+        ax.set_title('Overall prediction attenuation')
         ax.set_xlabel('Distance (Km)')
         ax.set_ylabel('Attenuation (dB)')
         ax.set_xlim([0,100])
-        ax.set_ylim([-8,40])
+        ax.set_ylim([0,60])
         ax.grid(True)
         fig.savefig('clear_air_att.png', dpi=350, format='png') 
            

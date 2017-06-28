@@ -59,13 +59,14 @@ class PropagationDutingReflectionTest(unittest.TestCase):
         data5 = []
         eixo_x = [] 
         
+           
+        
         for n in range (1,6,1):
     
             if (n==1):
                 f = 5000
-                    
-                for d in range(1, 100100,1000):
-           
+                
+                for d in range(1000, 100100,1000):
                     loss = self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm)
                                                    
                     data1.append(loss)
@@ -74,21 +75,21 @@ class PropagationDutingReflectionTest(unittest.TestCase):
             if (n==2):
                 f = 10000
                     
-                for d in range(1, 100100,1000):
+                for d in range(1000, 100100,1000):
                      loss = self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm)
                      data2.append(loss)
 
             if (n==3):
                 f = 20000
                     
-                for d in range(1, 100100,1000):
+                for d in range(1000, 100100,1000):
                      loss = self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm)
                      data3.append(loss)
 
             if (n==4):
                 f = 30000
                     
-                for d in range(1, 100100,1000):
+                for d in range(1000, 100100,1000):
                      loss = self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm)
                      data4.append(loss)
 
@@ -96,7 +97,7 @@ class PropagationDutingReflectionTest(unittest.TestCase):
             if (n==5):
                 f = 40000
                     
-                for d in range(1, 100100,1000):
+                for d in range(1000, 100100,1000):
                      loss = self.__dutingRef.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature= T, water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct, Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre, theta_tx = thetaT, theta_rx = thetaR, N0 = N0, delta_N = deltaN, percentage_p = p, omega=omega, phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm)
                      data5.append(loss)
                  
@@ -107,10 +108,9 @@ class PropagationDutingReflectionTest(unittest.TestCase):
         ax.plot(eixo_x, data2)
         ax.plot(eixo_x, data3)
         ax.plot(eixo_x, data4)
-        ax.plot(eixo_x, data5)
-    #    ax.plot(eixo_x, data6)  
+        ax.plot(eixo_x, data5)  
         
-          # Add legend, title and axis labels
+        # Add legend, title and axis labels
         lgd = ax.legend( [ 'f = ' + str(lag) for lag in f], loc='upper center', bbox_to_anchor=(0.8, 0.45))
         ax.set_title('Ducting/reflection attenuation')
         ax.set_xlabel('Distance (Km)')

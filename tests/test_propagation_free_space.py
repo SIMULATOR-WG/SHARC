@@ -69,7 +69,7 @@ class PropagationFreeSpaceTest(unittest.TestCase):
             if (n==3):
                 f = 20000
                     
-                for d in range(10, 100100,1000):
+                for d in range(1, 100100,1000):
                      loss = self.__freeSpace.get_loss(distance=d, frequency=f)
                      data3.append(loss)
 

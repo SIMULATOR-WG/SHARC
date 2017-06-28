@@ -52,7 +52,7 @@ class PropagationDutingReflection(Propagation):
         epsilon = np.asarray(kwargs["epsilon"])                                
         hm = np.asarray(kwargs["hm"])
         
-      
+    
         #β0 (%), the time percentage for which refractive index lapse-rates exceeding
         #100 N-units/km can be expected in the first 100 m of the lower atmosphere,    
         tau = 1 - np.exp(-(4.12*(10**-4)*dlm**2.41))
@@ -140,7 +140,7 @@ class PropagationDutingReflection(Propagation):
         
         beta = (B0*mu2*mu3)
         Gama = (1.076/((2.0058-np.log10(beta))**1.012))*np.exp(-((9.51-4.8*np.log10(beta))+ 0.198*(np.log10(beta))**2)*10**-6*d**1.13)       
-    
+     
         Ap = -12 + (1.2 + 3.7*(10**-3)*d)*np.log10(p/beta) + 12*(p/beta)**Gama                  
         #Time percentage and time percentage and angular-distance dependent losses 
         Ad = Yd*teta_line + Ap
@@ -151,4 +151,5 @@ class PropagationDutingReflection(Propagation):
         
         loss = Af + Ad + loss_Ag
         
+     
         return loss
