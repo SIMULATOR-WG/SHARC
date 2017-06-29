@@ -33,14 +33,10 @@ class AntennaBeamformingImt(Antenna):
         
         Parameters
         ---------
-            param (ParametersAntennaImt): antenna IMT parameters
+            param (AntennaPar): antenna IMT parameters
             azimuth (float): antenna's physical azimuth inclination
             elevation (float): antenna's physical elevation inclination
                 referenced in the x axis
-            station_type (srt): type of station. Possible values are "BS" and
-                "UE"
-            txrx (srt): indicates whether it is a transmissio or reception 
-                antenna. Possible values are "TX" and "RX"
         """
         self.param = par
         
@@ -82,8 +78,7 @@ class AntennaBeamformingImt(Antenna):
         ----------
         phi_vec (np.array): azimuth angles [degrees]
         theta_vec (np.array): elevation angles [degrees]
-        beam (int): Optional, beam index. If not provided, maximum gain is 
-                calculated
+        beam_l (np.array of int): index of beams for gain calculation
             
         Returns
         -------
@@ -208,8 +203,6 @@ class AntennaBeamformingImt(Antenna):
         -------
             gain (float): beam gain [dBi]
         """
-        if(beam > len(self.__beams_list) - 1):
-            beam = -1
         
         element_g = self.element.element_pattern(phi,theta)
         

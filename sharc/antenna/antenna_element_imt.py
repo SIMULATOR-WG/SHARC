@@ -39,14 +39,6 @@ class AntennaElementImt(object):
         self.__sla_v = par.element_sla_v
     
     @property
-    def station_type(self):
-        return self.__station_type
-    
-    @property
-    def tx_or_rx(self):
-        return self.__tx_or_rx
-    
-    @property
     def g_max(self):
         return self.__g_max
      
