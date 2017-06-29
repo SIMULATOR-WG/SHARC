@@ -13,8 +13,7 @@ class Antenna(object):
     
     Methods
     -------
-    calculate_gain: calculates the antenna gain in the 
-        given directions
+    calculate_gain: calculates the antenna gain in the given directions
     """
     
     __metaclass__ = ABCMeta
