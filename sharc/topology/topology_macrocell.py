@@ -12,9 +12,14 @@ import numpy as np
 
 class TopologyMacrocell(Topology):
     """
-    Generates the coordinates of the stations based on the macrocell network
-    topology.
+    Generates the coordinates of the sites based on the macrocell network
+    topology. 
     """
+    
+    # possible values for base station azimuth
+    AZIMUTH = [60, 180, 300]
+
+    ALLOWED_NUM_CLUSTERS = [1, 7]
     
     def __init__(self, intersite_distance: float, num_clusters: int):
         """
@@ -23,16 +28,19 @@ class TopologyMacrocell(Topology):
         
         Parameters
         ----------
-            intersite_distance : Distance between stations
+            intersite_distance : Distance between two sites
             num_clusters : Number of cluters, should be 1 or 7
         """
-        allowed_num_clusters = [1,7]
-        cell_radius = intersite_distance*2/3
-        super(TopologyMacrocell, self).__init__(intersite_distance, 
-                                                cell_radius, num_clusters,
-                                                allowed_num_clusters)
+        if num_clusters not in TopologyMacrocell.ALLOWED_NUM_CLUSTERS:
+            error_message = "invalid number of clusters ({})".format(num_clusters)
+            raise ValueError(error_message)         
 
-    def _calculate_coordinates(self):
+        self.num_clusters = num_clusters
+        cell_radius = intersite_distance*2/3
+        super(TopologyMacrocell, self).__init__(intersite_distance, cell_radius)
+
+        
+    def calculate_coordinates(self):
         """
         Calculates the coordinates of the stations according to the inter-site
         distance parameter.
@@ -56,19 +64,7 @@ class TopologyMacrocell(Topology):
                 self.x = np.concatenate((self.x, x_central + xs))
                 self.y = np.concatenate((self.x, y_central + ys))    
     
-    @Topology.cell_radius.setter
-    def cell_radius(self, value):
-        """
-        When cell radius changes, intersite distance has to be updated
-        """
-        self._intersite_distance = value*3/2
-        Topology.cell_radius.fset(self, value)
-        
-    @Topology.intersite_distance.setter
-    def intersite_distance(self, value):
-        """
-        When intersite distance changes, cell radius has to be updated
-        """
-        self._cell_radius = value*2/3
-        Topology.intersite_distance.fset(self, value)
-      
+        self.x = np.repeat(self.x, 3)
+        self.y = np.repeat(self.y, 3)
+        self.azimuth = np.tile(self.AZIMUTH, 19)
+                

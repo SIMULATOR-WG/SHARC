@@ -19,48 +19,22 @@ class ParametersHotspot(object):
         return ParametersHotspot.__instance
 
     ###########################################################################
-    # Number of hotspots per macro cell geographical area
-    # Possible values: 1, 2, optional of 4
-    num_hotspots_per_cell = 4
+    # Number of hotspots per macro cell (sector)
+    num_hotspots_per_cell = 1
     
     ###########################################################################
-    # Number of base stations per hotspot
-    # Possible values: 4 to 10
-    num_stations_per_hotspots = 4
+    # Maximum 2D distance between hotspot and UE [m]
+    max_dist_hotspot_ue = 100
     
     ###########################################################################
-    # Ratio of UEs randomly and uniformly dropped within the hotspots
-    ue_hotspot_dropping_ratio = 0.67
+    # Minimum 2D distance between hotspot and UE [m]
+    min_dist_hotspot_ue = 5
     
     ###########################################################################
-    # Ratio of outdoor UE's in the heterogeneous topology
-    ue_outdoor_ratio = 0.8
-    
-    ###########################################################################
-    # Maximum 2D distance between station and hotspot center [m]
-    max_dist_station_hotspot = 50
-    
-    ###########################################################################
-    # Maximum 2D distance between UE and hotspot center [m]
-    max_dist_ue_hotspot = 70
-    
-    ###########################################################################
-    # Minimum 2D distance between two stations (small cells) in a hotspot [m]
-    min_dist_stations = 20
-    
-    ###########################################################################
-    # Minimum 2D distance between station and UE in a hotspot [m]
-    min_dist_station_ue = 5
-    
-    ###########################################################################
-    # Minimum 2D distance between macro cell base station and hotspot center [m]
-    min_dist_bs_hotspot = 105
+    # Minimum 2D distance between macro cell base station and hotspot [m]
+    min_dist_bs_hotspot = 100
 
     ###########################################################################
-    # Minimum 2D distance between macro cell base station and UE [m]
-    min_dist_bs_ue = 35
-
-    ###########################################################################
-    # Minimum 2D distance between two hotspot centers [m]
-    # This is twice the distance between station and hotspot center
-    min_dist_hotspots = 2*max_dist_station_hotspot
+    # Minimum 2D distance between two hotspots in the same cell [m]
+    # This is twice the distance between hotspot and UE
+    min_dist_hotspots = 2*max_dist_hotspot_ue

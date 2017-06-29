@@ -10,27 +10,23 @@ import numpy as np
 #import numpy.testing as npt
 
 from sharc.parameters.parameters_hotspot import ParametersHotspot
-from sharc.topology.topology_macro_hotspot import TopologyMacroHotspot
+from sharc.topology.topology_hotspot import TopologyHotspot
 
-class TopologyMacroHotspotTest(unittest.TestCase):
+class TopologyHotspotTest(unittest.TestCase):
     
     def setUp(self):
+        # For this test case, hotspot parameters are useless because we are
+        # testing only the validation methods
         param = ParametersHotspot()
-        param.num_hotspots_per_cell = 2
-        param.num_stations_per_hotspots = 4
-        param.ue_hotspot_dropping_ratio = 0.67
-        param.ue_outdoor_ratio = 0.8
-        param.max_dist_station_hotspot = 50
-        param.max_dist_ue_hotspot = 70
-        param.min_dist_station_station = 20
-        param.min_dist_station_ue = 5
+        param.num_hotspots_per_cell = 1
+        param.max_dist_hotspot_ue = 100
+        param.min_dist_hotspot_ue = 5
         param.min_dist_bs_hotspot = 105
-        param.min_dist_bs_ue = 35
-        param.min_dist_hotspots = 2*param.max_dist_station_hotspot
+        param.min_dist_hotspots = 2*param.max_dist_hotspot_ue
 
         intersite_distance = 1000
         num_clusters = 1
-        self.topology = TopologyMacroHotspot(param, intersite_distance, num_clusters)
+        self.topology = TopologyHotspot(param, intersite_distance, num_clusters)
         
     def test_validade_min_dist_hotspots(self):
         hotspot_center_x = np.array([0, 100, 300])
@@ -96,38 +92,6 @@ class TopologyMacroHotspotTest(unittest.TestCase):
                                                                    macrocell_y, 
                                                                    min_dist_bs_hotspot))          
         
-    def test_validade_min_dist_stations(self):
-        station_x = np.array([0, 100, 300])
-        station_y = np.array([0, 0, 0])
-        min_dist_stations = 20
-        self.assertTrue(self.topology.validade_min_dist_hotspots(station_x, 
-                                                                 station_y, 
-                                                                 min_dist_stations))
-        
-        station_x = np.array([0, 0, 0])
-        station_y = np.array([0, 50, 80])
-        min_dist_stations = 30
-        self.assertTrue(self.topology.validade_min_dist_hotspots(station_x, 
-                                                                 station_y, 
-                                                                 min_dist_stations))
-        
-        station_x = np.array([0, 80, 300])
-        station_y = np.array([0, 0, 0])
-        min_dist_stations = 100
-        self.assertFalse(self.topology.validade_min_dist_hotspots(station_x, 
-                                                                  station_y, 
-                                                                  min_dist_stations))
-        
-        station_x = np.array([0, 20, 100])
-        station_y = np.array([0, 20, 0])
-        min_dist_stations = 50
-        self.assertFalse(self.topology.validade_min_dist_hotspots(station_x, 
-                                                                  station_y, 
-                                                                  min_dist_stations))
-        
-        
-    def test_calculate_coordinates(self):
-        self.topology.calculate_coordinates()
         
 if __name__ == '__main__':
     unittest.main()        
