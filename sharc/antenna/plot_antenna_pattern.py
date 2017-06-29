@@ -32,7 +32,7 @@ class PlotAntennaPattern(object):
             gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
             antenna.add_beam(phi_escan,theta_tilt)
-            gain = antenna.calculate_gain(phi,theta)
+            gain = antenna.calculate_gain(phi,theta,np.zeros_like(phi, dtype=int))
 
         fig = plt.figure(figsize=(20,10))
         ax1 = fig.add_subplot(121)
@@ -56,7 +56,7 @@ class PlotAntennaPattern(object):
         if plot_type == "ELEMENT":
             gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
-            gain = antenna.calculate_gain(phi,theta)
+            gain = antenna.calculate_gain(phi,theta,np.zeros_like(phi, dtype=int))
 
         ax2 = fig.add_subplot(122, sharey = ax1)
 
@@ -122,4 +122,6 @@ if __name__ == '__main__':
     ue_array = AntennaBeamformingImt(par,0,0)
     plot.plot_element_pattern(ue_array,"UE","RX","ELEMENT")
     plot.plot_element_pattern(ue_array,"UE","RX","ARRAY")
+    
+    print('END')
     
