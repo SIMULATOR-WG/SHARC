@@ -21,16 +21,10 @@ class Topology(object):
         self.x = np.empty(0)
         self.y = np.empty(0)
         self.azimuth = np.empty(0)
-        
-        #
-        self.x_min = 0
-        self.x_max = 0
-        self.y_min = 0
-        self.y_max = 0
-        
+
         # 
         self.calculate_coordinates()
-        self.calculate_limits()
+        self.num_base_stations = len(self.x)
     
         
     @abstractmethod
@@ -41,12 +35,3 @@ class Topology(object):
         """        
         pass
         
-    def calculate_limits(self):
-        """
-        Calculates the coordinates of the scenario's borders
-        """        
-        self.x_min = np.min(self.x) - self.cell_radius
-        self.x_max = np.max(self.x) + self.cell_radius
-        self.y_min = np.min(self.y) - self.cell_radius
-        self.y_max = np.max(self.y) + self.cell_radius        
-        pass
