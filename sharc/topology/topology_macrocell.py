@@ -36,7 +36,7 @@ class TopologyMacrocell(Topology):
             raise ValueError(error_message)         
 
         self.num_clusters = num_clusters
-        cell_radius = intersite_distance*2/3
+        cell_radius = intersite_distance/2
         super(TopologyMacrocell, self).__init__(intersite_distance, cell_radius)
 
         
