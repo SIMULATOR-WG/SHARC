@@ -7,49 +7,111 @@ Created on Sat Apr 15 15:35:51 2017
 
 import numpy as np
 
-from sharc.antenna.antenna_imt import AntennaImt
-from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.antenna.antenna_element_imt import AntennaElementImt
+from sharc.antenna.antenna import Antenna
+from sharc.support.named_tuples import AntennaPar
 
-class AntennaBeamformingImt(AntennaImt):
+class AntennaBeamformingImt(Antenna):
     """
-    Implements a an antenna array
+    Implements an antenna array
     
     Attributes
     ----------
-        gain (float): calculated antenna gain in given direction
-        g_max (float): maximum gain of element
-        theta_3db (float): vertical 3dB bandwidth of single element [degrees]
-        phi_3db (float): horizontal 3dB bandwidth of single element [degrees]
-        am (float): front-to-back ratio
-        sla_v (float): element vertical sidelobe attenuation
+        element (AntennaElementImt): antenna element
         n_rows (int): number of rows in array
         n_cols (int): number of columns in array
         dh (float): horizontal element spacing over wavelenght (d/lambda)
         dv (float): vertical element spacing over wavelenght (d/lambda)
+        beams (list): vertical and horizontal tilts of beams
     """
     
-    def __init__(self,param: ParametersAntennaImt, station_type: str):
+    def __init__(self,par: AntennaPar, azimuth: float, elevation: float):
         """
         Constructs an AntennaBeamformingImt object.
+        Does not receive angles in local coordinate system.
+        Elevation taken with x axis as reference.
         
         Parameters
         ---------
             param (ParametersAntennaImt): antenna IMT parameters
+            azimuth (float): antenna's physical azimuth inclination
+            elevation (float): antenna's physical elevation inclination
+                referenced in the x axis
             station_type (srt): type of station. Possible values are "BS" and
                 "UE"
+            txrx (srt): indicates whether it is a transmissio or reception 
+                antenna. Possible values are "TX" and "RX"
         """
-        super().__init__(param, station_type)
+        self.param = par
         
-        if station_type == "BS":
-            self.__n_rows =param.bs_n_rows
-            self.__n_cols =param.bs_n_columns
-            self.__dh =param.bs_element_horiz_spacing
-            self.__dv = param.bs_element_vert_spacing
-        elif station_type == "UE":
-            self.__n_rows =param.ue_n_rows
-            self.__n_cols =param.ue_n_columns
-            self.__dh =param.ue_element_horiz_spacing
-            self.__dv = param.ue_element_vert_spacing
+        self.element = AntennaElementImt(par)
+        
+        self.__azimuth = azimuth
+        self.__elevation = elevation
+        
+        self.__n_rows = par.n_rows
+        self.__n_cols = par.n_columns
+        self.__dh = par.element_horiz_spacing
+        self.__dv = par.element_vert_spacing
+        
+        self.__beams_list = []
+        self.__w_vec_list = []
+    
+    def add_beam(self, phi_etilt: float, theta_etilt: float):
+        """
+        Add new beam to antenna.
+        Does not receive angles in local coordinate system.
+        Theta taken with z axis as reference.
+        
+        Parameters
+        ----------
+            phi_etilt (float): azimuth electrical tilt angle [degrees]
+            theta_etilt (float): elevation electrical tilt angle [degrees]
+        """
+        phi, theta = self.to_local_coord(phi_etilt,theta_etilt)
+        self.__beams_list.append((phi,90 - theta))
+        self.__w_vec_list.append(self._weight_vector(phi,90 - theta))
+        
+    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, beams_l: np.array) -> np.array:
+        """
+        Calculates the gain in the given direction.
+        Does not receive angles in local coordinate system.
+        Theta taken with z axis as reference.
+        
+        Parameters
+        ----------
+        phi_vec (np.array): azimuth angles [degrees]
+        theta_vec (np.array): elevation angles [degrees]
+        beam (int): Optional, beam index. If not provided, maximum gain is 
+                calculated
+            
+        Returns
+        -------
+        gains (np.array): gain corresponding to each of the given directions.
+        """
+        lo_phi_vec, lo_theta_vec = self.to_local_coord(phi_vec,theta_vec)
+        
+        n_direct = len(lo_theta_vec)
+        
+        gains = np.zeros(n_direct)
+        
+        for g in range(n_direct):
+                gains[g] = self._beam_gain(lo_phi_vec[g],lo_theta_vec[g],\
+                     beams_l[g])
+                
+        return gains
+    
+    def reset_beams(self):
+        self.__beams_list = []
+        self.__w_vec_list = []
+        
+    @property
+    def azimuth(self):
+        return self.__azimuth
+    
+    @property
+    def elevation(self):
+        return self.__elevation
     
     @property
     def n_rows(self):
@@ -67,9 +129,18 @@ class AntennaBeamformingImt(AntennaImt):
     def dv(self):
         return self.__dv
     
-    def super_position_vector(self,phi: float, theta: float) -> np.array:
+    @property
+    def beams_list(self):
+        return self.__beams_list
+    
+    @property
+    def w_vec_list(self):
+        return self.__w_vec_list
+    
+    def _super_position_vector(self,phi: float, theta: float) -> np.array:
         """
         Calculates super position vector.
+        Angles are in the local coordinate system.
         
         Parameters
         ----------
@@ -93,20 +164,21 @@ class AntennaBeamformingImt(AntennaImt):
         
         return v_vec
         
-    def weight_vector(self, phi_scan: float, theta_tilt: float) -> np.array:
+    def _weight_vector(self, phi_tilt: float, theta_tilt: float) -> np.array:
         """
         Calculates super position vector.
+        Angles are in the local coordinate system.
         
         Parameters
         ----------
-            phi_scan (float): electrical horizontal steering [degrees]
+            phi_tilt (float): electrical horizontal steering [degrees]
             theta_tilt (float): electrical down-tilt steering [degrees]
             
         Returns
         -------
             w_vec (np.array): weighting vector
         """
-        r_phi = np.deg2rad(phi_scan)
+        r_phi = np.deg2rad(phi_tilt)
         r_theta = np.deg2rad(theta_tilt)
         
         n = np.arange(self.n_rows) + 1
@@ -118,47 +190,53 @@ class AntennaBeamformingImt(AntennaImt):
         w_vec = (1/np.sqrt(self.n_rows*self.n_cols))*\
                 np.exp(2*np.pi*1.0j*exp_arg)
         
-        return w_vec
+        return w_vec        
     
-    def array_gain(self, v_vec: np.array, w_vec: np.array) -> float:
-        """
-        Calculates the array gain. Does not consider element gain,
-        
-        Parameters
-        ----------
-            v_vec (np.array): superposition vector
-            w_vec (np.array): weighting vector
-            
-        Returns
-        -------
-            array_g (float): array gain
-        """
-        array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
-        return array_g
-        
-    
-    def beam_gain(self,phi: float, theta: float, phi_scan: float, theta_tilt: float) -> np.array:
+    def _beam_gain(self,phi: float, theta: float, beam = -1) -> float:
         """
         Calculates gain for a single beam in a given direction.
+        Angles are in the local coordinate system.
         
         Parameters
         ----------
             phi (float): azimuth angle [degrees]
             theta (float): elevation angle [degrees]
-            phi_scan (float): electrical horizontal steering [degrees]
-            theta_tilt (float): electrical down-tilt steering [degrees]
+            beam (int): Optional, beam index. If not provided, maximum gain is 
+                calculated
             
         Returns
         -------
             gain (float): beam gain [dBi]
         """
-        element_g = self.element_pattern(phi,theta)
+        if(beam > len(self.__beams_list) - 1):
+            beam = -1
         
-        v_vec = self.super_position_vector(phi,theta)
-        w_vec = self.weight_vector(phi_scan,theta_tilt)
+        element_g = self.element.element_pattern(phi,theta)
         
-        array_g = self.array_gain(v_vec,w_vec)
+        v_vec = self._super_position_vector(phi,theta)
         
-        self.gain = element_g + array_g
+        if(beam == -1):
+            w_vec = self._weight_vector(phi,90-theta)
+            array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
+        else:
+            array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,\
+                                            self.__w_vec_list[beam])))**2)
         
-        return self.gain
+        gain = element_g + array_g
+        
+        return gain      
+    
+    def to_local_coord(self,phi: float, theta: float) -> tuple:
+        lo_theta = np.ravel(np.array([theta + self.elevation]))
+        lo_phi = np.ravel(np.array([phi - self.azimuth]))
+        
+        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
+        lo_theta[ofb_theta] = np.mod((360 - lo_theta[ofb_theta]),180)
+        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
+        
+        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
+        lo_phi[ofb_phi] = np.mod(lo_phi[ofb_phi],360)
+        ofb_phi = np.where(lo_phi > 180)
+        lo_phi[ofb_phi] = lo_phi[ofb_phi] - 360
+        
+        return lo_phi, lo_theta

@@ -6,24 +6,42 @@ Created on Mon Feb  6 16:39:34 2017
 """
 
 import unittest
+import numpy as np
 
-from sharc.antenna.antenna import Antenna
+from sharc.antenna.antenna_omni import AntennaOmni
 
-class AntennaTest(unittest.TestCase):
+class AntennaOmniTest(unittest.TestCase):
     
     def setUp(self):
-        self.antenna1 = Antenna()
+        self.antenna1 = AntennaOmni()
         self.antenna1.gain = 5
         
-        self.antenna2 = Antenna()
+        self.antenna2 = AntennaOmni()
         self.antenna2.gain = 8.0
         
-        self.antenna3 = Antenna(10)
+        self.antenna3 = AntennaOmni(10)
         
     def test_gain(self):
         self.assertEqual(self.antenna1.gain, 5)
         self.assertEqual(self.antenna2.gain, 8)
         self.assertEqual(self.antenna3.gain, 10)
+        
+    def test_calculate_gain(self):
+        phi = [30, 60, 90, 45]
+        theta = [15, 45, 60, 75]
+        directions = list(zip(phi,theta))
+        # Test antenna1
+        gains = self.antenna1.calculate_gain(phi,theta,[])
+        self.assertEqual(len(gains),len(directions))
+        self.assertTrue(np.all(gains == self.antenna1.gain))
+        # Test antenna2
+        gains = self.antenna2.calculate_gain(phi,theta,[])
+        self.assertEqual(len(gains),len(directions))
+        self.assertTrue(np.all(gains == self.antenna2))
+        # Test antenna3
+        gains = self.antenna3.calculate_gain(phi,theta,[])
+        self.assertEqual(len(gains),len(directions))
+        self.assertTrue(np.all(gains == float(self.antenna3)))
         
     def test_float(self):
         self.assertTrue(type(float(self.antenna1)) is float )
@@ -69,12 +87,12 @@ class AntennaTest(unittest.TestCase):
     def test_eq(self):
         self.assertTrue(self.antenna1 == 5)
         self.assertFalse(self.antenna2 == 7)
-        self.assertTrue(self.antenna3 == Antenna(10))
+        self.assertTrue(self.antenna3 == AntennaOmni(10))
         
     def test_ne(self):
         self.assertTrue(self.antenna1 != 1)
         self.assertFalse(self.antenna2 != 8)
-        self.assertTrue(self.antenna3 != Antenna(3))        
+        self.assertTrue(self.antenna3 != AntennaOmni(3))        
         
         
 if __name__ == '__main__':

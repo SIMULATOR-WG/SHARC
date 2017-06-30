@@ -20,4 +20,4 @@ class ParametersGeneral(object):
 
     ###########################################################################
     # Number of simulation snapshots
-    num_snapshots = 500
+    num_snapshots = 100

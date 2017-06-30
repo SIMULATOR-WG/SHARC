@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Apr 16 16:36:54 2017
 
-@author: Calil
-"""
-
+__author__ = """Edgar Souza"""
+__email__ = 'edgar@anatel.gov.br'
+__version__ = '0.0.1'

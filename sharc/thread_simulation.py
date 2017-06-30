@@ -52,7 +52,7 @@ class ThreadSimulation(Thread):
         
         self.model.initialize()
         while not self.model.is_finished() and not self.is_stopped():
-            self.model.step()
+            self.model.snapshot()
         self.model.finalize()
         # calculates simulation time when it finishes and sets the elapsed time
         end = time.perf_counter()
