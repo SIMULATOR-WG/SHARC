@@ -114,25 +114,6 @@ class TopologyMacrocellTest(unittest.TestCase):
         npt.assert_allclose(topology.y, y_ref, atol=1e-2)
         npt.assert_allclose(topology.azimuth, az_ref, atol=1e-2)      
             
-    def test_limits(self):
-        intersite_distance = 1000
-        num_clusters = 1
-        topology = TopologyMacrocell(intersite_distance, num_clusters)        
-        
-        self.assertAlmostEqual(topology.x_min, -2666.66, places=1)
-        self.assertAlmostEqual(topology.x_max,  2666.66, places=1)
-        self.assertAlmostEqual(topology.y_min, -2398.71, places=1)
-        self.assertAlmostEqual(topology.y_max,  2398.71, places=1)
-        
-        # change inter site distance; scenario limits also have to change
-        intersite_distance = 500
-        num_clusters = 1
-        topology = TopologyMacrocell(intersite_distance, num_clusters)  
-        
-        self.assertAlmostEqual(topology.x_min, -1333.33, places=1)
-        self.assertAlmostEqual(topology.x_max,  1333.33, places=1)
-        self.assertAlmostEqual(topology.y_min, -1199.35, places=1)
-        self.assertAlmostEqual(topology.y_max,  1199.35, places=1)
         
         
 if __name__ == '__main__':
