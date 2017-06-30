@@ -21,6 +21,7 @@ class StationManager(object):
         self.num_stations = n
         self.x = np.empty(n)
         self.y = np.empty(n)
+        self.azimuth = np.empty(n)
         self.height = np.empty(n)
         self.active = np.ones(n, dtype=bool)
         self.tx_power = np.empty(n)
@@ -50,6 +51,7 @@ class StationManager(object):
         station.id = id
         station.x = self.x[id]
         station.y = self.y[id]
+        station.azimuth = self.azimuth[id]
         station.height = self.height[id]
         station.active = self.active[id]
         station.tx_power = self.tx_power[id]
