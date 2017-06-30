@@ -23,8 +23,8 @@ class ParametersImt(object):
     topology = "MACROCELL"
 
     ###########################################################################
-    # Number of base stations per cluster (must set to 19 in macrocell network)
-    num_base_stations = 19
+    # Number of macrocell sites per cluster (must set to 19 in macrocell network)
+    num_macrocell_sites = 19
 
     ###########################################################################
     # Number of clusters
