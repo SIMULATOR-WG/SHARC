@@ -16,8 +16,7 @@ class Station(object):
         self.__height = 0
         self.__tx_power = 0
         self.__rx_power = 0
-        self.__tx_antenna = Antenna()
-        self.__rx_antenna = Antenna()
+        self.__antenna = Antenna()
         # test attributes below
         self.__active = False
         self.__acs = 0
@@ -83,20 +82,12 @@ class Station(object):
         self.__rx_power = value
 
     @property
-    def tx_antenna(self):
-        return self.__tx_antenna
+    def antenna(self):
+        return self.__antenna
         
-    @tx_antenna.setter
-    def tx_antenna(self, value):
-        self.__tx_antenna = value
-
-    @property
-    def rx_antenna(self):
-        return self.__rx_antenna
-        
-    @rx_antenna.setter
-    def rx_antenna(self, value):
-        self.__rx_antenna = value
+    @antenna.setter
+    def antenna(self, value):
+        self.__antenna = value
     
     def __eq__(self, other):
         if isinstance(other, self.__class__):
