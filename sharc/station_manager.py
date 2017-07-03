@@ -28,8 +28,7 @@ class StationManager(object):
         self.tx_power = np.empty(n)
         self.rx_power = np.empty(n)
         self.rx_interference = np.empty(n)
-        self.tx_antenna = np.array([Antenna() for i in range(n)])
-        self.rx_antenna = np.array([Antenna() for i in range(n)])
+        self.antenna = np.array([Antenna() for i in range(n)])
         self.bandwidth = np.empty(n)
         self.noise_figure = np.empty(n)
         self.noise_temperature = np.empty(n)
@@ -58,8 +57,7 @@ class StationManager(object):
         station.active = self.active[id]
         station.tx_power = self.tx_power[id]
         station.rx_power = self.rx_power[id]
-        station.tx_antenna = self.tx_antenna[id]
-        station.rx_antenna = self.rx_antenna[id]
+        station.antenna = self.antenna[id]
         return station
 
     def get_distance_to(self, station) -> np.array:
