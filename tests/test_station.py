@@ -65,9 +65,7 @@ class StationTest(unittest.TestCase):
         self.station.tx_power = 20
         self.station.rx_power = -3
         par = self.param.get_antenna_parameters("BS","TX")
-        self.station.tx_antenna = AntennaBeamformingImt(par,300,-10)
-        par = self.param.get_antenna_parameters("BS","RX")
-        self.station.rx_antenna = AntennaBeamformingImt(par,120,-5)
+        self.station.antenna = AntennaBeamformingImt(par,300,-10)
         
         self.station2 = Station()
         self.station2.id = 1
@@ -77,9 +75,7 @@ class StationTest(unittest.TestCase):
         self.station2.tx_power = 17
         self.station2.rx_power = 9
         par = self.param.get_antenna_parameters("BS","TX")
-        self.station2.tx_antenna = AntennaBeamformingImt(par,270,2)
-        par = self.param.get_antenna_parameters("BS","RX")
-        self.station2.rx_antenna = AntennaBeamformingImt(par,30,-20)
+        self.station2.antenna = AntennaBeamformingImt(par,270,2)
         
         self.station3 = Station()
         self.station3.id = 2
@@ -89,9 +85,7 @@ class StationTest(unittest.TestCase):
         self.station3.tx_power = 20
         self.station3.rx_power = -3
         par = self.param.get_antenna_parameters("UE","TX")
-        self.station3.tx_antenna = AntennaBeamformingImt(par,100,2)
-        par = self.param.get_antenna_parameters("UE","RX")
-        self.station3.rx_antenna = AntennaBeamformingImt(par,20,-30)
+        self.station3.antenna = AntennaBeamformingImt(par,100,2)
         
     def test_id(self):
         self.assertEqual(self.station.id, 1)
@@ -112,30 +106,17 @@ class StationTest(unittest.TestCase):
         self.assertEqual(self.station.rx_power, -3)
 
     def test_tx_antenna(self):
-        self.assertEqual(self.station.tx_antenna.azimuth, 300)
-        self.assertEqual(self.station.tx_antenna.elevation, -10)
-        self.assertEqual(self.station.tx_antenna.n_rows, 16)
-        self.assertEqual(self.station.tx_antenna.n_cols, 16)
-        self.assertEqual(self.station.tx_antenna.dh, 1)
-        self.assertEqual(self.station.tx_antenna.dv, 1)
-        self.assertEqual(self.station.tx_antenna.element.g_max, 5)
-        self.assertEqual(self.station.tx_antenna.element.phi_3db, 80)
-        self.assertEqual(self.station.tx_antenna.element.theta_3db, 60)
-        self.assertEqual(self.station.tx_antenna.element.am, 30)
-        self.assertEqual(self.station.tx_antenna.element.sla_v, 30)
-
-    def test_rx_antenna(self):
-        self.assertEqual(self.station.rx_antenna.azimuth, 120)
-        self.assertEqual(self.station.rx_antenna.elevation, -5)
-        self.assertEqual(self.station.rx_antenna.n_rows, 8)
-        self.assertEqual(self.station.rx_antenna.n_cols, 8)
-        self.assertEqual(self.station.rx_antenna.dh, 0.5)
-        self.assertEqual(self.station.rx_antenna.dv, 0.5)
-        self.assertEqual(self.station.rx_antenna.element.g_max, 10)
-        self.assertEqual(self.station.rx_antenna.element.phi_3db, 65)
-        self.assertEqual(self.station.rx_antenna.element.theta_3db, 75)
-        self.assertEqual(self.station.rx_antenna.element.am, 35)
-        self.assertEqual(self.station.rx_antenna.element.sla_v, 25)
+        self.assertEqual(self.station.antenna.azimuth, 300)
+        self.assertEqual(self.station.antenna.elevation, -10)
+        self.assertEqual(self.station.antenna.n_rows, 16)
+        self.assertEqual(self.station.antenna.n_cols, 16)
+        self.assertEqual(self.station.antenna.dh, 1)
+        self.assertEqual(self.station.antenna.dv, 1)
+        self.assertEqual(self.station.antenna.element.g_max, 5)
+        self.assertEqual(self.station.antenna.element.phi_3db, 80)
+        self.assertEqual(self.station.antenna.element.theta_3db, 60)
+        self.assertEqual(self.station.antenna.element.am, 30)
+        self.assertEqual(self.station.antenna.element.sla_v, 30)
         
     def test_eq(self):
         self.assertTrue(self.station == self.station2)
