@@ -268,15 +268,19 @@ if __name__ == '__main__':
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
-    ax.semilogx(distance_2D, loss_los, label="UMi LOS")
-    ax.semilogx(distance_2D, loss_nlos, label="UMi NLOS")
-    ax.semilogx(distance_2D, loss_fs, label="free space")
+    #ax.semilogx(distance_2D, loss_los, label="UMi LOS")
+    #ax.semilogx(distance_2D, loss_nlos, label="UMi NLOS")
+    #ax.semilogx(distance_2D, loss_fs, label="free space")
+    
+    ax.plot(distance_2D, loss_los, label="UMi LOS")
+    ax.plot(distance_2D, loss_nlos, label="UMi NLOS")
+    ax.plot(distance_2D, loss_fs, label="free space")
         
     plt.title("UMi - path loss")
     plt.xlabel("distance [m]")
     plt.ylabel("path loss [dB]")
     plt.xlim((0, distance_2D[-1,0]))
-    #plt.ylim((0, 1.1))                
+    plt.ylim((60, 200))                
     plt.legend(loc="upper left")
     plt.tight_layout()    
     plt.grid()

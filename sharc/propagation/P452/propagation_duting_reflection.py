@@ -140,7 +140,7 @@ class PropagationDutingReflection(Propagation):
         
         beta = (B0*mu2*mu3)
         Gama = (1.076/((2.0058-np.log10(beta))**1.012))*np.exp(-((9.51-4.8*np.log10(beta))+ 0.198*(np.log10(beta))**2)*10**-6*d**1.13)       
-     
+       
         Ap = -12 + (1.2 + 3.7*(10**-3)*d)*np.log10(p/beta) + 12*(p/beta)**Gama                  
         #Time percentage and time percentage and angular-distance dependent losses 
         Ad = Yd*teta_line + Ap
