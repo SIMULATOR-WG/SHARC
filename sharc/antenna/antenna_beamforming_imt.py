@@ -67,8 +67,8 @@ class AntennaBeamformingImt(Antenna):
             theta_etilt (float): elevation electrical tilt angle [degrees]
         """
         phi, theta = self.to_local_coord(phi_etilt,theta_etilt)
-        self.__beams_list.append((phi,90 - theta))
-        self.__w_vec_list.append(self._weight_vector(phi,90 - theta))
+        self.__beams_list.append((phi,theta-90))
+        self.__w_vec_list.append(self._weight_vector(phi,theta-90))
         
     def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, beams_l: np.array) -> np.array:
         """
@@ -211,7 +211,7 @@ class AntennaBeamformingImt(Antenna):
         v_vec = self._super_position_vector(phi,theta)
         
         if(beam == -1):
-            w_vec = self._weight_vector(phi,90-theta)
+            w_vec = self._weight_vector(phi,theta-90)
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
         else:
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,\
@@ -219,9 +219,10 @@ class AntennaBeamformingImt(Antenna):
         
         gain = element_g + array_g
         
-        return gain      
+        return gain
     
     def to_local_coord(self,phi: float, theta: float) -> tuple:
+        
         lo_theta = np.ravel(np.array([theta + self.elevation]))
         lo_phi = np.ravel(np.array([phi - self.azimuth]))
         
@@ -258,8 +259,10 @@ class PlotAntennaPattern(object):
         elif plot_type == "ARRAY":
             antenna.add_beam(phi_escan,theta_tilt)
             gain = antenna.calculate_gain(phi,theta,np.zeros_like(phi, dtype=int))
+            
+        top_y_lim = np.ceil(np.max(gain)/10)*10
 
-        fig = plt.figure(figsize=(20,10))
+        fig = plt.figure(figsize=(15,8))
         ax1 = fig.add_subplot(121)
 
         ax1.plot(phi,gain)
@@ -276,7 +279,7 @@ class PlotAntennaPattern(object):
 
         # Plot vertical pattern
         theta = np.linspace(0,180, num = 360)
-        phi = (0 + phi_escan)*np.ones(np.size(theta))
+        phi = phi_escan*np.ones(np.size(theta))
 
         if plot_type == "ELEMENT":
             gain = antenna.element.element_pattern(phi, theta)
@@ -296,8 +299,8 @@ class PlotAntennaPattern(object):
             ax2.set_title("Array Vertical Radiation Pattern")
         
         ax2.set_xlim(0, 180)
-        top_y_lim = np.ceil(np.max(gain)/10)*10
-        ax2.set_ylim(top_y_lim - 50,top_y_lim)
+        if(np.max(gain) > top_y_lim): top_y_lim = np.ceil(np.max(gain)/10)*10
+        ax2.set_ylim(top_y_lim - 60,top_y_lim)
         
         if sta_type == "BS":
             file_name = self.figs_dir + "bs_"
