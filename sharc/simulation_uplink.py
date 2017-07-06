@@ -10,6 +10,7 @@ import random
 import math
 import sys
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
@@ -65,9 +66,9 @@ class SimulationUplink(Simulation):
                              + "in satellite propagation\n")
             sys.exit(1)
 
-        num_ue = self.param.num_clusters*self.param.num_base_stations \
+        num_ue = self.param.num_clusters*self.topology.num_base_stations \
                                  *self.param.ue_k*self.param.ue_k_m
-        num_bs = self.param.num_clusters*self.param.num_base_stations
+        num_bs = self.param.num_clusters*self.topology.num_base_stations
         
         # Emulate 3 cells per site by multiplying the number of BSs by 3
         if(self.param_imt_antenna.bs_rx_antenna_type == "BEAMFORMING"):
@@ -160,8 +161,9 @@ class SimulationUplink(Simulation):
         self.ue = StationFactory.generate_imt_ue(self.param, \
                                                  self.param_imt_antenna,\
                                                  self.topology)
-        #self.plot_scenario(self.topology.intersite_distance/3, self.bs.x, self.bs.y, self.ue.x, self.ue.y)
-        #sys.exit(1)
+        #self.plot_macrocell_scenario()
+        #self.plot_hotspot_scenario()
+        #sys.exit(0)
 
     def update_bs(self):
         self.bs.active = np.random.rand(self.bs.num_stations) < self.bs_load_prob
@@ -442,78 +444,45 @@ class SimulationUplink(Simulation):
 
         return tput
         
-    def plot_scenario(self, cell_radius, bs_x, bs_y, ue_x, ue_y):
-        psi = np.radians([60, 120, 240, 300])
-    
+    def plot_macrocell_scenario(self):
         fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
         ax = fig.gca()
         
-        r = cell_radius
-        for x, y in zip(bs_x, bs_y):
+        #plot hexagons
+        r = self.topology.intersite_distance/3
+        for x, y, az in zip(self.topology.x, self.topology.y, self.topology.azimuth):
             se = list([[x,y]])
-            se.extend([[se[-1][0] + r, se[-1][1]]])
-            se.extend([[se[-1][0] + r*math.cos(psi[0]), se[-1][1] + r*math.sin(psi[0])]])
-            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
-            se.extend([[se[-1][0] - r, se[-1][1]]])
-            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
+            angle = int(az - 60)
+            for a in range(6):
+                se.extend([[se[-1][0] + r*math.cos(math.radians(angle)), se[-1][1] + r*math.sin(math.radians(angle))]])
+                angle += 60
             sector = plt.Polygon(se, fill=None, edgecolor='k')
             ax.add_patch(sector)
-    
-            se = list([[x,y]])
-            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
-            se.extend([[se[-1][0] - r, se[-1][1]]])
-            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
-            se.extend([[se[-1][0] + r*math.cos(psi[3]), se[-1][1] + r*math.sin(psi[3])]])
-            se.extend([[se[-1][0] + r, se[-1][1]]])
-            sector = plt.Polygon(se, fill=None, edgecolor='k')
-            ax.add_patch(sector)
-            
-            se = list([[x,y]])
-            se.extend([[se[-1][0] + r, se[-1][1]]])
-            se.extend([[se[-1][0] + r*math.cos(psi[3]), se[-1][1] + r*math.sin(psi[3])]])
-            se.extend([[se[-1][0] + r*math.cos(psi[2]), se[-1][1] + r*math.sin(psi[2])]])
-            se.extend([[se[-1][0] - r, se[-1][1]]])
-            se.extend([[se[-1][0] + r*math.cos(psi[1]), se[-1][1] + r*math.sin(psi[1])]])
-            sector = plt.Polygon(se, fill=None, edgecolor='k')
-            ax.add_patch(sector)       
-            
-    
-        # plot hotspot centers
-        #plt.scatter(topology.hotspot_x, topology.hotspot_y, color='k', edgecolor="w", linewidth=0.5)
-        
-        # plot small cells
-        #plt.scatter(topology.x, topology.y, color='r', edgecolor="w", linewidth=0.5, label="Small cell")
-        
-        # plot hotspots coverage area
-#        for hx, hy in zip(topology.hotspot_x, topology.hotspot_y):
-#            circ = plt.Circle((hx, hy), radius=50, color='g', fill=False, linewidth=0.5)
-#            ax.add_patch(circ)
         
         # macro cell base stations
-        plt.scatter(bs_x, bs_y, color='k', edgecolor="k", linewidth=4, label="BS")
-
-        # UE
-        plt.scatter(ue_x, ue_y, color='r', edgecolor="w", linewidth=0.5, label="UE")
+        plt.scatter(self.topology.x, self.topology.y, color='k', edgecolor="k", linewidth=4, label="BS")
         
-        # sector centers
-        #plt.scatter(-sector_y, sector_x, color='g', edgecolor="g")
+        # UE's
+        plt.scatter(self.ue.x, self.ue.y, color='r', edgecolor="w", linewidth=0.5, label="UE")
+        
+#        # UE azimuth
+#        d = 0.2 * self.topology.cell_radius
+#        for i in range(len(self.ue.x)):
+#            plt.plot([self.ue.x[i], self.ue.x[i] + d*math.cos(math.radians(self.ue.azimuth[i]))], 
+#                     [self.ue.y[i], self.ue.y[i] + d*math.sin(math.radians(self.ue.azimuth[i]))], 
+#                     'r-')
         
         # plot macro cell coverage area
-        #ax = fig.gca()
-    #    for mx, my in zip(topology.topology_macrocell.x, topology.topology_macrocell.y):
-    #        circ = plt.Circle((mx, my), radius=666.667*math.sqrt(3)/2-70, color='b', fill=False, linewidth=0.5)
-    #        ax.add_patch(circ)  
-    
-        # plot separation radius
-        for mx, my in zip(bs_x, bs_y):
-            circ = plt.Circle((mx, my), radius=10, color='g', fill=False, linewidth=0.5)
-            ax.add_patch(circ)  
-        
-    
-    
+    #    r = (topology.macrocell.intersite_distance/3)*math.sqrt(3)/2 - topology.param.max_dist_hotspot_ue/2
+    #    for x, y, az in zip(topology.macrocell.x, topology.macrocell.y, topology.macrocell.azimuth):
+    #        # find the center coordinates of the sector (hexagon)
+    #        mx = x + topology.macrocell.intersite_distance/3*math.cos(math.radians(az))
+    #        my = y + topology.macrocell.intersite_distance/3*math.sin(math.radians(az))
+    #        circ = plt.Circle((mx, my), radius=r, color='b', fill=False, linewidth=0.5)
+    #        ax.add_patch(circ)    
         
         plt.axis('image') 
-        plt.title("Macro cell topology")
+        plt.title("Simulation scenario")
         plt.xlabel("x-coordinate [m]")
         plt.ylabel("y-coordinate [m]")
         #plt.xlim((-3000, 3000))
@@ -522,3 +491,50 @@ class SimulationUplink(Simulation):
         plt.tight_layout()    
         plt.show()
             
+        
+    def plot_hotspot_scenario(self):
+        fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
+        ax = fig.gca()
+        
+        #plot hexagons
+        r = self.topology.macrocell.intersite_distance/3
+        for x, y, az in zip(self.topology.macrocell.x, self.topology.macrocell.y, self.topology.macrocell.azimuth):
+            se = list([[x,y]])
+            angle = int(az - 60)
+            for a in range(6):
+                se.extend([[se[-1][0] + r*math.cos(math.radians(angle)), se[-1][1] + r*math.sin(math.radians(angle))]])
+                angle += 60
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)
+        
+        # macro cell base stations
+        plt.scatter(self.topology.macrocell.x, self.topology.macrocell.y, color='k', edgecolor="k", linewidth=4, label="BS")
+        
+        # plot hotspots
+        plt.scatter(self.topology.x, self.topology.y, color='g', edgecolor="w", linewidth=0.5, label="Hotspot")        
+        
+        # UE's
+        plt.scatter(self.ue.x, self.ue.y, color='r', edgecolor="w", linewidth=0.5, label="UE")
+        
+#        # UE azimuth
+#        d = 0.2 * self.topology.cell_radius
+#        for i in range(len(self.ue.x)):
+#            plt.plot([self.ue.x[i], self.ue.x[i] + d*math.cos(math.radians(self.ue.azimuth[i]))], 
+#                     [self.ue.y[i], self.ue.y[i] + d*math.sin(math.radians(self.ue.azimuth[i]))], 
+#                     'r-')
+        
+        # plot hotspots coverage area
+        for x, y, a in zip(self.topology.x, self.topology.y, self.topology.azimuth):
+            pa = patches.Wedge( (x, y), self.topology.cell_radius, a-60, a+60, fill=False, 
+                               edgecolor="green", linestyle='solid' )
+            ax.add_patch(pa)        
+        
+        plt.axis('image') 
+        plt.title("Hotspots simulation scenario")
+        plt.xlabel("x-coordinate [m]")
+        plt.ylabel("y-coordinate [m]")
+        #plt.xlim((-3000, 3000))
+        #plt.ylim((-3000, 3000))                
+        plt.legend(loc="upper left", scatterpoints=1)
+        plt.tight_layout()    
+        plt.show()        
