@@ -16,8 +16,9 @@ class TopologyMacrocell(Topology):
     topology. 
     """
     
-    # possible values for base station azimuth
+    # possible values for base station azimuth and elevation [degrees]
     AZIMUTH = [60, 180, 300]
+    ELEVATION = -10
 
     ALLOWED_NUM_CLUSTERS = [1, 7]
     
@@ -66,5 +67,8 @@ class TopologyMacrocell(Topology):
     
         self.x = np.repeat(self.x, 3)
         self.y = np.repeat(self.y, 3)
-        self.azimuth = np.tile(self.AZIMUTH, 19)
+        self.azimuth = np.tile(self.AZIMUTH, 19*self.num_clusters)
+        self.elevation = np.tile(self.ELEVATION, 3*19*self.num_clusters)
+        # In the end, we have to update the number of base stations
+        self.num_base_stations = len(self.x)        
                 
