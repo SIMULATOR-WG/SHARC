@@ -37,7 +37,8 @@ class PropagationABG(Propagation):
             alpha (float): captures how the PL increases as the distance increases
             beta (float): floating offset value in dB
             gama(float): captures the PL variation over the frequency
-            shadowing (bool) : if shadowing should be added or not
+            shadowing (float) : standard deviation value
+
         Returns
         -------
             array with path loss values with dimensions of distance_2D
@@ -52,7 +53,7 @@ class PropagationABG(Propagation):
         
     
         if x_sf:
-            shadowing_std = np.random.normal(0, x_sf)
+            shadowing_std = np.random.normal(0, x_sf, d.shape)
         else:
             shadowing_std = 0
             
@@ -79,12 +80,12 @@ if __name__ == '__main__':
     alphaUMA = 3.4
     betaUMA = 19.2
     gammaUMA = 2.3
-    x_sfUMA = 6.5
+    x_sfUMA = 0
     
     alphaUMI = 3.53
     betaUMI = 22.4
     gammaUMI = 2.13
-    x_sfUMI = 7.82
+    x_sfUMI = 0
     
     lossUMA_NLOS = ABG.get_loss(distance = distance, frequency = frequency, ABG_alpha = alphaUMA, ABG_beta = betaUMA, ABG_gamma = gammaUMA, shadowing = x_sfUMA)
     lossUMI_NLOS = ABG.get_loss(distance = distance, frequency = frequency, ABG_alpha = alphaUMI, ABG_beta = betaUMI, ABG_gamma = gammaUMI, shadowing = x_sfUMI)
