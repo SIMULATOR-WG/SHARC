@@ -19,8 +19,8 @@ class ParametersImt(object):
         return ParametersImt.__instance
 
     ###########################################################################
-    # Network topology. Possible values are "MACROCELL", "SINGLE_BS"
-    topology = "MACROCELL"
+    # Network topology. Possible values are "MACROCELL", "HOTSPOT", "SINGLE_BS"
+    topology = "HOTSPOT"
 
     ###########################################################################
     # Number of macrocell sites per cluster (must set to 19 in macrocell network)
@@ -36,7 +36,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 226
+    intersite_distance = 400
 
     ###########################################################################
     # Minimum 2D separation distance from BS to UE
@@ -52,7 +52,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT bandwidth [MHz]
-    bandwidth = 100
+    bandwidth = 200
 
     ###########################################################################
     # IMT resource block bandwidth [MHz]
@@ -85,7 +85,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Base station height [m]
-    bs_height = 25
+    bs_height = 6
 
     ###########################################################################
     # Adjacent channel leakage power Ratio of the base station [dB]
@@ -129,7 +129,7 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 10
+    ue_k_m = 2
 
     ###########################################################################
     # Power control algorithm
