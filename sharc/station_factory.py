@@ -35,22 +35,14 @@ class StationFactory(object):
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
         imt_base_stations.rx_interference = -500*np.ones(param.ue_k)
         
-        imt_base_stations.tx_antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
+        imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
         par = param_ant.get_antenna_parameters("BS", "TX")
         
         for i in range(num_bs):
-            imt_base_stations.tx_antenna[i] = \
+            imt_base_stations.antenna[i] = \
             AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
                                   imt_base_stations.elevation[i])
         
-        imt_base_stations.rx_antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
-        par = param_ant.get_antenna_parameters("BS", "RX")
-        
-        for i in range(num_bs):
-            imt_base_stations.rx_antenna[i] = \
-            AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
-                                  imt_base_stations.elevation[i])
-            
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
@@ -132,7 +124,7 @@ class StationFactory(object):
         # TODO: this piece of code works only for uplink
         par = param_ant.get_antenna_parameters("UE","TX")
         for i in range(num_ue):
-            imt_ue.tx_antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i], 
+            imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i], 
                                                          imt_ue.elevation[i])
             
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
@@ -168,8 +160,7 @@ class StationFactory(object):
 
         satellite_stations.height = [param.sat_altitude]
         satellite_stations.active = True
-        satellite_stations.rx_antenna = \
-            np.array([AntennaOmni(param.sat_rx_antenna_gain)])
+        satellite_stations.antenna = np.array([AntennaOmni(param.sat_rx_antenna_gain)])
         satellite_stations.bandwidth = param.sat_bandwidth
         satellite_stations.noise_temperature = param.sat_noise_temperature
         satellite_stations.rx_interference = -500
