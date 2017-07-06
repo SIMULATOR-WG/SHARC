@@ -29,7 +29,7 @@ class TopologySingleBaseStation(Topology):
                                                 cell_radius, num_clusters,
                                                 allowed_num_clusters)
         
-    def _calculate_coordinates(self):
+    def calculate_coordinates(self):
         """
         Defines the coordinates of the station.
         """        
@@ -43,19 +43,5 @@ class TopologySingleBaseStation(Topology):
             error_message = "invalid number of clusters ({})".format(self.num_clusters)
             raise ValueError(error_message)             
         
-    @Topology.cell_radius.setter
-    def cell_radius(self, value):
-        """
-        When cell radius changes, intersite distance has to be updated
-        """
-        self._intersite_distance = 2*value
-        Topology.cell_radius.fset(self, value)
-        
-    @Topology.intersite_distance.setter
-    def intersite_distance(self, value):
-        """
-        When intersite distance changes, cell radius has to be updated
-        """
-        self._cell_radius = value/2
-        Topology.intersite_distance.fset(self, value)
+
  
