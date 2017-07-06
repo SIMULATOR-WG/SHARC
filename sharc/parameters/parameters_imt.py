@@ -31,10 +31,6 @@ class ParametersImt(object):
     num_clusters = 1
 
     ###########################################################################
-    # Configures static or dynamic positions for base stations
-    static_base_stations = True
-
-    ###########################################################################
     # Inter-site distance in macrocell network topology
     intersite_distance = 400
 
