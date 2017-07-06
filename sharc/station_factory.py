@@ -36,7 +36,7 @@ class StationFactory(object):
         imt_base_stations.rx_interference = -500*np.ones(param.ue_k)
         
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
-        par = param_ant.get_antenna_parameters("BS", "TX")
+        par = param_ant.get_antenna_parameters("BS", "RX")
         
         for i in range(num_bs):
             imt_base_stations.antenna[i] = \
