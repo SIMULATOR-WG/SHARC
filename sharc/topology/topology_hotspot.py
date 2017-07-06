@@ -10,6 +10,8 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+#from shapely.geometry import Polygon
+
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
 from sharc.parameters.parameters_hotspot import ParametersHotspot
@@ -21,9 +23,12 @@ class TopologyHotspot(Topology):
     network topology (macro cell with hotspots).
     """
     
-    # Possible values for base station azimuth. The value is randomly chosen
-    # from this array
-    AZIMUTH = [0, 90, 180, 270]    
+    # Possible values for base station azimuth [degrees]. 
+    # The value is randomly chosen from this array
+    AZIMUTH = [0, 90, 180, 270]   
+
+    # Posible values for base station elevation [degrees]
+    ELEVATION = -10 
     
     def __init__(self, param: ParametersHotspot, intersite_distance: float, num_clusters: int):
         """
@@ -80,8 +85,54 @@ class TopologyHotspot(Topology):
             self.y = np.concatenate([self.y, hotspot_y])                    
 
         self.azimuth = np.random.choice(self.AZIMUTH, len(self.x))
+        self.elevation = self.ELEVATION*np.ones(len(self.x))
+        # In the end, we have to update the number of base stations
+        self.num_base_stations = len(self.x)
                 
                 
+#    def overlapping_hotspots(self, 
+#                             hotspot_x: np.array, 
+#                             hotspot_y: np.array,
+#                             hotspot_azimuth: np.array,
+#                             cell_radius: np.array) -> bool:
+#        """
+#        Evaluates the spatial relationships among hotspots and checks whether
+#        hotspots coverage areas intersect.
+#        
+#        Parameters
+#        ----------
+#            hotspots_x: x-coordinates of the hotspots
+#            hotspots_y: y-coordinates of the hotspots
+#            hotspot_azimuth: horizontal angle of the hotspots (orientation)
+#            cell_radius: radius of the coverage area of the hotspots
+#            
+#        Returns
+#        -------
+#            True if there is intersection between any two hotspots
+#        """
+#        # Each hotspot coverage area corresponds to a Polygon object
+#        polygons = list()
+#        for x, y, azimuth, r in zip(hotspot_x, hotspot_y, hotspot_azimuth, cell_radius):
+#            points = list((x, y))
+#            azimuth_values = np.linspace(-60, 60, 13)
+#            for a in range(len(azimuth_values)):
+#                points.extend((x + r*math.cos(np.radians(azimuth + a)), y + r*math.sin(np.radians(azimuth + a))))
+#            polygons.extend(Polygon(points))
+#        
+#        # Check if there is overlapping between any of the hotspots coverage
+#        # areas. In other words, check if any polygons intersect 
+#        for p in range(len(polygons)-1):
+#            for pi in range(p+1, len(polygons)):
+#                overlapping = polygons[p].intersects(polygons[pi])
+#                if overlapping:
+#                    # An intersection was found! We stop here because we do not
+#                    # need to check other combinations
+#                    return True
+#        
+#        # If this point is reached, then there is no intersection between polygons
+#        return False
+        
+        
     def validade_min_dist_hotspots(self, 
                                    hotspot_x: np.array, 
                                    hotspot_y: np.array, 
