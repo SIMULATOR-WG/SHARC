@@ -203,7 +203,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
         # Add first beam
         phi_scan = 11.79
-        theta_tilt = 65.31
+        theta_tilt = 125.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),1)
@@ -211,7 +211,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
         # Add second beam
         phi_scan = 56.79
-        theta_tilt = 5.31
+        theta_tilt = 185.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         
         self.assertEqual(len(self.antenna2.beams_list),2)
@@ -254,7 +254,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta = 45
         beam = 0
         phi_scan = 11.79
-        theta_tilt = 50.31
+        theta_tilt = 140.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
@@ -264,7 +264,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta = 60
         beam = 1
         phi_scan = 11.79
-        theta_tilt = 5.31
+        theta_tilt = 185.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
@@ -273,7 +273,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi = 32.5
         theta = 115.2
         beam_g = self.antenna2._beam_gain(phi,theta)
-        self.assertAlmostEqual(beam_g,-0.7617,delta = eps)
+        self.assertAlmostEqual(beam_g,11.9636,delta = eps)
         
     def test_calculate_gain(self):
         # Error margin
@@ -284,13 +284,13 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta_vec = np.array([50.31, 120.51])
         beams_l = -1*np.ones_like(phi_vec,dtype=int)
         gains = self.antenna2.calculate_gain(phi_vec,theta_vec,beams_l)
-        npt.assert_allclose(gains,np.array([1.594268,-0.7617]),atol=eps)
+        npt.assert_allclose(gains,np.array([5.9491,11.9636]),atol=eps)
         
         # Test 2
         phi = -33.21
         theta = 65.31
         phi_scan = 11.79
-        theta_tilt = 5.31
+        theta_tilt = 185.31
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beams_l = np.zeros_like(phi_vec,dtype=int)
         gains = self.antenna2.calculate_gain(phi,theta,beams_l)
