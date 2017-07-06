@@ -35,8 +35,8 @@ class PropagationABGTest(unittest.TestCase):
         alpha = 3.4
         beta = 19.2
         gamma = 2.3
-        shadowing = 6.5
+        shadowing = 0
         
-        loss = np.array ([155.352,176.870])
+        loss = np.array ([143.886,174.269])
         npt.assert_allclose(self.abg.get_loss(distance = d, frequency = f, ABG_alpha = alpha, ABG_beta = beta, ABG_gamma = gamma, shadowing = shadowing),
                            loss ,atol=1e-2)
