@@ -33,7 +33,12 @@ class StationFactory(object):
         
         imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
-        imt_base_stations.rx_interference = -500*np.ones(param.ue_k)
+        imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in num_bs])
+        imt_base_stations.rx_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in num_bs])
+        imt_base_stations.total_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in num_bs])
+        
+        imt_base_stations.snr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in num_bs])
+        imt_base_stations.sinr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in num_bs])
         
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
         par = param_ant.get_antenna_parameters("BS", "TX")
