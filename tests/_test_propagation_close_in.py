@@ -7,68 +7,68 @@ Created on Mon Mar  13 15:14:34 2017
 
 import unittest
 import numpy as np
+import numpy.testing as npt
 
 from sharc.propagation.propagation_close_in import PropagationCloseIn
 
 class PropagationCloseInTest(unittest.TestCase):
 
     def setUp(self):
-        self.__closeInMacroLos = PropagationCloseIn("MACROCELL", True, False)
-        self.__closeInMacroNLos = PropagationCloseIn("MACROCELL", False, False)
-        self.__closeInMacroShadowing = PropagationCloseIn("MACROCELL", True, True)
+        self.propagation = PropagationCloseIn()
 
-    def test_loss_macro_los(self):
-        d = 10
-        f = 10
-        self.assertEqual(-27.55+20+20,
-                         self.__closeInMacroLos.get_loss(distance=d, frequency=f))
+    def test_loss_los(self):
+        d = np.array([10, 100])
+        f = np.array([10, 100])
+        los_prob = 1
+        s_std = 0
+        result = np.array([-27.55 + 20 + 20, -27.55 + 40 + 40])
+        npt.assert_allclose(result, self.propagation.get_loss(distance=d, 
+                                                              frequency=f,
+                                                              line_of_sight_prob=los_prob,
+                                                              shadowing_std=s_std))
 
-        d = [ 10, 100 ]
-        f = [ 10, 100 ]
-        self.assertTrue(np.all(np.equal([-27.55+20+20, -27.55+40+40],
-                         self.__closeInMacroLos.get_loss(distance=d, frequency=f))))
-
-        d = [ 10, 100, 1000 ]
-        f = [ 10, 100, 1000 ]
-        self.assertTrue(np.all(np.equal([-27.55+20+20, -27.55+40+40, -27.55+60+60 ],
-                         self.__closeInMacroLos.get_loss(distance=d, frequency=f))))
-
-        d = [[1, 10],[100, 1000]]
-        f = [ 100 ]
-        ref_loss = [[ -27.55+0+40,  -27.55+20+40 ],
-                    [ -27.55+40+40, -27.55+60+40]]
-        loss = self.__closeInMacroLos.get_loss(distance=d, frequency=f)
-        self.assertTrue(np.all(np.equal(ref_loss, loss)))
-
+        d = np.array([[1, 10],[100, 1000]])
+        f = np.array([100])
+        los_prob = 1
+        s_std = 0
+        result = np.array([[ -27.55 + 0 + 40,  -27.55 + 20 + 40 ], [ -27.55 + 40 + 40, -27.55 + 60 + 40]])
+        npt.assert_allclose(result, self.propagation.get_loss(distance=d, 
+                                                              frequency=f,
+                                                              line_of_sight_prob=los_prob,
+                                                              shadowing_std=s_std))
+        
 
     def test_loss_nlos(self):
-        d = 10
-        f = 10
-        self.assertEqual(-27.55 + 30 + 20,
-                         self.__closeInMacroNLos.get_loss(distance=d, frequency=f))
+        d = np.array([10, 100])
+        f = np.array([10, 100])
+        los_prob = 0
+        s_std = 0
+        result = np.array([-27.55 + 30 + 20, -27.55 + 60 + 40])
+        npt.assert_allclose(result, self.propagation.get_loss(distance=d, 
+                                                              frequency=f,
+                                                              line_of_sight_prob=los_prob,
+                                                              shadowing_std=s_std))
 
-        d = [10, 100]
-        f = [10, 100]
-        self.assertTrue(np.all(np.equal([-27.55 + 30 + 20, -27.55 + 60 + 40],
-                                        self.__closeInMacroNLos.get_loss(distance=d, frequency=f))))
-
-        d = [10, 100, 1000]
-        f = [10, 100, 1000]
-        self.assertTrue(np.all(np.equal([-27.55 + 30 + 20, -27.55 + 60 + 40, -27.55 + 90 + 60],
-                                        self.__closeInMacroNLos.get_loss(distance=d, frequency=f))))
-
-        d = [[1, 10], [100, 1000]]
-        f = [100]
-        ref_loss = [[-27.55 + 0 + 40, -27.55 + 30 + 40],
-                    [-27.55 + 60 + 40, -27.55 + 90 + 40]]
-        loss = self.__closeInMacroNLos.get_loss(distance=d, frequency=f)
-        self.assertTrue(np.all(np.equal(ref_loss, loss)))
-
-
-    def test_shadowing (self):
+        d = np.array([[1, 10],[100, 1000]])
+        f = np.array([100])
+        los_prob = 0
+        s_std = 0
+        result = np.array([[-27.55 + 0 + 40, -27.55 + 30 + 40], [-27.55 + 60 + 40, -27.55 + 90 + 40]])
+        npt.assert_allclose(result, self.propagation.get_loss(distance=d, 
+                                                              frequency=f,
+                                                              line_of_sight_prob=los_prob,
+                                                              shadowing_std=s_std))
+        
+        
+    def test_shadowing(self):        
         d = np.ones(100000)
         f = np.ones(100000)
-        loss = self.__closeInMacroShadowing.get_loss(distance=d, frequency=f)
+        los_prob = 1
+        s_std = 4.1
+        loss = self.propagation.get_loss(distance=d, 
+                                         frequency=f,
+                                         line_of_sight_prob=los_prob,
+                                         shadowing_std=s_std)
 
         mean = np.mean(loss)
         std = np.std(loss)
