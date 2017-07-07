@@ -27,7 +27,7 @@ class ParametersImt(object):
     num_macrocell_sites = 19
 
     ###########################################################################
-    # Number of clusters
+    # Number of clusters in macro cell topology
     num_clusters = 1
 
     ###########################################################################
