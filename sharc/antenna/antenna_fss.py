@@ -8,6 +8,8 @@ Created on Thu Apr 13 17:18:59 2017
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.parameters.parameters_fss import ParametersFss
 
+import numpy as np
+
 class AntennaFss(AntennaOmni):
     """
     Implements the satellite antenna pattern in the fixed-satellite service
