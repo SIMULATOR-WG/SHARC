@@ -5,12 +5,14 @@ Created on Mon Feb  6 10:51:19 2017
 @author: edgar
 """
 
+from sharc.support.enumerations import StationType
 from sharc.antenna.antenna import Antenna
 
 class Station(object):
     
     def __init__(self):
         self.__id = -1
+        self.__station_type = StationType.NONE
         self.__x = 0
         self.__y = 0
         self.__height = 0
@@ -32,6 +34,14 @@ class Station(object):
     @id.setter
     def id(self, value):
         self.__id = value
+        
+    @property
+    def station_type(self):
+        return self.__station_type
+    
+    @station_type.setter
+    def station_type(self, value):
+        self.__station_type = value
         
     @property
     def x(self):
