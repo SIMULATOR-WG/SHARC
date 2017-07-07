@@ -33,14 +33,14 @@ class PropagationCloseIn(Propagation):
 
         line_of_sight = np.random.sample(d.shape) <= p_los
 
-        path_loss_exponent = np.ones(d.shape) * self._path_loss_exponent_nlos
-        path_loss_exponent[line_of_sight] = self._path_loss_exponent_los
+        path_loss_exponent = np.ones(d.shape) * self.path_loss_exponent_nlos
+        path_loss_exponent[line_of_sight] = self.path_loss_exponent_los
 
-        shadowing_sigma_dB = np.ones(d.shape) * self._shadowing_sigma_dB_nlos
-        shadowing_sigma_dB[line_of_sight] = self._shadowing_sigma_dB_los
+        shadowing_sigma_dB = np.ones(d.shape) * self.shadowing_sigma_dB_nlos
+        shadowing_sigma_dB[line_of_sight] = self.shadowing_sigma_dB_los
 
         if std:
-            shadowing = np.random.normal(0, std, d.shape)
+            shadowing = np.random.normal(0, shadowing_sigma_dB, d.shape)
         else:
             shadowing = 0
 
