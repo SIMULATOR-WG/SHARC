@@ -377,8 +377,7 @@ class SimulationUplink(Simulation):
 
     def calculate_gains(self,
                         station_a: StationManager,
-                        station_b: StationManager,
-                        antenna_txrx: str) -> np.array:
+                        station_b: StationManager) -> np.array:
         """
         Calculates the gains of antennas in station_a in the direction of
         station_b
@@ -401,21 +400,12 @@ class SimulationUplink(Simulation):
         self.theta = np.rad2deg(np.arccos(point_vec_z/dist))
         
         gains = np.zeros_like(self.phi)
-        if(antenna_txrx == "TX"):
-            if(len(np.shape(gains)) != 1):
-                for k in range(station_a.num_stations):
-                    gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
-                         self.theta[k,:],self.beams_idx)
-            else:
-                gains = station_a.tx_antenna[0].calculate_gain(self.phi,self.theta)
-        elif(antenna_txrx == "RX"):
-            if(len(np.shape(gains)) != 1):
-                for k in range(station_a.num_stations):
-                    gains[k,:] = station_a.rx_antenna[k].calculate_gain(self.phi[k,:],\
-                         self.theta[k,:],self.beams_idx)
-            else:
-                gains = station_a.rx_antenna[0].calculate_gain(self.phi,self.theta,\
-                                            self.beams_idx)
+        if(len(np.shape(gains)) != 1):
+            for k in range(station_a.num_stations):
+                gains[k,:] = station_a.antenna[k].calculate_gain(self.phi[k,:],\
+                     self.theta[k,:],self.beams_idx)
+        else:
+            gains = station_a.tx_antenna[0].calculate_gain(self.phi,self.theta)
                 
         return gains
     
