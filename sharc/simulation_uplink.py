@@ -343,10 +343,7 @@ class SimulationUplink(Simulation):
                         station_b: StationManager) -> np.array:
         """
         Calculates the gains of antennas in station_a in the direction of
-        station_b
-        
-        TODO: change antenna_txrx to an enum variable
-        
+        station_b       
         """
         if(station_a.num_stations > 1):
             point_vec_x = station_b.x- station_a.x[:,np.newaxis]
