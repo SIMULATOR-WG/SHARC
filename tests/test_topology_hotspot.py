@@ -14,6 +14,7 @@ from sharc.topology.topology_hotspot import TopologyHotspot
 
 class TopologyHotspotTest(unittest.TestCase):
     
+    
     def setUp(self):
         # For this test case, hotspot parameters are useless because we are
         # testing only the validation methods
@@ -27,6 +28,33 @@ class TopologyHotspotTest(unittest.TestCase):
         intersite_distance = 1000
         num_clusters = 1
         self.topology = TopologyHotspot(param, intersite_distance, num_clusters)
+        
+        
+    def test_overlapping_hotspots(self):
+        x = np.array([0, 200, 300])
+        y = np.array([0,   0,   0])
+        azimuth = np.array([0, -180, -180])
+        radius = np.array([100, 100, 100])
+        self.assertFalse(self.topology.overlapping_hotspots(x, y, azimuth, radius))
+        
+        x = np.array([0, 0, 0])
+        y = np.array([0, 150, 400])
+        azimuth = np.array([90, 270, 270])
+        radius = np.array([100, 100, 100])
+        self.assertTrue(self.topology.overlapping_hotspots(x, y, azimuth, radius))        
+                
+        x = np.array([ 0, -1, 101])
+        y = np.array([ 0,  0,   0])
+        azimuth = np.array([0, 180, 0])
+        radius = np.array([100, 100, 100])
+        self.assertFalse(self.topology.overlapping_hotspots(x, y, azimuth, radius))       
+        
+        x = np.array([ 1, 0])
+        y = np.array([ 0, 1])
+        azimuth = np.array([0, 90])
+        radius = np.array([100, 100])
+        self.assertTrue(self.topology.overlapping_hotspots(x, y, azimuth, radius))         
+        
         
     def test_validade_min_dist_hotspots(self):
         hotspot_center_x = np.array([0, 100, 300])
