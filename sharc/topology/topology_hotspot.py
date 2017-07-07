@@ -43,16 +43,19 @@ class TopologyHotspot(Topology):
         """
         self.param = param
         self.macrocell = TopologyMacrocell(intersite_distance, num_clusters)
+        self.macrocell.calculate_coordinates()
 
         cell_radius = self.param.max_dist_hotspot_ue
-        super(TopologyHotspot, self).__init__(intersite_distance, cell_radius)
+        super().__init__(intersite_distance, cell_radius)
         
         
     def calculate_coordinates(self):
         """
-        Calculates coordinates of macrocell and hotspots base stations
+        Calculates coordinates of hotspots
         """
         i = 0
+        x = list()
+        y = list()
         for cell_x, cell_y, azimuth in zip(self.macrocell.x, self.macrocell.y, self.macrocell.azimuth):
             #print("base station #{}".format(i))
             i += 1
@@ -81,9 +84,11 @@ class TopologyHotspot(Topology):
                                                       self.macrocell.x, 
                                                       self.macrocell.y, 
                                                       self.param.min_dist_bs_hotspot)
-            self.x = np.concatenate([self.x, hotspot_x])
-            self.y = np.concatenate([self.y, hotspot_y])                    
+            x = np.concatenate([x, hotspot_x])
+            y = np.concatenate([y, hotspot_y])                    
 
+        self.x = x
+        self.y = y
         self.azimuth = np.random.choice(self.AZIMUTH, len(self.x))
         self.elevation = self.ELEVATION*np.ones(len(self.x))
         # In the end, we have to update the number of base stations
@@ -243,6 +248,6 @@ if __name__ == '__main__':
     intersite_distance = 339.8
     num_clusters = 1
     topology = TopologyHotspot(param, intersite_distance, num_clusters)
-    
+    topology.calculate_coordinates()
     plot_topology(topology)
 

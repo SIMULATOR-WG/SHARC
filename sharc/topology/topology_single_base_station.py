@@ -25,9 +25,7 @@ class TopologySingleBaseStation(Topology):
         allowed_num_clusters = [1,2]
         # Actually, intersite distance is not used
         intersite_distance = 2*cell_radius
-        super(TopologySingleBaseStation, self).__init__(intersite_distance, 
-                                                cell_radius, num_clusters,
-                                                allowed_num_clusters)
+        super().__init__(intersite_distance, cell_radius, num_clusters, allowed_num_clusters)
         
     def calculate_coordinates(self):
         """

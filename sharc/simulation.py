@@ -13,17 +13,29 @@ class Simulation(Observable):
     __metaclass__ = ABCMeta
     
     def __init__(self):
-        super(Simulation, self).__init__()
+        super().__init__()
     
+        
     @abstractmethod
     def initialize(self, *args, **kwargs):
+        """
+        This method is executed only once to initialize the simulation variables. 
+        """        
         pass
+    
     
     @abstractmethod
     def snapshot(self, *args, **kwargs):
+        """
+        Performs a single snapshot 
+        """
         pass
 
+    
     @abstractmethod
     def finalize(self, *args, **kwargs):
+        """
+        Finalizes the simulation (collect final results, etc...)
+        """
         pass
     

@@ -20,7 +20,7 @@ class PropagationUMa(Propagation):
     
     
     def __init__(self):
-        super(Propagation, self).__init__()    
+        super().__init__()    
     
     
     def get_loss(self, *args, **kwargs) -> np.array:

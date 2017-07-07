@@ -52,8 +52,7 @@ class AntennaBeamformingImt(Antenna):
         self.__dh = par.element_horiz_spacing
         self.__dv = par.element_vert_spacing
         
-        self.__beams_list = []
-        self.__w_vec_list = []
+        self.reset_beams()
     
     def add_beam(self, phi_etilt: float, theta_etilt: float):
         """

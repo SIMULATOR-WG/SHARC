@@ -8,13 +8,15 @@ Created on Mon Apr 17 15:35:00 2017
 from sharc.propagation.propagation import Propagation
 
 import numpy as np
-import sys
 
 class PropagationP619(Propagation):
     """
     Implements the earth-to-space channel model from ITU-R P.619
     Currently, only free-space is implemented
     """
+    
+    def __init__(self):
+        super().__init__()
 
 
     def get_loss(self, *args, **kwargs) -> np.array:
