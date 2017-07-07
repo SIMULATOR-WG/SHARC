@@ -9,6 +9,7 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
+from sharc.support.enumerations import StationType
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.station import Station
@@ -70,6 +71,7 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager.rx_power = np.array([-50, -35, -10])
         par = self.param.get_antenna_parameters("BS","TX")
         self.station_manager.antenna = np.array([AntennaBeamformingImt(par,60,-10), AntennaBeamformingImt(par,180,-10), AntennaBeamformingImt(par,300,-10)])
+        self.station_manager.station_type = StationType.IMT_BS
         
         self.station_manager2 = StationManager(2)
         self.station_manager2.x = np.array([100, 200])
@@ -80,6 +82,7 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager2.rx_power = np.array([-50, -35])
         par = self.param.get_antenna_parameters("BS","RX")
         self.station_manager2.antenna = np.array([AntennaBeamformingImt(par,0,-5), AntennaBeamformingImt(par,180,-5)])
+        self.station_manager2.station_type = StationType.IMT_BS
         
         self.station_manager3 = StationManager(1)
         self.station_manager3.x = np.array([300])
@@ -90,6 +93,7 @@ class StationManagerTest(unittest.TestCase):
         self.station_manager3.rx_power = np.array([-50,-35])
         par = self.param.get_antenna_parameters("UE","TX")
         self.station_manager3.antenna = np.array([AntennaBeamformingImt(par,0,-30), AntennaBeamformingImt(par,35,45)])
+        self.station_manager3.station_type = StationType.IMT_UE
         
         self.station = Station()
         self.station.id = 0
@@ -100,6 +104,7 @@ class StationManagerTest(unittest.TestCase):
         self.station.rx_power = -50
         par = self.param.get_antenna_parameters("UE","TX")
         self.station.antenna = AntennaBeamformingImt(par,100,-10)
+        self.station.station_type = StationType.IMT_UE
 
         self.station2 = Station()
         self.station2.id = 1
@@ -110,12 +115,18 @@ class StationManagerTest(unittest.TestCase):
         self.station2.rx_power = -35
         par = self.param.get_antenna_parameters("BS","RX")
         self.station2.antenna = AntennaBeamformingImt(par,-90,-15)
+        self.station2.station_type = StationType.IMT_BS
         
         
     def test_num_stations(self):
         self.assertEqual(self.station_manager.num_stations, 3)
         self.assertEqual(self.station_manager2.num_stations, 2)
         self.assertEqual(self.station_manager3.num_stations, 1)
+        
+    def test_station_type(self):
+        self.assertEqual(self.station_manager.station_type, StationType.IMT_BS)
+        self.assertEqual(self.station_manager2.station_type, StationType.IMT_BS)
+        self.assertEqual(self.station_manager3.station_type, StationType.IMT_UE)
 
     def test_x(self):
         # get a single value from the original array
@@ -265,6 +276,9 @@ class StationManagerTest(unittest.TestCase):
         # now we change station id and verify if stations became different
         self.station.id = 1
         self.assertTrue(self.station != self.station_manager.get_station(0))
+        # test station type
+        self.assertEqual(self.station_manager.get_station(0).station_type,\
+                         StationType.IMT_BS)
 
     def test_station_list(self):
         # test if manager returns the correct station list
