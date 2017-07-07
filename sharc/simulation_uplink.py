@@ -112,9 +112,6 @@ class SimulationUplink(Simulation):
         #self.plot_hotspot_scenario()
         #sys.exit(0)
         
-        # reset the index of beams
-        #self.beams_idx = -1*np.ones(self.ue.num_stations, dtype=int)
-        
         self.connect_ue_to_bs()
         self.select_ue()
         
@@ -213,10 +210,6 @@ class SimulationUplink(Simulation):
             # Activate the selected UE's
             if self.bs.active[bs]:
                 self.ue.active[self.link[bs]] = np.ones(K, dtype=bool)
-            for ue in self.link[bs]:
-                # add beam to antennas
-                self.ue.antenna[ue].add_beam(self.phi[bs,ue] - 180,
-                                             180 - self.theta[bs,ue])
 
                 
     def scheduler(self):
@@ -293,7 +286,6 @@ class SimulationUplink(Simulation):
         self.coupling_loss_ue_sat = np.array(np.transpose(
                                 self.calculate_coupling_loss(self.ue, self.system,
                                             self.propagation_system)).tolist()[0])
-        self.beams_idx = -1*np.ones(self.ue.num_stations,dtype=int)
 
         ue_bandwidth = self.num_rb_per_ue * self.param_imt.rb_bandwidth
 

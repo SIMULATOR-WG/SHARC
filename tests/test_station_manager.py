@@ -316,6 +316,29 @@ class StationManagerTest(unittest.TestCase):
         distance = self.station_manager.get_3d_distance_to(self.station_manager2)
         npt.assert_allclose(distance, ref_distance, atol=1e-2)
         
+    def test_pointing_vector_to(self):
+        eps = 1e-1
+        # Test 1
+        phi, theta = self.station_manager.get_pointing_vector_to(self.station_manager2)
+        npt.assert_allclose(phi,np.array([[45.00, 51.04],
+                                          [45.00, 51.34],
+                                          [45.00, 51.67]]),atol=eps)
+        npt.assert_allclose(theta,np.array([[88.65, 89.24],
+                                            [88.89, 89.40],
+                                            [89.42, 89.58]]),atol=eps)
+    
+        # Test 2
+        phi, theta = self.station_manager2.get_pointing_vector_to(self.station_manager)
+        npt.assert_allclose(phi,np.array([[-135.00, -135.00, -135.00],
+                                          [-128.96, -128.66, -128.33]]),atol=eps)
+        npt.assert_allclose(theta,np.array([[91.35, 91.01, 90.58],
+                                            [90.76, 90.60, 90.42]]),atol=eps)
+    
+        # Test 3
+        phi, theta = self.station_manager3.get_pointing_vector_to(self.station_manager2)
+        npt.assert_allclose(phi,np.array([45.48, 33.69]),atol=eps)
+        npt.assert_allclose(theta,np.array([90.27, 90.95]),atol=eps)
+        
 if __name__ == '__main__':
     unittest.main()
                 
