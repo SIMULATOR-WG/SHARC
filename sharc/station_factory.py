@@ -7,6 +7,7 @@ Created on Thu Mar 23 16:37:32 2017
 
 import numpy as np
 
+from sharc.support.enumerations import StationType
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
@@ -23,7 +24,7 @@ class StationFactory(object):
                                    topology: Topology):
         num_bs = topology.num_base_stations
         imt_base_stations = StationManager(num_bs)
-        
+        imt_base_stations.station_type = StationType.IMT_BS
         # now we set the coordinates
         imt_base_stations.x = topology.x
         imt_base_stations.y = topology.y
@@ -59,6 +60,7 @@ class StationFactory(object):
         num_ue = num_bs*num_ue_per_bs
 
         imt_ue = StationManager(num_ue)
+        imt_ue.station_type = StationType.IMT_UE
         ue_x = list()
         ue_y = list()
         
@@ -136,6 +138,7 @@ class StationFactory(object):
     @staticmethod
     def generate_fss_stations(param: ParametersFss):
         satellite_stations = StationManager(1)
+        satellite_stations.station_type = StationType.FSS_SS
 
         # now we set the coordinates according to
         # ITU-R P619-1, Attachment A
