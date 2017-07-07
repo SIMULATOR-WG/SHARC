@@ -5,6 +5,9 @@ Created on Mon Mar 13 15:37:01 2017
 @author: edgar
 """
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.axes
+import matplotlib.patches as patches
 
 from sharc.topology.topology import Topology
 
@@ -46,14 +49,44 @@ class TopologySingleBaseStation(Topology):
             if self.num_clusters == 1:
                 self.x = np.array([0])
                 self.y = np.array([0])
-                self.azimuth = TopologySingleBaseStation.AZIMUTH
-                self.elevation = TopologySingleBaseStation.ELEVATION
+                self.azimuth = TopologySingleBaseStation.AZIMUTH*np.ones(1)
+                self.elevation = TopologySingleBaseStation.ELEVATION*np.ones(1)
                 self.num_base_stations = 1
             elif self.num_clusters == 2:
                 self.x = np.array([0, 0])
                 self.y = np.array([0, self.intersite_distance])
                 self.azimuth = TopologySingleBaseStation.AZIMUTH*np.ones(2)
                 self.elevation = TopologySingleBaseStation.ELEVATION*np.ones(2)
-                self.num_base_stations = 2             
+                self.num_base_stations = 2       
+                
+                
+    def plot(self, ax: matplotlib.axes.Axes):
+        # plot base station
+        plt.scatter(self.x, self.y, color='g', edgecolor="w", linewidth=0.5, label="Hotspot")
+        
+        # plot base station coverage area
+        for x, y, a in zip(self.x, self.y, self.azimuth):
+            pa = patches.Wedge( (x, y), self.cell_radius, a-60, a+60, fill=False, 
+                               edgecolor="green", linestyle='solid' )
+            ax.add_patch(pa)              
 
- 
+
+if __name__ == '__main__':
+    cell_radius = 100
+    num_clusters = 1
+    topology = TopologySingleBaseStation(cell_radius, num_clusters)
+    topology.calculate_coordinates()
+    
+    fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')  # create a figure object
+    ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
+    
+    topology.plot(ax)
+    
+    plt.axis('image') 
+    plt.title("Single base station topology")
+    plt.xlabel("x-coordinate [m]")
+    plt.ylabel("y-coordinate [m]")
+    plt.tight_layout()    
+    plt.show()    
+    
+                

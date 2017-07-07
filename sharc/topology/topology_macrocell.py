@@ -6,6 +6,8 @@ Created on Tue Feb 14 12:51:22 2017
 """
 
 from sharc.topology.topology import Topology
+import matplotlib.pyplot as plt
+import matplotlib.axes
 
 import math
 import numpy as np
@@ -70,7 +72,7 @@ class TopologyMacrocell(Topology):
                 y_shift = np.array([9*h, 15*h, 6*h, -9*h, -15*h, -6*h])
                 for xs, ys in zip(x_shift, y_shift):
                     self.x = np.concatenate((self.x, x_central + xs))
-                    self.y = np.concatenate((self.x, y_central + ys))    
+                    self.y = np.concatenate((self.y, y_central + ys))    
         
             self.x = np.repeat(self.x, 3)
             self.y = np.repeat(self.y, 3)
@@ -80,3 +82,40 @@ class TopologyMacrocell(Topology):
             # In the end, we have to update the number of base stations
             self.num_base_stations = len(self.x)        
                 
+            
+    def plot(self, ax: matplotlib.axes.Axes):
+        # create the hexagons
+        r = self.intersite_distance/3
+        for x, y, az in zip(self.x, self.y, self.azimuth):
+            se = list([[x,y]])
+            angle = int(az - 60)
+            for a in range(6):
+                se.extend([[se[-1][0] + r*math.cos(math.radians(angle)), se[-1][1] + r*math.sin(math.radians(angle))]])
+                angle += 60
+            sector = plt.Polygon(se, fill=None, edgecolor='k')
+            ax.add_patch(sector)
+        
+        # macro cell base stations
+        ax.scatter(self.x, self.y, color='k', edgecolor="k", linewidth=4, label="Macro cell")
+
+
+if __name__ == '__main__':
+    intersite_distance = 500
+    num_clusters = 1
+    topology = TopologyMacrocell(intersite_distance, num_clusters)
+    topology.calculate_coordinates()
+    
+    fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')  # create a figure object
+    ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
+    
+    topology.plot(ax)
+    
+    plt.axis('image') 
+    plt.title("Macro cell topology")
+    plt.xlabel("x-coordinate [m]")
+    plt.ylabel("y-coordinate [m]")
+    plt.tight_layout()    
+    plt.show()    
+    
+            
+            

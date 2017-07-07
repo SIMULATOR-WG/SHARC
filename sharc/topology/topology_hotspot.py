@@ -8,6 +8,7 @@ Created on Tue May 16 16:59:40 2017
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import matplotlib.axes
 import matplotlib.patches as patches
 
 from shapely.geometry import Polygon
@@ -196,55 +197,19 @@ class TopologyHotspot(Topology):
         return len(occ) == 0
 
 
+    def plot(self, ax: matplotlib.axes.Axes):
+        # plot macrocells
+        self.macrocell.plot(ax)
 
-def plot_topology(topology: TopologyHotspot):
-    fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
-    ax = fig.gca()
-    
-    r = topology.macrocell.intersite_distance/3
-    for x, y, az in zip(topology.macrocell.x, topology.macrocell.y, topology.macrocell.azimuth):
-        se = list([[x,y]])
-        angle = int(az - 60)
-        for a in range(6):
-            se.extend([[se[-1][0] + r*math.cos(math.radians(angle)), se[-1][1] + r*math.sin(math.radians(angle))]])
-            angle += 60
-        sector = plt.Polygon(se, fill=None, edgecolor='k')
-        ax.add_patch(sector)
-    
-    # plot small cells
-    plt.scatter(topology.x, topology.y, color='g', edgecolor="w", linewidth=0.5, label="Hotspot")
-    
-    # plot small cells coverage area
-    for x, y, a in zip(topology.x, topology.y, topology.azimuth):
-        pa = patches.Wedge( (x, y), topology.cell_radius, a-60, a+60, fill=False, 
-                           edgecolor="green", linestyle='solid' )
-        ax.add_patch(pa)
+        # plot hotspots
+        plt.scatter(self.x, self.y, color='g', edgecolor="w", linewidth=0.5, label="Hotspot")
+        
+        # plot hotspots coverage area
+        for x, y, a in zip(self.x, self.y, self.azimuth):
+            pa = patches.Wedge( (x, y), self.cell_radius, a-60, a+60, fill=False, 
+                               edgecolor="green", linestyle='solid' )
+            ax.add_patch(pa)        
 
-    
-    # macro cell base stations
-    plt.scatter(topology.macrocell.x, topology.macrocell.y, color='k', edgecolor="k", linewidth=4, label="Macro cell")
-
-    # sector centers
-    #plt.scatter(-sector_y, sector_x, color='g', edgecolor="g")
-    
-    # plot macro cell coverage area
-#    r = (topology.macrocell.intersite_distance/3)*math.sqrt(3)/2 - topology.param.max_dist_hotspot_ue/2
-#    for x, y, az in zip(topology.macrocell.x, topology.macrocell.y, topology.macrocell.azimuth):
-#        # find the center coordinates of the sector (hexagon)
-#        mx = x + topology.macrocell.intersite_distance/3*math.cos(math.radians(az))
-#        my = y + topology.macrocell.intersite_distance/3*math.sin(math.radians(az))
-#        circ = plt.Circle((mx, my), radius=r, color='b', fill=False, linewidth=0.5)
-#        ax.add_patch(circ)    
-    
-    plt.axis('image') 
-    plt.title("Macro cell topology with hotspots")
-    plt.xlabel("x-coordinate [m]")
-    plt.ylabel("y-coordinate [m]")
-    #plt.xlim((-3000, 3000))
-    #plt.ylim((-3000, 3000))                
-    plt.legend(loc="upper left", scatterpoints=1)
-    plt.tight_layout()    
-    plt.show()
 
 
 if __name__ == '__main__':
@@ -259,5 +224,16 @@ if __name__ == '__main__':
     num_clusters = 1
     topology = TopologyHotspot(param, intersite_distance, num_clusters)
     topology.calculate_coordinates()
-    plot_topology(topology)
-
+    
+    fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')  # create a figure object
+    ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
+    
+    topology.plot(ax)
+    
+    plt.axis('image') 
+    plt.title("Macro cell topology with hotspots")
+    plt.xlabel("x-coordinate [m]")
+    plt.ylabel("y-coordinate [m]")
+    plt.legend(loc="upper left", scatterpoints=1)
+    plt.tight_layout()    
+    plt.show() 
