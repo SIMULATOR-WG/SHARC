@@ -23,3 +23,7 @@ class AntennaFssTest(unittest.TestCase):
         
     def test_gain(self):
         pass
+    
+        
+if __name__ == '__main__':
+    unittest.main()    

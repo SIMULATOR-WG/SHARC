@@ -7,6 +7,7 @@ Created on Tue Feb 14 12:48:58 2017
 
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import matplotlib.axes
  
 class Topology(object):
     
@@ -36,3 +37,11 @@ class Topology(object):
         """        
         pass
         
+
+    @abstractmethod
+    def plot(self, ax: matplotlib.axes.Axes):
+        """
+        Plots the topology on the given axis.
+        """        
+        pass
+    

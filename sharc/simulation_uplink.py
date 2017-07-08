@@ -10,7 +10,6 @@ import random
 import math
 import sys
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
@@ -108,9 +107,10 @@ class SimulationUplink(Simulation):
         self.ue = StationFactory.generate_imt_ue(self.param_imt,
                                                  self.param_imt_antenna,
                                                  self.topology)
-        #self.plot_macrocell_scenario()
-        #self.plot_hotspot_scenario()
-        #sys.exit(0)
+        #self.plot_scenario()
+        
+        # reset the index of beams
+        #self.beams_idx = -1*np.ones(self.ue.num_stations, dtype=int)
         
         self.connect_ue_to_bs()
         self.select_ue()
@@ -210,6 +210,10 @@ class SimulationUplink(Simulation):
             # Activate the selected UE's
             if self.bs.active[bs]:
                 self.ue.active[self.link[bs]] = np.ones(K, dtype=bool)
+            for ue in self.link[bs]:
+                # add beam to antennas
+                self.ue.antenna[ue].add_beam(self.phi[bs,ue] - 180,
+                                             180 - self.theta[bs,ue])
 
                 
     def scheduler(self):
@@ -241,39 +245,42 @@ class SimulationUplink(Simulation):
         Calculates the uplink SINR for each UE. This is useful only in the
         cases when IMT system is interfered by other system
         """
-        #bs_all = [b for b in range(self.bs.num_stations)]
-        bs_active = np.where(self.bs.active)[0]
-
-        self.bs.rx_power = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-        self.bs.rx_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-        self.bs.total_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-        self.bs.snr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-        self.bs.sinr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+        # This part is commented because it was moved to StationFactory
+        # TODO: delete it permanently after testing
+#        self.bs.rx_power = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+#        self.bs.rx_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+#        self.bs.total_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+#        self.bs.snr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
+#        self.bs.sinr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
 
         # calculate uplink received power for each active BS
+        bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue_list = self.link[bs]
-            self.bs.rx_power[bs] = self.ue.tx_power[ue_list] - self.coupling_loss[bs,ue_list]
+            self.bs.rx_power[bs] = self.ue.tx_power[ue_list] - self.coupling_loss_imt[bs,ue_list]
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]
 
             # calculate intra system interference
             for bi in bs_interf:
                 ui_list = self.link[bi]
-                interference = self.ue.tx_power[ui_list] - self.coupling_loss[bs,ui_list]
+                interference = self.ue.tx_power[ui_list] - self.coupling_loss_imt[bs,ui_list]
                 self.bs.rx_interference[bs] = 10*np.log10( \
                     np.power(10, 0.1*self.bs.rx_interference[bs])
                     + np.power(10, 0.1*interference))
 
+            # calculate N
             self.bs.thermal_noise[bs] = \
                 10*np.log10(self.param_imt.BOLTZMANN_CONSTANT*self.param_imt.noise_temperature) + \
                 10*np.log10(self.num_rb_per_ue*self.param_imt.rb_bandwidth * 1e6) + \
                 self.bs.noise_figure[bs]
     
+            # calculate I+N
             self.bs.total_interference[bs] = \
                 10*np.log10(np.power(10, 0.1*self.bs.rx_interference[bs]) + \
                             np.power(10, 0.1*self.bs.thermal_noise[bs]))
                 
+            # calculate SNR and SINR
             self.bs.sinr[bs] = self.bs.rx_power[bs] - self.bs.total_interference[bs]
             self.bs.snr[bs] = self.bs.rx_power[bs] - self.bs.thermal_noise[bs]
 
@@ -283,9 +290,12 @@ class SimulationUplink(Simulation):
         Calculates interference that IMT system generates on other system
         """
 
-        self.coupling_loss_ue_sat = np.array(np.transpose(
+        self.coupling_loss_imt_system = np.array(np.transpose(
                                 self.calculate_coupling_loss(self.ue, self.system,
                                             self.propagation_system)).tolist()[0])
+        
+        # TODO: review beams_idx
+        self.beams_idx = -1*np.ones(self.ue.num_stations,dtype=int)
 
         ue_bandwidth = self.num_rb_per_ue * self.param_imt.rb_bandwidth
 
@@ -293,26 +303,30 @@ class SimulationUplink(Simulation):
         # of the satellite's bandwidth
         # calculate interference only from active UE's
         ue_active = np.where(self.ue.active)[0]
-        interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_ue_sat[ue_active] \
+        interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_imt_system[ue_active] \
                             + 10*math.log10(ue_bandwidth/self.param_system.sat_bandwidth)
 
+        # calculate the aggregate interference on system
         self.system.rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference_ue)))
 
+        # calculate N
         self.system.thermal_noise = \
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
                           self.param_system.sat_noise_temperature) + \
                           10*math.log10(self.param_system.sat_bandwidth * 1e6)
 
+        # calculate I+N
         self.system.total_interference = \
             10*np.log10(np.power(10, 0.1*self.system.rx_interference) + \
                         np.power(10, 0.1*self.system.thermal_noise))
 
+        # calculate INR at the system
         self.system.inr = self.system.rx_interference - self.system.thermal_noise
 
 
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         self.results.imt_ul_coupling_loss.extend( \
-            np.reshape(self.coupling_loss, self.ue.num_stations*self.bs.num_stations).tolist())
+            np.reshape(self.coupling_loss_imt, self.ue.num_stations*self.bs.num_stations).tolist())
         self.results.system_inr.extend([self.system.inr])
         
         bs_active = np.where(self.bs.active)[0]
@@ -332,10 +346,14 @@ class SimulationUplink(Simulation):
             
     def calculate_gains(self,
                         station_a: StationManager,
-                        station_b: StationManager) -> np.array:
+                        station_b: StationManager,
+                        antenna_txrx: str) -> np.array:
         """
         Calculates the gains of antennas in station_a in the direction of
-        station_b       
+        station_b
+        
+        TODO: change antenna_txrx to an enum variable
+        
         """
         if(station_a.num_stations > 1):
             point_vec_x = station_b.x- station_a.x[:,np.newaxis]
@@ -352,12 +370,21 @@ class SimulationUplink(Simulation):
         self.theta = np.rad2deg(np.arccos(point_vec_z/dist))
         
         gains = np.zeros_like(self.phi)
-        if(len(np.shape(gains)) != 1):
-            for k in range(station_a.num_stations):
-                gains[k,:] = station_a.antenna[k].calculate_gain(self.phi[k,:],\
-                     self.theta[k,:],self.beams_idx)
-        else:
-            gains = station_a.tx_antenna[0].calculate_gain(self.phi,self.theta)
+        if(antenna_txrx == "TX"):
+            if(len(np.shape(gains)) != 1):
+                for k in range(station_a.num_stations):
+                    gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
+                         self.theta[k,:],self.beams_idx)
+            else:
+                gains = station_a.tx_antenna[0].calculate_gain(self.phi,self.theta)
+        elif(antenna_txrx == "RX"):
+            if(len(np.shape(gains)) != 1):
+                for k in range(station_a.num_stations):
+                    gains[k,:] = station_a.rx_antenna[k].calculate_gain(self.phi[k,:],\
+                         self.theta[k,:],self.beams_idx)
+            else:
+                gains = station_a.rx_antenna[0].calculate_gain(self.phi,self.theta,\
+                                            self.beams_idx)
                 
         return gains
     
@@ -379,97 +406,30 @@ class SimulationUplink(Simulation):
         return tput
         
         
-    def plot_macrocell_scenario(self):
+    def plot_scenario(self):
         fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
         ax = fig.gca()
         
-        #plot hexagons
-        r = self.topology.intersite_distance/3
-        for x, y, az in zip(self.topology.x, self.topology.y, self.topology.azimuth):
-            se = list([[x,y]])
-            angle = int(az - 60)
-            for a in range(6):
-                se.extend([[se[-1][0] + r*math.cos(math.radians(angle)), se[-1][1] + r*math.sin(math.radians(angle))]])
-                angle += 60
-            sector = plt.Polygon(se, fill=None, edgecolor='k')
-            ax.add_patch(sector)
+        # Plot network topology
+        self.topology.plot(ax)
         
-        # macro cell base stations
-        plt.scatter(self.topology.x, self.topology.y, color='k', edgecolor="k", linewidth=4, label="BS")
+        # Plot user equipments
+        ax.scatter(self.ue.x, self.ue.y, color='r', edgecolor="w", linewidth=0.5, label="UE")
         
-        # UE's
-        plt.scatter(self.ue.x, self.ue.y, color='r', edgecolor="w", linewidth=0.5, label="UE")
-        
-#        # UE azimuth
-#        d = 0.2 * self.topology.cell_radius
-#        for i in range(len(self.ue.x)):
-#            plt.plot([self.ue.x[i], self.ue.x[i] + d*math.cos(math.radians(self.ue.azimuth[i]))], 
-#                     [self.ue.y[i], self.ue.y[i] + d*math.sin(math.radians(self.ue.azimuth[i]))], 
-#                     'r-')
-        
-        # plot macro cell coverage area
-    #    r = (topology.macrocell.intersite_distance/3)*math.sqrt(3)/2 - topology.param.max_dist_hotspot_ue/2
-    #    for x, y, az in zip(topology.macrocell.x, topology.macrocell.y, topology.macrocell.azimuth):
-    #        # find the center coordinates of the sector (hexagon)
-    #        mx = x + topology.macrocell.intersite_distance/3*math.cos(math.radians(az))
-    #        my = y + topology.macrocell.intersite_distance/3*math.sin(math.radians(az))
-    #        circ = plt.Circle((mx, my), radius=r, color='b', fill=False, linewidth=0.5)
-    #        ax.add_patch(circ)    
+        # Plot UE's azimuth
+        d = 0.1 * self.topology.cell_radius
+        for i in range(len(self.ue.x)):
+            plt.plot([self.ue.x[i], self.ue.x[i] + d*math.cos(math.radians(self.ue.azimuth[i]))], 
+                     [self.ue.y[i], self.ue.y[i] + d*math.sin(math.radians(self.ue.azimuth[i]))], 
+                     'r-')        
         
         plt.axis('image') 
         plt.title("Simulation scenario")
         plt.xlabel("x-coordinate [m]")
         plt.ylabel("y-coordinate [m]")
-        #plt.xlim((-3000, 3000))
-        #plt.ylim((-3000, 3000))                
-        plt.legend(loc="upper left", scatterpoints=1)
-        plt.tight_layout()    
-        plt.show()
-            
-        
-    def plot_hotspot_scenario(self):
-        fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
-        ax = fig.gca()
-        
-        #plot hexagons
-        r = self.topology.macrocell.intersite_distance/3
-        for x, y, az in zip(self.topology.macrocell.x, self.topology.macrocell.y, self.topology.macrocell.azimuth):
-            se = list([[x,y]])
-            angle = int(az - 60)
-            for a in range(6):
-                se.extend([[se[-1][0] + r*math.cos(math.radians(angle)), se[-1][1] + r*math.sin(math.radians(angle))]])
-                angle += 60
-            sector = plt.Polygon(se, fill=None, edgecolor='k')
-            ax.add_patch(sector)
-        
-        # macro cell base stations
-        plt.scatter(self.topology.macrocell.x, self.topology.macrocell.y, color='k', edgecolor="k", linewidth=4, label="BS")
-        
-        # plot hotspots
-        plt.scatter(self.topology.x, self.topology.y, color='g', edgecolor="w", linewidth=0.5, label="Hotspot")        
-        
-        # UE's
-        plt.scatter(self.ue.x, self.ue.y, color='r', edgecolor="w", linewidth=0.5, label="UE")
-        
-#        # UE azimuth
-#        d = 0.2 * self.topology.cell_radius
-#        for i in range(len(self.ue.x)):
-#            plt.plot([self.ue.x[i], self.ue.x[i] + d*math.cos(math.radians(self.ue.azimuth[i]))], 
-#                     [self.ue.y[i], self.ue.y[i] + d*math.sin(math.radians(self.ue.azimuth[i]))], 
-#                     'r-')
-        
-        # plot hotspots coverage area
-        for x, y, a in zip(self.topology.x, self.topology.y, self.topology.azimuth):
-            pa = patches.Wedge( (x, y), self.topology.cell_radius, a-60, a+60, fill=False, 
-                               edgecolor="green", linestyle='solid' )
-            ax.add_patch(pa)        
-        
-        plt.axis('image') 
-        plt.title("Hotspots simulation scenario")
-        plt.xlabel("x-coordinate [m]")
-        plt.ylabel("y-coordinate [m]")
-        #plt.xlim((-3000, 3000))
-        #plt.ylim((-3000, 3000))                
         plt.legend(loc="upper left", scatterpoints=1)
         plt.tight_layout()    
         plt.show()        
+        
+        sys.exit(0)
+        
