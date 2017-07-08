@@ -336,8 +336,13 @@ class StationManagerTest(unittest.TestCase):
     
         # Test 3
         phi, theta = self.station_manager3.get_pointing_vector_to(self.station_manager2)
-        npt.assert_allclose(phi,np.array([45.48, 33.69]),atol=eps)
-        npt.assert_allclose(theta,np.array([90.27, 90.95]),atol=eps)
+        npt.assert_allclose(phi,np.array([[-124.13, -123.69]]),atol=eps)
+        npt.assert_allclose(theta,np.array([[89.73, 89.05]]),atol=eps)
+        
+        # Test 4
+        phi, theta = self.station_manager2.get_pointing_vector_to(self.station_manager3)
+        npt.assert_allclose(phi,np.array([[55.86], [56.31]]),atol=eps)
+        npt.assert_allclose(theta,np.array([[90.32], [90.95]]),atol=eps)
         
 if __name__ == '__main__':
     unittest.main()

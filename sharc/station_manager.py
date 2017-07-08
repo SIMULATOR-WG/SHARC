@@ -108,18 +108,14 @@ class StationManager(object):
         return{'free_space': free_space_angle, 'apparent': angle}
     
     def get_pointing_vector_to(self, station) -> tuple:
-        if(self.num_stations > 1):
-            point_vec_x = station.x- self.x[:,np.newaxis]
-            point_vec_y = station.y - self.y[:,np.newaxis]
-            point_vec_z = station.height - self.height[:,np.newaxis]
-        else:
-            point_vec_x = station.x- self.x
-            point_vec_y = station.y - self.y
-            point_vec_z = station.height - self.height
+
+        point_vec_x = station.x- self.x[:,np.newaxis]
+        point_vec_y = station.y - self.y[:,np.newaxis]
+        point_vec_z = station.height - self.height[:,np.newaxis]
             
         dist = self.get_3d_distance_to(station)
         
-        phi = np.rad2deg(np.arctan2(point_vec_y,point_vec_x))
+        phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
         theta = np.rad2deg(np.arccos(point_vec_z/dist))
         
         return phi, theta
