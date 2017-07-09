@@ -173,14 +173,13 @@ class SimulationUplink(Simulation):
                                                   ue_height=station_a.height,
                                                   shadowing=False)
         # define antenna gains
-        gain_a = self.calculate_gains(station_a,station_b,"TX")
-        gain_b = self.calculate_gains(station_b,station_a,"RX")
-        if(station_b.num_stations > 1):
-            gain_b_t = np.transpose(gain_b)
-        else:
-            gain_b_t = gain_b[:,np.newaxis]
+        gain_a = self.calculate_gains(station_a,station_b)
+        gain_b = np.transpose(self.calculate_gains(station_b,station_a))
+        
         # calculate coupling loss
-        return self.path_loss - gain_a - gain_b_t
+        coupling_loss = np.squeeze(self.path_loss - gain_a - gain_b)
+        
+        return coupling_loss
 
         
     def connect_ue_to_bs(self):
