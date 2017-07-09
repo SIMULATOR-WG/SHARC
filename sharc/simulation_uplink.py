@@ -11,6 +11,7 @@ import math
 import sys
 import matplotlib.pyplot as plt
 
+from sharc.support.enumerations import StationType
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
@@ -354,41 +355,21 @@ class SimulationUplink(Simulation):
                         antenna_txrx: str) -> np.array:
         """
         Calculates the gains of antennas in station_a in the direction of
-        station_b
-        
-        TODO: change antenna_txrx to an enum variable
-        
+        station_b        
         """
-        if(station_a.num_stations > 1):
-            point_vec_x = station_b.x- station_a.x[:,np.newaxis]
-            point_vec_y = station_b.y - station_a.y[:,np.newaxis]
-            point_vec_z = station_b.height - station_a.height[:,np.newaxis]
-        else:
-            point_vec_x = station_b.x- station_a.x
-            point_vec_y = station_b.y - station_a.y
-            point_vec_z = station_b.height - station_a.height
-            
-        dist = station_a.get_3d_distance_to(station_b)
+        phi, theta = station_a.get_pointing_vector_to(station_b)
         
-        self.phi = np.rad2deg(np.arctan2(point_vec_y,point_vec_x))
-        self.theta = np.rad2deg(np.arccos(point_vec_z/dist))
+        if(station_a.station_type == StationType.IMT_BS):
+            beams_idx = self.bs_to_ue_beam_rbs
+        elif(station_a.station_type == StationType.IMT_UE):
+            beams_idx = np.zeros(self.bs.num_stations)
+        elif(station_a.station_type == StationType.FSS_SS):
+            beams_idx = np.zeros(self.ue.num_stations)
         
         gains = np.zeros_like(self.phi)
-        if(antenna_txrx == "TX"):
-            if(len(np.shape(gains)) != 1):
-                for k in range(station_a.num_stations):
-                    gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
-                         self.theta[k,:],self.beams_idx)
-            else:
-                gains = station_a.tx_antenna[0].calculate_gain(self.phi,self.theta)
-        elif(antenna_txrx == "RX"):
-            if(len(np.shape(gains)) != 1):
-                for k in range(station_a.num_stations):
-                    gains[k,:] = station_a.rx_antenna[k].calculate_gain(self.phi[k,:],\
-                         self.theta[k,:],self.beams_idx)
-            else:
-                gains = station_a.rx_antenna[0].calculate_gain(self.phi,self.theta,\
-                                            self.beams_idx)
+        for k in range(station_a.num_stations):
+            gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
+                 self.theta[k,:],beams_idx)
                 
         return gains
     
