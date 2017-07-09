@@ -43,8 +43,9 @@ class SimulationUplink(Simulation):
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
 
-        self.phi = np.empty(0)
-        self.theta = np.empty(0)
+        self.bs_to_ue_phi = np.empty(0)
+        self.bs_to_ue_theta = np.empty(0)
+        self.bs_to_ue_beam_rbs = np.empty(0)
 
         self.ue = np.empty(0)
         self.bs = np.empty(0)
@@ -68,8 +69,9 @@ class SimulationUplink(Simulation):
         self.coupling_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt_system = np.empty(num_ue)
 
-        self.phi = np.empty([num_bs, num_ue])
-        self.theta = np.empty([num_bs, num_ue])
+        self.bs_to_ue_phi = np.empty([num_bs, num_ue])
+        self.bs_to_ue_theta = np.empty([num_bs, num_ue])
+        self.bs_to_ue_beam_rbs = -1.0*np.ones(num_bs)
 
         self.ue = np.empty(num_ue)
         self.bs = np.empty(num_bs)
@@ -108,9 +110,6 @@ class SimulationUplink(Simulation):
                                                  self.param_imt_antenna,
                                                  self.topology)
         #self.plot_scenario()
-        
-        # reset the index of beams
-        #self.beams_idx = -1*np.ones(self.ue.num_stations, dtype=int)
         
         self.connect_ue_to_bs()
         self.select_ue()
@@ -200,20 +199,28 @@ class SimulationUplink(Simulation):
         """
         Select K UEs randomly from all the UEs linked to one BS as “chosen”
         UEs. These K “chosen” UEs will be scheduled during this snapshot.
-        """
+        """               
+        self.bs_to_ue_phi, self.bs_to_ue_theta = \
+            self.bs.get_pointing_vector_to(self.ue)
+        
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             # select K UE's among the ones that are connected to BS
             random.shuffle(self.link[bs])
             K = self.param_imt.ue_k
             del self.link[bs][K:]
-            # Activate the selected UE's
+            # Activate the selected UE's and create beams
             if self.bs.active[bs]:
                 self.ue.active[self.link[bs]] = np.ones(K, dtype=bool)
-            for ue in self.link[bs]:
-                # add beam to antennas
-                self.ue.antenna[ue].add_beam(self.phi[bs,ue] - 180,
-                                             180 - self.theta[bs,ue])
+                for ue in self.link[bs]:
+                    # add beam to BS antennas
+                    self.bs.antenna[bs].add_beam(self.bs_to_ue_phi[bs,ue],
+                                             self.bs_to_ue_theta[bs,ue])
+                    # add beam to UE antennas
+                    self.ue.antenna[ue].add_beam(self.bs_to_ue_phi[bs,ue] - 180,
+                                             180 - self.bs_to_ue_theta[bs,ue])
+                    # set beam resource block group
+                    self.bs_to_ue_beam_rbs[ue] = len(self.bs.antenna[bs].beam_list) - 1
 
                 
     def scheduler(self):
@@ -293,9 +300,6 @@ class SimulationUplink(Simulation):
         self.coupling_loss_imt_system = np.array(np.transpose(
                                 self.calculate_coupling_loss(self.ue, self.system,
                                             self.propagation_system)).tolist()[0])
-        
-        # TODO: review beams_idx
-        self.beams_idx = -1*np.ones(self.ue.num_stations,dtype=int)
 
         ue_bandwidth = self.num_rb_per_ue * self.param_imt.rb_bandwidth
 
