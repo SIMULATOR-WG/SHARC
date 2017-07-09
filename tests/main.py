@@ -6,10 +6,11 @@ Created on Tue Feb  7 19:23:27 2017
 """
 
 import unittest
+import sys
 
 loader = unittest.TestLoader()
 tests = loader.discover('.')
 testRunner = unittest.runner.TextTestRunner()
 test_results = testRunner.run(tests)
 
-input("Press Enter to continue...")
+sys.exit(0)
