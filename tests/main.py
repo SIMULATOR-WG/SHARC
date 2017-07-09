@@ -11,3 +11,5 @@ loader = unittest.TestLoader()
 tests = loader.discover('.')
 testRunner = unittest.runner.TextTestRunner()
 test_results = testRunner.run(tests)
+
+input("Press Enter to continue...")
