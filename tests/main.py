@@ -13,4 +13,9 @@ tests = loader.discover('.')
 testRunner = unittest.runner.TextTestRunner()
 test_results = testRunner.run(tests)
 
-sys.exit(0)
+if(test_results.errors != [] or test_results.failures != []):
+    try:
+        sys.exit(1)
+    except SystemExit as e:
+        pass
+        
