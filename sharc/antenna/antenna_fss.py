@@ -5,19 +5,19 @@ Created on Thu Apr 13 17:18:59 2017
 @author: edgar
 """
 
-from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna import Antenna
 from sharc.parameters.parameters_fss import ParametersFss
 
 import numpy as np
 
-class AntennaFss(AntennaOmni):
+class AntennaFss(Antenna):
     """
     Implements the satellite antenna pattern in the fixed-satellite service
     according to Recommendation ITU-R S.672-4
     """
     
     def __init__(self, param: ParametersFss):
-        super(AntennaOmni, self).__init__()
+        super().__init__()
         self.peak_gain = param.sat_rx_antenna_gain
         self.l_s = param.sat_rx_antenna_l_s
         
@@ -37,7 +37,8 @@ class AntennaFss(AntennaOmni):
         self.psi_1 = self.psi_0 * np.power(10, (self.peak_gain + self.l_s + 20)/25)
             
         
-    def calculate_gain(self, psi: np.array):
+    def calculate_gain(self, *args, **kwargs) -> np.array:
+        psi = np.asarray(kwargs["theta_vec"])        
         
         p = np.absolute(psi)
         
@@ -59,4 +60,4 @@ class AntennaFss(AntennaOmni):
         idx_4 = np.where(self.psi_1 < p)
         gain[idx_4] = 0
         
-        self.gain = gain
+        return gain

@@ -27,7 +27,7 @@ class AntennaBeamformingImt(Antenna):
         beams (list): vertical and horizontal tilts of beams
     """
     
-    def __init__(self,par: AntennaPar, azimuth: float, elevation: float):
+    def __init__(self, par: AntennaPar, azimuth: float, elevation: float):
         """
         Constructs an AntennaBeamformingImt object.
         Does not receive angles in local coordinate system.
@@ -40,19 +40,21 @@ class AntennaBeamformingImt(Antenna):
             elevation (float): antenna's physical elevation inclination
                 referenced in the x axis
         """
+        super().__init__()
         self.param = par
         
         self.element = AntennaElementImt(par)
         
-        self.__azimuth = azimuth
-        self.__elevation = elevation
+        self.azimuth = azimuth
+        self.elevation = elevation
         
-        self.__n_rows = par.n_rows
-        self.__n_cols = par.n_columns
-        self.__dh = par.element_horiz_spacing
-        self.__dv = par.element_vert_spacing
+        self.n_rows = par.n_rows
+        self.n_cols = par.n_columns
+        self.dh = par.element_horiz_spacing
+        self.dv = par.element_vert_spacing
         
-        self.reset_beams()
+        self.beams_list = []
+        self.w_vec_list = []
     
     def add_beam(self, phi_etilt: float, theta_etilt: float):
         """
@@ -65,11 +67,11 @@ class AntennaBeamformingImt(Antenna):
             phi_etilt (float): azimuth electrical tilt angle [degrees]
             theta_etilt (float): elevation electrical tilt angle [degrees]
         """
-        phi, theta = self.to_local_coord(phi_etilt,theta_etilt)
-        self.__beams_list.append((phi,theta-90))
-        self.__w_vec_list.append(self._weight_vector(phi,theta-90))
+        phi, theta = self.to_local_coord(phi_etilt, theta_etilt)
+        self.beams_list.append((phi, theta-90))
+        self.w_vec_list.append(self._weight_vector(phi, theta-90))
         
-    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array, beams_l: np.array) -> np.array:
+    def calculate_gain(self, *args, **kwargs) -> np.array:
         """
         Calculates the gain in the given direction.
         Does not receive angles in local coordinate system.
@@ -85,54 +87,26 @@ class AntennaBeamformingImt(Antenna):
         -------
         gains (np.array): gain corresponding to each of the given directions.
         """
-        lo_phi_vec, lo_theta_vec = self.to_local_coord(phi_vec,theta_vec)
+        phi_vec = np.asarray(kwargs["phi_vec"])
+        theta_vec = np.asarray(kwargs["theta_vec"])
+        beams_l = np.asarray(kwargs["beams_l"])        
+        
+        lo_phi_vec, lo_theta_vec = self.to_local_coord(phi_vec, theta_vec)
         
         n_direct = len(lo_theta_vec)
         
         gains = np.zeros(n_direct)
         
         for g in range(n_direct):
-                gains[g] = self._beam_gain(lo_phi_vec[g],lo_theta_vec[g],\
-                     beams_l[g])
+                gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g],
+                                           beams_l[g])
                 
         return gains
     
     def reset_beams(self):
-        self.__beams_list = []
-        self.__w_vec_list = []
+        self.beams_list = []
+        self.w_vec_list = []
         
-    @property
-    def azimuth(self):
-        return self.__azimuth
-    
-    @property
-    def elevation(self):
-        return self.__elevation
-    
-    @property
-    def n_rows(self):
-        return self.__n_rows
-    
-    @property
-    def n_cols(self):
-        return self.__n_cols
-    
-    @property
-    def dh(self):
-        return self.__dh
-    
-    @property
-    def dv(self):
-        return self.__dv
-    
-    @property
-    def beams_list(self):
-        return self.__beams_list
-    
-    @property
-    def w_vec_list(self):
-        return self.__w_vec_list
-    
     def _super_position_vector(self,phi: float, theta: float) -> np.array:
         """
         Calculates super position vector.
@@ -214,7 +188,7 @@ class AntennaBeamformingImt(Antenna):
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,w_vec)))**2)
         else:
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec,\
-                                            self.__w_vec_list[beam])))**2)
+                                            self.w_vec_list[beam])))**2)
         
         gain = element_g + array_g
         
@@ -241,7 +215,7 @@ class PlotAntennaPattern(object):
     """
     Plots imt antenna pattern.
     """
-    def __init__(self,figs_dir):
+    def __init__(self, figs_dir):
         self.figs_dir = figs_dir
     
     def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, antenna_type: str, plot_type: str):
@@ -250,14 +224,14 @@ class PlotAntennaPattern(object):
         theta_tilt = 90
         
         # Plot horizontal pattern
-        phi = np.linspace(-180,180, num = 360)
+        phi = np.linspace(-180, 180, num = 360)
         theta = theta_tilt*np.ones(np.size(phi))
 
         if plot_type == "ELEMENT":
             gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
-            antenna.add_beam(phi_escan,theta_tilt)
-            gain = antenna.calculate_gain(phi,theta,np.zeros_like(phi, dtype=int))
+            antenna.add_beam(phi_escan, theta_tilt)
+            gain = antenna.calculate_gain(phi, theta,np.zeros_like(phi, dtype=int))
             
         top_y_lim = np.ceil(np.max(gain)/10)*10
 
@@ -277,13 +251,13 @@ class PlotAntennaPattern(object):
         ax1.set_xlim(-180, 180)
 
         # Plot vertical pattern
-        theta = np.linspace(0,180, num = 360)
+        theta = np.linspace(0, 180, num = 360)
         phi = phi_escan*np.ones(np.size(theta))
 
         if plot_type == "ELEMENT":
             gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
-            gain = antenna.calculate_gain(phi,theta,np.zeros_like(phi, dtype=int))
+            gain = antenna.calculate_gain(phi, theta, np.zeros_like(phi, dtype=int))
 
         ax2 = fig.add_subplot(122, sharey = ax1)
 
