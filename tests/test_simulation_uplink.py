@@ -14,6 +14,7 @@ from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.station_factory import StationFactory
 
 class SimulationUplinkTest(unittest.TestCase):
     
@@ -22,7 +23,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.topology = "SINGLE_BS"
         self.param.num_macrocell_sites = 19
         self.param.num_clusters = 2
-        self.param.intersite_distance = 100
+        self.param.intersite_distance = 200
         self.param.minimum_separation_distance_bs_ue = 10
         self.param.interfered_with = False
         self.param.frequency = 10000
@@ -104,7 +105,33 @@ class SimulationUplinkTest(unittest.TestCase):
         
         
     def test_simulation_2bs_4ue(self):
-        pass
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param,
+                                                                       self.param_ant,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param,
+                                                            self.param_ant,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(11), AntennaOmni(12), AntennaOmni(21), AntennaOmni(22)])
+        
+        self.simulation.connect_ue_to_bs()
+        
+        self.simulation.select_ue()
+        
+        self.simulation.coupling_loss_imt = \
+            np.transpose(self.simulation.calculate_coupling_loss(self.simulation.ue, 
+                                                                 self.simulation.bs,
+                                                                 self.simulation.propagation_imt))
+        
+        self.simulation.scheduler()
+        
+        self.simulation.power_control()
+        
+        self.simulation.calculate_sinr()
+        
 
 
     def test_calculate_gains(self):
