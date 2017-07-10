@@ -149,6 +149,7 @@ class SimulationUplink(Simulation):
         """
         Calculates the path coupling loss from each station_a to all station_b.
         Result is returned as a numpy array with dimensions num_a x num_b
+        TODO: calculate coupling loss between activa stations only
         """
         # Calculate distance from transmitters to receivers. The result is a
         # num_bs x num_ue array
@@ -158,17 +159,17 @@ class SimulationUplink(Simulation):
         if station_b.is_satellite:
             elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
             path_loss = propagation.get_loss(distance=d_3D, 
-                                                             frequency=self.param_imt.frequency,
-                                                             elevation=elevation_angles, 
-                                                             sat_params = self.param_system,
-                                                             earth_to_space = True)
+                                             frequency=self.param_imt.frequency,
+                                             elevation=elevation_angles, 
+                                             sat_params = self.param_system,
+                                             earth_to_space = True)
         else:
             path_loss = propagation.get_loss(distance=np.transpose(d_3D), 
-                                                  distance_2D=np.transpose(d_2D), 
-                                                  frequency=self.param_imt.frequency*np.ones(np.transpose(d_3D).shape),
-                                                  bs_height=station_b.height,
-                                                  ue_height=station_a.height,
-                                                  shadowing=False)
+                                             distance_2D=np.transpose(d_2D), 
+                                             frequency=self.param_imt.frequency*np.ones(np.transpose(d_3D).shape),
+                                             bs_height=station_b.height,
+                                             ue_height=station_a.height,
+                                             shadowing=False)
         # define antenna gains
         gain_a = self.calculate_gains(station_a, station_b)
         gain_b = np.transpose(self.calculate_gains(station_b, station_a))
@@ -363,10 +364,12 @@ class SimulationUplink(Simulation):
             beams_idx = np.zeros(self.ue.num_stations)
         
         gains = np.zeros_like(self.phi)
-        for k in range(station_a.num_stations):
-            gains[k,:] = station_a.tx_antenna[k].calculate_gain(phi_vec=self.phi[k,:],
-                                                                theta_vec=self.theta[k,:],
-                                                                beams_l=beams_idx)
+        station_a_active = np.where(station_a.active)[0]
+        station_b_active = np.where(station_b.active)[0]
+        for k in station_a_active:
+            gains[k,station_b_active] = station_a.tx_antenna[k].calculate_gain(phi_vec=self.phi[k,station_b_active],
+                                                                theta_vec=self.theta[k,station_b_active],
+                                                                beams_l=beams_idx[station_b_active])
                 
         return gains
     
