@@ -68,7 +68,7 @@ class SimulationUplink(Simulation):
 
         self.bs_to_ue_phi = np.empty([num_bs, num_ue])
         self.bs_to_ue_theta = np.empty([num_bs, num_ue])
-        self.bs_to_ue_beam_rbs = -1.0*np.ones(num_bs)
+        self.bs_to_ue_beam_rbs = -1.0*np.ones(num_ue)
 
         self.ue = np.empty(num_ue)
         self.bs = np.empty(num_bs)
@@ -158,15 +158,15 @@ class SimulationUplink(Simulation):
 
         if station_b.is_satellite:
             elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
-            path_loss = propagation.get_loss(distance=d_3D, 
+            path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              frequency=self.param_imt.frequency,
                                              elevation=elevation_angles, 
                                              sat_params = self.param_system,
                                              earth_to_space = True)
         else:
-            path_loss = propagation.get_loss(distance=np.transpose(d_3D), 
-                                             distance_2D=np.transpose(d_2D), 
-                                             frequency=self.param_imt.frequency*np.ones(np.transpose(d_3D).shape),
+            path_loss = propagation.get_loss(distance_3D=d_3D, 
+                                             distance_2D=d_2D, 
+                                             frequency=self.param_imt.frequency*np.ones(d_2D.shape),
                                              bs_height=station_b.height,
                                              ue_height=station_a.height,
                                              shadowing=False)
@@ -186,7 +186,7 @@ class SimulationUplink(Simulation):
         user equipments are distributed and pointed to a certain base station
         according to the decisions taken at TG 5/1 meeting
         """
-        num_ue_per_bs = self.param_imt.ue_k*self.param_imt.ue_m
+        num_ue_per_bs = self.param_imt.ue_k*self.param_imt.ue_k_m
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue_list = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]
@@ -218,7 +218,7 @@ class SimulationUplink(Simulation):
                     self.ue.antenna[ue].add_beam(self.bs_to_ue_phi[bs,ue] - 180,
                                              180 - self.bs_to_ue_theta[bs,ue])
                     # set beam resource block group
-                    self.bs_to_ue_beam_rbs[ue] = len(self.bs.antenna[bs].beam_list) - 1
+                    self.bs_to_ue_beam_rbs[ue] = len(self.bs.antenna[bs].beams_list) - 1
 
                 
     def scheduler(self):
@@ -236,7 +236,7 @@ class SimulationUplink(Simulation):
         Apply uplink power control algorithm
         """
         if self.param_imt.ue_tx_power_control == "OFF":
-            self.param_imt.ue.tx_power = self.param_imt.ue_tx_power*np.ones(self.ue.num_stations)
+            self.param_imt.ue_tx_power = self.param_imt.ue_tx_power*np.ones(self.ue.num_stations)
         else:
             power_aux =  10*np.log10(self.num_rb_per_ue) + self.param_imt.ue_tx_power_target
             for bs in range(self.bs.num_stations):
@@ -348,8 +348,7 @@ class SimulationUplink(Simulation):
             
     def calculate_gains(self,
                         station_a: StationManager,
-                        station_b: StationManager,
-                        antenna_txrx: str) -> np.array:
+                        station_b: StationManager) -> np.array:
         """
         Calculates the gains of antennas in station_a in the direction of
         station_b        
@@ -363,12 +362,12 @@ class SimulationUplink(Simulation):
         elif(station_a.station_type == StationType.FSS_SS):
             beams_idx = np.zeros(self.ue.num_stations)
         
-        gains = np.zeros_like(self.phi)
+        gains = np.zeros(phi.shape)
         station_a_active = np.where(station_a.active)[0]
         station_b_active = np.where(station_b.active)[0]
         for k in station_a_active:
-            gains[k,station_b_active] = station_a.antenna[k].calculate_gain(phi_vec=self.phi[k,station_b_active],
-                                                                            theta_vec=self.theta[k,station_b_active],
+            gains[k,station_b_active] = station_a.antenna[k].calculate_gain(phi_vec=phi[k,station_b_active],
+                                                                            theta_vec=theta[k,station_b_active],
                                                                             beams_l=beams_idx[station_b_active])
                 
         return gains
