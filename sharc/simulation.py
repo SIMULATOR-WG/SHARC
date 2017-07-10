@@ -5,15 +5,14 @@ Created on Wed Jan 11 19:04:03 2017
 @author: edgar
 """
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from sharc.support.observable import Observable
  
-class Simulation(Observable):
-    
-    __metaclass__ = ABCMeta
+class Simulation(ABC, Observable):
     
     def __init__(self):
-        super().__init__()
+        ABC.__init__(self)
+        Observable.__init__(self)
     
         
     @abstractmethod
