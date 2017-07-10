@@ -367,9 +367,9 @@ class SimulationUplink(Simulation):
         station_a_active = np.where(station_a.active)[0]
         station_b_active = np.where(station_b.active)[0]
         for k in station_a_active:
-            gains[k,station_b_active] = station_a.tx_antenna[k].calculate_gain(phi_vec=self.phi[k,station_b_active],
-                                                                theta_vec=self.theta[k,station_b_active],
-                                                                beams_l=beams_idx[station_b_active])
+            gains[k,station_b_active] = station_a.antenna[k].calculate_gain(phi_vec=self.phi[k,station_b_active],
+                                                                            theta_vec=self.theta[k,station_b_active],
+                                                                            beams_l=beams_idx[station_b_active])
                 
         return gains
     
