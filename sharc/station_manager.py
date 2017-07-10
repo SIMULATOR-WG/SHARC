@@ -29,7 +29,7 @@ class StationManager(object):
         self.tx_power = np.empty(n)
         self.rx_power = np.empty(n)
         self.rx_interference = np.empty(n)
-        self.antenna = np.array([Antenna() for i in range(n)])
+        self.antenna = np.empty(n, dtype=Antenna)
         self.bandwidth = np.empty(n)
         self.noise_figure = np.empty(n)
         self.noise_temperature = np.empty(n)
@@ -40,7 +40,7 @@ class StationManager(object):
         self.inr = np.empty(n)
         self.station_type = StationType.NONE
 
-    def get_station_list(self,id=None) -> list:
+    def get_station_list(self, id=None) -> list:
         if(id is None):
             id = range(self.num_stations)
         station_list = list()
@@ -48,7 +48,7 @@ class StationManager(object):
             station_list.append(self.get_station(i))
         return station_list
 
-    def get_station(self,id) -> Station:
+    def get_station(self, id) -> Station:
         station = Station()
         station.id = id
         station.x = self.x[id]
@@ -59,7 +59,16 @@ class StationManager(object):
         station.active = self.active[id]
         station.tx_power = self.tx_power[id]
         station.rx_power = self.rx_power[id]
+        station.rx_interference = self.rx_interference[id]
         station.antenna = self.antenna[id]
+        station.bandwidth = self.bandwidth[id]
+        station.noise_figure = self.noise_figure[id]
+        station.noise_temperature = self.noise_temperature[id]
+        station.thermal_noise = self.thermal_noise[id]
+        station.total_interference = self.total_interference[id]
+        station.snr = self.snr[id]
+        station.sinr = self.sinr[id]
+        station.inr = self.inr[id]
         station.station_type = self.station_type
         return station
 
