@@ -18,7 +18,8 @@ class Antenna(ABC):
     """
     
     def __init__(self):
-        pass
+        self.beams_list = []
+        self.w_vec_list = []
     
     
     @abstractmethod
@@ -26,4 +27,18 @@ class Antenna(ABC):
         """
         Calculates the antenan gain.
         """        
+        pass
+    
+    
+    def add_beam(self, phi_etilt: float, theta_etilt: float):
+        """
+        Add new beam to antenna.
+        Does not receive angles in local coordinate system.
+        Theta taken with z axis as reference.
+        
+        Parameters
+        ----------
+            phi_etilt (float): azimuth electrical tilt angle [degrees]
+            theta_etilt (float): elevation electrical tilt angle [degrees]
+        """
         pass
