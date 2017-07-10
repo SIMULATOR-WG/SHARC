@@ -28,8 +28,8 @@ class TopologySingleBaseStationTest(unittest.TestCase):
         num_clusters = 2
         topology = TopologySingleBaseStation(cell_radius, num_clusters)
         topology.calculate_coordinates()
-        npt.assert_equal(topology.x, np.array([0, 0]))
-        npt.assert_equal(topology.y, np.array([0, 2*cell_radius]))
+        npt.assert_equal(topology.x, np.array([0, 2*cell_radius]))
+        npt.assert_equal(topology.y, np.array([0, 0]))
 
         
     def test_num_clusters(self):
@@ -90,7 +90,7 @@ class TopologySingleBaseStationTest(unittest.TestCase):
         num_clusters = 2
         topology = TopologySingleBaseStation(cell_radius, num_clusters)
         topology.calculate_coordinates()
-        npt.assert_equal(topology.azimuth, np.array([0, 0]))
+        npt.assert_equal(topology.azimuth, np.array([0, 180]))
         
 
     def test_elevation(self):
