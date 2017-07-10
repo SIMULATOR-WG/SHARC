@@ -19,23 +19,23 @@ class PropagationFreeSpaceTest(unittest.TestCase):
         d = 10
         f = 10
         self.assertEqual(12.45, 
-                         self.__freeSpace.get_loss(distance=d, frequency=f))
+                         self.__freeSpace.get_loss(distance_2D=d, frequency=f))
 
         d = [ 10, 100 ]
         f = [ 10, 100 ]
         self.assertTrue(np.all(np.equal([12.45, 52.45], 
-                         self.__freeSpace.get_loss(distance=d, frequency=f))))
+                         self.__freeSpace.get_loss(distance_2D=d, frequency=f))))
 
         d = [ 10, 100, 1000 ]
         f = [ 10, 100, 1000 ]
         self.assertTrue(np.all(np.equal([12.45, 52.45, 92.45], 
-                         self.__freeSpace.get_loss(distance=d, frequency=f))))
+                         self.__freeSpace.get_loss(distance_2D=d, frequency=f))))
 
         d = [[10, 20, 30],[40, 50, 60]]
         f = [ 100 ]
         ref_loss = [[ 32.45,  38.47,  41.99],
                     [ 44.49,  46.42,  48.01]]
-        loss = self.__freeSpace.get_loss(distance=d, frequency=f)
+        loss = self.__freeSpace.get_loss(distance_2D=d, frequency=f)
         self.assertTrue(np.all(np.isclose(ref_loss, loss, atol=1e-2)))         
         
         
