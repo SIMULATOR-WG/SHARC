@@ -39,8 +39,6 @@ class SimulationUplink(Simulation):
         self.propagation_imt = PropagationFactory.createPropagation(self.param_imt.channel_model)
         self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
 
-        self.path_loss_imt = np.empty(0)
-        self.path_loss_imt_system = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
 
@@ -65,8 +63,6 @@ class SimulationUplink(Simulation):
         num_bs = self.topology.num_base_stations
         num_ue = num_bs*self.param_imt.ue_k*self.param_imt.ue_k_m
         
-        self.path_loss_imt = np.empty([num_bs, num_ue])
-        self.path_loss_imt_system = np.empty(num_ue)
         self.coupling_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt_system = np.empty(num_ue)
 
@@ -139,7 +135,6 @@ class SimulationUplink(Simulation):
             pass
         
         self.collect_results(write_to_file, snapshot_number)
-        self.reset_antennas()
 
         
     def finalize(self, snapshot_number, *args, **kwargs):
@@ -162,22 +157,24 @@ class SimulationUplink(Simulation):
 
         if station_b.is_satellite:
             elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
-            self.path_loss = propagation.get_loss(distance=d_3D, frequency=self.param_imt.frequency,
-                                             elevation=elevation_angles, sat_params = self.param_system,
-                                             earth_to_space = True)
+            path_loss = propagation.get_loss(distance=d_3D, 
+                                                             frequency=self.param_imt.frequency,
+                                                             elevation=elevation_angles, 
+                                                             sat_params = self.param_system,
+                                                             earth_to_space = True)
         else:
-            self.path_loss = propagation.get_loss(distance=np.transpose(d_3D), 
+            path_loss = propagation.get_loss(distance=np.transpose(d_3D), 
                                                   distance_2D=np.transpose(d_2D), 
                                                   frequency=self.param_imt.frequency*np.ones(np.transpose(d_3D).shape),
                                                   bs_height=station_b.height,
                                                   ue_height=station_a.height,
                                                   shadowing=False)
         # define antenna gains
-        gain_a = self.calculate_gains(station_a,station_b)
-        gain_b = np.transpose(self.calculate_gains(station_b,station_a))
+        gain_a = self.calculate_gains(station_a, station_b)
+        gain_b = np.transpose(self.calculate_gains(station_b, station_a))
         
         # calculate coupling loss
-        coupling_loss = np.squeeze(self.path_loss - gain_a - gain_b)
+        coupling_loss = np.squeeze(path_loss - gain_a - gain_b)
         
         return coupling_loss
 
@@ -367,8 +364,9 @@ class SimulationUplink(Simulation):
         
         gains = np.zeros_like(self.phi)
         for k in range(station_a.num_stations):
-            gains[k,:] = station_a.tx_antenna[k].calculate_gain(self.phi[k,:],\
-                 self.theta[k,:],beams_idx)
+            gains[k,:] = station_a.tx_antenna[k].calculate_gain(phi_vec=self.phi[k,:],
+                                                                theta_vec=self.theta[k,:],
+                                                                beams_l=beams_idx)
                 
         return gains
     
