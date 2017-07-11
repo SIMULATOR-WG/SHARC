@@ -169,7 +169,8 @@ class SimulationUplink(Simulation):
                                              frequency=self.param_imt.frequency*np.ones(d_2D.shape),
                                              bs_height=station_a.height,
                                              ue_height=station_b.height,
-                                             shadowing=False)
+                                             shadowing=True,
+                                             line_of_sight_prob=self.param_imt.line_of_sight_prob)
         # define antenna gains
         gain_a = self.calculate_gains(station_a, station_b)
         gain_b = np.transpose(self.calculate_gains(station_b, station_a))
