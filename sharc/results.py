@@ -43,6 +43,7 @@ class Results(object):
         self.system_dl_interf_power = list()
 
         self.system_inr = list()
+        self.output_directory = "output"
 
     def add_interf_power_ul(self, sample):
         self.interf_power_ul.extend(sample)
