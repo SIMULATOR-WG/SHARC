@@ -167,8 +167,8 @@ class SimulationUplink(Simulation):
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              distance_2D=d_2D, 
                                              frequency=self.param_imt.frequency*np.ones(d_2D.shape),
-                                             bs_height=station_b.height,
-                                             ue_height=station_a.height,
+                                             bs_height=station_a.height,
+                                             ue_height=station_b.height,
                                              shadowing=False)
         # define antenna gains
         gain_a = self.calculate_gains(station_a, station_b)
