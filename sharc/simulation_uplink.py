@@ -292,9 +292,9 @@ class SimulationUplink(Simulation):
         Calculates interference that IMT system generates on other system
         """
 
-        self.coupling_loss_imt_system = np.array(np.transpose(
-                                self.calculate_coupling_loss(self.ue, self.system,
-                                            self.propagation_system)).tolist()[0])
+        self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system, 
+                                                                     self.ue,
+                                                                     self.propagation_system)
 
         ue_bandwidth = self.num_rb_per_ue * self.param_imt.rb_bandwidth
 
