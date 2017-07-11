@@ -42,7 +42,7 @@ class PropagationUMa(Propagation):
             array with path loss values with dimensions of distance_2D
         
         """
-        d_3D = kwargs["distance"]
+        d_3D = kwargs["distance_3D"]
         d_2D = kwargs["distance_2D"]
         f = kwargs["frequency"]*np.ones(d_2D.shape)
         h_bs = kwargs["bs_height"]
@@ -73,9 +73,7 @@ class PropagationUMa(Propagation):
             loss_nlos = self.get_loss_los(d_2D, d_3D, f, h_bs, h_ue, h_e, shadowing_nlos)
             loss[i_nlos] = loss_nlos[i_nlos]
         
-        # TODO: remove the transposition. This is a hack that makes it working 
-        # only for uplink
-        return np.transpose(loss)
+        return loss
 
         
     def get_loss_los(self, distance_2D: np.array, distance_3D: np.array,
