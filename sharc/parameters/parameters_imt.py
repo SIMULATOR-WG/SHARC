@@ -61,19 +61,10 @@ class ParametersImt(object):
     guard_band_ratio = 0.1
 
     ###########################################################################
-    # Handover margin [dB]
-    ho_margin = 3
-
-    ###########################################################################
     # The load probability (or activity factor) models the statistical
     # variation of the network load by defining the number of fully loaded
     # base stations that are simultaneously transmitting
     bs_load_probability = .5
-
-    ###########################################################################
-    # Number of resource blocks per UE
-    num_resource_blocks = 10
-
 
     ###########################################################################
     # Maximum base station transmit power [dBm]
@@ -185,7 +176,7 @@ class ParametersImt(object):
     #                                    "CI" (close-in FS reference distance)
     #                                    "UMa" (Urban Macro - 3GPP)
     channel_model = "UMa"
-    line_of_sight_prob = 0.75 # probability of line-of-sight (not for FSPL)
+    line_of_sight_prob = 0.75 # probability of line-of-sight (for CI only)
 
     ###########################################################################
 
