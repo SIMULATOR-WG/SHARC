@@ -8,6 +8,7 @@ Created on Mon Apr 10 18:32:30 2017
 import unittest
 import numpy as np
 import numpy.testing as npt
+import math
 
 from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_imt import ParametersImt
@@ -109,29 +110,85 @@ class SimulationUplinkTest(unittest.TestCase):
                                                                        self.param_ant,
                                                                        self.simulation.topology)
         self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
         
         self.simulation.ue = StationFactory.generate_imt_ue(self.param,
                                                             self.param_ant,
                                                             self.simulation.topology)
         self.simulation.ue.x = np.array([20, 70, 110, 170])
         self.simulation.ue.y = np.array([ 0,  0,   0,   0])
-        self.simulation.ue.antenna = np.array([AntennaOmni(11), AntennaOmni(12), AntennaOmni(21), AntennaOmni(22)])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
         
+        # test connection method
         self.simulation.connect_ue_to_bs()
+        self.assertEqual(self.simulation.link, {0: [0,1], 1: [2,3]})
         
-        self.simulation.select_ue()
+        # We do not test the selection method here because in this specific 
+        # scenario we do not want to change the order of the UE's 
+        #self.simulation.select_ue()
         
-        self.simulation.coupling_loss_imt = \
-            np.transpose(self.simulation.calculate_coupling_loss(self.simulation.ue, 
-                                                                 self.simulation.bs,
-                                                                 self.simulation.propagation_imt))
+        # test coupling loss method
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        npt.assert_allclose(self.simulation.coupling_loss_imt, 
+                            np.array([[78.47-1-10,  89.35-1-11,  93.27-1-22,  97.05-1-23], 
+                                      [97.55-2-10,  94.72-2-11,  91.53-2-22,  81.99-2-23]]), 
+                            atol=1e-2)
         
+        # test scheduler and bandwidth allocation
         self.simulation.scheduler()
+        bandwidth_per_ue = math.trunc((1 - 0.1)*100/2)       
+        npt.assert_allclose(self.simulation.ue.bandwidth, bandwidth_per_ue*np.ones(4), atol=1e-2)
         
+        # there is no power control, so UE's will transmit at maximum power
         self.simulation.power_control()
+        npt.assert_allclose(self.simulation.ue.tx_power, 20*np.ones(4))
         
+        # test method that calculates SINR 
         self.simulation.calculate_sinr()
-        
+        # check BS received power
+        npt.assert_allclose(self.simulation.bs.rx_power[0], 
+                            np.array([20-(78.47-1-10), 20-(89.35-1-11)]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.rx_power[1], 
+                            np.array([20-(91.53-2-22), 20-(81.99-2-23)]),
+                            atol=1e-2)        
+        # check BS received interference
+        npt.assert_allclose(self.simulation.bs.rx_interference[0], 
+                            np.array([20-(93.27-1-22),  20-(97.05-1-23)]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.rx_interference[1], 
+                            np.array([20-(97.55-2-10), 20-(94.72-2-11)]),
+                            atol=1e-2)      
+        # check BS thermal noise
+        npt.assert_allclose(self.simulation.bs.thermal_noise, 
+                            10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e6) + 7,
+                            atol=1e-2)
+        # check BS thermal noise + interference
+        npt.assert_allclose(self.simulation.bs.total_interference[0], 
+                            10*np.log10(np.power(10, 0.1*np.array([20-(93.27-1-22),  20-(97.05-1-23)])) +
+                                        np.power(10, 0.1*(-120.44))),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.total_interference[1], 
+                            10*np.log10(np.power(10, 0.1*np.array([20-(97.55-2-10), 20-(94.72-2-11)])) +
+                                        np.power(10, 0.1*(-120.44))),
+                            atol=1e-2)    
+        # check SNR 
+        npt.assert_allclose(self.simulation.bs.snr[0], 
+                            np.array([20-(78.47-1-10) - (-120.44),  20-(89.35-1-11) - (-120.44)]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.snr[1], 
+                            np.array([20-(91.53-2-22) - (-120.44),  20-(81.99-2-23) - (-120.44)]),
+                            atol=1e-2)
+        # check SINR (using only the I term since I >> N in this case)
+        npt.assert_allclose(self.simulation.bs.sinr[0], 
+                            np.array([20-(78.47-1-10) - (20-(93.27-1-22)),  20-(89.35-1-11) - (20-(97.05-1-23))]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.sinr[1], 
+                            np.array([20-(91.53-2-22) - (20-(97.55-2-10)),  20-(81.99-2-23) - (20-(94.72-2-11))]),
+                            atol=1e-2)
 
 
     def test_calculate_gains(self):
