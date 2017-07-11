@@ -32,7 +32,7 @@ class PropagationUMa(Propagation):
         ----------
             distance (np.array) : 3D distances between stations
             distance_2D (np.array) : 2D distances between stations
-            frequency (float) : center frequencie [MHz]
+            frequency (np.array) : center frequencie [MHz]
             bs_height (np.array) : base station antenna heights
             ue_height (np.array) : user equipment antenna heights
             shadowing (bool) : if shadowing should be added or not
@@ -44,13 +44,13 @@ class PropagationUMa(Propagation):
         """
         d_3D = kwargs["distance_3D"]
         d_2D = kwargs["distance_2D"]
-        f = kwargs["frequency"]*np.ones(d_2D.shape)
+        f = kwargs["frequency"]
         h_bs = kwargs["bs_height"]
         h_ue = kwargs["ue_height"]
         h_e = np.ones(d_2D.shape)
-        shadowing = kwargs["shadowing"]
+        std = kwargs["shadowing"]
         
-        if shadowing:
+        if std:
             shadowing_los = 4
             shadowing_nlos = 6
         else:

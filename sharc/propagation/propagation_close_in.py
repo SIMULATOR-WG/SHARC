@@ -26,10 +26,10 @@ class PropagationCloseIn(Propagation):
 
 
     def get_loss(self, *args, **kwargs) -> np.array:
-        d = np.asarray(kwargs["distance"])
+        d = np.asarray(kwargs["distance_2D"])
         f = np.asarray(kwargs["frequency"])
         p_los = kwargs["line_of_sight_prob"]
-        std = kwargs["shadowing_std"]
+        std = kwargs["shadowing"]
 
         line_of_sight = np.random.sample(d.shape) <= p_los
 
