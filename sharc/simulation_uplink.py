@@ -112,9 +112,9 @@ class SimulationUplink(Simulation):
         self.select_ue()
         
         # Calculate coupling loss after beams are created
-        self.coupling_loss_imt = np.transpose( \
-                             self.calculate_coupling_loss(self.ue, self.bs,
-                                                          self.propagation_imt))
+        self.coupling_loss_imt = self.calculate_coupling_loss(self.bs, 
+                                                              self.ue,
+                                                              self.propagation_imt)
         self.scheduler()
         self.power_control()
         
@@ -130,7 +130,7 @@ class SimulationUplink(Simulation):
             # Execute this piece of code if IMT generates interference into
             # the other system
             self.calculate_sinr()
-            self.calculate_external_interference()
+            #self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass
         
@@ -156,7 +156,7 @@ class SimulationUplink(Simulation):
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
 
-        if station_b.is_satellite:
+        if station_b.station_type is StationType.FSS_SS:
             elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              frequency=self.param_imt.frequency,
@@ -226,7 +226,8 @@ class SimulationUplink(Simulation):
         This scheduler divides the available resource blocks among UE's for
         a given BS
         """
-        for bs in range(self.bs.num_stations):
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
             ue_list = self.link[bs]
             self.ue.bandwidth[ue_list] = self.num_rb_per_ue*self.param_imt.rb_bandwidth
 
@@ -236,11 +237,14 @@ class SimulationUplink(Simulation):
         Apply uplink power control algorithm
         """
         if self.param_imt.ue_tx_power_control == "OFF":
-            self.param_imt.ue_tx_power = self.param_imt.ue_tx_power*np.ones(self.ue.num_stations)
+            ue_active = np.where(self.ue.active)[0]
+            self.ue.tx_power[ue_active] = self.param_imt.ue_tx_power*np.ones(len(ue_active))
         else:
             power_aux =  10*np.log10(self.num_rb_per_ue) + self.param_imt.ue_tx_power_target
-            for bs in range(self.bs.num_stations):
-                power2 = self.coupling_loss[self.link[bs], bs]
+            bs_active = np.where(self.bs.active)[0]
+            for bs in bs_active:
+                ue = self.link[bs]
+                power2 = self.coupling_loss_imt[bs,ue]
                 self.ue.tx_power[self.link[bs]] = np.minimum(self.param_imt.ue_tx_power,
                                                              self.param_imt.ue_tx_power_alfa*power2 + power_aux)
 
@@ -250,14 +254,6 @@ class SimulationUplink(Simulation):
         Calculates the uplink SINR for each UE. This is useful only in the
         cases when IMT system is interfered by other system
         """
-        # This part is commented because it was moved to StationFactory
-        # TODO: delete it permanently after testing
-#        self.bs.rx_power = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-#        self.bs.rx_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-#        self.bs.total_interference = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-#        self.bs.snr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-#        self.bs.sinr = dict([(bs, -500 * np.ones(len(self.link[bs]))) for bs in bs_active])
-
         # calculate uplink received power for each active BS
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
