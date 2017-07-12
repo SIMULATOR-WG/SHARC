@@ -25,6 +25,7 @@ class PropagationABG(Propagation):
         self.alpha = 3.4
         self.beta = 19.2
         self.gamma = 2.3
+        self.building_loss = 20
         self.shadowing_sigma_dB = 6.5
     
     
@@ -35,8 +36,9 @@ class PropagationABG(Propagation):
         
         Parameters
         ----------
-            distance (np.array) : distances between stations [m]
+            distance_2D (np.array) : distances between stations [m]
             frequency (np.array) : center frequencie [MHz]
+            line_of_sight_prob (float) : probability of LOS
             alpha (float): captures how the PL increases as the distance increases
             beta (float): floating offset value in dB
             gamma(float): captures the PL variation over the frequency
@@ -49,6 +51,9 @@ class PropagationABG(Propagation):
         """
         d = kwargs["distance_2D"]
         f = kwargs["frequency"]
+        p_los = kwargs["line_of_sight_prob"]
+
+        building_loss = np.random.choice([0, self.building_loss], d.shape, p=[p_los, 1-p_los])
         
         if "alpha" in kwargs:
             self.alpha = kwargs["alpha"]
@@ -71,7 +76,8 @@ class PropagationABG(Propagation):
             shadowing = 0
             
        
-        loss = 10*self.alpha*np.log10(d) + self.beta + 10*self.gamma*np.log10(f*1e-3) + shadowing
+        loss = 10*self.alpha*np.log10(d) + self.beta + 10*self.gamma*np.log10(f*1e-3) + \
+                shadowing + building_loss
         
         return loss
 

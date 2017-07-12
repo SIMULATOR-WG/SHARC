@@ -27,7 +27,13 @@ class PropagationABGTest(unittest.TestCase):
         shadowing = 0
         loss = np.array ([[120.121, 143.886347],[140.591406, 112.578509]])
        
-        npt.assert_allclose(self.abg.get_loss(distance_2D = d, frequency = f, ABG_alpha = alpha, ABG_beta = beta, ABG_gamma = gamma, shadowing = shadowing),
+        npt.assert_allclose(self.abg.get_loss(distance_2D = d, 
+                                              frequency = f, 
+                                              line_of_sight_prob = 1,
+                                              alpha = alpha, 
+                                              beta = beta, 
+                                              gamma = gamma, 
+                                              shadowing = shadowing),
                              loss,atol=1e-2)
 
         d = np.array([500, 3000])
@@ -38,5 +44,11 @@ class PropagationABGTest(unittest.TestCase):
         shadowing = 0
         
         loss = np.array ([143.886,174.269])
-        npt.assert_allclose(self.abg.get_loss(distance_2D = d, frequency = f, ABG_alpha = alpha, ABG_beta = beta, ABG_gamma = gamma, shadowing = shadowing),
+        npt.assert_allclose(self.abg.get_loss(distance_2D = d, 
+                                              frequency = f, 
+                                              line_of_sight_prob = 1,
+                                              alpha = alpha, 
+                                              beta = beta, 
+                                              gamma = gamma, 
+                                              shadowing = shadowing),
                            loss ,atol=1e-2)
