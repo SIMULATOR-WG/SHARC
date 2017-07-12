@@ -100,7 +100,7 @@ class SimulationUplink(Simulation):
         
         # Create the other system (FSS, HAPS, etc...)
         # Currently it supports only FSS space station
-        self.system = StationFactory.generate_fss_stations(self.param_system)
+        self.system = StationFactory.generate_fss_space_stations(self.param_system)
 
         # Create IMT user equipments
         self.ue = StationFactory.generate_imt_ue(self.param_imt,
@@ -292,8 +292,8 @@ class SimulationUplink(Simulation):
         Calculates interference that IMT system generates on other system
         """
 
-        self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system, 
-                                                                     self.ue,
+        self.coupling_loss_imt_system = self.calculate_coupling_loss(self.ue, 
+                                                                     self.system,
                                                                      self.propagation_system)
 
         ue_bandwidth = self.num_rb_per_ue * self.param_imt.rb_bandwidth
@@ -313,11 +313,6 @@ class SimulationUplink(Simulation):
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
                           self.param_system.sat_noise_temperature) + \
                           10*math.log10(self.param_system.sat_bandwidth * 1e6)
-
-        # calculate I+N
-        self.system.total_interference = \
-            10*np.log10(np.power(10, 0.1*self.system.rx_interference) + \
-                        np.power(10, 0.1*self.system.thermal_noise))
 
         # calculate INR at the system
         self.system.inr = self.system.rx_interference - self.system.thermal_noise
