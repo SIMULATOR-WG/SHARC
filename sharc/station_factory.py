@@ -41,7 +41,6 @@ class StationFactory(object):
         imt_base_stations.snr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.sinr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         
-        #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
         par = param_ant.get_antenna_parameters("BS", "RX")
         
@@ -50,6 +49,7 @@ class StationFactory(object):
             AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
                                   imt_base_stations.elevation[i])
         
+        #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
@@ -128,13 +128,13 @@ class StationFactory(object):
         imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
 
-        #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         # TODO: this piece of code works only for uplink
         par = param_ant.get_antenna_parameters("UE","TX")
         for i in range(num_ue):
             imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i], 
                                                          imt_ue.elevation[i])
             
+        #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         return imt_ue
