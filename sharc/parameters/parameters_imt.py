@@ -20,7 +20,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Network topology. Possible values are "MACROCELL", "HOTSPOT", "SINGLE_BS"
-    topology = "HOTSPOT"
+    topology = "MACROCELL"
 
     ###########################################################################
     # Number of macrocell sites per cluster (must set to 19 in macrocell network)
@@ -32,7 +32,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 400
+    intersite_distance = 150
 
     ###########################################################################
     # Minimum 2D separation distance from BS to UE
@@ -44,7 +44,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT center frequency [MHz]
-    frequency = 27250
+    frequency = 26000
 
     ###########################################################################
     # IMT bandwidth [MHz]
@@ -84,7 +84,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Base station noise figure [dB]
-    bs_noise_figure = 7
+    bs_noise_figure = 10
 
     ###########################################################################
     # User equipment noise temperature [K]
@@ -132,7 +132,7 @@ class ParametersImt(object):
     ###########################################################################
     # Alfa is the balacing factor for UEs with bad channel
     # and UEs with good channel
-    ue_tx_power_alfa = 0.8
+    ue_tx_power_alfa = 1
 
     ###########################################################################
     # UE maximum transmit power [dBm]
@@ -152,11 +152,15 @@ class ParametersImt(object):
 
     ###########################################################################
     # User equipment noise figure [dB]
-    ue_noise_figure = 9
+    ue_noise_figure = 10
 
     ###########################################################################
     # User equipment feed loss [dB]
     ue_feed_loss = 3
+
+    ###########################################################################
+    # User equipment body loss [dB]
+    ue_body_loss = 4
 
     ###########################################################################
     # Downlink attenuation factor used in link-to-system mapping
@@ -175,8 +179,10 @@ class ParametersImt(object):
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "CI" (close-in FS reference distance)
     #                                    "UMa" (Urban Macro - 3GPP)
-    channel_model = "UMa"
-    line_of_sight_prob = 0.75 # probability of line-of-sight (for CI only)
+    #                                    "UMi" (Urban Micro - 3GPP)
+    #                                    "ABG" (Alpha-Beta-Gamma)
+    channel_model = "ABG"
+    line_of_sight_prob = 0.95 # probability of line-of-sight (CI and ABG)
 
     ###########################################################################
 
