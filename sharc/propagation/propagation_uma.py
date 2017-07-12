@@ -30,7 +30,7 @@ class PropagationUMa(Propagation):
         
         Parameters
         ----------
-            distance (np.array) : 3D distances between stations
+            distance_3D (np.array) : 3D distances between stations
             distance_2D (np.array) : 2D distances between stations
             frequency (np.array) : center frequencie [MHz]
             bs_height (np.array) : base station antenna heights
