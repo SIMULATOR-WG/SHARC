@@ -55,7 +55,7 @@ class SimulationUplink(Simulation):
         self.num_rb_per_bs = 0
         self.num_rb_per_ue = 0
 
-        self.results = Results()
+        self.results = None
 
         
     def initialize(self, *args, **kwargs):
@@ -83,7 +83,9 @@ class SimulationUplink(Simulation):
         self.num_rb_per_bs = math.trunc((1-self.param_imt.guard_band_ratio)* \
                             self.param_imt.bandwidth /self.param_imt.rb_bandwidth)
         # calculates the number of RB per UE on a given BS
-        self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.param_imt.ue_k)        
+        self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.param_imt.ue_k)
+        
+        self.results = Results()
         
         
     def snapshot(self, write_to_file, snapshot_number, *args, **kwargs):
@@ -130,7 +132,7 @@ class SimulationUplink(Simulation):
             # Execute this piece of code if IMT generates interference into
             # the other system
             self.calculate_sinr()
-            #self.calculate_external_interference()
+            self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass
         
@@ -139,7 +141,6 @@ class SimulationUplink(Simulation):
         
     def finalize(self, snapshot_number, *args, **kwargs):
         self.results.write_files(snapshot_number)
-        self.notify_observers(source=__name__, results=self.results)
 
 
     def calculate_coupling_loss(self,
@@ -336,6 +337,8 @@ class SimulationUplink(Simulation):
             
         if write_to_file:
             self.results.write_files(snapshot_number)
+            self.notify_observers(source=__name__, results=self.results)
+
 
             
     def calculate_gains(self,
