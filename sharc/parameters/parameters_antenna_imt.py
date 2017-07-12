@@ -32,7 +32,7 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # Base station horizontal 3dB beamwidth of single transmit element [degrees]
-    bs_tx_element_phi_3db = 80
+    bs_tx_element_phi_3db = 65
     
     ###########################################################################
     # Base station vertical 3dB beamwidth of single transmit element [degrees]
@@ -48,11 +48,11 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # Base station number of rows in transmit array
-    bs_tx_n_rows = 16
+    bs_tx_n_rows = 8
     
     ###########################################################################
     # Base station number of columns in transmit array
-    bs_tx_n_columns = 16
+    bs_tx_n_columns = 8
     
     ###########################################################################
     # Base station array horizontal transmit element spacing (d/lambda)
@@ -104,19 +104,19 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE horizontal 3dB beamwidth of single transmit element [degrees]
-    ue_tx_element_phi_3db = 80
+    ue_tx_element_phi_3db = 90
     
     ###########################################################################
     # UE vertical 3dB beamwidth of single transmit element [degrees]
-    ue_tx_element_theta_3db = 65
+    ue_tx_element_theta_3db = 90
     
     ###########################################################################
     # UE front to back ratio of single transmit element [dB]
-    ue_tx_element_am = 30
+    ue_tx_element_am = 25
     
     ###########################################################################
     # UE transmit element vertical sidelobe attenuation [dB]
-    ue_tx_element_sla_v = 30
+    ue_tx_element_sla_v = 25
     
     ###########################################################################
     # UE number of rows in transmit array
@@ -124,7 +124,7 @@ class ParametersAntennaImt(object):
     
     ###########################################################################
     # UE number of columns in transmit array
-    ue_tx_n_columns = 2
+    ue_tx_n_columns = 4
     
     ###########################################################################
     # UE array horizontal transmit element spacing (d/lambda)
