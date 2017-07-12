@@ -183,6 +183,6 @@ class StationFactory(object):
         fss_space_station.total_interference = -500*np.ones(1)
         fss_space_station.snr = None
         fss_space_station.sinr = None
-        fss_space_station.inr = -500*np.ones(1)
+        fss_space_station.inr = None
         
         return fss_space_station
