@@ -163,7 +163,8 @@ class SimulationUplink(Simulation):
                                              frequency=self.param_imt.frequency,
                                              elevation=elevation_angles, 
                                              sat_params = self.param_system,
-                                             earth_to_space = True)
+                                             earth_to_space = True,
+                                             line_of_sight_prob=self.param_system.line_of_sight_prob)
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              distance_2D=d_2D, 
