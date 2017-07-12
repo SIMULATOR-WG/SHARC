@@ -30,9 +30,9 @@ class PropagationUMi(Propagation):
         
         Parameters
         ----------
-            distance (np.array) : 3D distances between stations
+            distance_3D (np.array) : 3D distances between stations
             distance_2D (np.array) : 2D distances between stations
-            frequency (float) : center frequencie [MHz]
+            frequency (np.array) : center frequencie [MHz]
             bs_height (np.array) : base station antenna heights
             ue_height (np.array) : user equipment antenna heights
             shadowing (bool) : if shadowing should be added or not
@@ -42,15 +42,15 @@ class PropagationUMi(Propagation):
             array with path loss values with dimensions of distance_2D
         
         """
-        d_3D = kwargs["distance"]
+        d_3D = kwargs["distance_3D"]
         d_2D = kwargs["distance_2D"]
-        f = kwargs["frequency"]*np.ones(d_2D.shape)
+        f = kwargs["frequency"]
         h_bs = kwargs["bs_height"]
         h_ue = kwargs["ue_height"]
         h_e = np.ones(d_2D.shape)
-        shadowing = kwargs["shadowing"]
+        std = kwargs["shadowing"]
         
-        if shadowing:
+        if std:
             shadowing_los = 4
             shadowing_nlos = 7.82
         else:
@@ -73,9 +73,7 @@ class PropagationUMi(Propagation):
             loss_nlos = self.get_loss_los(d_2D, d_3D, f, h_bs, h_ue, h_e, shadowing_nlos)
             loss[i_nlos] = loss_nlos[i_nlos]
         
-        # TODO: remove the transposition. This is a hack that makes it working 
-        # only for uplink
-        return np.transpose(loss)
+        return loss
 
         
     def get_loss_los(self, distance_2D: np.array, distance_3D: np.array,
