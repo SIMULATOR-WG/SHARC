@@ -68,7 +68,7 @@ class SimulationUplink(Simulation):
 
         self.bs_to_ue_phi = np.empty([num_bs, num_ue])
         self.bs_to_ue_theta = np.empty([num_bs, num_ue])
-        self.bs_to_ue_beam_rbs = -1.0*np.ones(num_ue)
+        self.bs_to_ue_beam_rbs = -1.0*np.ones(num_ue, dtype=int)
 
         self.ue = np.empty(num_ue)
         self.bs = np.empty(num_bs)
@@ -355,9 +355,9 @@ class SimulationUplink(Simulation):
         if(station_a.station_type == StationType.IMT_BS):
             beams_idx = self.bs_to_ue_beam_rbs
         elif(station_a.station_type == StationType.IMT_UE):
-            beams_idx = np.zeros(self.bs.num_stations)
+            beams_idx = np.zeros(self.bs.num_stations,dtype=int)
         elif(station_a.station_type == StationType.FSS_SS):
-            beams_idx = np.zeros(self.ue.num_stations)
+            beams_idx = np.zeros(self.ue.num_stations,dtype=int)
         
         gains = np.zeros(phi.shape)
         station_a_active = np.where(station_a.active)[0]

@@ -87,7 +87,7 @@ class AntennaBeamformingImt(Antenna):
         """
         phi_vec = np.asarray(kwargs["phi_vec"])
         theta_vec = np.asarray(kwargs["theta_vec"])
-        beams_l = np.asarray(kwargs["beams_l"])        
+        beams_l = np.asarray(kwargs["beams_l"],dtype=int)        
         
         lo_phi_vec, lo_theta_vec = self.to_local_coord(phi_vec, theta_vec)
         
