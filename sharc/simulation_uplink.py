@@ -39,6 +39,7 @@ class SimulationUplink(Simulation):
         self.propagation_imt = PropagationFactory.createPropagation(self.param_imt.channel_model)
         self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
 
+        self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
 
@@ -63,6 +64,7 @@ class SimulationUplink(Simulation):
         num_bs = self.topology.num_base_stations
         num_ue = num_bs*self.param_imt.ue_k*self.param_imt.ue_k_m
         
+        self.path_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt_system = np.empty(num_ue)
 
@@ -173,6 +175,7 @@ class SimulationUplink(Simulation):
                                              ue_height=station_b.height,
                                              shadowing=True,
                                              line_of_sight_prob=self.param_imt.line_of_sight_prob)
+            self.path_loss_imt = path_loss
         # define antenna gains
         gain_a = self.calculate_gains(station_a, station_b)
         gain_b = np.transpose(self.calculate_gains(station_b, station_a))
@@ -247,7 +250,8 @@ class SimulationUplink(Simulation):
             bs_active = np.where(self.bs.active)[0]
             for bs in bs_active:
                 ue = self.link[bs]
-                power2 = self.coupling_loss_imt[bs,ue]
+                #power2 = self.coupling_loss_imt[bs,ue]
+                power2 = self.path_loss_imt[bs,ue]
                 self.ue.tx_power[self.link[bs]] = np.minimum(self.param_imt.ue_tx_power,
                                                              self.param_imt.ue_tx_power_alfa*power2 + power_aux)
 
@@ -261,14 +265,16 @@ class SimulationUplink(Simulation):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue_list = self.link[bs]
-            self.bs.rx_power[bs] = self.ue.tx_power[ue_list] - self.coupling_loss_imt[bs,ue_list]
+            self.bs.rx_power[bs] = self.ue.tx_power[ue_list] - self.coupling_loss_imt[bs,ue_list] \
+                                    - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss - self.param_imt.bs_feed_loss
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]
 
             # calculate intra system interference
             for bi in bs_interf:
                 ui_list = self.link[bi]
-                interference = self.ue.tx_power[ui_list] - self.coupling_loss_imt[bs,ui_list]
+                interference = self.ue.tx_power[ui_list] - self.coupling_loss_imt[bs,ui_list] \
+                                - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss - self.param_imt.bs_feed_loss
                 self.bs.rx_interference[bs] = 10*np.log10( \
                     np.power(10, 0.1*self.bs.rx_interference[bs])
                     + np.power(10, 0.1*interference))
@@ -305,7 +311,8 @@ class SimulationUplink(Simulation):
         # calculate interference only from active UE's
         ue_active = np.where(self.ue.active)[0]
         interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_imt_system[ue_active] \
-                            + 10*math.log10(ue_bandwidth/self.param_system.bandwidth)
+                            + 10*math.log10(ue_bandwidth/self.param_system.bandwidth) \
+                            - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss
 
         # calculate the aggregate interference on system
         self.system.rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference_ue)))
