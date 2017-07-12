@@ -11,7 +11,7 @@ import numpy as np
 import numpy.testing as npt
 
 
-from sharc.propagation.propagation_ABG import PropagationABG
+from sharc.propagation.propagation_abg import PropagationABG
 
 class PropagationABGTest(unittest.TestCase):
     
