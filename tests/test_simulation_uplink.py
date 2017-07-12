@@ -103,8 +103,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param_ant.ue_rx_element_vert_spacing = 1
         
         self.param_service = ParametersFss()
-        self.param_service.sat_frequency = 10000
-        self.param_service.sat_bandwidth = 100
+        self.param_service.frequency = 10000
+        self.param_service.bandwidth = 100
         self.param_service.sat_altitude = 35786000
         self.param_service.sat_lat_deg = 0
         self.param_service.sat_noise_temperature = 950

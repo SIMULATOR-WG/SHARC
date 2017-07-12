@@ -160,7 +160,7 @@ class SimulationUplink(Simulation):
         if station_b.station_type is StationType.FSS_SS:
             elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
             path_loss = propagation.get_loss(distance_3D=d_3D, 
-                                             frequency=self.param_imt.frequency,
+                                             frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              elevation=elevation_angles, 
                                              sat_params = self.param_system,
                                              earth_to_space = True,
@@ -305,7 +305,7 @@ class SimulationUplink(Simulation):
         # calculate interference only from active UE's
         ue_active = np.where(self.ue.active)[0]
         interference_ue = self.ue.tx_power[ue_active] - self.coupling_loss_imt_system[ue_active] \
-                            + 10*math.log10(ue_bandwidth/self.param_system.sat_bandwidth)
+                            + 10*math.log10(ue_bandwidth/self.param_system.bandwidth)
 
         # calculate the aggregate interference on system
         self.system.rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference_ue)))
@@ -314,7 +314,7 @@ class SimulationUplink(Simulation):
         self.system.thermal_noise = \
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
                           self.param_system.sat_noise_temperature) + \
-                          10*math.log10(self.param_system.sat_bandwidth * 1e6)
+                          10*math.log10(self.param_system.bandwidth * 1e6)
 
         # calculate INR at the system
         self.system.inr = self.system.rx_interference - self.system.thermal_noise
