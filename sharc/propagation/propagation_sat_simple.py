@@ -22,7 +22,7 @@ class PropagationSatSimple(Propagation):
 
         
     def get_loss(self, *args, **kwargs) -> np.array:
-        d = np.asarray(kwargs["distance"])
+        d = np.asarray(kwargs["distance_3D"])
         f = np.asarray(kwargs["frequency"])
         p_los = kwargs["line_of_sight_prob"]
         
