@@ -184,7 +184,7 @@ class View(tkinter.Tk, Observer):
         elif state is State.RUNNING:
             self.__start_button.config(state=tkinter.DISABLED)
             self.__stop_button.config(state=tkinter.NORMAL)
-            self.__results_button.config(state=tkinter.DISABLED)
+            self.__results_button.config(state=tkinter.NORMAL)
             self.__stop_button.focus_set()
         elif state is State.STOPPING:
             self.__start_button.config(state=tkinter.DISABLED)
