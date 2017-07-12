@@ -15,13 +15,17 @@ from cycler import cycler
  
 class PropagationABG(Propagation):
     """
-    Implements the ABG loss model according to the article "Propagation Path Loss Models for 5G Urban Microand
-    Macro-Cellular Scenarios"
+    Implements the ABG loss model according to the article "Propagation Path 
+    Loss Models for 5G Urban Microand Macro-Cellular Scenarios"
     """
     
     
     def __init__(self):
-        super(Propagation, self).__init__()    
+        super().__init__()
+        self.alpha = 3.4
+        self.beta = 19.2
+        self.gamma = 2.3
+        self.shadowing_sigma_dB = 6.5
     
     
     def get_loss(self, *args, **kwargs) -> np.array:
@@ -31,42 +35,49 @@ class PropagationABG(Propagation):
         
         Parameters
         ----------
-            distance (np.array) : distances between stations (m)
-            frequency (float) : center frequencie [MHz]
-            shadowing (float) : SF term in dB
+            distance (np.array) : distances between stations [m]
+            frequency (np.array) : center frequencie [MHz]
             alpha (float): captures how the PL increases as the distance increases
             beta (float): floating offset value in dB
-            gama(float): captures the PL variation over the frequency
-            shadowing (float) : standard deviation value
+            gamma(float): captures the PL variation over the frequency
+            shadowing (bool) : standard deviation value
 
         Returns
         -------
             array with path loss values with dimensions of distance_2D
         
         """
-        d = kwargs["distance"]
-        f = kwargs["frequency"]*(1e-3) #converts to GHz
-        alpha = kwargs["ABG_alpha"]
-        beta = kwargs["ABG_beta"]
-        gamma = kwargs["ABG_gamma"]
-        x_sf = kwargs["shadowing"] 
+        d = kwargs["distance_2D"]
+        f = kwargs["frequency"]
+        
+        if "alpha" in kwargs:
+            self.alpha = kwargs["alpha"]
+            
+        if "beta" in kwargs:
+            self.beta = kwargs["beta"]
+            
+        if "gamma" in kwargs:
+            self.gamma = kwargs["gamma"]
+            
+        if "shadowing" in kwargs:
+            std = kwargs["shadowing"] 
+        else:
+            std = False
         
     
-        if x_sf:
-            shadowing_std = np.random.normal(0, x_sf, d.shape)
+        if std:
+            shadowing = np.random.normal(0, self.shadowing_sigma_dB, d.shape)
         else:
-            shadowing_std = 0
+            shadowing = 0
             
        
-        loss = 10*alpha*np.log10(d) + beta + 10*gamma*np.log10(f) + shadowing_std
+        loss = 10*self.alpha*np.log10(d) + self.beta + 10*self.gamma*np.log10(f*1e-3) + shadowing
         
         return loss
 
    
   
 if __name__ == '__main__':
-    
-   
         
     ###########################################################################
     # Print path loss for ABG and Free Space models
@@ -76,7 +87,7 @@ if __name__ == '__main__':
     
     shadowing_std = 0
     distance = np.linspace(1, 10000, num=10000)[:,np.newaxis]
-    frequency = 27000
+    frequency = 27000*np.ones(distance.shape)
     alphaUMA = 3.4
     betaUMA = 19.2
     gammaUMA = 2.3
@@ -87,17 +98,17 @@ if __name__ == '__main__':
     gammaUMI = 2.13
     x_sfUMI = 0
     
-    lossUMA_NLOS = ABG.get_loss(distance = distance, frequency = frequency, ABG_alpha = alphaUMA, ABG_beta = betaUMA, ABG_gamma = gammaUMA, shadowing = x_sfUMA)
-    lossUMI_NLOS = ABG.get_loss(distance = distance, frequency = frequency, ABG_alpha = alphaUMI, ABG_beta = betaUMI, ABG_gamma = gammaUMI, shadowing = x_sfUMI)
-    loss_fs = PropagationFreeSpace().get_loss(distance=distance, frequency=frequency)
+    lossUMA_NLOS = ABG.get_loss(distance_2D = distance, frequency = frequency, alpha = alphaUMA, beta = betaUMA, gamma = gammaUMA)
+    lossUMI_NLOS = ABG.get_loss(distance_2D = distance, frequency = frequency, alpha = alphaUMI, beta = betaUMI, gamma = gammaUMI)
+    loss_fs = PropagationFreeSpace().get_loss(distance_2D=distance, frequency=frequency)
     
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
-    ax.plot(distance, lossUMA_NLOS, label="UMa NLOS scenario")
-    ax.plot(distance, lossUMI_NLOS, label="Umi Street Canyon NLOS scenario")
-    ax.plot(distance, loss_fs, label="Free space")
+    ax.semilogx(distance, lossUMA_NLOS, label="UMa NLOS scenario")
+    ax.semilogx(distance, lossUMI_NLOS, label="Umi Street Canyon NLOS scenario")
+    ax.semilogx(distance, loss_fs, label="Free space")
         
     plt.title("ABG path loss model")
     plt.xlabel("distance [m]")
