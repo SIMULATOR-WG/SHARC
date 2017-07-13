@@ -39,6 +39,7 @@ class SimulationUplink(Simulation):
         self.propagation_imt = PropagationFactory.createPropagation(self.param_imt.channel_model)
         self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
 
+        self.imt_bs_antenna_gain = list()
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
@@ -64,6 +65,7 @@ class SimulationUplink(Simulation):
         num_bs = self.topology.num_base_stations
         num_ue = num_bs*self.param_imt.ue_k*self.param_imt.ue_k_m
         
+        self.imt_bs_antenna_gain = list()
         self.path_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt_system = np.empty(num_ue)
@@ -159,10 +161,11 @@ class SimulationUplink(Simulation):
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
 
-        if station_b.station_type is StationType.FSS_SS:
-            elevation_angles = station_a.get_elevation_angle(station_b, self.param_system)
+        if station_a.station_type is StationType.FSS_SS:
+            elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
+                                             indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, 
                                              sat_params = self.param_system,
                                              earth_to_space = True,
@@ -171,14 +174,19 @@ class SimulationUplink(Simulation):
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              distance_2D=d_2D, 
                                              frequency=self.param_imt.frequency*np.ones(d_2D.shape),
+                                             indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              bs_height=station_a.height,
                                              ue_height=station_b.height,
-                                             shadowing=True,
+                                             shadowing=self.param_imt.shadowing,
                                              line_of_sight_prob=self.param_imt.line_of_sight_prob)
             self.path_loss_imt = path_loss
         # define antenna gains
         gain_a = self.calculate_gains(station_a, station_b)
         gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+        
+        # collect IMT BS antenna gain samples
+        if station_a.station_type is StationType.IMT_BS:
+            self.imt_bs_antenna_gain = gain_a
         
         # calculate coupling loss
         coupling_loss = np.squeeze(path_loss - gain_a - gain_b)
@@ -246,14 +254,16 @@ class SimulationUplink(Simulation):
             ue_active = np.where(self.ue.active)[0]
             self.ue.tx_power[ue_active] = self.param_imt.ue_tx_power*np.ones(len(ue_active))
         else:
-            power_aux =  10*np.log10(self.num_rb_per_ue) + self.param_imt.ue_tx_power_target
             bs_active = np.where(self.bs.active)[0]
             for bs in bs_active:
                 ue = self.link[bs]
-                #power2 = self.coupling_loss_imt[bs,ue]
-                power2 = self.path_loss_imt[bs,ue]
-                self.ue.tx_power[self.link[bs]] = np.minimum(self.param_imt.ue_tx_power,
-                                                             self.param_imt.ue_tx_power_alfa*power2 + power_aux)
+                p_cmax = self.param_imt.ue_tx_power
+                m_pusch = self.num_rb_per_ue
+                p_o_pusch = self.param_imt.ue_tx_power_target
+                alpha = self.param_imt.ue_tx_power_alfa
+                pl = self.path_loss_imt[bs,ue]
+                #pl = self.coupling_loss_imt[bs,ue]
+                self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*pl)
 
 
     def calculate_sinr(self):
@@ -300,8 +310,8 @@ class SimulationUplink(Simulation):
         Calculates interference that IMT system generates on other system
         """
 
-        self.coupling_loss_imt_system = self.calculate_coupling_loss(self.ue, 
-                                                                     self.system,
+        self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system, 
+                                                                     self.ue,
                                                                      self.propagation_system)
 
         ue_bandwidth = self.num_rb_per_ue * self.param_imt.rb_bandwidth
@@ -328,17 +338,17 @@ class SimulationUplink(Simulation):
 
 
     def collect_results(self, write_to_file: bool, snapshot_number: int):
-        self.results.imt_ul_coupling_loss.extend( \
-            np.reshape(self.coupling_loss_imt, self.ue.num_stations*self.bs.num_stations).tolist())
         self.results.system_inr.extend([self.system.inr])
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
-            ue_list = self.link[bs]
+            ue = self.link[bs]
+            self.results.imt_ul_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+            self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])
             self.results.imt_ul_tput.extend(tput.tolist())
-            self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue_list].tolist())
-            imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue_list])/(self.num_rb_per_ue*self.param_imt.rb_bandwidth*1e6))
+            self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
+            imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue])/(self.num_rb_per_ue*self.param_imt.rb_bandwidth*1e6))
             self.results.imt_ul_tx_power_density.extend(imt_ul_tx_power_density.tolist())
             self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
             self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
