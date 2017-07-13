@@ -249,8 +249,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.ue = StationFactory.generate_imt_ue(self.param,
                                                             self.param_ant,
                                                             self.simulation.topology)
-        self.simulation.ue.x = np.array([50.000, 150.000, 43.301, 25.000])
-        self.simulation.ue.y = np.array([ 0.000,   0.000, 25.000, 43.301])
+        self.simulation.ue.x = np.array([50.000, 43.301, 150.000, 175.000])
+        self.simulation.ue.y = np.array([ 0.000, 25.000,   0.000, 43.301])
         
         # Physical pointing angles
         self.assertEqual(self.simulation.bs.antenna[0].azimuth,0)
@@ -259,7 +259,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.assertEqual(self.simulation.bs.antenna[0].elevation,-10)
         
         # Change UE pointing
-        self.simulation.ue.azimuth = np.array([180, 90, 30, -30])
+        self.simulation.ue.azimuth = np.array([180, -90, 90, -90])
         self.simulation.ue.elevation = np.array([-30, -15, 15, 30])
         par = self.param_ant.get_antenna_parameters("UE","TX")
         for i in range(self.simulation.ue.num_stations):
@@ -267,31 +267,79 @@ class SimulationUplinkTest(unittest.TestCase):
                                                                   self.simulation.ue.elevation[i])
         self.assertEqual(self.simulation.ue.antenna[0].azimuth,180)
         self.assertEqual(self.simulation.ue.antenna[0].elevation,-30)
-        self.assertEqual(self.simulation.ue.antenna[1].azimuth,90)
+        self.assertEqual(self.simulation.ue.antenna[1].azimuth,-90)
         self.assertEqual(self.simulation.ue.antenna[1].elevation,-15)
-        self.assertEqual(self.simulation.ue.antenna[2].azimuth,30)
+        self.assertEqual(self.simulation.ue.antenna[2].azimuth,90)
         self.assertEqual(self.simulation.ue.antenna[2].elevation,15)
-        self.assertEqual(self.simulation.ue.antenna[3].azimuth,-30)
+        self.assertEqual(self.simulation.ue.antenna[3].azimuth,-90)
         self.assertEqual(self.simulation.ue.antenna[3].elevation,30)
         
         # Simulate connection and selection
         self.simulation.connect_ue_to_bs()
-        self.simulation.select_ue()
-        # Deactivate some stations for test
-        self.simulation.ue.active = [True, False, False, True]
+        self.assertEqual(self.simulation.link,{0:[0,1],1:[2,3]})
+            
+        # Test BS gains
+        # Test pointing vector
+        phi, theta = self.simulation.bs.get_pointing_vector_to(self.simulation.ue)
+        npt.assert_allclose(phi,np.array([[0.0, 30.0, 0.0,    13.898],
+                                          [180.0, 170.935, 180.0, 120.0  ]]),atol=eps)
+        npt.assert_allclose(theta,np.array([[95.143, 95.143, 91.718, 91.430],
+                                            [91.718, 91.624, 95.143, 95.143]]),atol=eps)
+    
+        # Add beams by brute force: since the SimulationUplink.select_ue()
+        # method shufles the link dictionary, the order of the beams cannot be
+        # predicted. Thus, the beams need to be added outside of the function
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        self.simulation.bs.antenna[0].add_beam(phi[0,0],theta[0,0])
+        self.simulation.bs.antenna[0].add_beam(phi[0,1],theta[0,1])
+        self.simulation.bs.antenna[1].add_beam(phi[1,2],theta[1,2])
+        self.simulation.bs.antenna[1].add_beam(phi[1,3],theta[1,3])
+        self.simulation.ue.antenna[0].add_beam(phi[0,0]-180,180-theta[0,0])
+        self.simulation.ue.antenna[1].add_beam(phi[0,1]-180,180-theta[0,1])
+        self.simulation.ue.antenna[2].add_beam(phi[1,2]-180,180-theta[1,2])
+        self.simulation.ue.antenna[3].add_beam(phi[1,3]-180,180-theta[1,3])
+        self.simulation.bs_to_ue_beam_rbs = np.array([0, 1, 0, 1],dtype=int)
+                
+        # Test beams pointing
+        npt.assert_allclose(self.simulation.bs.antenna[0].beams_list[0],
+                            np.array([[0.0],[-4.857]]),atol=eps)
+        npt.assert_allclose(self.simulation.bs.antenna[0].beams_list[1],
+                            np.array([[30.0],[-4.857]]),atol=eps)
+        npt.assert_allclose(self.simulation.bs.antenna[1].beams_list[0],
+                            np.array([[0.0],[-4.857]]),atol=eps)
+        npt.assert_allclose(self.simulation.bs.antenna[1].beams_list[1],
+                            np.array([[-60.0],[-4.857]]),atol=eps)     
+        npt.assert_allclose(self.simulation.ue.antenna[0].beams_list[0],
+                            np.array([[0.0],[-35.143]]),atol=eps)
+        npt.assert_allclose(self.simulation.ue.antenna[1].beams_list[0],
+                            np.array([[-60.0],[-20.143]]),atol=eps)
+        npt.assert_allclose(self.simulation.ue.antenna[2].beams_list[0],
+                            np.array([[-90.0],[9.857]]),atol=eps)
+        npt.assert_allclose(self.simulation.ue.antenna[3].beams_list[0],
+                            np.array([[30.0],[24.857]]),atol=eps)
         
-        # Test gains
-        ref_gain = np.array([[]])
+        # BS Gain matrix
+        ref_gain = np.array([[ 10.954, 8.397, 10.788, 9.469],
+                             [ 10.788, 3.497, 10.954, 0.729]])
         gain = self.simulation.calculate_gains(self.simulation.bs,self.simulation.ue)
-#        npt.assert_allclose(gain,ref_gain,atol=eps)
-    
-    def test_calculate_coupling_loss(self):
-        pass
-    
+        npt.assert_allclose(gain,ref_gain,atol=eps)
+        
+        # UE Gain matrix
+        ref_gain = np.array([[  4.503, -22.016],
+                             [ -3.367, -11.416],
+                             [-15.533, -15.272],
+                             [-10.793,   3.699]])
+        gain = self.simulation.calculate_gains(self.simulation.ue,self.simulation.bs)
+        npt.assert_allclose(gain,ref_gain,atol=eps) 
     
     def test_calculate_imt_ul_tput(self):
-        pass
-    
+        eps = 1e-2
+        
+        # Test 1
+        snir = np.array([0.0, 1.0, 15.0, -5.0, 100.00, 200.00])
+        ref_tput = np.array([ 0.400, 0.470, 2.011, 0.159, 2.927, 2.927])
+        tput = self.simulation.calculate_imt_ul_tput(snir)
+        npt.assert_allclose(tput,ref_tput,atol=eps)
                 
 if __name__ == '__main__':
     unittest.main()
