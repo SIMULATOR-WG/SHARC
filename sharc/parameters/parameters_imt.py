@@ -32,7 +32,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 100
+    intersite_distance = 150
 
     ###########################################################################
     # Minimum 2D separation distance from BS to UE
@@ -184,7 +184,7 @@ class ParametersImt(object):
     #                                    "UMa" (Urban Macro - 3GPP)
     #                                    "UMi" (Urban Micro - 3GPP)
     #                                    "ABG" (Alpha-Beta-Gamma)
-    channel_model = "ABG"
+    channel_model = "UMi"
     
     ###########################################################################
     # Probability of line-of-sight (CI)
