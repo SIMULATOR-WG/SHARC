@@ -32,7 +32,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 150
+    intersite_distance = 100
 
     ###########################################################################
     # Minimum 2D separation distance from BS to UE
@@ -52,7 +52,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT resource block bandwidth [MHz]
-    rb_bandwidth = 0.180
+    rb_bandwidth = 0.200
 
     ###########################################################################
     # Amount of guard band wrt total bandwidth. Setting this parameter to 0.1
@@ -119,10 +119,13 @@ class ParametersImt(object):
     ue_k_m = 2
 
     ###########################################################################
+    # Percentage of indoor UE's
+    ue_indoor_percent = 0.05
+
+    ###########################################################################
     # Power control algorithm
     # ue_tx_power_control = "ON",power control On
     # ue_tx_power_control = "OFF",power control Off
-
     ue_tx_power_control = "ON"
 
     ###########################################################################
@@ -182,10 +185,14 @@ class ParametersImt(object):
     #                                    "UMi" (Urban Micro - 3GPP)
     #                                    "ABG" (Alpha-Beta-Gamma)
     channel_model = "ABG"
-    line_of_sight_prob = 0.95 # probability of line-of-sight (CI and ABG)
+    
+    ###########################################################################
+    # Probability of line-of-sight (CI)
+    line_of_sight_prob = 0.95
 
     ###########################################################################
-
+    # If shadowing should be applied or not
+    shadowing = False
 
     ###########################################################################
     # System receive noise temperature [K]
