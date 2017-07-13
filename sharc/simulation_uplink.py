@@ -261,8 +261,8 @@ class SimulationUplink(Simulation):
                 m_pusch = self.num_rb_per_ue
                 p_o_pusch = self.param_imt.ue_tx_power_target
                 alpha = self.param_imt.ue_tx_power_alfa
-                pl = self.path_loss_imt[bs,ue]
-                #pl = self.coupling_loss_imt[bs,ue]
+                #pl = self.path_loss_imt[bs,ue]
+                pl = self.coupling_loss_imt[bs,ue]
                 self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*pl)
 
 
