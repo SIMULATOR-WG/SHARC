@@ -16,6 +16,7 @@ class Station(object):
         self.azimuth = 0
         self.elevation = 0
         self.height = 0
+        self.indoor = False
         self.active = False
         self.tx_power = 0
         self.rx_power = 0
