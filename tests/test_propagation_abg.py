@@ -21,6 +21,7 @@ class PropagationABGTest(unittest.TestCase):
     def test_loss(self):
         d = np.array([[100, 500],[400, 60]])
         f = 27000
+        indoor = np.zeros(d.shape, dtype=bool)
         alpha = 3.4
         beta = 19.2
         gamma = 2.3
@@ -29,6 +30,7 @@ class PropagationABGTest(unittest.TestCase):
        
         npt.assert_allclose(self.abg.get_loss(distance_2D = d, 
                                               frequency = f, 
+                                              indoor_stations = indoor,
                                               line_of_sight_prob = 1,
                                               alpha = alpha, 
                                               beta = beta, 
@@ -38,6 +40,7 @@ class PropagationABGTest(unittest.TestCase):
 
         d = np.array([500, 3000])
         f = np.array([27000, 40000])
+        indoor = np.zeros(d.shape, dtype=bool)
         alpha = 3.4
         beta = 19.2
         gamma = 2.3
@@ -46,6 +49,7 @@ class PropagationABGTest(unittest.TestCase):
         loss = np.array ([143.886,174.269])
         npt.assert_allclose(self.abg.get_loss(distance_2D = d, 
                                               frequency = f, 
+                                              indoor_stations = indoor,
                                               line_of_sight_prob = 1,
                                               alpha = alpha, 
                                               beta = beta, 
