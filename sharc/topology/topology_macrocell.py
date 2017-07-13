@@ -38,7 +38,7 @@ class TopologyMacrocell(Topology):
             error_message = "invalid number of clusters ({})".format(num_clusters)
             raise ValueError(error_message)         
 
-        cell_radius = intersite_distance/2
+        cell_radius = intersite_distance*2/3
         super().__init__(intersite_distance, cell_radius)
         self.num_clusters = num_clusters
         
