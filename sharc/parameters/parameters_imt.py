@@ -184,7 +184,7 @@ class ParametersImt(object):
     #                                    "UMa" (Urban Macro - 3GPP)
     #                                    "UMi" (Urban Micro - 3GPP)
     #                                    "ABG" (Alpha-Beta-Gamma)
-    channel_model = "UMi"
+    channel_model = "ABG"
     
     ###########################################################################
     # Probability of line-of-sight (CI)
