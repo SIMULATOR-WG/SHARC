@@ -8,8 +8,6 @@ Created on Mon Jul  3 10:29:47 2017
 from sharc.propagation.propagation import Propagation 
 
 import numpy as np
-import matplotlib.pyplot as plt
-from cycler import cycler
  
 class PropagationUMi(Propagation):
     """
@@ -217,12 +215,15 @@ class PropagationUMi(Propagation):
         
         
 if __name__ == '__main__':
-    
+
+    import matplotlib.pyplot as plt
+    from cycler import cycler
+
     ###########################################################################
     # Print LOS probability
-    distance_2D = np.column_stack((np.linspace(1, 10000, num=10000)[:,np.newaxis],
-                                   np.linspace(1, 10000, num=10000)[:,np.newaxis],
-                                   np.linspace(1, 10000, num=10000)[:,np.newaxis]))
+    distance_2D = np.column_stack((np.linspace(1, 1000, num=1000)[:,np.newaxis],
+                                   np.linspace(1, 1000, num=1000)[:,np.newaxis],
+                                   np.linspace(1, 1000, num=1000)[:,np.newaxis]))
     #h_ue = np.array([1.5, 17, 23])
     umi = PropagationUMi()
 
@@ -235,8 +236,6 @@ if __name__ == '__main__':
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
-    #for h in range(len(h_ue)):
-   
     ax.loglog(distance_2D, los_probability)
         
     plt.title("UMi - LOS probability")
@@ -251,7 +250,7 @@ if __name__ == '__main__':
     # Print path loss for UMi-LOS, UMi-NLOS and Free Space
     from propagation_free_space import PropagationFreeSpace
     shadowing_std = 0
-    distance_2D = np.linspace(1, 10000, num=10000)[:,np.newaxis]
+    distance_2D = np.linspace(1, 1000, num=1000)[:,np.newaxis]
     freq = 27000*np.ones(distance_2D.shape)
     h_bs = 25*np.ones(len(distance_2D[:,0]))
     h_ue = 1.5*np.ones(len(distance_2D[0,:]))
@@ -260,20 +259,16 @@ if __name__ == '__main__':
     
     loss_los = umi.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     loss_nlos = umi.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
-    loss_fs = PropagationFreeSpace().get_loss(distance=distance_2D, frequency=freq)
+    loss_fs = PropagationFreeSpace().get_loss(distance_2D=distance_2D, frequency=freq)
     
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
-    #ax.semilogx(distance_2D, loss_los, label="UMi LOS")
-    #ax.semilogx(distance_2D, loss_nlos, label="UMi NLOS")
-    #ax.semilogx(distance_2D, loss_fs, label="free space")
+    ax.semilogx(distance_2D, loss_los, label="UMi LOS")
+    ax.semilogx(distance_2D, loss_nlos, label="UMi NLOS")
+    ax.semilogx(distance_2D, loss_fs, label="free space")
     
-    ax.plot(distance_2D, loss_los, label="UMi LOS")
-    ax.plot(distance_2D, loss_nlos, label="UMi NLOS")
-    ax.plot(distance_2D, loss_fs, label="free space")
-        
     plt.title("UMi - path loss")
     plt.xlabel("distance [m]")
     plt.ylabel("path loss [dB]")
