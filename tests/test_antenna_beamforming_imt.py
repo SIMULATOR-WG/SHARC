@@ -283,7 +283,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi_vec = np.array([11.79, -0.71])
         theta_vec = np.array([50.31, 120.51])
         beams_l = -1*np.ones_like(phi_vec, dtype=int)
-        gains = self.antenna2.calculate_gain(phi_vec=phi_vec, theta_vec=theta_vec, beams_l=beams_l)
+        gains = self.antenna2.calculate_gain(phi_vec=phi_vec, theta_vec=theta_vec,
+                                             beams_l=beams_l)
         npt.assert_allclose(gains,np.array([5.9491,11.9636]),atol=eps)
         
         # Test 2
@@ -293,8 +294,18 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         theta_tilt = 185.31
         self.antenna2.add_beam(phi_scan, theta_tilt)
         beams_l = np.zeros_like(phi_vec, dtype=int)
-        gains = self.antenna2.calculate_gain(phi_vec=phi, theta_vec=theta, beams_l=beams_l)
+        gains = self.antenna2.calculate_gain(phi_vec=phi, theta_vec=theta, 
+                                             beams_l=beams_l)
         npt.assert_allclose(gains,np.array([10.454087]),atol=eps)
+        
+        # Test 3
+        phi = -20
+        theta = 110
+        beams_l = np.zeros_like(phi_vec, dtype=int)
+        gains = self.antenna1.calculate_gain(phi_vec=phi, theta_vec=theta, 
+                                             co_channel=False)
+        npt.assert_allclose(gains,np.array([1.6667]),atol=eps)
+        
         
     def test_to_local_coord(self):        
         # Angles to be converted

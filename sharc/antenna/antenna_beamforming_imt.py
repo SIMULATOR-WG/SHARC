@@ -19,12 +19,14 @@ class AntennaBeamformingImt(Antenna):
     
     Attributes
     ----------
+        azimuth (float): physical azimuth inclination
+        elevation (float): physical elevation inclination
         element (AntennaElementImt): antenna element
         n_rows (int): number of rows in array
         n_cols (int): number of columns in array
         dh (float): horizontal element spacing over wavelenght (d/lambda)
         dv (float): vertical element spacing over wavelenght (d/lambda)
-        beams (list): vertical and horizontal tilts of beams
+        beams_list (list): vertical and horizontal tilts of beams
     """
     
     def __init__(self, par: AntennaPar, azimuth: float, elevation: float):
@@ -79,7 +81,12 @@ class AntennaBeamformingImt(Antenna):
         ----------
         phi_vec (np.array): azimuth angles [degrees]
         theta_vec (np.array): elevation angles [degrees]
-        beam_l (np.array of int): index of beams for gain calculation
+        beam_l (np.array of int): optional. Index of beams for gain calculation
+                Default is -1, which corresponds to the beam of maximum gain in
+                given direction.
+        co_channel (bool): optional, default is True. Indicates whether the 
+                antenna array pattern (co-channel case), or the element pattern
+                (adjacent channel case) will be used for gain calculation.
             
         Returns
         -------
@@ -87,7 +94,11 @@ class AntennaBeamformingImt(Antenna):
         """
         phi_vec = np.asarray(kwargs["phi_vec"])
         theta_vec = np.asarray(kwargs["theta_vec"])
-        beams_l = np.asarray(kwargs["beams_l"],dtype=int)        
+        if("beams_l" in kwargs.keys()): beams_l = np.asarray(kwargs["beams_l"],
+                                                             dtype=int)
+        else: beams_l = -1*np.ones_like(phi_vec)
+        if("co_channel" in kwargs.keys()): co_channel = kwargs["co_channel"]
+        else: co_channel = True
         
         lo_phi_vec, lo_theta_vec = self.to_local_coord(phi_vec, theta_vec)
         
@@ -95,9 +106,14 @@ class AntennaBeamformingImt(Antenna):
         
         gains = np.zeros(n_direct)
         
-        for g in range(n_direct):
+        if(co_channel):
+            for g in range(n_direct):
                 gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g],
                                            beams_l[g])
+        else:
+            for g in range(n_direct):
+                gains[g] = self.element.element_pattern(lo_phi_vec[g],  
+                                                        lo_theta_vec[g])
                 
         return gains
     
