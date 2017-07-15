@@ -282,9 +282,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         # Test 1
         phi_vec = np.array([11.79, -0.71])
         theta_vec = np.array([50.31, 120.51])
-        beams_l = -1*np.ones_like(phi_vec, dtype=int)
-        gains = self.antenna2.calculate_gain(phi_vec=phi_vec, theta_vec=theta_vec,
-                                             beams_l=beams_l)
+        gains = self.antenna2.calculate_gain(phi_vec=phi_vec, theta_vec=theta_vec)
         npt.assert_allclose(gains,np.array([5.9491,11.9636]),atol=eps)
         
         # Test 2
