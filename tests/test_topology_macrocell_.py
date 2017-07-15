@@ -22,7 +22,7 @@ class TopologyMacrocellTest(unittest.TestCase):
         topology = TopologyMacrocell(intersite_distance, num_clusters)
         topology.calculate_coordinates()
         self.assertEqual(topology.intersite_distance, 1000)
-        self.assertAlmostEqual(topology.cell_radius, 500, places=2)
+        self.assertAlmostEqual(topology.cell_radius, 666.66, places=1)
         
         # when intersite distance changes, cell radius also changes
         intersite_distance = 600
@@ -30,7 +30,7 @@ class TopologyMacrocellTest(unittest.TestCase):
         topology = TopologyMacrocell(intersite_distance, num_clusters)
         topology.calculate_coordinates()
         self.assertEqual(topology.intersite_distance, 600)
-        self.assertEqual(topology.cell_radius, 300)
+        self.assertEqual(topology.cell_radius, 400)
         
         # let's change it one more time...
         intersite_distance = 1500
@@ -38,7 +38,7 @@ class TopologyMacrocellTest(unittest.TestCase):
         topology = TopologyMacrocell(intersite_distance, num_clusters)
         topology.calculate_coordinates()
         self.assertEqual(topology.intersite_distance, 1500)
-        self.assertAlmostEqual(topology.cell_radius, 750, places=2)
+        self.assertAlmostEqual(topology.cell_radius, 1000, places=2)
 
     def test_num_clusters(self):
         # set to 1 cluster

@@ -10,8 +10,6 @@ Created on Tue Jul  4 11:57:41 2017
 from sharc.propagation.propagation import Propagation 
 
 import numpy as np
-import matplotlib.pyplot as plt
-from cycler import cycler
  
 class PropagationABG(Propagation):
     """
@@ -38,7 +36,7 @@ class PropagationABG(Propagation):
         ----------
             distance_2D (np.array) : distances between stations [m]
             frequency (np.array) : center frequencie [MHz]
-            line_of_sight_prob (float) : probability of LOS
+            indoor_stations (np.array) : array indicating stations that are indoor
             alpha (float): captures how the PL increases as the distance increases
             beta (float): floating offset value in dB
             gamma(float): captures the PL variation over the frequency
@@ -51,10 +49,8 @@ class PropagationABG(Propagation):
         """
         d = kwargs["distance_2D"]
         f = kwargs["frequency"]
-        p_los = kwargs["line_of_sight_prob"]
+        indoor_stations = kwargs["indoor_stations"]
 
-        building_loss = np.random.choice([0, self.building_loss], d.shape, p=[p_los, 1-p_los])
-        
         if "alpha" in kwargs:
             self.alpha = kwargs["alpha"]
             
@@ -68,14 +64,14 @@ class PropagationABG(Propagation):
             std = kwargs["shadowing"] 
         else:
             std = False
-        
     
         if std:
             shadowing = np.random.normal(0, self.shadowing_sigma_dB, d.shape)
         else:
             shadowing = 0
             
-       
+        building_loss = self.building_loss*indoor_stations
+        
         loss = 10*self.alpha*np.log10(d) + self.beta + 10*self.gamma*np.log10(f*1e-3) + \
                 shadowing + building_loss
         
@@ -88,39 +84,48 @@ if __name__ == '__main__':
     ###########################################################################
     # Print path loss for ABG and Free Space models
     from propagation_free_space import PropagationFreeSpace
+    from propagation_uma import PropagationUMa
+    from propagation_umi import PropagationUMi
     
-    ABG = PropagationABG()
-    
+    import matplotlib.pyplot as plt
+    #from cycler import cycler
+
     shadowing_std = 0
-    distance = np.linspace(1, 10000, num=10000)[:,np.newaxis]
-    frequency = 27000*np.ones(distance.shape)
-    alphaUMA = 3.4
-    betaUMA = 19.2
-    gammaUMA = 2.3
-    x_sfUMA = 0
+    distance_2D = np.linspace(1, 1000, num=1000)[:,np.newaxis]
+    freq = 26000*np.ones(distance_2D.shape)
+    h_bs = 25*np.ones(len(distance_2D[:,0]))
+    h_ue = 1.5*np.ones(len(distance_2D[0,:]))
+    h_e = np.zeros(distance_2D.shape)
+    distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
     
-    alphaUMI = 3.53
-    betaUMI = 22.4
-    gammaUMI = 2.13
-    x_sfUMI = 0
+    uma = PropagationUMa()
+    umi = PropagationUMi()
+    abg = PropagationABG()
+    freespace = PropagationFreeSpace()
     
-    lossUMA_NLOS = ABG.get_loss(distance_2D = distance, frequency = frequency, alpha = alphaUMA, beta = betaUMA, gamma = gammaUMA)
-    lossUMI_NLOS = ABG.get_loss(distance_2D = distance, frequency = frequency, alpha = alphaUMI, beta = betaUMI, gamma = gammaUMI)
-    loss_fs = PropagationFreeSpace().get_loss(distance_2D=distance, frequency=frequency)
+    uma_los = uma.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
+    uma_nlos = uma.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
+    umi_los = umi.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
+    umi_nlos = umi.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
+    fs = freespace.get_loss(distance_2D=distance_2D, frequency=freq)
+    abg_los = abg.get_loss(distance_2D=distance_2D, frequency=freq, indoor_stations=0)
     
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()
-    ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
+    #ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
-    ax.semilogx(distance, lossUMA_NLOS, label="UMa NLOS scenario")
-    ax.semilogx(distance, lossUMI_NLOS, label="Umi Street Canyon NLOS scenario")
-    ax.semilogx(distance, loss_fs, label="Free space")
+    ax.semilogx(distance_2D, uma_los, "-r", label="UMa LOS")
+    ax.semilogx(distance_2D, uma_nlos, "--r", label="UMa NLOS")
+    ax.semilogx(distance_2D, umi_los, "-b", label="UMi LOS")
+    ax.semilogx(distance_2D, umi_nlos, "--b", label="UMi NLOS")
+    ax.semilogx(distance_2D, abg_los, "-g", label="ABG")
+    ax.semilogx(distance_2D, fs, "-k", label="free space")
         
-    plt.title("ABG path loss model")
+    plt.title("Path loss models")
     plt.xlabel("distance [m]")
     plt.ylabel("path loss [dB]")
-    plt.xlim((0, distance[-1,0]))
-    plt.ylim((60, 200))                
+    plt.xlim((0, distance_2D[-1,0]))
+    #plt.ylim((0, 1.1))                
     plt.legend(loc="upper left")
     plt.tight_layout()    
     plt.grid()

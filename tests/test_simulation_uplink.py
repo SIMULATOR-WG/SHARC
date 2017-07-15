@@ -47,6 +47,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.ul_sinr_max = 22
         self.param.ue_k = 2
         self.param.ue_k_m = 1
+        self.param.ue_indoor_percent = 0
         self.param.ue_tx_power_control = "OFF"
         self.param.ue_tx_power_target = -95
         self.param.ue_tx_power_alfa = 0.8

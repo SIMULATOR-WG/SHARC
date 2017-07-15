@@ -31,7 +31,7 @@ class StationFactory(object):
         imt_base_stations.azimuth = topology.azimuth
         imt_base_stations.elevation = topology.elevation
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
-        
+        imt_base_stations.indoor = np.zeros(num_bs, dtype=bool)
         imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
         imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
@@ -81,18 +81,24 @@ class StationFactory(object):
         radius_scale = topology.cell_radius/3.0345
         radius = np.random.rayleigh(radius_scale, num_ue)
         
+        # testing uniform distribution for radius
+#        radius = topology.cell_radius*np.random.random(num_ue)
+        
         # In case of the angles, we generate N times the number of UE's because 
         # the angle cutoff will discard 5% of the terminals whose angle is 
         # outside the angular sector defined by [-60, 60]. So, N = 1.4 seems to
         # be a safe choice.
-        N = 1.4
-        angle_scale = 30
-        angle_mean = 0
-        angle_n = np.random.normal(angle_mean, angle_scale, int(N*num_ue))
-        
-        angle_cutoff = 60
-        idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
-        angle = angle_n[idx]
+#        N = 1.4
+#        angle_scale = 30
+#        angle_mean = 0
+#        angle_n = np.random.normal(angle_mean, angle_scale, int(N*num_ue))
+#        
+#        angle_cutoff = 60
+#        idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
+#        angle = angle_n[idx]
+
+        # testing uniform distribution for angle
+        angle = (60 - (-60))*np.random.random(num_ue) + (-60)
 
         # Calculate UE pointing
         azimuth_range = (-60, 60)
@@ -125,6 +131,7 @@ class StationFactory(object):
 
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
+        imt_ue.indoor = np.random.random(num_ue) <= param.ue_indoor_percent
         imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
 

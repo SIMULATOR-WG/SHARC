@@ -20,7 +20,7 @@ class ParametersFss(object):
 
     ###########################################################################
     # satellite center frequency [MHz]
-    frequency = 27250
+    frequency = 26000
 
     ###########################################################################
     # satellite bandwidth [MHz]
