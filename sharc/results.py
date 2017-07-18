@@ -19,8 +19,10 @@ class Results(object):
         self.imt_ul_snr = list()
         self.imt_ul_tput = list()
 
+        self.imt_path_loss = list()
         self.imt_coupling_loss = list()
         self.imt_bs_antenna_gain = list()
+        self.imt_ue_antenna_gain = list()
 
         self.imt_dl_tx_power_density = list()
         self.imt_dl_tx_power = list()
@@ -48,6 +50,18 @@ class Results(object):
             x_label = "Antenna gain [dBi]"
             y_label = "Probability of antenna gain < $X$"
             title = "[IMT] CDF of BS antenna gain towards the UE"
+            file_name = title
+            x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))        
+        if len(self.imt_ue_antenna_gain) > 0:
+            values, base = np.histogram(self.imt_ue_antenna_gain, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Antenna gain [dBi]"
+            y_label = "Probability of antenna gain < $X$"
+            title = "[IMT] CDF of UE antenna gain towards the BS"
             file_name = title
             x_limits = (0, 25)
             y_limits = (0, 1)
@@ -96,8 +110,9 @@ class Results(object):
             x_label = "UL SNR [dB]"
             y_label = "Probability of SNR < $X$"
             file_name = title
+            x_limits = (-15, 20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ul_tput) > 0:
             values, base = np.histogram(self.imt_ul_tput, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -109,6 +124,18 @@ class Results(object):
             file_name = title
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_path_loss) > 0:
+            values, base = np.histogram(self.imt_path_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of path loss"
+            x_label = "Path loss [dB]"
+            y_label = "Probability of path loss < $X$"
+            file_name = title
+            x_limits = (40, 140)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_coupling_loss) > 0:
             values, base = np.histogram(self.imt_coupling_loss, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -118,8 +145,9 @@ class Results(object):
             x_label = "Coupling loss [dB]"
             y_label = "Probability of coupling loss < $X$"
             file_name = title
+            x_limits = (40, 140)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_dl_tx_power) > 0:
             values, base = np.histogram(self.imt_dl_tx_power, bins=n_bins)
             cumulative = np.cumsum(values)

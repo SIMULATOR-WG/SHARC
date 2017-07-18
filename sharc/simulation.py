@@ -41,6 +41,7 @@ class Simulation(ABC, Observable):
         self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
 
         self.imt_bs_antenna_gain = list()
+        self.imt_ue_antenna_gain = list()
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
@@ -70,6 +71,7 @@ class Simulation(ABC, Observable):
         num_ue = num_bs*self.param_imt.ue_k*self.param_imt.ue_k_m
         
         self.imt_bs_antenna_gain = list()
+        self.imt_ue_antenna_gain = list()
         self.path_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt = np.empty([num_bs, num_ue])
         self.coupling_loss_imt_system = np.empty(num_ue)
@@ -142,8 +144,9 @@ class Simulation(ABC, Observable):
         gain_b = np.transpose(self.calculate_gains(station_b, station_a))
         
         # collect IMT BS antenna gain samples
-        if station_a.station_type is StationType.IMT_BS:
+        if station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_UE:
             self.imt_bs_antenna_gain = gain_a
+            self.imt_ue_antenna_gain = gain_b
         
         # calculate coupling loss
         coupling_loss = np.squeeze(path_loss - gain_a - gain_b)
