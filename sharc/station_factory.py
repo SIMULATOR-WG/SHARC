@@ -6,6 +6,7 @@ Created on Thu Mar 23 16:37:32 2017
 """
 
 import numpy as np
+import sys
 
 from sharc.support.enumerations import StationType
 from sharc.parameters.parameters_imt import ParametersImt
@@ -72,34 +73,41 @@ class StationFactory(object):
         # The Rayleigh and Normal distribution parameters (mean, scale and cutoff)
         # were agreed in TG 5/1 meeting (May 2017).
         
-        # For the distance between UE and BS, it is desired that 99% of UE's 
-        # are located inside the [soft] cell edge, i.e. Prob(d<d_edge) = 99%.
-        # Since the distance is modeled by a random variable with Rayleigh
-        # distribution, we use the quantile function to find that 
-        # sigma = distance/3.0345. So we always distibute UE's in order to meet
-        # the requirement Prob(d<d_edge) = 99% for a given cell radius.
-        radius_scale = topology.cell_radius/3.0345
-        radius = np.random.rayleigh(radius_scale, num_ue)
-        
-        # testing uniform distribution for radius
-#        radius = topology.cell_radius*np.random.random(num_ue)
-        
-        # In case of the angles, we generate N times the number of UE's because 
-        # the angle cutoff will discard 5% of the terminals whose angle is 
-        # outside the angular sector defined by [-60, 60]. So, N = 1.4 seems to
-        # be a safe choice.
-#        N = 1.4
-#        angle_scale = 30
-#        angle_mean = 0
-#        angle_n = np.random.normal(angle_mean, angle_scale, int(N*num_ue))
-#        
-#        angle_cutoff = 60
-#        idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
-#        angle = angle_n[idx]
-
-        # testing uniform distribution for angle
-        angle = (60 - (-60))*np.random.random(num_ue) + (-60)
-
+        if param.ue_distribution_distance == "RAYLEIGH":
+            # For the distance between UE and BS, it is desired that 99% of UE's 
+            # are located inside the [soft] cell edge, i.e. Prob(d<d_edge) = 99%.
+            # Since the distance is modeled by a random variable with Rayleigh
+            # distribution, we use the quantile function to find that 
+            # sigma = distance/3.0345. So we always distibute UE's in order to meet
+            # the requirement Prob(d<d_edge) = 99% for a given cell radius.
+            radius_scale = topology.cell_radius/3.0345
+            radius = np.random.rayleigh(radius_scale, num_ue)
+        elif param.ue_distribution_distance == "UNIFORM":
+            radius = topology.cell_radius*np.random.random(num_ue)
+        else:
+            sys.stderr.write("ERROR\nInvalid UE distance distribution: " + param.ue_distribution_distance)
+            sys.exit(1)            
+            
+        if param.ue_distribution_azimuth == "NORMAL":
+            # In case of the angles, we generate N times the number of UE's because 
+            # the angle cutoff will discard 5% of the terminals whose angle is 
+            # outside the angular sector defined by [-60, 60]. So, N = 1.4 seems to
+            # be a safe choice.
+            N = 1.4
+            angle_scale = 30
+            angle_mean = 0
+            angle_n = np.random.normal(angle_mean, angle_scale, int(N*num_ue))
+            
+            angle_cutoff = 60
+            idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
+            angle = angle_n[idx]
+        elif param.ue_distribution_azimuth == "UNIFORM":
+            azimuth_range = (-60, 60)
+            angle = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]
+        else:
+            sys.stderr.write("ERROR\nInvalid UE azimuth distribution: " + param.ue_distribution_distance)
+            sys.exit(1)  
+            
         # Calculate UE pointing
         azimuth_range = (-60, 60)
         azimuth = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]

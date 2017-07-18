@@ -68,7 +68,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Maximum base station transmit power [dBm]
-    bs_tx_power = 46
+    bs_tx_power = 25
 
     ###########################################################################
     # Base station height [m]
@@ -122,6 +122,18 @@ class ParametersImt(object):
     # Percentage of indoor UE's
     ue_indoor_percent = 0.05
 
+    ###########################################################################
+    # Regarding the distribution of active UE's over the cell area, this
+    # parameter models the distance between UE's and BS.
+    # Possible values: RAYLEIGH, UNIFORM
+    ue_distribution_distance = "RAYLEIGH"
+    
+    ###########################################################################
+    # Regarding the distribution of active UE's over the cell area, this
+    # parameter models the azimuth between UE and BS (within ±60° range).
+    # Possible values: NORMAL, UNIFORM
+    ue_distribution_azimuth = "UNIFORM"
+    
     ###########################################################################
     # Power control algorithm
     # ue_tx_power_control = "ON",power control On
