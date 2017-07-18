@@ -188,30 +188,30 @@ class SimulationUplinkTest(unittest.TestCase):
                             atol=1e-2)      
         # check BS thermal noise
         npt.assert_allclose(self.simulation.bs.thermal_noise, 
-                            10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e6) + 7,
+                            10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 7,
                             atol=1e-2)
         # check BS thermal noise + interference
         npt.assert_allclose(self.simulation.bs.total_interference[0], 
                             10*np.log10(np.power(10, 0.1*np.array([20-(93.27-1-22)-10,  20-(97.05-1-23)-10])) +
-                                        np.power(10, 0.1*(-120.44))),
+                                        np.power(10, 0.1*(-90.44))),
                             atol=1e-2)
         npt.assert_allclose(self.simulation.bs.total_interference[1], 
                             10*np.log10(np.power(10, 0.1*np.array([20-(97.55-2-10)-10, 20-(94.72-2-11)-10])) +
-                                        np.power(10, 0.1*(-120.44))),
+                                        np.power(10, 0.1*(-90.44))),
                             atol=1e-2)    
         # check SNR 
         npt.assert_allclose(self.simulation.bs.snr[0], 
-                            np.array([20-(78.47-1-10)-10 - (-120.44),  20-(89.35-1-11)-10 - (-120.44)]),
+                            np.array([20-(78.47-1-10)-10 - (-90.44),  20-(89.35-1-11)-10 - (-90.44)]),
                             atol=1e-2)
         npt.assert_allclose(self.simulation.bs.snr[1], 
-                            np.array([20-(91.53-2-22)-10 - (-120.44),  20-(81.99-2-23)-10 - (-120.44)]),
+                            np.array([20-(91.53-2-22)-10 - (-90.44),  20-(81.99-2-23)-10 - (-90.44)]),
                             atol=1e-2)
-        # check SINR (using only the I term since I >> N in this case)
+        # check SINR 
         npt.assert_allclose(self.simulation.bs.sinr[0], 
-                            np.array([20-(78.47-1-10) - (20-(93.27-1-22)),  20-(89.35-1-11) - (20-(97.05-1-23))]),
+                            np.array([-57.47 - (-60.27),  -67.35 - (-63.05)]),
                             atol=1e-2)
         npt.assert_allclose(self.simulation.bs.sinr[1], 
-                            np.array([20-(91.53-2-22) - (20-(97.55-2-10)),  20-(81.99-2-23) - (20-(94.72-2-11))]),
+                            np.array([-57.53 - (-75.41),  -46.99 - (-71.67)]),
                             atol=1e-2)
 
         self.simulation.system = StationFactory.generate_fss_space_stations(self.param_service)

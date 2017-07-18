@@ -183,20 +183,20 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)
         # check UE thermal noise
         npt.assert_allclose(self.simulation.ue.thermal_noise, 
-                            10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e6) + 9,
+                            10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9,
                             atol=1e-2)
         # check BS thermal noise + interference
         npt.assert_allclose(self.simulation.ue.total_interference, 
                             10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-10,  p_tx-(94.72-2-11)-10, p_tx-(93.27-1-22)-10, p_tx-(97.05-1-23)-10])) +
-                                        np.power(10, 0.1*(-120.44))),
+                                        np.power(10, 0.1*(-88.44))),
                             atol=1e-2)
         # check SNR 
         npt.assert_allclose(self.simulation.ue.snr, 
-                            np.array([p_tx-(78.47-1-10)-10 - (-118.44),  p_tx-(89.35-1-11)-10 - (-118.44), p_tx-(91.53-2-22)-10 - (-118.44),  p_tx-(81.99-2-23)-10 - (-118.44)]),
+                            np.array([-40.48 - (-88.44),  -50.36 - (-88.44), -40.54 - (-88.44),  -30.00 - (-88.44)]),
                             atol=1e-2)        
-        # check SINR (using only the I term since I >> N in this case)
+        # check SINR
         npt.assert_allclose(self.simulation.ue.sinr, 
-                            np.array([-(78.47-1-10) + (97.55-2-10), -(89.35-1-11) + (94.72-2-11), -(91.53-2-22) + (93.27-1-22), -(81.99-2-23) + (97.05-1-23)]),
+                            np.array([-40.48 - (-58.56), -50.36 - (-54.73), -40.54 - (-43.28), -30.00 - (-46.06)]),
                             atol=1e-2)        
 
 #        self.simulation.system = StationFactory.generate_fss_space_stations(self.param_service)

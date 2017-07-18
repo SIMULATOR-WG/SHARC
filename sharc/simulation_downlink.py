@@ -119,7 +119,7 @@ class SimulationDownlink(Simulation):
                     np.power(10, 0.1*self.ue.rx_interference[ue]) + np.power(10, 0.1*interference))
 
         self.ue.thermal_noise = \
-            10*math.log10(self.param_imt.BOLTZMANN_CONSTANT*self.param_imt.noise_temperature) + \
+            10*math.log10(self.param_imt.BOLTZMANN_CONSTANT*self.param_imt.noise_temperature*1e3) + \
             10*np.log10(self.num_rb_per_ue*self.param_imt.rb_bandwidth * 1e6) + \
             self.ue.noise_figure
 
@@ -137,6 +137,7 @@ class SimulationDownlink(Simulation):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
+            self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
             self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             #tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])

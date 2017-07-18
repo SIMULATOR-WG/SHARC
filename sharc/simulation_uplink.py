@@ -89,7 +89,7 @@ class SimulationUplink(Simulation):
             for bs in bs_active:
                 ue = self.link[bs]
                 p_cmax = self.param_imt.ue_tx_power
-                m_pusch = self.num_rb_per_ue
+                m_pusch = 6 #self.num_rb_per_ue
                 p_o_pusch = self.param_imt.ue_tx_power_target
                 alpha = self.param_imt.ue_tx_power_alfa
                 pl = self.path_loss_imt[bs,ue]
@@ -104,16 +104,16 @@ class SimulationUplink(Simulation):
         # calculate uplink received power for each active BS
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
-            ue_list = self.link[bs]
-            self.bs.rx_power[bs] = self.ue.tx_power[ue_list] - self.coupling_loss_imt[bs,ue_list] \
+            ue = self.link[bs]
+            self.bs.rx_power[bs] = self.ue.tx_power[ue] - self.coupling_loss_imt[bs,ue] \
                                     - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss - self.param_imt.bs_feed_loss
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]
 
             # calculate intra system interference
             for bi in bs_interf:
-                ui_list = self.link[bi]
-                interference = self.ue.tx_power[ui_list] - self.coupling_loss_imt[bs,ui_list] \
+                ui = self.link[bi]
+                interference = self.ue.tx_power[ui] - self.coupling_loss_imt[bs,ui] \
                                 - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss - self.param_imt.bs_feed_loss
                 self.bs.rx_interference[bs] = 10*np.log10( \
                     np.power(10, 0.1*self.bs.rx_interference[bs])
@@ -121,7 +121,7 @@ class SimulationUplink(Simulation):
 
             # calculate N
             self.bs.thermal_noise[bs] = \
-                10*np.log10(self.param_imt.BOLTZMANN_CONSTANT*self.param_imt.noise_temperature) + \
+                10*np.log10(self.param_imt.BOLTZMANN_CONSTANT*self.param_imt.noise_temperature*1e3) + \
                 10*np.log10(self.num_rb_per_ue*self.param_imt.rb_bandwidth * 1e6) + \
                 self.bs.noise_figure[bs]
     
@@ -173,8 +173,10 @@ class SimulationUplink(Simulation):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
-            self.results.imt_ul_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+            self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
+            self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
+            self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
             tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])
             self.results.imt_ul_tput.extend(tput.tolist())
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())

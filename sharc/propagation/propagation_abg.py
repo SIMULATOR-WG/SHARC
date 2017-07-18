@@ -47,9 +47,13 @@ class PropagationABG(Propagation):
             array with path loss values with dimensions of distance_2D
         
         """
-        d = kwargs["distance_2D"]
         f = kwargs["frequency"]
         indoor_stations = kwargs["indoor_stations"]
+
+        if "distance_3D" in kwargs:
+            d = kwargs["distance_3D"]
+        else:
+            d = kwargs["distance_2D"]
 
         if "alpha" in kwargs:
             self.alpha = kwargs["alpha"]

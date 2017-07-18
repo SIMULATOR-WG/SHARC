@@ -24,7 +24,7 @@ class ParametersGeneral(object):
 
     ###########################################################################
     # IMT link that will be simulated (DOWNLINK or UPLINK)
-    imt_link = "UPLINK"
+    imt_link = "DOWNLINK"
     
     ###########################################################################
     # The chosen service for sharing study
