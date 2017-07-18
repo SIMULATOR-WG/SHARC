@@ -134,7 +134,7 @@ class View(tkinter.Tk, Observer):
         transparent_figure = True
         
         for plot in results.plot_list:
-            plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+            plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')
             plt.plot(plot.x, plot.y, color='#990000', linewidth=2)        
             plt.title(plot.title)
             plt.xlabel(plot.x_label)
