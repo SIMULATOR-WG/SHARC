@@ -67,8 +67,8 @@ class ParametersImt(object):
     bs_load_probability = .5
 
     ###########################################################################
-    # Maximum base station transmit power [dBm]
-    bs_tx_power = 25
+    # Conducted power per antenna element [dBm/200 MHz]
+    bs_conducted_power = 10
 
     ###########################################################################
     # Base station height [m]
@@ -116,7 +116,7 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 2
+    ue_k_m = 1
 
     ###########################################################################
     # Percentage of indoor UE's
@@ -141,17 +141,21 @@ class ParametersImt(object):
     ue_tx_power_control = "ON"
 
     ###########################################################################
-    # Power per RB used as target value in dBm
-    ue_tx_power_target = -95
+    # Power per RB used as target value [dBm]
+    ue_p_o_pusch = -95
 
     ###########################################################################
     # Alfa is the balacing factor for UEs with bad channel
     # and UEs with good channel
-    ue_tx_power_alfa = 1
+    ue_alfa = 1
 
     ###########################################################################
-    # UE maximum transmit power [dBm]
-    ue_tx_power = 22
+    # Maximum UE transmit power [dBm]
+    ue_p_cmax = 22    
+    
+    ###########################################################################
+    # Conducted power per antenna element [dBm/200 MHz]
+    ue_conducted_power = 10
     
     ###########################################################################
     # UE height [m]
