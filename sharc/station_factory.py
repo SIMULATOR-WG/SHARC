@@ -34,7 +34,7 @@ class StationFactory(object):
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
         imt_base_stations.indoor = np.zeros(num_bs, dtype=bool)
         imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
-        imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
+        imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
         imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.rx_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.total_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
@@ -140,7 +140,7 @@ class StationFactory(object):
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
         imt_ue.indoor = np.random.random(num_ue) <= param.ue_indoor_percent
-        imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
+        imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
 
         # TODO: this piece of code works only for uplink
