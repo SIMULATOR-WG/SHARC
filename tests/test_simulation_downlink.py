@@ -24,7 +24,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.topology = "SINGLE_BS"
         self.param.num_macrocell_sites = 19
         self.param.num_clusters = 2
-        self.param.intersite_distance = 200
+        self.param.intersite_distance = 150
         self.param.minimum_separation_distance_bs_ue = 10
         self.param.interfered_with = False
         self.param.frequency = 10000
@@ -34,7 +34,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.ho_margin = 3
         self.param.bs_load_probability = 1
         self.param.num_resource_blocks = 10
-        self.param.bs_tx_power = 40
+        self.param.bs_conducted_power = 10
         self.param.bs_height = 6
         self.param.bs_aclr = 40
         self.param.bs_acs = 30
@@ -47,10 +47,13 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.ue_k = 2
         self.param.ue_k_m = 1
         self.param.ue_indoor_percent = 0
+        self.param.ue_distribution_distance = "RAYLEIGH"
+        self.param.ue_distribution_azimuth = "UNIFORM"
         self.param.ue_tx_power_control = "OFF"
-        self.param.ue_tx_power_target = -95
-        self.param.ue_tx_power_alfa = 0.8
-        self.param.ue_tx_power = 20
+        self.param.ue_p_o_pusch = -95
+        self.param.ue_alfa = 0.8
+        self.param.ue_p_cmax = 20
+        self.param.ue_conducted_power = 10
         self.param.ue_height = 1.5
         self.param.ue_aclr = 35
         self.param.ue_acs = 25
@@ -129,6 +132,9 @@ class SimulationDownlinkTest(unittest.TestCase):
 
 
     def test_simulation_2bs_4ue(self):
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param,
                                                                        self.param_ant,
                                                                        self.simulation.topology)
@@ -167,7 +173,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         
         # there is no power control, so BS's will transmit at maximum power
         self.simulation.power_control()
-        p_tx = 10*math.log10(math.pow(10, 0.1*(40))/2)
+        p_tx = 10 + 0 - 3 - 10*math.log10(2)
         npt.assert_allclose(self.simulation.bs.tx_power[0], np.array([p_tx, p_tx]), atol=1e-2)
         npt.assert_allclose(self.simulation.bs.tx_power[1], np.array([p_tx, p_tx]), atol=1e-2)
         
@@ -175,11 +181,11 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.calculate_sinr()
         # check UE received power
         npt.assert_allclose(self.simulation.ue.rx_power, 
-                            np.array([p_tx-(78.47-1-10)-10, p_tx-(89.35-1-11)-10, p_tx-(91.53-2-22)-10, p_tx-(81.99-2-23)-10]),
+                            np.array([p_tx-(78.47-1-10)-7, p_tx-(89.35-1-11)-7, p_tx-(91.53-2-22)-7, p_tx-(81.99-2-23)-7]),
                             atol=1e-2)
         # check UE received interference
         npt.assert_allclose(self.simulation.ue.rx_interference, 
-                            np.array([p_tx-(97.55-2-10)-10,  p_tx-(94.72-2-11)-10, p_tx-(93.27-1-22)-10, p_tx-(97.05-1-23)-10]),
+                            np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7]),
                             atol=1e-2)
         # check UE thermal noise
         npt.assert_allclose(self.simulation.ue.thermal_noise, 
@@ -187,16 +193,16 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)
         # check BS thermal noise + interference
         npt.assert_allclose(self.simulation.ue.total_interference, 
-                            10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-10,  p_tx-(94.72-2-11)-10, p_tx-(93.27-1-22)-10, p_tx-(97.05-1-23)-10])) +
+                            10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7])) +
                                         np.power(10, 0.1*(-88.44))),
                             atol=1e-2)
         # check SNR 
         npt.assert_allclose(self.simulation.ue.snr, 
-                            np.array([-40.48 - (-88.44),  -50.36 - (-88.44), -40.54 - (-88.44),  -30.00 - (-88.44)]),
+                            np.array([-70.48 - (-88.44),  -80.36 - (-88.44), -70.54 - (-88.44),  -60.00 - (-88.44)]),
                             atol=1e-2)        
         # check SINR
         npt.assert_allclose(self.simulation.ue.sinr, 
-                            np.array([-40.48 - (-58.56), -50.36 - (-54.73), -40.54 - (-43.28), -30.00 - (-46.06)]),
+                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
                             atol=1e-2)        
 
 #        self.simulation.system = StationFactory.generate_fss_space_stations(self.param_service)
