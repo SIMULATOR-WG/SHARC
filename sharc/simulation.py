@@ -40,6 +40,8 @@ class Simulation(ABC, Observable):
         self.propagation_imt = PropagationFactory.createPropagation(self.param_imt.channel_model)
         self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
 
+        self.bs_power_gain = 0
+        self.ue_power_gain = 0
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
         self.path_loss_imt = np.empty(0)
@@ -70,6 +72,8 @@ class Simulation(ABC, Observable):
         num_bs = self.topology.num_base_stations
         num_ue = num_bs*self.param_imt.ue_k*self.param_imt.ue_k_m
         
+        self.bs_power_gain = 10*math.log10(self.param_imt_antenna.bs_tx_n_rows*self.param_imt_antenna.bs_tx_n_columns)
+        self.ue_power_gain = 10*math.log10(self.param_imt_antenna.ue_tx_n_rows*self.param_imt_antenna.ue_tx_n_columns)
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
         self.path_loss_imt = np.empty([num_bs, num_ue])
@@ -143,7 +147,7 @@ class Simulation(ABC, Observable):
         gain_a = self.calculate_gains(station_a, station_b)
         gain_b = np.transpose(self.calculate_gains(station_b, station_a))
         
-        # collect IMT BS antenna gain samples
+        # collect IMT BS and UE antenna gain samples
         if station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_UE:
             self.imt_bs_antenna_gain = gain_a
             self.imt_ue_antenna_gain = gain_b
@@ -202,8 +206,9 @@ class Simulation(ABC, Observable):
         """
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
-            ue_list = self.link[bs]
-            self.ue.bandwidth[ue_list] = self.num_rb_per_ue*self.param_imt.rb_bandwidth
+            ue = self.link[bs]
+            self.bs.bandwidth[bs] = self.num_rb_per_ue*self.param_imt.rb_bandwidth
+            self.ue.bandwidth[ue] = self.num_rb_per_ue*self.param_imt.rb_bandwidth
 
         
             
