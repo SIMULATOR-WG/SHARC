@@ -25,7 +25,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.topology = "SINGLE_BS"
         self.param.num_macrocell_sites = 19
         self.param.num_clusters = 2
-        self.param.intersite_distance = 200
+        self.param.intersite_distance = 150
         self.param.minimum_separation_distance_bs_ue = 10
         self.param.interfered_with = False
         self.param.frequency = 10000
@@ -35,7 +35,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.ho_margin = 3
         self.param.bs_load_probability = 1
         self.param.num_resource_blocks = 10
-        self.param.bs_tx_power = 40
+        self.param.bs_conducted_power = 10
         self.param.bs_height = 6
         self.param.bs_aclr = 40
         self.param.bs_acs = 30
@@ -48,10 +48,13 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.ue_k = 2
         self.param.ue_k_m = 1
         self.param.ue_indoor_percent = 0
+        self.param.ue_distribution_distance = "RAYLEIGH"
+        self.param.ue_distribution_azimuth = "UNIFORM"
         self.param.ue_tx_power_control = "OFF"
-        self.param.ue_tx_power_target = -95
-        self.param.ue_tx_power_alfa = 0.8
-        self.param.ue_tx_power = 20
+        self.param.ue_p_o_pusch = -95
+        self.param.ue_alfa = 0.8
+        self.param.ue_p_cmax = 20
+        self.param.ue_conducted_power = 10
         self.param.ue_height = 1.5
         self.param.ue_aclr = 35
         self.param.ue_acs = 25
@@ -130,6 +133,9 @@ class SimulationUplinkTest(unittest.TestCase):
         
         
     def test_simulation_2bs_4ue(self):
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param,
                                                                        self.param_ant,
                                                                        self.simulation.topology)
