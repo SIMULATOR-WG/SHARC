@@ -88,8 +88,8 @@ class SimulationDownlink(Simulation):
         """
         # Currently, the maximum transmit power of the base station is equaly
         # divided among the selected UEs
-        p_max = math.pow(10, 0.1*self.param_imt.bs_tx_power)
-        tx_power = 10*math.log10(p_max/self.param_imt.ue_k)
+        tx_power = self.param_imt.bs_conducted_power + self.bs_power_gain \
+                    - self.param_imt.bs_feed_loss - 10*math.log10(self.param_imt.ue_k) 
         # calculate tansmit powers to have a structure such as
         # {bs_1: [pwr_1, pwr_2,...], ...}, where bs_1 is the base station id,
         # pwr_1 is the transmit power from bs_1 to ue_1, pwr_2 is the transmit
@@ -106,7 +106,7 @@ class SimulationDownlink(Simulation):
         for bs in bs_active:
             ue = self.link[bs]
             self.ue.rx_power[ue] = self.bs.tx_power[bs] - self.coupling_loss_imt[bs,ue] \
-                                     - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss - self.param_imt.bs_feed_loss
+                                     - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss
 
             # create a list with base stations that generate interference in ue_list
             bs_interf = [b for b in bs_active if b not in [bs]]
@@ -114,13 +114,13 @@ class SimulationDownlink(Simulation):
             # calculate intra system interference
             for bi in bs_interf:
                 interference = self.bs.tx_power[bi] - self.coupling_loss_imt[bi,ue] \
-                                - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss - self.param_imt.bs_feed_loss
+                                 - self.param_imt.ue_body_loss - self.param_imt.ue_feed_loss
                 self.ue.rx_interference[ue] = 10*np.log10( \
                     np.power(10, 0.1*self.ue.rx_interference[ue]) + np.power(10, 0.1*interference))
 
         self.ue.thermal_noise = \
             10*math.log10(self.param_imt.BOLTZMANN_CONSTANT*self.param_imt.noise_temperature*1e3) + \
-            10*np.log10(self.num_rb_per_ue*self.param_imt.rb_bandwidth * 1e6) + \
+            10*np.log10(self.ue.bandwidth * 1e6) + \
             self.ue.noise_figure
 
         self.ue.total_interference = \
