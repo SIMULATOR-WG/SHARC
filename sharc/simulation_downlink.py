@@ -70,7 +70,7 @@ class SimulationDownlink(Simulation):
             # Execute this piece of code if IMT generates interference into
             # the other system
             self.calculate_sinr()
-            #self.calculate_external_interference()
+            self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass
         
@@ -130,6 +130,36 @@ class SimulationDownlink(Simulation):
         self.ue.sinr = self.ue.rx_power - self.ue.total_interference
         self.ue.snr = self.ue.rx_power - self.ue.thermal_noise
 
+        
+    def calculate_external_interference(self):
+        """
+        Calculates interference that IMT system generates on other system
+        """
+
+        self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system, 
+                                                                     self.bs,
+                                                                     self.propagation_system)
+
+        # applying a bandwidth scaling factor since UE transmits on a portion
+        # of the satellite's bandwidth
+        # calculate interference only from active UE's
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
+            interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[bs] \
+                                + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth)
+                                
+            self.system.rx_interference = 10*np.log10( \
+                    np.power(10, 0.1*self.system.rx_interference) + np.sum(np.power(10, 0.1*interference)))
+
+        # calculate N
+        self.system.thermal_noise = \
+            10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
+                          self.param_system.sat_noise_temperature*1e3) + \
+                          10*math.log10(self.param_system.bandwidth * 1e6)
+
+        # calculate INR at the system
+        self.system.inr = self.system.rx_interference - self.system.thermal_noise
+        
         
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         #self.results.system_inr.extend([self.system.inr])
