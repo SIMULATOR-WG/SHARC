@@ -163,29 +163,30 @@ class StationFactory(object):
         # now we set the coordinates according to
         # ITU-R P619-1, Attachment A
 
-#        # calculate distances to the centre of the Earth
-#        dist_sat_centre_earth = param.EARTH_RADIUS + param.sat_altitude
-#        dist_imt_centre_earth = param.EARTH_RADIUS + param.imt_altitude
-#
-#        # calculate Cartesian coordinates of satellite, with origin at centre of the Earth
-#        sat_lat_rad = param.sat_lat_deg * np.pi / 180.
-#        imt_long_diff_rad = param.imt_long_diff_deg * np.pi / 180.
-#        x1 = dist_sat_centre_earth * np.cos(sat_lat_rad) * np.cos(imt_long_diff_rad)
-#        y1 = dist_sat_centre_earth * np.cos(sat_lat_rad) * np.sin(imt_long_diff_rad)
-#        z1 = dist_sat_centre_earth * np.sin(sat_lat_rad)
-#
-#        # calculate coordinates with origin at IMT system
-#        imt_lat_rad = param.imt_lat_deg * np.pi / 180.
-#        fss_space_station.x = [x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)]
-#        fss_space_station.y = [y1]
-#        fss_space_station.height = [(z1 * np.sin(imt_lat_rad) + x1 * np.cos(imt_lat_rad)
-#                                     - dist_imt_centre_earth)]
-        fss_space_station.x = np.array([0])
-        fss_space_station.y = np.array([0])
+        # calculate distances to the centre of the Earth
+        dist_sat_centre_earth = param.EARTH_RADIUS + param.sat_altitude
+        dist_imt_centre_earth = param.EARTH_RADIUS + param.imt_altitude
+
+        # calculate Cartesian coordinates of satellite, with origin at centre of the Earth
+        sat_lat_rad = param.sat_lat_deg * np.pi / 180.
+        imt_long_diff_rad = param.imt_long_diff_deg * np.pi / 180.
+        x1 = dist_sat_centre_earth * np.cos(sat_lat_rad) * np.cos(imt_long_diff_rad)
+        y1 = dist_sat_centre_earth * np.cos(sat_lat_rad) * np.sin(imt_long_diff_rad)
+        z1 = dist_sat_centre_earth * np.sin(sat_lat_rad)
+
+        # calculate coordinates with origin at IMT system
+        imt_lat_rad = param.imt_lat_deg * np.pi / 180.
+        fss_space_station.x = np.array([x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)])
+        fss_space_station.y = np.array([y1])
+        fss_space_station.height = np.array([(z1 * np.sin(imt_lat_rad) + x1 * np.cos(imt_lat_rad) - dist_imt_centre_earth)])
+        
+        #fss_space_station.x = np.array([0])
+        #fss_space_station.y = np.array([0])
+        #fss_space_station.height = np.array([param.sat_altitude])
+
         fss_space_station.azimuth = np.array([0])
         fss_space_station.elevation = np.array([0])
 
-        fss_space_station.height = np.array([param.sat_altitude])
         fss_space_station.active = True
         fss_space_station.tx_power = None
         fss_space_station.rx_power = None

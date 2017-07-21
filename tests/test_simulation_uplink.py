@@ -221,6 +221,9 @@ class SimulationUplinkTest(unittest.TestCase):
                             atol=1e-2)
 
         self.simulation.system = StationFactory.generate_fss_space_stations(self.param_service)
+        self.simulation.system.x = np.array([0])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param_service.sat_altitude])
         
         # test the method that calculates interference from IMT UE to FSS space station
         self.simulation.calculate_external_interference()
