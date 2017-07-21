@@ -235,13 +235,13 @@ class SimulationUplinkTest(unittest.TestCase):
                                rx_interference,
                                delta=.01)
         # check FSS space station thermal noise
-        thermal_noise = 10*np.log10(1.38064852e-23*950*100*1e6)
+        thermal_noise = 10*np.log10(1.38064852e-23*950*100*1e3*1e6)
         self.assertAlmostEqual(self.simulation.system.thermal_noise, 
                                thermal_noise,
                                delta=.01)      
         # check INR at FSS space station
         self.assertAlmostEqual(self.simulation.system.inr, 
-                               rx_interference - thermal_noise,
+                               -117.18 - (-88.82),
                                delta=.01)        
         
         
