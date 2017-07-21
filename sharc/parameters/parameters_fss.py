@@ -29,7 +29,7 @@ class ParametersFss(object):
     ###########################################################################
     # satellite altitude [m] and latitude [deg]
     sat_altitude = 35786000
-    sat_lat_deg = 0
+    sat_lat_deg = 8
 
     ###########################################################################
     # System receive noise temperature [K]
@@ -47,12 +47,17 @@ class ParametersFss(object):
     # Satellite antenna pattern in the fixed-satellite service
     sat_rx_antenna_pattern = "ITU-R S.672-4"
 
-
     # IMT parameters relevant to the satellite system
-    imt_altitude = 1000   # altitude of IMT system (in meters)
-    imt_lat_deg = -23.5629739   # latitude of IMT system (in degrees)
-    imt_long_diff_deg = (-46.6555132-75) # difference between longitudes of IMT and satellite system
+    imt_altitude = 0   # altitude of IMT system (in meters)
+    imt_lat_deg = 0   # latitude of IMT system (in degrees)
+    imt_long_diff_deg = 0 # difference between longitudes of IMT and satellite system
                              # positive if space-station is to the East of earth-station
+
+#    # IMT parameters relevant to the satellite system
+#    imt_altitude = 1000   # altitude of IMT system (in meters)
+#    imt_lat_deg = -23.5629739   # latitude of IMT system (in degrees)
+#    imt_long_diff_deg = (-46.6555132-75) # difference between longitudes of IMT and satellite system
+#                             # positive if space-station is to the East of earth-station
 
     ###########################################################################
     # Channel parameters
