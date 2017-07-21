@@ -19,17 +19,20 @@ class PropagationSatSimple(Propagation):
         self.nlos_loss = 20
         self.atmospheric_loss = 1
         self.polarization_loss = 3
+        self.building_loss = 20
 
         
     def get_loss(self, *args, **kwargs) -> np.array:
-        d = np.asarray(kwargs["distance_3D"])
-        f = np.asarray(kwargs["frequency"])
+        d = kwargs["distance_3D"]
+        f = kwargs["frequency"]
         p_los = kwargs["line_of_sight_prob"]
+        indoor_stations = kwargs["indoor_stations"]
         
         free_space_loss = 20*np.log10(d) + 20*np.log10(f) - 27.55
         line_of_sight = np.random.sample(d.shape) <= p_los
         nlos_loss = self.nlos_loss * ( ~line_of_sight )
+        building_loss = self.building_loss*indoor_stations
         loss = (free_space_loss + nlos_loss + self.polarization_loss
-                + self.atmospheric_loss)
+                + self.atmospheric_loss + building_loss)
         
         return loss
