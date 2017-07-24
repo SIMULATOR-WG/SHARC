@@ -20,13 +20,15 @@ class TopologyMacrocellTest(unittest.TestCase):
         intersite_distance = 1000
         num_clusters = 1
         topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
         self.assertEqual(topology.intersite_distance, 1000)
-        self.assertAlmostEqual(topology.cell_radius, 666.667, places=2)
+        self.assertAlmostEqual(topology.cell_radius, 666.66, places=1)
         
         # when intersite distance changes, cell radius also changes
         intersite_distance = 600
         num_clusters = 1
         topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
         self.assertEqual(topology.intersite_distance, 600)
         self.assertEqual(topology.cell_radius, 400)
         
@@ -34,6 +36,7 @@ class TopologyMacrocellTest(unittest.TestCase):
         intersite_distance = 1500
         num_clusters = 1
         topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
         self.assertEqual(topology.intersite_distance, 1500)
         self.assertAlmostEqual(topology.cell_radius, 1000, places=2)
 
@@ -42,12 +45,14 @@ class TopologyMacrocellTest(unittest.TestCase):
         intersite_distance = 1000
         num_clusters = 1
         topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
         self.assertEqual(topology.num_clusters, 1)
         
         # set to 7 clusters
         intersite_distance = 1000
         num_clusters = 7
         topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
         self.assertEqual(topology.num_clusters, 7)
         
         # set to any other value raises an exception
@@ -68,6 +73,7 @@ class TopologyMacrocellTest(unittest.TestCase):
         intersite_distance = 1000
         num_clusters = 1
         topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
         
         num_sites = 19
         num_bs_per_site = 3
@@ -95,6 +101,7 @@ class TopologyMacrocellTest(unittest.TestCase):
         intersite_distance = 500
         num_clusters = 1
         topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
 
         # check the number of base stations
         self.assertEqual(len(topology.x), num_bs)
@@ -113,7 +120,14 @@ class TopologyMacrocellTest(unittest.TestCase):
         npt.assert_allclose(topology.x, x_ref, atol=1e-2)
         npt.assert_allclose(topology.y, y_ref, atol=1e-2)
         npt.assert_allclose(topology.azimuth, az_ref, atol=1e-2)      
-            
+
+
+    def test_elevation(self):
+        intersite_distance = 500
+        num_clusters = 1
+        topology = TopologyMacrocell(intersite_distance, num_clusters)
+        topology.calculate_coordinates()
+        npt.assert_equal(topology.elevation, -10*np.ones(3*19))
         
         
 if __name__ == '__main__':

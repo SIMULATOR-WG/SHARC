@@ -7,12 +7,15 @@ Created on Tue Feb 14 12:48:58 2017
 
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import matplotlib.axes
  
 class Topology(object):
     
     __metaclass__ = ABCMeta
     
-    def __init__(self, intersite_distance: float, cell_radius: float):
+    def __init__(self, 
+                 intersite_distance: float, 
+                 cell_radius: float):
         self.intersite_distance = intersite_distance
         self.cell_radius = cell_radius
         
@@ -23,6 +26,7 @@ class Topology(object):
         self.azimuth = np.empty(0)
         self.elevation = np.empty(0)
         self.num_base_stations = -1
+        self.static_base_stations = False
     
         
     @abstractmethod
@@ -33,3 +37,11 @@ class Topology(object):
         """        
         pass
         
+
+    @abstractmethod
+    def plot(self, ax: matplotlib.axes.Axes):
+        """
+        Plots the topology on the given axis.
+        """        
+        pass
+    

@@ -6,7 +6,9 @@ Created on Thu Mar 23 16:37:32 2017
 """
 
 import numpy as np
+import sys
 
+from sharc.support.enumerations import StationType
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
@@ -23,30 +25,35 @@ class StationFactory(object):
                                    topology: Topology):
         num_bs = topology.num_base_stations
         imt_base_stations = StationManager(num_bs)
-        
+        imt_base_stations.station_type = StationType.IMT_BS
         # now we set the coordinates
         imt_base_stations.x = topology.x
         imt_base_stations.y = topology.y
         imt_base_stations.azimuth = topology.azimuth
         imt_base_stations.elevation = topology.elevation
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
+        imt_base_stations.indoor = np.zeros(num_bs, dtype=bool)
+        imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
+        imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
+        imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.rx_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.total_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         
-        imt_base_stations.active = np.ones(num_bs)
-        imt_base_stations.tx_power = param.bs_tx_power*np.ones(num_bs)
-        imt_base_stations.rx_interference = -500*np.ones(param.ue_k)
+        imt_base_stations.snr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.sinr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
-        par = param_ant.get_antenna_parameters("BS", "TX")
+        par = param_ant.get_antenna_parameters("BS", "RX")
         
         for i in range(num_bs):
             imt_base_stations.antenna[i] = \
             AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
                                   imt_base_stations.elevation[i])
         
+        #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
-        imt_base_stations.is_satellite = False
         return imt_base_stations
 
         
@@ -59,34 +66,48 @@ class StationFactory(object):
         num_ue = num_bs*num_ue_per_bs
 
         imt_ue = StationManager(num_ue)
+        imt_ue.station_type = StationType.IMT_UE
         ue_x = list()
         ue_y = list()
         
         # The Rayleigh and Normal distribution parameters (mean, scale and cutoff)
         # were agreed in TG 5/1 meeting (May 2017).
         
-        # For the distance between UE and BS, it is desired that 99% of UE's 
-        # are located inside the [soft] cell edge, i.e. Prob(d<d_edge) = 99%.
-        # Since the distance is modeled by a random variable with Rayleigh
-        # distribution, we use the quantile function to find that 
-        # sigma = distance/3.0345. So we always distibute UE's in order to meet
-        # the requirement Prob(d<d_edge) = 99% for a given cell radius.
-        radius_scale = topology.cell_radius/3.0345
-        radius = np.random.rayleigh(radius_scale, num_ue)
-        
-        # In case of the angles, we generate N times the number of UE's because 
-        # the angle cutoff will discard 5% of the terminals whose angle is 
-        # outside the angular sector defined by [-60, 60]. So, N = 1.4 seems to
-        # be a safe choice.
-        N = 1.4
-        angle_scale = 30
-        angle_mean = 0
-        angle_n = np.random.normal(angle_mean, angle_scale, int(N*num_ue))
-        
-        angle_cutoff = 60
-        idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
-        angle = angle_n[idx]
-
+        if param.ue_distribution_distance == "RAYLEIGH":
+            # For the distance between UE and BS, it is desired that 99% of UE's 
+            # are located inside the [soft] cell edge, i.e. Prob(d<d_edge) = 99%.
+            # Since the distance is modeled by a random variable with Rayleigh
+            # distribution, we use the quantile function to find that 
+            # sigma = distance/3.0345. So we always distibute UE's in order to meet
+            # the requirement Prob(d<d_edge) = 99% for a given cell radius.
+            radius_scale = topology.cell_radius/3.0345
+            radius = np.random.rayleigh(radius_scale, num_ue)
+        elif param.ue_distribution_distance == "UNIFORM":
+            radius = topology.cell_radius*np.random.random(num_ue)
+        else:
+            sys.stderr.write("ERROR\nInvalid UE distance distribution: " + param.ue_distribution_distance)
+            sys.exit(1)            
+            
+        if param.ue_distribution_azimuth == "NORMAL":
+            # In case of the angles, we generate N times the number of UE's because 
+            # the angle cutoff will discard 5% of the terminals whose angle is 
+            # outside the angular sector defined by [-60, 60]. So, N = 1.4 seems to
+            # be a safe choice.
+            N = 1.4
+            angle_scale = 30
+            angle_mean = 0
+            angle_n = np.random.normal(angle_mean, angle_scale, int(N*num_ue))
+            
+            angle_cutoff = 60
+            idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
+            angle = angle_n[idx]
+        elif param.ue_distribution_azimuth == "UNIFORM":
+            azimuth_range = (-60, 60)
+            angle = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]
+        else:
+            sys.stderr.write("ERROR\nInvalid UE azimuth distribution: " + param.ue_distribution_distance)
+            sys.exit(1)  
+            
         # Calculate UE pointing
         azimuth_range = (-60, 60)
         azimuth = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]
@@ -118,7 +139,8 @@ class StationFactory(object):
 
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
-        imt_ue.tx_power = param.ue_tx_power*np.ones(num_ue)
+        imt_ue.indoor = np.random.random(num_ue) <= param.ue_indoor_percent
+        imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
 
         # TODO: this piece of code works only for uplink
@@ -127,15 +149,16 @@ class StationFactory(object):
             imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i], 
                                                          imt_ue.elevation[i])
             
+        #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
-        imt_ue.is_satellite = False
         return imt_ue
 
         
     @staticmethod
-    def generate_fss_stations(param: ParametersFss):
-        satellite_stations = StationManager(1)
+    def generate_fss_space_stations(param: ParametersFss):
+        fss_space_station = StationManager(1)
+        fss_space_station.station_type = StationType.FSS_SS
 
         # now we set the coordinates according to
         # ITU-R P619-1, Attachment A
@@ -153,17 +176,29 @@ class StationFactory(object):
 
         # calculate coordinates with origin at IMT system
         imt_lat_rad = param.imt_lat_deg * np.pi / 180.
-        satellite_stations.x = [x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)]
-        satellite_stations.y = [y1]
-        satellite_stations.height = [(z1 * np.sin(imt_lat_rad) + x1 * np.cos(imt_lat_rad)
-                                     - dist_imt_centre_earth)]
+        fss_space_station.x = np.array([x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)])
+        fss_space_station.y = np.array([y1])
+        fss_space_station.height = np.array([(z1 * np.sin(imt_lat_rad) + x1 * np.cos(imt_lat_rad) - dist_imt_centre_earth)])
+        
+        #fss_space_station.x = np.array([0])
+        #fss_space_station.y = np.array([0])
+        #fss_space_station.height = np.array([param.sat_altitude])
 
-        satellite_stations.height = [param.sat_altitude]
-        satellite_stations.active = True
-        satellite_stations.antenna = np.array([AntennaOmni(param.sat_rx_antenna_gain)])
-        satellite_stations.bandwidth = param.sat_bandwidth
-        satellite_stations.noise_temperature = param.sat_noise_temperature
-        satellite_stations.rx_interference = -500
-        satellite_stations.is_satellite = True
+        fss_space_station.azimuth = np.array([0])
+        fss_space_station.elevation = np.array([0])
 
-        return satellite_stations
+        fss_space_station.active = True
+        fss_space_station.tx_power = None
+        fss_space_station.rx_power = None
+        fss_space_station.rx_interference = -500*np.ones(1)
+        fss_space_station.antenna = np.array([AntennaOmni(param.sat_rx_antenna_gain)])
+        fss_space_station.bandwidth = param.bandwidth
+        fss_space_station.noise_figure = None
+        fss_space_station.noise_temperature = param.sat_noise_temperature
+        fss_space_station.thermal_noise = -500*np.ones(1)
+        fss_space_station.total_interference = -500*np.ones(1)
+        fss_space_station.snr = None
+        fss_space_station.sinr = None
+        fss_space_station.inr = None
+        
+        return fss_space_station

@@ -17,7 +17,7 @@ class TopologyFactory(object):
     @staticmethod
     def createTopology(param: ParametersImt) -> Topology:
         if param.topology == "SINGLE_BS":
-            return TopologySingleBaseStation(param.intersite_distance/2, param.num_clusters)
+            return TopologySingleBaseStation(param.intersite_distance*2/3, param.num_clusters)
         elif param.topology == "MACROCELL":
             return TopologyMacrocell(param.intersite_distance, param.num_clusters)
         elif param.topology == "HOTSPOT":

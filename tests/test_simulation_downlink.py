@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr 10 18:32:30 2017
+Created on Fri Mar 17 16:22:42 2017
 
 @author: edgar
 """
@@ -10,16 +10,15 @@ import numpy as np
 import numpy.testing as npt
 import math
 
-from sharc.simulation_uplink import SimulationUplink
+from sharc.simulation_downlink import SimulationDownlink
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.antenna.antenna_omni import AntennaOmni
-from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.station_factory import StationFactory
 
-class SimulationUplinkTest(unittest.TestCase):
-    
+class SimulationDownlinkTest(unittest.TestCase):
+
     def setUp(self):
         self.param = ParametersImt()
         self.param.topology = "SINGLE_BS"
@@ -128,10 +127,10 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param_service.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param_service.EARTH_RADIUS = 6371000        
 
-        self.simulation = SimulationUplink(self.param, self.param_service, self.param_ant)
+        self.simulation = SimulationDownlink(self.param, self.param_service, self.param_ant)
         self.simulation.initialize()
-        
-        
+
+
     def test_simulation_2bs_4ue(self):
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
@@ -172,53 +171,39 @@ class SimulationUplinkTest(unittest.TestCase):
         bandwidth_per_ue = math.trunc((1 - 0.1)*100/2)       
         npt.assert_allclose(self.simulation.ue.bandwidth, bandwidth_per_ue*np.ones(4), atol=1e-2)
         
-        # there is no power control, so UE's will transmit at maximum power
+        # there is no power control, so BS's will transmit at maximum power
         self.simulation.power_control()
-        npt.assert_allclose(self.simulation.ue.tx_power, 20*np.ones(4))
+        p_tx = 10 + 0 - 3 - 10*math.log10(2)
+        npt.assert_allclose(self.simulation.bs.tx_power[0], np.array([p_tx, p_tx]), atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.tx_power[1], np.array([p_tx, p_tx]), atol=1e-2)
         
         # test method that calculates SINR 
         self.simulation.calculate_sinr()
-        # check BS received power
-        npt.assert_allclose(self.simulation.bs.rx_power[0], 
-                            np.array([20-(78.47-1-10)-10, 20-(89.35-1-11)-10]),
+        # check UE received power
+        npt.assert_allclose(self.simulation.ue.rx_power, 
+                            np.array([p_tx-(78.47-1-10)-7, p_tx-(89.35-1-11)-7, p_tx-(91.53-2-22)-7, p_tx-(81.99-2-23)-7]),
                             atol=1e-2)
-        npt.assert_allclose(self.simulation.bs.rx_power[1], 
-                            np.array([20-(91.53-2-22)-10, 20-(81.99-2-23)-10]),
-                            atol=1e-2)        
-        # check BS received interference
-        npt.assert_allclose(self.simulation.bs.rx_interference[0], 
-                            np.array([20-(93.27-1-22)-10,  20-(97.05-1-23)-10]),
+        # check UE received interference
+        npt.assert_allclose(self.simulation.ue.rx_interference, 
+                            np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7]),
                             atol=1e-2)
-        npt.assert_allclose(self.simulation.bs.rx_interference[1], 
-                            np.array([20-(97.55-2-10)-10, 20-(94.72-2-11)-10]),
-                            atol=1e-2)      
-        # check BS thermal noise
-        npt.assert_allclose(self.simulation.bs.thermal_noise, 
-                            10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 7,
+        # check UE thermal noise
+        npt.assert_allclose(self.simulation.ue.thermal_noise, 
+                            10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9,
                             atol=1e-2)
         # check BS thermal noise + interference
-        npt.assert_allclose(self.simulation.bs.total_interference[0], 
-                            10*np.log10(np.power(10, 0.1*np.array([20-(93.27-1-22)-10,  20-(97.05-1-23)-10])) +
-                                        np.power(10, 0.1*(-90.44))),
+        npt.assert_allclose(self.simulation.ue.total_interference, 
+                            10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7])) +
+                                        np.power(10, 0.1*(-88.44))),
                             atol=1e-2)
-        npt.assert_allclose(self.simulation.bs.total_interference[1], 
-                            10*np.log10(np.power(10, 0.1*np.array([20-(97.55-2-10)-10, 20-(94.72-2-11)-10])) +
-                                        np.power(10, 0.1*(-90.44))),
-                            atol=1e-2)    
         # check SNR 
-        npt.assert_allclose(self.simulation.bs.snr[0], 
-                            np.array([20-(78.47-1-10)-10 - (-90.44),  20-(89.35-1-11)-10 - (-90.44)]),
-                            atol=1e-2)
-        npt.assert_allclose(self.simulation.bs.snr[1], 
-                            np.array([20-(91.53-2-22)-10 - (-90.44),  20-(81.99-2-23)-10 - (-90.44)]),
-                            atol=1e-2)
-        # check SINR 
-        npt.assert_allclose(self.simulation.bs.sinr[0], 
-                            np.array([-57.47 - (-60.27),  -67.35 - (-63.05)]),
-                            atol=1e-2)
-        npt.assert_allclose(self.simulation.bs.sinr[1], 
-                            np.array([-57.53 - (-75.41),  -46.99 - (-71.67)]),
-                            atol=1e-2)
+        npt.assert_allclose(self.simulation.ue.snr, 
+                            np.array([-70.48 - (-88.44),  -80.36 - (-88.44), -70.54 - (-88.44),  -60.00 - (-88.44)]),
+                            atol=1e-2)        
+        # check SINR
+        npt.assert_allclose(self.simulation.ue.sinr, 
+                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            atol=1e-2)        
 
         self.simulation.system = StationFactory.generate_fss_space_stations(self.param_service)
         self.simulation.system.x = np.array([0])
@@ -229,128 +214,24 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.calculate_external_interference()
         # check coupling loss
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
-                            np.array([203.52-51-10, 203.52-51-11, 203.52-51-22, 203.52-51-23]),
+                            np.array([203.52-51-1, 203.52-51-2]),
                             atol=1e-2)
-        # check interference generated by UE to FSS space station
-        interference_ue = 20 - np.array([203.52-51-10, 203.52-51-11, 203.52-51-22, 203.52-51-23]) - 7 + 10*math.log10(45/100)
-        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference_ue)))
+        # check interference generated by BS to FSS space station
+        interference = 10 - np.array([203.52-51-1, 203.52-51-2]) - 3 + 10*math.log10(45/100)
+        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
                                delta=.01)
         # check FSS space station thermal noise
-        thermal_noise = 10*np.log10(1.38064852e-23*950*100*1e3*1e6)
+        thermal_noise = 10*np.log10(1.38064852e-23*950*1e3*100*1e6)
         self.assertAlmostEqual(self.simulation.system.thermal_noise, 
                                thermal_noise,
                                delta=.01)      
         # check INR at FSS space station
         self.assertAlmostEqual(self.simulation.system.inr, 
-                               -117.18 - (-88.82),
+                               -144.448 - (-88.821),
                                delta=.01)        
+
         
-        
-    def test_beamforming_gains(self):
-        eps = 1e-2
-        
-        # Set scenario
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param,
-                                                                       self.param_ant,
-                                                                       self.simulation.topology)
-        
-        self.simulation.ue = StationFactory.generate_imt_ue(self.param,
-                                                            self.param_ant,
-                                                            self.simulation.topology)
-        self.simulation.ue.x = np.array([50.000, 43.301, 150.000, 175.000])
-        self.simulation.ue.y = np.array([ 0.000, 25.000,   0.000, 43.301])
-        
-        # Physical pointing angles
-        self.assertEqual(self.simulation.bs.antenna[0].azimuth,0)
-        self.assertEqual(self.simulation.bs.antenna[0].elevation,-10)
-        self.assertEqual(self.simulation.bs.antenna[1].azimuth,180)
-        self.assertEqual(self.simulation.bs.antenna[0].elevation,-10)
-        
-        # Change UE pointing
-        self.simulation.ue.azimuth = np.array([180, -90, 90, -90])
-        self.simulation.ue.elevation = np.array([-30, -15, 15, 30])
-        par = self.param_ant.get_antenna_parameters("UE","TX")
-        for i in range(self.simulation.ue.num_stations):
-            self.simulation.ue.antenna[i] = AntennaBeamformingImt(par, self.simulation.ue.azimuth[i], 
-                                                                  self.simulation.ue.elevation[i])
-        self.assertEqual(self.simulation.ue.antenna[0].azimuth,180)
-        self.assertEqual(self.simulation.ue.antenna[0].elevation,-30)
-        self.assertEqual(self.simulation.ue.antenna[1].azimuth,-90)
-        self.assertEqual(self.simulation.ue.antenna[1].elevation,-15)
-        self.assertEqual(self.simulation.ue.antenna[2].azimuth,90)
-        self.assertEqual(self.simulation.ue.antenna[2].elevation,15)
-        self.assertEqual(self.simulation.ue.antenna[3].azimuth,-90)
-        self.assertEqual(self.simulation.ue.antenna[3].elevation,30)
-        
-        # Simulate connection and selection
-        self.simulation.connect_ue_to_bs()
-        self.assertEqual(self.simulation.link,{0:[0,1],1:[2,3]})
-            
-        # Test BS gains
-        # Test pointing vector
-        phi, theta = self.simulation.bs.get_pointing_vector_to(self.simulation.ue)
-        npt.assert_allclose(phi,np.array([[0.0, 30.0, 0.0,    13.898],
-                                          [180.0, 170.935, 180.0, 120.0  ]]),atol=eps)
-        npt.assert_allclose(theta,np.array([[95.143, 95.143, 91.718, 91.430],
-                                            [91.718, 91.624, 95.143, 95.143]]),atol=eps)
-    
-        # Add beams by brute force: since the SimulationUplink.select_ue()
-        # method shufles the link dictionary, the order of the beams cannot be
-        # predicted. Thus, the beams need to be added outside of the function
-        self.simulation.ue.active = np.ones(4, dtype=bool)
-        self.simulation.bs.antenna[0].add_beam(phi[0,0],theta[0,0])
-        self.simulation.bs.antenna[0].add_beam(phi[0,1],theta[0,1])
-        self.simulation.bs.antenna[1].add_beam(phi[1,2],theta[1,2])
-        self.simulation.bs.antenna[1].add_beam(phi[1,3],theta[1,3])
-        self.simulation.ue.antenna[0].add_beam(phi[0,0]-180,180-theta[0,0])
-        self.simulation.ue.antenna[1].add_beam(phi[0,1]-180,180-theta[0,1])
-        self.simulation.ue.antenna[2].add_beam(phi[1,2]-180,180-theta[1,2])
-        self.simulation.ue.antenna[3].add_beam(phi[1,3]-180,180-theta[1,3])
-        self.simulation.bs_to_ue_beam_rbs = np.array([0, 1, 0, 1],dtype=int)
-                
-        # Test beams pointing
-        npt.assert_allclose(self.simulation.bs.antenna[0].beams_list[0],
-                            np.array([[0.0],[-4.857]]),atol=eps)
-        npt.assert_allclose(self.simulation.bs.antenna[0].beams_list[1],
-                            np.array([[30.0],[-4.857]]),atol=eps)
-        npt.assert_allclose(self.simulation.bs.antenna[1].beams_list[0],
-                            np.array([[0.0],[-4.857]]),atol=eps)
-        npt.assert_allclose(self.simulation.bs.antenna[1].beams_list[1],
-                            np.array([[-60.0],[-4.857]]),atol=eps)     
-        npt.assert_allclose(self.simulation.ue.antenna[0].beams_list[0],
-                            np.array([[0.0],[-35.143]]),atol=eps)
-        npt.assert_allclose(self.simulation.ue.antenna[1].beams_list[0],
-                            np.array([[-60.0],[-20.143]]),atol=eps)
-        npt.assert_allclose(self.simulation.ue.antenna[2].beams_list[0],
-                            np.array([[-90.0],[9.857]]),atol=eps)
-        npt.assert_allclose(self.simulation.ue.antenna[3].beams_list[0],
-                            np.array([[30.0],[24.857]]),atol=eps)
-        
-        # BS Gain matrix
-        ref_gain = np.array([[ 10.954, 8.397, 10.788, 9.469],
-                             [ 10.788, 3.497, 10.954, 0.729]])
-        gain = self.simulation.calculate_gains(self.simulation.bs,self.simulation.ue)
-        npt.assert_allclose(gain,ref_gain,atol=eps)
-        
-        # UE Gain matrix
-        ref_gain = np.array([[  4.503, -22.016],
-                             [ -3.367, -11.416],
-                             [-15.533, -15.272],
-                             [-10.793,   3.699]])
-        gain = self.simulation.calculate_gains(self.simulation.ue,self.simulation.bs)
-        npt.assert_allclose(gain,ref_gain,atol=eps) 
-    
-    def test_calculate_imt_ul_tput(self):
-        eps = 1e-2
-        
-        # Test 1
-        snir = np.array([0.0, 1.0, 15.0, -5.0, 100.00, 200.00])
-        ref_tput = np.array([ 0.400, 0.470, 2.011, 0.159, 2.927, 2.927])
-        tput = self.simulation.calculate_imt_ul_tput(snir)
-        npt.assert_allclose(tput,ref_tput,atol=eps)
-                
 if __name__ == '__main__':
     unittest.main()
-    

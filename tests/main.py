@@ -6,8 +6,12 @@ Created on Tue Feb  7 19:23:27 2017
 """
 
 import unittest
+import sys
 
 loader = unittest.TestLoader()
 tests = loader.discover('.')
 testRunner = unittest.runner.TextTestRunner()
-testRunner.run(tests)
+test_results = testRunner.run(tests)
+
+if(test_results.errors != [] or test_results.failures != []): sys.exit(1)
+        

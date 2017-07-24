@@ -7,6 +7,7 @@ Created on Mon Feb  6 17:59:07 2017
 
 import unittest
 
+from sharc.support.enumerations import StationType
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.station import Station
@@ -59,6 +60,7 @@ class StationTest(unittest.TestCase):
         
         self.station = Station()
         self.station.id = 1
+        self.station.station_type = StationType.IMT_BS
         self.station.x = 10
         self.station.y = 15
         self.station.height = 6
@@ -69,6 +71,7 @@ class StationTest(unittest.TestCase):
         
         self.station2 = Station()
         self.station2.id = 1
+        self.station2.station_type = StationType.IMT_UE
         self.station2.x = 10
         self.station2.y = 15
         self.station2.height = 6
@@ -79,6 +82,7 @@ class StationTest(unittest.TestCase):
         
         self.station3 = Station()
         self.station3.id = 2
+        self.station3.station_type = StationType.FSS_SS
         self.station3.x = 10
         self.station3.y = 15
         self.station3.height = 6
@@ -89,6 +93,9 @@ class StationTest(unittest.TestCase):
         
     def test_id(self):
         self.assertEqual(self.station.id, 1)
+        
+    def test_station_type(self):
+        self.assertEqual(self.station.station_type,StationType.IMT_BS)
 
     def test_x(self):
         self.assertEqual(self.station.x, 10)

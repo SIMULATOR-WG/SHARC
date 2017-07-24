@@ -131,11 +131,11 @@ class View(tkinter.Tk, Observer):
 
     def __plot_results(self, results: Results):
         file_extension = ".png"
-        transparent_figure = False
+        transparent_figure = True
         
         for plot in results.plot_list:
-            plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
-            plt.plot(plot.x, plot.y)        
+            plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')
+            plt.plot(plot.x, plot.y, color='#990000', linewidth=2)        
             plt.title(plot.title)
             plt.xlabel(plot.x_label)
             plt.ylabel(plot.y_label)
@@ -143,7 +143,7 @@ class View(tkinter.Tk, Observer):
                 plt.xlim(plot.x_lim)
             if not plot.y_lim is None:
                 plt.ylim(plot.y_lim)                
-            plt.grid()
+            #plt.grid()
             plt.tight_layout()
             plt.savefig(os.path.join("output", plot.file_name + file_extension), 
                         transparent=transparent_figure)        
@@ -184,7 +184,7 @@ class View(tkinter.Tk, Observer):
         elif state is State.RUNNING:
             self.__start_button.config(state=tkinter.DISABLED)
             self.__stop_button.config(state=tkinter.NORMAL)
-            self.__results_button.config(state=tkinter.DISABLED)
+            self.__results_button.config(state=tkinter.NORMAL)
             self.__stop_button.focus_set()
         elif state is State.STOPPING:
             self.__start_button.config(state=tkinter.DISABLED)

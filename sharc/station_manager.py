@@ -7,6 +7,7 @@ Created on Fri Feb  3 15:29:48 2017
 
 import numpy as np
 
+from sharc.support.enumerations import StationType
 from sharc.station import Station
 from sharc.antenna.antenna import Antenna
 
@@ -24,11 +25,12 @@ class StationManager(object):
         self.azimuth = np.empty(n)
         self.elevation = np.empty(n)
         self.height = np.empty(n)
+        self.indoor = np.zeros(n, dtype=bool)
         self.active = np.ones(n, dtype=bool)
         self.tx_power = np.empty(n)
         self.rx_power = np.empty(n)
         self.rx_interference = np.empty(n)
-        self.antenna = np.array([Antenna() for i in range(n)])
+        self.antenna = np.empty(n, dtype=Antenna)
         self.bandwidth = np.empty(n)
         self.noise_figure = np.empty(n)
         self.noise_temperature = np.empty(n)
@@ -37,8 +39,9 @@ class StationManager(object):
         self.snr = np.empty(n)
         self.sinr = np.empty(n)
         self.inr = np.empty(n)
+        self.station_type = StationType.NONE
 
-    def get_station_list(self,id=None) -> list:
+    def get_station_list(self, id=None) -> list:
         if(id is None):
             id = range(self.num_stations)
         station_list = list()
@@ -46,7 +49,7 @@ class StationManager(object):
             station_list.append(self.get_station(i))
         return station_list
 
-    def get_station(self,id) -> Station:
+    def get_station(self, id) -> Station:
         station = Station()
         station.id = id
         station.x = self.x[id]
@@ -54,10 +57,21 @@ class StationManager(object):
         station.azimuth = self.azimuth[id]
         station.elevation = self.elevation[id]
         station.height = self.height[id]
+        station.indoor = self.indoor[id]
         station.active = self.active[id]
         station.tx_power = self.tx_power[id]
         station.rx_power = self.rx_power[id]
+        station.rx_interference = self.rx_interference[id]
         station.antenna = self.antenna[id]
+        station.bandwidth = self.bandwidth[id]
+        station.noise_figure = self.noise_figure[id]
+        station.noise_temperature = self.noise_temperature[id]
+        station.thermal_noise = self.thermal_noise[id]
+        station.total_interference = self.total_interference[id]
+        station.snr = self.snr[id]
+        station.sinr = self.sinr[id]
+        station.inr = self.inr[id]
+        station.station_type = self.station_type
         return station
 
     def get_distance_to(self, station) -> np.array:
@@ -103,4 +117,17 @@ class StationManager(object):
             angle[i] = theta_0 + tau_fs
 
         return{'free_space': free_space_angle, 'apparent': angle}
+    
+    def get_pointing_vector_to(self, station) -> tuple:
+
+        point_vec_x = station.x- self.x[:,np.newaxis]
+        point_vec_y = station.y - self.y[:,np.newaxis]
+        point_vec_z = station.height - self.height[:,np.newaxis]
+            
+        dist = self.get_3d_distance_to(station)
+        
+        phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
+        theta = np.rad2deg(np.arccos(point_vec_z/dist))
+        
+        return phi, theta
 

@@ -24,11 +24,8 @@ class ParametersHotspot(object):
     
     ###########################################################################
     # Maximum 2D distance between hotspot and UE [m]
+    # This is the hotspot radius
     max_dist_hotspot_ue = 100
-    
-    ###########################################################################
-    # Minimum 2D distance between hotspot and UE [m]
-    min_dist_hotspot_ue = 5
     
     ###########################################################################
     # Minimum 2D distance between macro cell base station and hotspot [m]

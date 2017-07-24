@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
-from sharc.station_factory import SationFactory
+from sharc.station_factory import StationFactory
 
 class StationFactoryTest(unittest.TestCase):
     
@@ -18,3 +18,7 @@ class StationFactoryTest(unittest.TestCase):
         
     def test_generate_imt_base_stations(self):
         pass
+    
+        
+if __name__ == '__main__':
+    unittest.main()    

@@ -20,23 +20,19 @@ class ParametersImt(object):
 
     ###########################################################################
     # Network topology. Possible values are "MACROCELL", "HOTSPOT", "SINGLE_BS"
-    topology = "HOTSPOT"
+    topology = "MACROCELL"
 
     ###########################################################################
     # Number of macrocell sites per cluster (must set to 19 in macrocell network)
     num_macrocell_sites = 19
 
     ###########################################################################
-    # Number of clusters
+    # Number of clusters in macro cell topology
     num_clusters = 1
 
     ###########################################################################
-    # Configures static or dynamic positions for base stations
-    static_base_stations = True
-
-    ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 400
+    intersite_distance = 150
 
     ###########################################################################
     # Minimum 2D separation distance from BS to UE
@@ -48,7 +44,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT center frequency [MHz]
-    frequency = 27250
+    frequency = 26000
 
     ###########################################################################
     # IMT bandwidth [MHz]
@@ -56,7 +52,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT resource block bandwidth [MHz]
-    rb_bandwidth = 0.180
+    rb_bandwidth = 0.200
 
     ###########################################################################
     # Amount of guard band wrt total bandwidth. Setting this parameter to 0.1
@@ -65,23 +61,14 @@ class ParametersImt(object):
     guard_band_ratio = 0.1
 
     ###########################################################################
-    # Handover margin [dB]
-    ho_margin = 3
-
-    ###########################################################################
     # The load probability (or activity factor) models the statistical
     # variation of the network load by defining the number of fully loaded
     # base stations that are simultaneously transmitting
     bs_load_probability = .5
 
     ###########################################################################
-    # Number of resource blocks per UE
-    num_resource_blocks = 10
-
-
-    ###########################################################################
-    # Maximum base station transmit power [dBm]
-    bs_tx_power = 46
+    # Conducted power per antenna element [dBm/200 MHz]
+    bs_conducted_power = 10
 
     ###########################################################################
     # Base station height [m]
@@ -97,7 +84,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Base station noise figure [dB]
-    bs_noise_figure = 7
+    bs_noise_figure = 10
 
     ###########################################################################
     # User equipment noise temperature [K]
@@ -129,27 +116,46 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 2
+    ue_k_m = 1
 
+    ###########################################################################
+    # Percentage of indoor UE's
+    ue_indoor_percent = 0.05
+
+    ###########################################################################
+    # Regarding the distribution of active UE's over the cell area, this
+    # parameter models the distance between UE's and BS.
+    # Possible values: RAYLEIGH, UNIFORM
+    ue_distribution_distance = "RAYLEIGH"
+    
+    ###########################################################################
+    # Regarding the distribution of active UE's over the cell area, this
+    # parameter models the azimuth between UE and BS (within ±60° range).
+    # Possible values: NORMAL, UNIFORM
+    ue_distribution_azimuth = "UNIFORM"
+    
     ###########################################################################
     # Power control algorithm
     # ue_tx_power_control = "ON",power control On
     # ue_tx_power_control = "OFF",power control Off
-
     ue_tx_power_control = "ON"
 
     ###########################################################################
-    # Power per RB used as target value in dBm
-    ue_tx_power_target = -95
+    # Power per RB used as target value [dBm]
+    ue_p_o_pusch = -95
 
     ###########################################################################
     # Alfa is the balacing factor for UEs with bad channel
     # and UEs with good channel
-    ue_tx_power_alfa = 0.8
+    ue_alfa = 1
 
     ###########################################################################
-    # UE maximum transmit power [dBm]
-    ue_tx_power = 22
+    # Maximum UE transmit power [dBm]
+    ue_p_cmax = 22    
+    
+    ###########################################################################
+    # Conducted power per antenna element [dBm/200 MHz]
+    ue_conducted_power = 10
     
     ###########################################################################
     # UE height [m]
@@ -165,11 +171,15 @@ class ParametersImt(object):
 
     ###########################################################################
     # User equipment noise figure [dB]
-    ue_noise_figure = 9
+    ue_noise_figure = 10
 
     ###########################################################################
     # User equipment feed loss [dB]
     ue_feed_loss = 3
+
+    ###########################################################################
+    # User equipment body loss [dB]
+    ue_body_loss = 4
 
     ###########################################################################
     # Downlink attenuation factor used in link-to-system mapping
@@ -188,11 +198,17 @@ class ParametersImt(object):
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "CI" (close-in FS reference distance)
     #                                    "UMa" (Urban Macro - 3GPP)
-    channel_model = "UMa"
-    line_of_sight_prob = 0.75 # probability of line-of-sight (not for FSPL)
+    #                                    "UMi" (Urban Micro - 3GPP)
+    #                                    "ABG" (Alpha-Beta-Gamma)
+    channel_model = "ABG"
+    
+    ###########################################################################
+    # Probability of line-of-sight (CI)
+    line_of_sight_prob = 0.95
 
     ###########################################################################
-
+    # If shadowing should be applied or not
+    shadowing = False
 
     ###########################################################################
     # System receive noise temperature [K]

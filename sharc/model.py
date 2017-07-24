@@ -23,8 +23,13 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        #self.simulation = SimulationDownlink(ParametersImt(), ParametersFss(), ParametersAntennaImt())
-        self.simulation = SimulationUplink(ParametersImt(), ParametersFss(), ParametersAntennaImt())
+        if ParametersGeneral.service == "FSS-SS":
+            param_service = ParametersFss()
+        
+        if ParametersGeneral.imt_link == "DOWNLINK":
+            self.simulation = SimulationDownlink(ParametersImt(), param_service, ParametersAntennaImt())
+        else:
+            self.simulation = SimulationUplink(ParametersImt(), param_service, ParametersAntennaImt())
 
     def add_observer(self, observer):
         Observable.add_observer(self, observer)
@@ -52,7 +57,8 @@ class Model(Observable):
             self.notify_observers(source=__name__,
                                   message="Snapshot #" + str(self.current_snapshot))
 
-        self.simulation.snapshot(write_to_file, self.current_snapshot)
+        self.simulation.snapshot(write_to_file = write_to_file, 
+                                 snapshot_number = self.current_snapshot)
             
     def is_finished(self) -> bool:
         """
@@ -72,7 +78,7 @@ class Model(Observable):
         """
         Finalizes the simulation and performs all post-simulation tasks
         """
-        self.simulation.finalize(self.current_snapshot)
+        self.simulation.finalize(snapshot_number=self.current_snapshot)
         self.notify_observers(source=__name__, 
                               message="FINISHED!", state=State.FINISHED)
         
