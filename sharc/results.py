@@ -15,8 +15,10 @@ class Results(object):
     def __init__(self):
         self.imt_ul_tx_power_density = list()
         self.imt_ul_tx_power = list()
+        self.imt_ul_sinr_ext = list()
         self.imt_ul_sinr = list()
         self.imt_ul_snr = list()
+        self.imt_ul_tput_ext = list()
         self.imt_ul_tput = list()
 
         self.imt_path_loss = list()
@@ -26,8 +28,10 @@ class Results(object):
 
         self.imt_dl_tx_power_density = list()
         self.imt_dl_tx_power = list()
+        self.imt_dl_sinr_ext = list()
         self.imt_dl_sinr = list()
         self.imt_dl_snr = list()
+        self.imt_dl_tput_ext = list()
         self.imt_dl_tput = list()
         
         self.system_ul_coupling_loss = list()
@@ -89,6 +93,18 @@ class Results(object):
             x_limits = (-40, 30)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_ul_sinr_ext) > 0:
+            values, base = np.histogram(self.imt_ul_sinr_ext, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "UL SINR [dB]"
+            y_label = "Probability of SINR < $X$"
+            title = "[IMT] CDF of UL SINR with external interference"
+            file_name = title
+            x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ul_sinr) > 0:
             values, base = np.histogram(self.imt_ul_sinr, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -113,6 +129,17 @@ class Results(object):
             x_limits = (-15, 20)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_ul_tput_ext) > 0:
+            values, base = np.histogram(self.imt_ul_tput_ext, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of UL throughput with external interference"
+            x_label = "UL throughput [bits/s/Hz]"
+            y_label = "Probability of UL throughput < $X$"
+            file_name = title
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))            
         if len(self.imt_ul_tput) > 0:
             values, base = np.histogram(self.imt_ul_tput, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -159,6 +186,18 @@ class Results(object):
             file_name = title
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_dl_sinr_ext) > 0:
+            values, base = np.histogram(self.imt_dl_sinr_ext, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "SINR [dB]"
+            y_label = "Probability of SINR < $X$"
+            title = "[IMT] CDF of DL SINR with external interference"
+            file_name = title
+            x_limits = (-20, 80)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_dl_sinr) > 0:
             values, base = np.histogram(self.imt_dl_sinr, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -183,6 +222,17 @@ class Results(object):
             x_limits = (-20, 80)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_dl_tput_ext) > 0:
+            values, base = np.histogram(self.imt_dl_tput_ext, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of DL throughput with external interference"
+            x_label = "Throughput [bits/s/Hz]"
+            y_label = "Probability of throughput < $X$"
+            file_name = title
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_dl_tput) > 0:
             values, base = np.histogram(self.imt_dl_tput, bins=n_bins)
             cumulative = np.cumsum(values)
