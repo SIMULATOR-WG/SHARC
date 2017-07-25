@@ -220,7 +220,7 @@ class SimulationUplinkTest(unittest.TestCase):
                             np.array([-57.53 - (-75.41),  -46.99 - (-71.67)]),
                             atol=1e-2)
 
-        self.simulation.system = StationFactory.generate_fss_space_stations(self.param_service)
+        self.simulation.system = StationFactory.generate_fss_space_station(self.param_service)
         self.simulation.system.x = np.array([0])
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param_service.sat_altitude])
@@ -348,7 +348,10 @@ class SimulationUplinkTest(unittest.TestCase):
         # Test 1
         snir = np.array([0.0, 1.0, 15.0, -5.0, 100.00, 200.00])
         ref_tput = np.array([ 0.400, 0.470, 2.011, 0.159, 2.927, 2.927])
-        tput = self.simulation.calculate_imt_ul_tput(snir)
+        tput = self.simulation.calculate_imt_tput(snir, 
+                                                  self.param.ul_sinr_min,
+                                                  self.param.ul_sinr_max,
+                                                  self.param.ul_attenuation_factor)
         npt.assert_allclose(tput,ref_tput,atol=eps)
                 
 if __name__ == '__main__':

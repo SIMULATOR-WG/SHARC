@@ -205,7 +205,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
                             atol=1e-2)        
 
-        self.simulation.system = StationFactory.generate_fss_space_stations(self.param_service)
+        self.simulation.system = StationFactory.generate_fss_space_station(self.param_service)
         self.simulation.system.x = np.array([0])
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param_service.sat_altitude])

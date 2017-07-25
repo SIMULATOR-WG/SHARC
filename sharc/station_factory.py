@@ -7,11 +7,13 @@ Created on Thu Mar 23 16:37:32 2017
 
 import numpy as np
 import sys
+import math
 
 from sharc.support.enumerations import StationType
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
@@ -156,7 +158,7 @@ class StationFactory(object):
 
         
     @staticmethod
-    def generate_fss_space_stations(param: ParametersFss):
+    def generate_fss_space_station(param: ParametersFss):
         fss_space_station = StationManager(1)
         fss_space_station.station_type = StationType.FSS_SS
 
@@ -187,7 +189,7 @@ class StationFactory(object):
         fss_space_station.azimuth = np.array([0])
         fss_space_station.elevation = np.array([0])
 
-        fss_space_station.active = True
+        fss_space_station.active = np.array([True])
         fss_space_station.tx_power = None
         fss_space_station.rx_power = None
         fss_space_station.rx_interference = -500*np.ones(1)
@@ -202,3 +204,23 @@ class StationFactory(object):
         fss_space_station.inr = None
         
         return fss_space_station
+
+        
+    @staticmethod
+    def generate_fss_earth_station(param: ParametersFssEs):
+        fss_earth_station = StationManager(1)
+        fss_earth_station.station_type = StationType.FSS_ES
+
+        fss_earth_station.x = np.array([param.x])
+        fss_earth_station.y = np.array([param.y])
+        fss_earth_station.height = np.array([param.height])
+
+        fss_earth_station.azimuth = np.array([param.azimuth])
+        fss_earth_station.elevation = np.array([param.elevation])
+
+        fss_earth_station.active = np.array([True])
+        fss_earth_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
+        fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        fss_earth_station.bandwidth = np.array([param.bandwidth])
+        
+        return fss_earth_station
