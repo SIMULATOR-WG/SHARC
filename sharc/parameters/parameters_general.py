@@ -27,6 +27,6 @@ class ParametersGeneral(object):
     imt_link = "DOWNLINK"
     
     ###########################################################################
-    # The chosen service for sharing study
-    # FSS-SS
-    service = "FSS-SS"
+    # The chosen system for sharing study
+    # FSS-SS, FSS-ES
+    system = "FSS-ES"
