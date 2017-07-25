@@ -30,6 +30,7 @@ class StationManager(object):
         self.tx_power = np.empty(n)
         self.rx_power = np.empty(n)
         self.rx_interference = np.empty(n)
+        self.ext_interference = np.empty(n)
         self.antenna = np.empty(n, dtype=Antenna)
         self.bandwidth = np.empty(n)
         self.noise_figure = np.empty(n)
@@ -38,6 +39,7 @@ class StationManager(object):
         self.total_interference = np.empty(n)
         self.snr = np.empty(n)
         self.sinr = np.empty(n)
+        self.sinr_ext = np.empty(n)
         self.inr = np.empty(n)
         self.station_type = StationType.NONE
 
@@ -62,6 +64,7 @@ class StationManager(object):
         station.tx_power = self.tx_power[id]
         station.rx_power = self.rx_power[id]
         station.rx_interference = self.rx_interference[id]
+        station.ext_interference = self.ext_interference[id]
         station.antenna = self.antenna[id]
         station.bandwidth = self.bandwidth[id]
         station.noise_figure = self.noise_figure[id]
@@ -70,6 +73,7 @@ class StationManager(object):
         station.total_interference = self.total_interference[id]
         station.snr = self.snr[id]
         station.sinr = self.sinr[id]
+        station.sinr_ext = self.sinr_ext[id]
         station.inr = self.inr[id]
         station.station_type = self.station_type
         return station
