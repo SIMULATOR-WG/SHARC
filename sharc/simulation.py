@@ -142,13 +142,13 @@ class Simulation(ABC, Observable):
                                              ue_height=station_b.height,
                                              shadowing=self.param_imt.shadowing,
                                              line_of_sight_prob=self.param_imt.line_of_sight_prob)
-            self.path_loss_imt = path_loss
         # define antenna gains
         gain_a = self.calculate_gains(station_a, station_b)
         gain_b = np.transpose(self.calculate_gains(station_b, station_a))
         
         # collect IMT BS and UE antenna gain samples
         if station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_UE:
+            self.path_loss_imt = path_loss
             self.imt_bs_antenna_gain = gain_a
             self.imt_ue_antenna_gain = gain_b
         
@@ -221,11 +221,11 @@ class Simulation(ABC, Observable):
         """
         phi, theta = station_a.get_pointing_vector_to(station_b)
         
-        if(station_a.station_type == StationType.IMT_BS):
+        if(station_a.station_type is StationType.IMT_BS):
             beams_idx = self.bs_to_ue_beam_rbs
-        elif(station_a.station_type == StationType.IMT_UE):
+        elif(station_a.station_type is StationType.IMT_UE):
             beams_idx = np.zeros(self.bs.num_stations,dtype=int)
-        elif(station_a.station_type == StationType.FSS_SS):
+        elif(station_a.station_type is StationType.FSS_SS or station_a.station_type is StationType.FSS_ES):
             beams_idx = np.zeros(self.ue.num_stations,dtype=int)
         
         gains = np.zeros(phi.shape)
@@ -237,6 +237,28 @@ class Simulation(ABC, Observable):
                                                                             beams_l=beams_idx[station_b_active])
                 
         return gains
+        
+        
+    def calculate_imt_tput(self, 
+                           sinr: np.array,
+                           sinr_min: float,
+                           sinr_max: float,
+                           attenuation_factor: float) -> np.array:
+        tput_min = 0
+        tput_max = attenuation_factor*math.log2(1+math.pow(10, 0.1*sinr_max))
+        
+        tput = attenuation_factor*np.log2(1+np.power(10, 0.1*sinr))
+        
+        id_min = np.where(sinr < sinr_min)[0]
+        id_max = np.where(sinr > sinr_max)[0]
+
+        if len(id_min) > 0:
+            tput[id_min] = tput_min
+        if len(id_max) > 0:
+            tput[id_max] = tput_max
+
+        return tput        
+        
         
         
     def plot_scenario(self):
