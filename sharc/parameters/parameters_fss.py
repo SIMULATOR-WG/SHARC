@@ -20,7 +20,7 @@ class ParametersFss(object):
 
     ###########################################################################
     # satellite center frequency [MHz]
-    frequency = 26000
+    frequency = 27250
 
     ###########################################################################
     # satellite bandwidth [MHz]
@@ -29,7 +29,7 @@ class ParametersFss(object):
     ###########################################################################
     # satellite altitude [m] and latitude [deg]
     sat_altitude = 35786000
-    sat_lat_deg = 8
+    sat_lat_deg = 0
 
     ###########################################################################
     # System receive noise temperature [K]
