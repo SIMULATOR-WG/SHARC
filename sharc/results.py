@@ -25,6 +25,9 @@ class Results(object):
         self.imt_coupling_loss = list()
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
+        
+        self.system_imt_antenna_gain = list()
+        self.imt_system_antenna_gain = list()
 
         self.imt_dl_tx_power_density = list()
         self.imt_dl_tx_power = list()
@@ -46,6 +49,30 @@ class Results(object):
         
     def generate_plot_list(self, n_bins):
         self.plot_list = list()
+        if len(self.system_imt_antenna_gain) > 0:
+            values, base = np.histogram(self.system_imt_antenna_gain, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Antenna gain [dBi]"
+            y_label = "Probability of antenna gain < $X$"
+            title = "[SYS] CDF of system antenna gain towards IMT stations"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))        
+        if len(self.imt_system_antenna_gain) > 0:
+            values, base = np.histogram(self.imt_system_antenna_gain, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Antenna gain [dBi]"
+            y_label = "Probability of antenna gain < $X$"
+            title = "[IMT] CDF of IMT station antenna gain towards system"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))        
         if len(self.imt_bs_antenna_gain) > 0:
             values, base = np.histogram(self.imt_bs_antenna_gain, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -249,12 +276,24 @@ class Results(object):
             cumulative = np.cumsum(values)
             x = base[:-1]
             y = cumulative / cumulative[-1]
-            title = "[FSS] CDF of FSS INR"
+            title = "[SYS] CDF of system INR"
             x_label = "INR [dB]"
             y_label = "Probability of INR < $X$"
             file_name = title
+            x_limits = (-80, -20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            ###################################################################
+            # now we plot INR samples
+            x = np.arange(len(self.system_inr))
+            y = np.array(self.system_inr)
+            title = "[SYS] INR samples"
+            x_label = "Number of samples"
+            y_label = "INR [dB]"
+            file_name = title
+            #x_limits = (0, 800)
+            #y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))            
             
     def write_files(self, snapshot_number: int):
         n_bins = 200

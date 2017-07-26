@@ -175,8 +175,11 @@ class SimulationUplink(Simulation):
             ue = self.link[bs]
             self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
             self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
+            self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
+            self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
             
             tput = self.calculate_imt_tput(self.bs.sinr[bs],
                                            self.param_imt.ul_sinr_min,
@@ -192,7 +195,7 @@ class SimulationUplink(Simulation):
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
             imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue])/(self.num_rb_per_ue*self.param_imt.rb_bandwidth*1e6))
             self.results.imt_ul_tx_power_density.extend(imt_ul_tx_power_density.tolist())
-            self.results.imt_ul_sinr_ext.extend(self.bs.sinr_ext[bs].tolist())
+            #self.results.imt_ul_sinr_ext.extend(self.bs.sinr_ext[bs].tolist())
             self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
             self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
             
