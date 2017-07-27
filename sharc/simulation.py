@@ -134,6 +134,7 @@ class Simulation(ABC, Observable):
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, 
+                                             loc_percentage="RANDOM",
                                              sat_params = self.param_system,
                                              earth_to_space = True,
                                              line_of_sight_prob=self.param_system.line_of_sight_prob)
