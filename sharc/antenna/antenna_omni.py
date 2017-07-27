@@ -14,73 +14,22 @@ class AntennaOmni(Antenna):
     """
     
     def __init__(self, gain: float = 0):
+        super().__init__()
         self.gain = gain
     
-    def calculate_gain(self,phi_vec: np.array, theta_vec: np.array) -> np.array:
+
+    def calculate_gain(self, *args, **kwargs) -> np.array:        
         """
         Calculates the gain, which is the same for all the directions
+        
+        Parameters
+        ----------
+        phi_vec (np.array): azimuth angles [degrees]
+
+        Returns
+        -------
+        gains (np.array): numpy array of gains        
         """
+        phi_vec = np.asarray(kwargs["phi_vec"])
         return self.gain*np.ones(len(phi_vec))
     
-    def __float__(self):
-        return float(self.gain)
-        
-    def __add__(self, other):
-        return self.gain + other
-
-    def __radd__(self, other):
-        return self.gain + other
-
-    def __sub__(self, other):
-        return self.gain - other
-
-    def __rsub__(self, other):
-        return other - self.gain
-
-    def __lt__(self, other):
-        if isinstance(other, self.__class__):
-            return self.gain < other.gain
-        elif isinstance(other, (int, float)):
-            return self.gain < other
-        else:
-            return NotImplemented
-
-    def __le__(self, other):
-        if isinstance(other, self.__class__):
-            return self.gain <= other.gain
-        elif isinstance(other, (int, float)):
-            return self.gain <= other
-        else:
-            return NotImplemented
-        
-    def __gt__(self, other):
-        if isinstance(other, self.__class__):
-            return self.gain > other.gain
-        elif isinstance(other, (int, float)):
-            return self.gain > other
-        else:
-            return NotImplemented
-    
-    def __ge__(self, other):
-        if isinstance(other, self.__class__):
-            return self.gain >= other.gain
-        elif isinstance(other, (int, float)):
-            return self.gain >= other
-        else:
-            return NotImplemented
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.gain == other.gain
-        elif isinstance(other, (int, float)):
-            return self.gain == other
-        else:
-            return NotImplemented
-
-    def __ne__(self, other):
-        if isinstance(other, self.__class__):
-            return self.gain != other.gain
-        elif isinstance(other, (int, float)):
-            return self.gain != other            
-        else:
-            return NotImplemented            

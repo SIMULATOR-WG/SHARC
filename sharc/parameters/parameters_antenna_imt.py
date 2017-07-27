@@ -24,56 +24,15 @@ class ParametersAntennaImt(object):
         return ParametersAntennaImt.__instance
     
     ###########################################################################
-    # BS transmit antenna type. Possible values are "OMNI", "BEAMFORMING"
-    bs_tx_antenna_type = "OMNI"
-    
-    ###########################################################################
-    # BS receive antenna type. Possible values are "OMNI", "BEAMFORMING"
-    bs_rx_antenna_type = "BEAMFORMING"
-    
-    ###########################################################################
-    # UE transmit antenna type. Possible values are "OMNI", "BEAMFORMING"
-    ue_tx_antenna_type = "BEAMFORMING"
-    
-    ###########################################################################
-    # UE receive antenna type. Possible values are "OMNI", "BEAMFORMING"
-    ue_rx_antenna_type = "OMNI"
-    
-    ###########################################################################
-    # OMNIDIRECTIONAL ANTENNA PARAMETERS
-    ###########################################################################
-    # Base station transmit antenna gain [dBi]
-    bs_tx_omni_antenna_gain = 29.1
-
-    ###########################################################################
-    # Base station receive antenna gain [dBi]
-    bs_rx_omni_antenna_gain = 29.1
-
-    ###########################################################################
-    # UE transmit antenna gain [dBi]
-    ue_tx_omni_antenna_gain = 14
-
-    ###########################################################################
-    # UE receive antenna gain [dBi]
-    ue_rx_omni_antenna_gain = 14
-    
-    ###########################################################################
     # BEAMFORMING PARAMETERS
     ###########################################################################
-    # BS sector azimuth angle [degrees]
-    bs_tx_azimuth = [60, 180, 300]
-    
-    ###########################################################################
-    # BS sector elevation angle [degrees]
-    bs_tx_elevation = -10
-    
     ###########################################################################
     # Base station maximum transmit element gain [dBi]
     bs_tx_element_max_g = 5
     
     ###########################################################################
     # Base station horizontal 3dB beamwidth of single transmit element [degrees]
-    bs_tx_element_phi_3db = 80
+    bs_tx_element_phi_3db = 65
     
     ###########################################################################
     # Base station vertical 3dB beamwidth of single transmit element [degrees]
@@ -104,20 +63,12 @@ class ParametersAntennaImt(object):
     bs_tx_element_vert_spacing = 0.5
     
     ###########################################################################
-    # BS sector azimuth angle [degrees]
-    bs_rx_azimuth = [60, 180, 300]
-    
-    ###########################################################################
-    # BS sector elevation angle [degrees]
-    bs_rx_elevation = -10
-    
-    ###########################################################################
     # Base station maximum receive element gain [dBi]
     bs_rx_element_max_g = 5
     
     ###########################################################################
     # Base station horizontal 3dB beamwidth of single receive element [degrees]
-    bs_rx_element_phi_3db = 80
+    bs_rx_element_phi_3db = 65
     
     ###########################################################################
     # Base station vertical 3dB beamwidth of single receive element [degrees]
@@ -148,36 +99,24 @@ class ParametersAntennaImt(object):
     bs_rx_element_vert_spacing = 0.5
     
     ###########################################################################
-    # UE pointing type. Possible values are "FIXED" and "RANDOM".
-    ue_tx_pointing = "FIXED"
-    
-    ###########################################################################
-    # UEs azimuth angle, if fixed [degrees]
-    ue_tx_azimuth = 0
-    
-    ###########################################################################
-    # UEs elevation angle, if fixed [degrees]
-    ue_tx_elevation = 0
-    
-    ###########################################################################
     # UE maximum transmit element gain [dBi]
     ue_tx_element_max_g = 5
     
     ###########################################################################
     # UE horizontal 3dB beamwidth of single transmit element [degrees]
-    ue_tx_element_phi_3db = 80
+    ue_tx_element_phi_3db = 90
     
     ###########################################################################
     # UE vertical 3dB beamwidth of single transmit element [degrees]
-    ue_tx_element_theta_3db = 65
+    ue_tx_element_theta_3db = 90
     
     ###########################################################################
     # UE front to back ratio of single transmit element [dB]
-    ue_tx_element_am = 30
+    ue_tx_element_am = 25
     
     ###########################################################################
     # UE transmit element vertical sidelobe attenuation [dB]
-    ue_tx_element_sla_v = 30
+    ue_tx_element_sla_v = 25
     
     ###########################################################################
     # UE number of rows in transmit array
@@ -196,36 +135,24 @@ class ParametersAntennaImt(object):
     ue_tx_element_vert_spacing = 0.5
     
     ###########################################################################
-    # UE pointing type. Possible values are "FIXED" and "RANDOM".
-    ue_rx_pointing = "FIXED"
-    
-    ###########################################################################
-    # UEs azimuth angle, if fixed [degrees]
-    ue_rx_azimuth = 0
-    
-    ###########################################################################
-    # UEs elevation angle, if fixed [degrees]
-    ue_rx_elevation = 0
-    
-    ###########################################################################
     # UE maximum receive element gain [dBi]
     ue_rx_element_max_g = 5
     
     ###########################################################################
     # UE horizontal 3dB beamwidth of single receive element [degrees]
-    ue_rx_element_phi_3db = 80
+    ue_rx_element_phi_3db = 90
     
     ###########################################################################
     # UE vertical 3dB beamwidth of single receive element [degrees]
-    ue_rx_element_theta_3db = 65
+    ue_rx_element_theta_3db = 90
     
     ###########################################################################
     # UE front to back ratio of single receive element [dB]
-    ue_rx_element_am = 30
+    ue_rx_element_am = 25
     
     ###########################################################################
     # UE receive element vertical sidelobe attenuation [dB]
-    ue_rx_element_sla_v = 30
+    ue_rx_element_sla_v = 25
     
     ###########################################################################
     # UE number of rows in receive array

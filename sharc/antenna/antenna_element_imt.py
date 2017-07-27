@@ -32,39 +32,11 @@ class AntennaElementImt(object):
         """        
         self.param = par
     
-        self.__g_max = par.element_max_g
-        self.__phi_3db = par.element_phi_3db
-        self.__theta_3db = par.element_theta_3db
-        self.__am = par.element_am
-        self.__sla_v = par.element_sla_v
-    
-    @property
-    def station_type(self):
-        return self.__station_type
-    
-    @property
-    def tx_or_rx(self):
-        return self.__tx_or_rx
-    
-    @property
-    def g_max(self):
-        return self.__g_max
-     
-    @property
-    def phi_3db(self):
-        return self.__phi_3db
-    
-    @property
-    def theta_3db(self):
-        return self.__theta_3db
-    
-    @property
-    def am(self):
-        return self.__am
-    
-    @property
-    def sla_v(self):
-        return self.__sla_v
+        self.g_max = par.element_max_g
+        self.phi_3db = par.element_phi_3db
+        self.theta_3db = par.element_theta_3db
+        self.am = par.element_am
+        self.sla_v = par.element_sla_v
     
     def horizontal_pattern(self,phi: np.array) -> np.array:
         """

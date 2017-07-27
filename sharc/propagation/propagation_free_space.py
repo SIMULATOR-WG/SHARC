@@ -14,8 +14,14 @@ class PropagationFreeSpace(Propagation):
     Implements the Free Space propagation model
     """
     
+    def __init__(self):
+        super().__init__()
+    
     def get_loss(self, *args, **kwargs) -> np.array:
-        d = np.asarray(kwargs["distance"])
+        if "distance_2D" in kwargs:
+            d = np.asarray(kwargs["distance_2D"])
+        else:
+            d = np.asarray(kwargs["distance_3D"])
         f = np.asarray(kwargs["frequency"])
         loss = 20*np.log10(d) + 20*np.log10(f) - 27.55
         return loss

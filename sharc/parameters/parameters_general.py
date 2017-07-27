@@ -20,4 +20,13 @@ class ParametersGeneral(object):
 
     ###########################################################################
     # Number of simulation snapshots
-    num_snapshots = 100
+    num_snapshots = 800
+
+    ###########################################################################
+    # IMT link that will be simulated (DOWNLINK or UPLINK)
+    imt_link = "UPLINK"
+    
+    ###########################################################################
+    # The chosen system for sharing study
+    # FSS-SS, FSS-ES
+    system = "FSS-SS"

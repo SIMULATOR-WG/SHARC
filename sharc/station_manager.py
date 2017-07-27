@@ -7,6 +7,7 @@ Created on Fri Feb  3 15:29:48 2017
 
 import numpy as np
 
+from sharc.support.enumerations import StationType
 from sharc.station import Station
 from sharc.antenna.antenna import Antenna
 
@@ -18,26 +19,31 @@ class StationManager(object):
     """
 
     def __init__(self, n):
-        self.__num_stations = n
-        self.__x = np.empty(n)
-        self.__y = np.empty(n)
-        self.__height = np.empty(n)
-        self.__active = np.ones(n, dtype=bool)
-        self.__tx_power = np.empty(n)
-        self.__rx_power = np.empty(n)
-        self.__rx_interference = np.empty(n)
-        self.__tx_antenna = np.array([Antenna() for i in range(n)])
-        self.__rx_antenna = np.array([Antenna() for i in range(n)])
-        self.__bandwidth = np.empty(n)
-        self.__noise_figure = np.empty(n)
-        self.__noise_temperature = np.empty(n)
-        self.__thermal_noise = np.empty(n)
-        self.__total_interference = np.empty(n)
-        self.__snr = np.empty(n)
-        self.__sinr = np.empty(n)
-        self.__inr = np.empty(n)
+        self.num_stations = n
+        self.x = np.empty(n)
+        self.y = np.empty(n)
+        self.azimuth = np.empty(n)
+        self.elevation = np.empty(n)
+        self.height = np.empty(n)
+        self.indoor = np.zeros(n, dtype=bool)
+        self.active = np.ones(n, dtype=bool)
+        self.tx_power = np.empty(n)
+        self.rx_power = np.empty(n)
+        self.rx_interference = np.empty(n)
+        self.ext_interference = np.empty(n)
+        self.antenna = np.empty(n, dtype=Antenna)
+        self.bandwidth = np.empty(n)
+        self.noise_figure = np.empty(n)
+        self.noise_temperature = np.empty(n)
+        self.thermal_noise = np.empty(n)
+        self.total_interference = np.empty(n)
+        self.snr = np.empty(n)
+        self.sinr = np.empty(n)
+        self.sinr_ext = np.empty(n)
+        self.inr = np.empty(n)
+        self.station_type = StationType.NONE
 
-    def get_station_list(self,id=None) -> list:
+    def get_station_list(self, id=None) -> list:
         if(id is None):
             id = range(self.num_stations)
         station_list = list()
@@ -45,17 +51,31 @@ class StationManager(object):
             station_list.append(self.get_station(i))
         return station_list
 
-    def get_station(self,id) -> Station:
+    def get_station(self, id) -> Station:
         station = Station()
         station.id = id
         station.x = self.x[id]
         station.y = self.y[id]
+        station.azimuth = self.azimuth[id]
+        station.elevation = self.elevation[id]
         station.height = self.height[id]
+        station.indoor = self.indoor[id]
         station.active = self.active[id]
         station.tx_power = self.tx_power[id]
         station.rx_power = self.rx_power[id]
-        station.tx_antenna = self.tx_antenna[id]
-        station.rx_antenna = self.rx_antenna[id]
+        station.rx_interference = self.rx_interference[id]
+        station.ext_interference = self.ext_interference[id]
+        station.antenna = self.antenna[id]
+        station.bandwidth = self.bandwidth[id]
+        station.noise_figure = self.noise_figure[id]
+        station.noise_temperature = self.noise_temperature[id]
+        station.thermal_noise = self.thermal_noise[id]
+        station.total_interference = self.total_interference[id]
+        station.snr = self.snr[id]
+        station.sinr = self.sinr[id]
+        station.sinr_ext = self.sinr_ext[id]
+        station.inr = self.inr[id]
+        station.station_type = self.station_type
         return station
 
     def get_distance_to(self, station) -> np.array:
@@ -101,148 +121,17 @@ class StationManager(object):
             angle[i] = theta_0 + tau_fs
 
         return{'free_space': free_space_angle, 'apparent': angle}
+    
+    def get_pointing_vector_to(self, station) -> tuple:
 
+        point_vec_x = station.x- self.x[:,np.newaxis]
+        point_vec_y = station.y - self.y[:,np.newaxis]
+        point_vec_z = station.height - self.height[:,np.newaxis]
+            
+        dist = self.get_3d_distance_to(station)
+        
+        phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
+        theta = np.rad2deg(np.arccos(point_vec_z/dist))
+        
+        return phi, theta
 
-    @property
-    def num_stations(self):
-        return self.__num_stations
-
-    @num_stations.setter
-    def num_stations(self, value):
-        self.__num_stations = value
-
-    @property
-    def x(self):
-        return self.__x
-
-    @x.setter
-    def x(self, value):
-        self.__x = np.array(value)
-
-    @property
-    def y(self):
-        return self.__y
-
-    @y.setter
-    def y(self, value):
-        self.__y = np.array(value)
-
-    @property
-    def height(self):
-        return self.__height
-
-    @height.setter
-    def height(self, value):
-        self.__height = np.array(value)
-
-    @property
-    def active(self):
-        return self.__active
-
-    @active.setter
-    def active(self, value):
-        self.__active = np.array(value)
-
-    @property
-    def tx_power(self):
-        return self.__tx_power
-
-    @tx_power.setter
-    def tx_power(self, value):
-        self.__tx_power = value
-
-    @property
-    def rx_power(self):
-        return self.__rx_power
-
-    @rx_power.setter
-    def rx_power(self, value):
-        self.__rx_power = np.array(value)
-
-    @property
-    def rx_interference(self):
-        return self.__rx_interference
-
-    @rx_interference.setter
-    def rx_interference(self, value):
-        self.__rx_interference = np.array(value)
-
-    @property
-    def tx_antenna(self):
-        return self.__tx_antenna
-
-    @tx_antenna.setter
-    def tx_antenna(self, value):
-        self.__tx_antenna = np.array(value)
-
-    @property
-    def rx_antenna(self):
-        return self.__rx_antenna
-
-    @rx_antenna.setter
-    def rx_antenna(self, value):
-        self.__rx_antenna = np.array(value)
-
-    @property
-    def bandwidth(self):
-        return self.__bandwidth
-
-    @bandwidth.setter
-    def bandwidth(self, value):
-        self.__bandwidth = np.array(value)
-
-    @property
-    def noise_figure(self):
-        return self.__noise_figure
-
-    @noise_figure.setter
-    def noise_figure(self, value):
-        self.__noise_figure = np.array(value)
-
-    @property
-    def noise_temperature(self):
-        return self.__noise_temperature
-
-    @noise_temperature.setter
-    def noise_temperature(self, value):
-        self.__noise_temperature = np.array(value)
-
-    @property
-    def thermal_noise(self):
-        return self.__thermal_noise
-
-    @thermal_noise.setter
-    def thermal_noise(self, value):
-        self.__thermal_noise = np.array(value)
-
-    @property
-    def total_interference(self):
-        return self.__total_interference
-
-    @total_interference.setter
-    def total_interference(self, value):
-        self.__total_interference = np.array(value)
-
-    @property
-    def sinr(self):
-        return self.__sinr
-
-    @sinr.setter
-    def sinr(self, value):
-        self.__sinr = np.array(value)
-
-    @property
-    def snr(self):
-        return self.__snr
-
-    @snr.setter
-    def snr(self, value):
-        self.__snr = np.array(value)
-
-    @property
-    def inr(self):
-        return self.__inr
-
-    @inr.setter
-    def inr(self, value):
-        self.__inr = np.array(value)

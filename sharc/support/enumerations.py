@@ -23,3 +23,13 @@ class State( Enum ):
     FINISHED = 3
     STOPPED  = 4
     STOPPING = 5
+    
+class StationType(Enum):
+    """
+    Station types supported by simulator.
+    """
+    NONE   = 0  # Dummy enum, for initialization purposes only
+    IMT_BS = 1  # IMT Base Station
+    IMT_UE = 2  # IMT User Equipment
+    FSS_SS = 3  # FSS Space Station
+    FSS_ES = 4  # FSS Earth Station
