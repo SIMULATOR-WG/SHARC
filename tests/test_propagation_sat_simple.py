@@ -22,7 +22,7 @@ class PropagationSatSimpleTest(unittest.TestCase):
         d = np.array(10)
         f = np.array(10)
         loc_percentage = 0
-        elevation = 90*np.ones(d.shape)
+        elevation = {'free_space': 90*np.ones(d.shape)}
         indoor_stations = np.zeros(d.shape, dtype=bool)
         self.assertEqual(12.45 + 4, 
                          self.propagation.get_loss(distance_3D=d, 
@@ -34,7 +34,7 @@ class PropagationSatSimpleTest(unittest.TestCase):
         d = np.array([ 10, 100 ])
         f = np.array([ 10, 100 ])
         loc_percentage = 0
-        elevation = 90*np.ones(d.shape)
+        elevation = {'free_space': 90*np.ones(d.shape)}
         indoor_stations = np.zeros(d.shape, dtype=bool)
         npt.assert_allclose([12.45 + 4, 52.45 + 4], 
                             self.propagation.get_loss(distance_3D=d, 
@@ -47,7 +47,7 @@ class PropagationSatSimpleTest(unittest.TestCase):
         d = np.array([ 10, 100, 1000 ])
         f = np.array([ 10, 100, 1000 ])
         loc_percentage = 0
-        elevation = 90*np.ones(d.shape)
+        elevation = {'free_space': 90*np.ones(d.shape)}
         indoor_stations = np.array([1, 0, 0], dtype=bool)
         npt.assert_allclose([12.45 + 4 + 20, 52.45 + 4, 92.45 + 4], 
                             self.propagation.get_loss(distance_3D=d, 
@@ -60,7 +60,7 @@ class PropagationSatSimpleTest(unittest.TestCase):
         d = np.array([[10, 20, 30],[40, 50, 60]])
         f = np.array([ 100 ])
         loc_percentage = 0
-        elevation = 90*np.ones(d.shape)
+        elevation = {'free_space': 90*np.ones(d.shape)}
         indoor_stations = np.zeros(d.shape, dtype=bool)
         ref_loss = [[ 32.45 + 4,  38.47 + 4,  41.99 + 4],
                     [ 44.49 + 4,  46.42 + 4,  48.01 + 4]]
