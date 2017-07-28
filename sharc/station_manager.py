@@ -104,7 +104,7 @@ class StationManager(object):
 
             gts = np.sqrt(rel_x**2 + rel_y**2)
             theta_0 = np.arctan2(rel_z, gts) # free-space elevation angle
-            free_space_angle[i] = theta_0
+            free_space_angle[i] = np.degrees(theta_0)
 
             ##
             # calculate apparent elevation angle according to Attachment B
@@ -118,7 +118,7 @@ class StationManager(object):
                             sat_params.sat_altitude**2*tau_fs3)
             tau_fs = tau_fs_deg / 180. * np.pi
 
-            angle[i] = theta_0 + tau_fs
+            angle[i] = np.degrees(theta_0 + tau_fs)
 
         return{'free_space': free_space_angle, 'apparent': angle}
     
