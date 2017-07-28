@@ -40,6 +40,10 @@ class ParametersFss(object):
     sat_interference_noise_ratio = -12.2
 
     ###########################################################################
+    # INR scaling factor (to estimate INR for larger number of interfering stations)
+    sat_inr_scaling = 1
+    
+    ###########################################################################
     # Satellite peak reeive antenna gain [dBi]
     sat_rx_antenna_gain = 51
     
