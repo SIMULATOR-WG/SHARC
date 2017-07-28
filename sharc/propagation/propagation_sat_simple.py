@@ -36,7 +36,7 @@ class PropagationSatSimple(Propagation):
         free_space_loss = self.free_space.get_loss(distance_3D=d,
                                                    frequency=f)
         clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
-                                                           elevation=elevation,
+                                                           elevation=elevation["free_space"],
                                                            loc_percentage=p,
                                                            station_type=StationType.FSS_SS))
         building_loss = self.building_loss*indoor_stations
