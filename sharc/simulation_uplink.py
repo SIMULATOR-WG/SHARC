@@ -169,6 +169,7 @@ class SimulationUplink(Simulation):
 
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         self.results.system_inr.extend([self.system.inr])
+        self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.sat_inr_scaling)])
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
