@@ -144,8 +144,9 @@ class Simulation(ABC, Observable):
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a))
             else:
                 # define antenna gains
-                gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.param_imt.ue_k)
-                gain_b = np.transpose(self.calculate_gains(station_b, station_a))                
+                gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.param_imt.ue_k, 1)
+                gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+                path_loss = np.repeat(path_loss, self.param_imt.ue_k, 1)                
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              distance_2D=d_2D, 
@@ -232,28 +233,44 @@ class Simulation(ABC, Observable):
         
             
     def calculate_gains(self,
-                        station_a: StationManager,
-                        station_b: StationManager) -> np.array:
+                        station_1: StationManager,
+                        station_2: StationManager) -> np.array:
         """
         Calculates the gains of antennas in station_a in the direction of
         station_b        
         """
-        phi, theta = station_a.get_pointing_vector_to(station_b)
+        phi, theta = station_1.get_pointing_vector_to(station_2)
         
-        if(station_a.station_type is StationType.IMT_BS):
-            beams_idx = self.bs_to_ue_beam_rbs
-        elif(station_a.station_type is StationType.IMT_UE):
-            beams_idx = np.zeros(self.bs.num_stations,dtype=int)
-        elif(station_a.station_type is StationType.FSS_SS or station_a.station_type is StationType.FSS_ES):
-            beams_idx = np.zeros(self.ue.num_stations,dtype=int)
+        station_1_active = np.where(station_1.active)[0]
+        station_2_active = np.where(station_2.active)[0]
+        
+        if(station_1.station_type is StationType.IMT_BS):
+            if(station_2.station_type is StationType.IMT_UE):
+                beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
+            elif(station_2.station_type is StationType.FSS_SS):
+                phi = np.repeat(phi,self.param_imt.ue_k,0)
+                theta = np.repeat(theta,self.param_imt.ue_k,0)
+                beams_idx = np.tile(np.arange(self.param_imt.ue_k),self.bs.num_stations)
+                
+        elif(station_1.station_type is StationType.IMT_UE):
+            beams_idx = np.zeros(len(station_2_active),dtype=int)
+            
+        elif(station_1.station_type is StationType.FSS_SS or station_1.station_type is StationType.FSS_ES):
+            beams_idx = np.zeros(len(station_2_active),dtype=int)
         
         gains = np.zeros(phi.shape)
-        station_a_active = np.where(station_a.active)[0]
-        station_b_active = np.where(station_b.active)[0]
-        for k in station_a_active:
-            gains[k,station_b_active] = station_a.antenna[k].calculate_gain(phi_vec=phi[k,station_b_active],
-                                                                            theta_vec=theta[k,station_b_active],
-                                                                            beams_l=beams_idx[station_b_active])
+        
+        if(station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS):
+            for k in station_1_active:
+                for b in range(k*self.param_imt.ue_k,(k+1)*self.param_imt.ue_k):
+                    gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
+                                                                            theta_vec=theta[b,station_2_active],
+                                                                            beams_l=beams_idx[b])
+        else:
+            for k in station_1_active:
+                gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
+                                                                            theta_vec=theta[k,station_2_active],
+                                                                            beams_l=beams_idx)
                 
         return gains
         
