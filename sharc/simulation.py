@@ -138,6 +138,14 @@ class Simulation(ABC, Observable):
                                              sat_params = self.param_system,
                                              earth_to_space = True,
                                              line_of_sight_prob=self.param_system.line_of_sight_prob)
+            if station_b.station_type is StationType.IMT_UE:
+                # define antenna gains
+                gain_a = self.calculate_gains(station_a, station_b)
+                gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+            else:
+                # define antenna gains
+                gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.param_imt.ue_k)
+                gain_b = np.transpose(self.calculate_gains(station_b, station_a))                
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              distance_2D=d_2D, 
@@ -147,9 +155,9 @@ class Simulation(ABC, Observable):
                                              ue_height=station_b.height,
                                              shadowing=self.param_imt.shadowing,
                                              line_of_sight_prob=self.param_imt.line_of_sight_prob)
-        # define antenna gains
-        gain_a = self.calculate_gains(station_a, station_b)
-        gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+            # define antenna gains
+            gain_a = self.calculate_gains(station_a, station_b)
+            gain_b = np.transpose(self.calculate_gains(station_b, station_a))
         
         # collect IMT BS and UE antenna gain samples
         if station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_UE:
