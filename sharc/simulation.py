@@ -144,8 +144,9 @@ class Simulation(ABC, Observable):
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a))
             else:
                 # define antenna gains
-                gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.param_imt.ue_k)
-                gain_b = np.transpose(self.calculate_gains(station_b, station_a))                
+                gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.param_imt.ue_k, 1)
+                gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+                path_loss = np.repeat(path_loss, self.param_imt.ue_k, 1)                
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              distance_2D=d_2D, 
@@ -258,9 +259,16 @@ class Simulation(ABC, Observable):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
         
         gains = np.zeros(phi.shape)
-        for k in station_1_active:
-            gains[k,station_2_active]
-            gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
+        
+        if(station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS):
+            for k in station_1_active:
+                for b in range(k*self.param_imt.ue_k,(k+1)*self.param_imt.ue_k):
+                    gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
+                                                                            theta_vec=theta[b,station_2_active],
+                                                                            beams_l=beams_idx[b])
+        else:
+            for k in station_1_active:
+                gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
                                                                             theta_vec=theta[k,station_2_active],
                                                                             beams_l=beams_idx)
                 

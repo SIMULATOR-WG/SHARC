@@ -167,7 +167,8 @@ class SimulationDownlink(Simulation):
         # calculate interference only from active UE's
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
-            interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[bs] \
+            active_beams = [i for i in range(bs*self.param_imt.ue_k, (bs+1)*self.param_imt.ue_k)]
+            interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[active_beams] \
                                 + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth)
                                 
             self.system.rx_interference = 10*math.log10( \
