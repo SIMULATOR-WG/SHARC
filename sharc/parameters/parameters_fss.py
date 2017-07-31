@@ -28,7 +28,7 @@ class ParametersFss(object):
 
     ###########################################################################
     # satellite altitude [m] and latitude [deg]
-    sat_altitude = 35786000
+    sat_altitude = 35780000
     sat_lat_deg = 0
 
     ###########################################################################
@@ -41,7 +41,7 @@ class ParametersFss(object):
 
     ###########################################################################
     # INR scaling factor (to estimate INR for larger number of interfering stations)
-    sat_inr_scaling = 1
+    sat_inr_scaling = 14.95
     
     ###########################################################################
     # Satellite peak reeive antenna gain [dBi]
