@@ -84,6 +84,7 @@ class PropagationClutterLoss(Propagation):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
+    from cycler import cycler
 
     #theta = np.array([90, 80, 70, 60, 50, 40, 30, 20, 15, 10, 5, 0])
     theta = np.array([90, 45, 30, 20 ])
@@ -101,11 +102,12 @@ if __name__ == '__main__':
     
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()
+    ax.set_prop_cycle( cycler('color', ['k', 'r', 'b', 'g']) )
 
     for j in range(len(theta)):
-        ax.plot(clutter_loss[j,:], 100*p, label="%i deg" % theta[j])
+        ax.plot(clutter_loss[j,:], 100*p, label="%i deg" % theta[j], linewidth=2)
     
-    plt.title("Cumulative distribution of clutter loss not exceeded for 27 GHz")
+    #plt.title("Cumulative distribution of clutter loss not exceeded for 27 GHz")
     plt.xlabel("clutter loss [dB]")
     plt.ylabel("percent of locations [%]")
     plt.xlim((-5, 20))
