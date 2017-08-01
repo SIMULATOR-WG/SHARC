@@ -64,7 +64,7 @@ class ParametersImt(object):
     # The load probability (or activity factor) models the statistical
     # variation of the network load by defining the number of fully loaded
     # base stations that are simultaneously transmitting
-    bs_load_probability = .5
+    bs_load_probability = .2
 
     ###########################################################################
     # Conducted power per antenna element [dBm/200 MHz]
@@ -120,7 +120,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Percentage of indoor UE's
-    ue_indoor_percent = 0.05
+    ue_indoor_percent = 0
 
     ###########################################################################
     # Regarding the distribution of active UE's over the cell area, this

@@ -40,8 +40,8 @@ class SimulationDownlink(Simulation):
         
         # Create the other system (FSS, HAPS, etc...)
         # Currently it supports only FSS space station
-        #self.system = StationFactory.generate_fss_space_station(self.param_system)
-        self.system = StationFactory.generate_fss_earth_station(self.param_system)
+        self.system = StationFactory.generate_fss_space_station(self.param_system)
+        #self.system = StationFactory.generate_fss_earth_station(self.param_system)
 
         # Create IMT user equipments
         self.ue = StationFactory.generate_imt_ue(self.param_imt,
@@ -167,10 +167,11 @@ class SimulationDownlink(Simulation):
         # calculate interference only from active UE's
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
-            interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[bs] \
+            active_beams = [i for i in range(bs*self.param_imt.ue_k, (bs+1)*self.param_imt.ue_k)]
+            interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[active_beams] \
                                 + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth)
                                 
-            self.system.rx_interference = 10*np.log10( \
+            self.system.rx_interference = 10*math.log10( \
                     np.power(10, 0.1*self.system.rx_interference) + np.sum(np.power(10, 0.1*interference)))
 
         # calculate N
@@ -184,30 +185,35 @@ class SimulationDownlink(Simulation):
         
         
     def collect_results(self, write_to_file: bool, snapshot_number: int):
-        #self.results.system_inr.extend([self.system.inr])
+        self.results.system_inr.extend([self.system.inr])
+        self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.sat_inr_scaling)])
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
             self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
             self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+            
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
+            self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
+            self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
+            self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
             
             tput = self.calculate_imt_tput(self.ue.sinr[ue],
                                            self.param_imt.dl_sinr_min,
                                            self.param_imt.dl_sinr_max,
                                            self.param_imt.dl_attenuation_factor)
             self.results.imt_dl_tput.extend(tput.tolist())
-            tput_ext = self.calculate_imt_tput(self.ue.sinr_ext[ue],
-                                               self.param_imt.dl_sinr_min,
-                                               self.param_imt.dl_sinr_max,
-                                               self.param_imt.dl_attenuation_factor)
-            self.results.imt_dl_tput_ext.extend(tput_ext.tolist()) 
+#            tput_ext = self.calculate_imt_tput(self.ue.sinr_ext[ue],
+#                                               self.param_imt.dl_sinr_min,
+#                                               self.param_imt.dl_sinr_max,
+#                                               self.param_imt.dl_attenuation_factor)
+#            self.results.imt_dl_tput_ext.extend(tput_ext.tolist()) 
 
             self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
             #imt_dl_tx_power_density = 10*np.log10(np.power(10, 0.1*self.bs.tx_power[bs])/(self.num_rb_per_ue*self.param_imt.rb_bandwidth*1e6))
             #self.results.imt_dl_tx_power_density.extend(imt_dl_tx_power_density.tolist())
-            self.results.imt_dl_sinr_ext.extend(self.ue.sinr_ext[ue].tolist())
+            #self.results.imt_dl_sinr_ext.extend(self.ue.sinr_ext[ue].tolist())
             self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
             self.results.imt_dl_snr.extend(self.ue.snr[ue].tolist())
             

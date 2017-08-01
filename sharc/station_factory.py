@@ -192,13 +192,13 @@ class StationFactory(object):
         fss_space_station.active = np.array([True])
         fss_space_station.tx_power = None
         fss_space_station.rx_power = None
-        fss_space_station.rx_interference = -500*np.ones(1)
+        fss_space_station.rx_interference = -500
         fss_space_station.antenna = np.array([AntennaOmni(param.sat_rx_antenna_gain)])
         fss_space_station.bandwidth = param.bandwidth
         fss_space_station.noise_figure = None
         fss_space_station.noise_temperature = param.sat_noise_temperature
-        fss_space_station.thermal_noise = -500*np.ones(1)
-        fss_space_station.total_interference = -500*np.ones(1)
+        fss_space_station.thermal_noise = -500
+        fss_space_station.total_interference = -500
         fss_space_station.snr = None
         fss_space_station.sinr = None
         fss_space_station.inr = None
