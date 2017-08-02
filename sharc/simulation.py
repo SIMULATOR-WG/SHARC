@@ -265,7 +265,7 @@ class Simulation(ABC, Observable):
                 for b in range(k*self.param_imt.ue_k,(k+1)*self.param_imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
-                                                                            beams_l=beams_idx[b])
+                                                                            beams_l=np.array([beams_idx[b]]))
         else:
             for k in station_1_active:
                 gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
