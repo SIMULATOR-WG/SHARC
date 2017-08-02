@@ -196,8 +196,10 @@ class SimulationDownlink(Simulation):
             
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
-            self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
-            self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
+            
+            active_beams = [i for i in range(bs*self.param_imt.ue_k, (bs+1)*self.param_imt.ue_k)]
+            self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
+            self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
             
             tput = self.calculate_imt_tput(self.ue.sinr[ue],
                                            self.param_imt.dl_sinr_min,
