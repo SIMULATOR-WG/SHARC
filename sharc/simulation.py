@@ -128,8 +128,12 @@ class Simulation(ABC, Observable):
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
 
-        if station_a.station_type is StationType.FSS_SS:
+        if station_a.station_type is StationType.FSS_SS :
             elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
+        else:
+            elevation_angles = None
+
+        if station_a.station_type is StationType.FSS_SS or station_a.station_type is StationType.FSS_ES:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
