@@ -20,7 +20,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Network topology. Possible values are "MACROCELL", "HOTSPOT", "SINGLE_BS"
-    topology = "MACROCELL"
+    topology = "HOTSPOT"
 
     ###########################################################################
     # Number of macrocell sites per cluster (must set to 19 in macrocell network)
@@ -32,7 +32,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # Inter-site distance in macrocell network topology
-    intersite_distance = 150
+    intersite_distance = 1000
 
     ###########################################################################
     # Minimum 2D separation distance from BS to UE
@@ -44,7 +44,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT center frequency [MHz]
-    frequency = 26000
+    frequency = 27250
 
     ###########################################################################
     # IMT bandwidth [MHz]
@@ -52,7 +52,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # IMT resource block bandwidth [MHz]
-    rb_bandwidth = 0.200
+    rb_bandwidth = 0.180
 
     ###########################################################################
     # Amount of guard band wrt total bandwidth. Setting this parameter to 0.1
@@ -64,7 +64,7 @@ class ParametersImt(object):
     # The load probability (or activity factor) models the statistical
     # variation of the network load by defining the number of fully loaded
     # base stations that are simultaneously transmitting
-    bs_load_probability = .5
+    bs_load_probability = .2
 
     ###########################################################################
     # Conducted power per antenna element [dBm/200 MHz]
@@ -116,11 +116,11 @@ class ParametersImt(object):
     # of UE's will distributed throughout ths system area such that the number
     # of K users is allocated to each cell. Normally, this values varies
     # between 2 and 10 according to the user drop method
-    ue_k_m = 1
+    ue_k_m = 2
 
     ###########################################################################
     # Percentage of indoor UE's
-    ue_indoor_percent = 0.05
+    ue_indoor_percent = 0
 
     ###########################################################################
     # Regarding the distribution of active UE's over the cell area, this
@@ -132,7 +132,7 @@ class ParametersImt(object):
     # Regarding the distribution of active UE's over the cell area, this
     # parameter models the azimuth between UE and BS (within ±60° range).
     # Possible values: NORMAL, UNIFORM
-    ue_distribution_azimuth = "UNIFORM"
+    ue_distribution_azimuth = "NORMAL"
     
     ###########################################################################
     # Power control algorithm
@@ -200,7 +200,7 @@ class ParametersImt(object):
     #                                    "UMa" (Urban Macro - 3GPP)
     #                                    "UMi" (Urban Micro - 3GPP)
     #                                    "ABG" (Alpha-Beta-Gamma)
-    channel_model = "ABG"
+    channel_model = "UMi"
     
     ###########################################################################
     # Probability of line-of-sight (CI)
@@ -208,7 +208,7 @@ class ParametersImt(object):
 
     ###########################################################################
     # If shadowing should be applied or not
-    shadowing = False
+    shadowing = True
 
     ###########################################################################
     # System receive noise temperature [K]

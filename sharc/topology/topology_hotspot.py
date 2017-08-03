@@ -70,7 +70,7 @@ class TopologyHotspot(Topology):
                 # Hotspots are generated inside an inscribed circle of a regular hexagon (sector).
                 # The backoff factor (1.0) controls the overlapping rate between hotspots
                 # coverage areas (overlapping of hotspots in different macro cells)
-                r = (self.macrocell.intersite_distance/3)*np.sqrt(3)/2 - self.param.max_dist_hotspot_ue/1.0
+                r = np.maximum(0, (self.macrocell.intersite_distance/3)*np.sqrt(3)/2 - self.param.max_dist_hotspot_ue/1.0)
                 hotspot_radius = r*np.random.random(self.param.num_hotspots_per_cell)
                 hotspot_angle = 2*np.pi*np.random.random(self.param.num_hotspots_per_cell)
                 hotspot_x = hotspot_radius*np.cos(hotspot_angle) + macro_cell_x

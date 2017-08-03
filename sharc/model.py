@@ -14,6 +14,7 @@ from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_es import ParametersFssEs
 
 class Model(Observable):
     """
@@ -23,13 +24,15 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        if ParametersGeneral.service == "FSS-SS":
-            param_service = ParametersFss()
+        if ParametersGeneral.system == "FSS-SS":
+            param_system = ParametersFss()
+        if ParametersGeneral.system == "FSS-ES":
+            param_system = ParametersFssEs()
         
         if ParametersGeneral.imt_link == "DOWNLINK":
-            self.simulation = SimulationDownlink(ParametersImt(), param_service, ParametersAntennaImt())
+            self.simulation = SimulationDownlink(ParametersImt(), param_system, ParametersAntennaImt())
         else:
-            self.simulation = SimulationUplink(ParametersImt(), param_service, ParametersAntennaImt())
+            self.simulation = SimulationUplink(ParametersImt(), param_system, ParametersAntennaImt())
 
     def add_observer(self, observer):
         Observable.add_observer(self, observer)

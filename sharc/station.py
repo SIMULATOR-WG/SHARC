@@ -21,6 +21,7 @@ class Station(object):
         self.tx_power = 0
         self.rx_power = 0
         self.rx_interference = 0
+        self.ext_interference = 0
         self.antenna = None
         self.bandwidth = 0
         self.noise_figure = 0
@@ -29,6 +30,7 @@ class Station(object):
         self.total_interference = 0
         self.snr = 0
         self.sinr = 0
+        self.sinr_ext = 0
         self.inr = 0
         self.station_type = StationType.NONE
         

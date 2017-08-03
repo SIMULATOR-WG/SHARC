@@ -40,7 +40,7 @@ class SimulationUplink(Simulation):
         
         # Create the other system (FSS, HAPS, etc...)
         # Currently it supports only FSS space station
-        self.system = StationFactory.generate_fss_space_stations(self.param_system)
+        self.system = StationFactory.generate_fss_space_station(self.param_system)
 
         # Create IMT user equipments
         self.ue = StationFactory.generate_imt_ue(self.param_imt,
@@ -169,19 +169,34 @@ class SimulationUplink(Simulation):
 
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         self.results.system_inr.extend([self.system.inr])
+        self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.sat_inr_scaling)])
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
             self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
             self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
-            tput = self.calculate_imt_ul_tput(self.bs.sinr[bs])
+            self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
+            self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
+            
+            tput = self.calculate_imt_tput(self.bs.sinr[bs],
+                                           self.param_imt.ul_sinr_min,
+                                           self.param_imt.ul_sinr_max,
+                                           self.param_imt.ul_attenuation_factor)
             self.results.imt_ul_tput.extend(tput.tolist())
+#            tput_ext = self.calculate_imt_tput(self.bs.sinr_ext[bs],
+#                                                  self.param_imt.ul_sinr_min,
+#                                                  self.param_imt.ul_sinr_max,
+#                                                  self.param_imt.ul_attenuation_factor)
+#            self.results.imt_ul_tput_ext.extend(tput_ext.tolist())  
+            
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
             imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue])/(self.num_rb_per_ue*self.param_imt.rb_bandwidth*1e6))
             self.results.imt_ul_tx_power_density.extend(imt_ul_tx_power_density.tolist())
+            #self.results.imt_ul_sinr_ext.extend(self.bs.sinr_ext[bs].tolist())
             self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
             self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
             
@@ -189,25 +204,6 @@ class SimulationUplink(Simulation):
             self.results.write_files(snapshot_number)
             self.notify_observers(source=__name__, results=self.results)
 
-
-    
-        
-    def calculate_imt_ul_tput(self, sinr: np.array) -> np.array:
-        tput_min = 0
-        tput_max = self.param_imt.ul_attenuation_factor*math.log2(1+math.pow(10, 0.1*self.param_imt.ul_sinr_max))
-        
-        tput = self.param_imt.ul_attenuation_factor*np.log2(1+np.power(10, 0.1*sinr))
-        
-        id_min = np.where(sinr<self.param_imt.ul_sinr_min)[0]
-        id_max = np.where(sinr>self.param_imt.ul_sinr_max)[0]
-
-        if len(id_min) > 0:
-            tput[id_min] = tput_min
-        if len(id_max) > 0:
-            tput[id_max] = tput_max
-
-        return tput
-        
         
 
         

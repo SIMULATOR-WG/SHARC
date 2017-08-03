@@ -30,6 +30,7 @@ class StationManager(object):
         self.tx_power = np.empty(n)
         self.rx_power = np.empty(n)
         self.rx_interference = np.empty(n)
+        self.ext_interference = np.empty(n)
         self.antenna = np.empty(n, dtype=Antenna)
         self.bandwidth = np.empty(n)
         self.noise_figure = np.empty(n)
@@ -38,6 +39,7 @@ class StationManager(object):
         self.total_interference = np.empty(n)
         self.snr = np.empty(n)
         self.sinr = np.empty(n)
+        self.sinr_ext = np.empty(n)
         self.inr = np.empty(n)
         self.station_type = StationType.NONE
 
@@ -62,6 +64,7 @@ class StationManager(object):
         station.tx_power = self.tx_power[id]
         station.rx_power = self.rx_power[id]
         station.rx_interference = self.rx_interference[id]
+        station.ext_interference = self.ext_interference[id]
         station.antenna = self.antenna[id]
         station.bandwidth = self.bandwidth[id]
         station.noise_figure = self.noise_figure[id]
@@ -70,6 +73,7 @@ class StationManager(object):
         station.total_interference = self.total_interference[id]
         station.snr = self.snr[id]
         station.sinr = self.sinr[id]
+        station.sinr_ext = self.sinr_ext[id]
         station.inr = self.inr[id]
         station.station_type = self.station_type
         return station
@@ -100,7 +104,7 @@ class StationManager(object):
 
             gts = np.sqrt(rel_x**2 + rel_y**2)
             theta_0 = np.arctan2(rel_z, gts) # free-space elevation angle
-            free_space_angle[i] = theta_0
+            free_space_angle[i] = np.degrees(theta_0)
 
             ##
             # calculate apparent elevation angle according to Attachment B
@@ -114,7 +118,7 @@ class StationManager(object):
                             sat_params.sat_altitude**2*tau_fs3)
             tau_fs = tau_fs_deg / 180. * np.pi
 
-            angle[i] = theta_0 + tau_fs
+            angle[i] = np.degrees(theta_0 + tau_fs)
 
         return{'free_space': free_space_angle, 'apparent': angle}
     

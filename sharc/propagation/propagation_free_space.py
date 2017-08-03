@@ -19,9 +19,11 @@ class PropagationFreeSpace(Propagation):
     
     def get_loss(self, *args, **kwargs) -> np.array:
         if "distance_2D" in kwargs:
-            d = np.asarray(kwargs["distance_2D"])
+            d = kwargs["distance_2D"]
         else:
-            d = np.asarray(kwargs["distance_3D"])
-        f = np.asarray(kwargs["frequency"])
+            d = kwargs["distance_3D"]
+
+        f = kwargs["frequency"]
+
         loss = 20*np.log10(d) + 20*np.log10(f) - 27.55
         return loss
