@@ -220,7 +220,13 @@ class StationFactory(object):
 
         fss_earth_station.active = np.array([True])
         fss_earth_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
-        fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        
+        if param.antenna_pattern == "OMNI":
+            fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        else:
+            sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+            
         fss_earth_station.bandwidth = np.array([param.bandwidth])
         
         return fss_earth_station
