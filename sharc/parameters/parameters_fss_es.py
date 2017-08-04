@@ -23,12 +23,12 @@ class ParametersFssEs(object):
 
     ###########################################################################
     # x-y coordinates [m]
-    x = -5000
+    x = 5000
     y = 0
         
     ###########################################################################
     # antenna height [m]
-    height = 10
+    height = 3
     
     ###########################################################################
     # Elevation angle [deg]
@@ -36,7 +36,7 @@ class ParametersFssEs(object):
     
     ###########################################################################
     # Azimuth angle [deg]
-    azimuth = 0
+    azimuth = 180
 
     ###########################################################################
     # center frequency [MHz]
@@ -55,9 +55,13 @@ class ParametersFssEs(object):
     antenna_gain = 62.8
     
     ###########################################################################
-    # Antenna pattern 
+    # Antenna pattern  (OMNI, ITU-R S.1855)
     antenna_pattern = "ITU-R S.1855"
 
+    ###########################################################################
+    # Diameter of antenna [m]
+    diameter = 1.8
+    
     ###########################################################################
     # Channel parameters
     # channel model, possible values are "FSPL" (free-space path loss),
