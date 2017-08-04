@@ -246,7 +246,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                                delta=.01)      
         # check INR at FSS space station
         self.assertAlmostEqual(self.simulation.system.inr, 
-                               -144.448 - (-88.821),
+                               np.array([ -144.448 - (-88.821) ]),
                                delta=.01)        
        
         
