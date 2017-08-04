@@ -251,7 +251,7 @@ class Simulation(ABC, Observable):
         if(station_1.station_type is StationType.IMT_BS):
             if(station_2.station_type is StationType.IMT_UE):
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
-            elif(station_2.station_type is StationType.FSS_SS):
+            elif(station_2.station_type is StationType.FSS_SS or station_2.station_type is StationType.FSS_ES):
                 phi = np.repeat(phi,self.param_imt.ue_k,0)
                 theta = np.repeat(theta,self.param_imt.ue_k,0)
                 beams_idx = np.tile(np.arange(self.param_imt.ue_k),self.bs.num_stations)
@@ -270,6 +270,13 @@ class Simulation(ABC, Observable):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]))
+        elif (station_1.station_type is StationType.FSS_ES and station_2.station_type is StationType.IMT_UE):
+            phi = station_1.get_off_axis_angle(station_2)
+            distance = station_1.get_distance_to(station_2)
+            theta = station_1.elevation - np.arctan(np.degrees((station_1.height - station_2.height)/distance))
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active],
+                                                                            theta_vec=theta[0,station_2_active],
+                                                                            beams_l=beams_idx)            
         else:
             for k in station_1_active:
                 gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
