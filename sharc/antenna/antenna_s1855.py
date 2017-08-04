@@ -25,7 +25,7 @@ class AntennaS1855(Antenna):
         frequency (float): frequency of operation [MHz]
     """
     
-    def __init__(self, diameter: float, frequency: float, peak_gain: float):
+    def __init__(self, params):
         """
         Constructs an AntennaS1855 object.
         
@@ -33,33 +33,37 @@ class AntennaS1855(Antenna):
         ---------
         diameter: diameter of the earth station antenna
         frequency: operation frequency of the antena of the earth station
-        peak_gain: peak gain of the antena on the direction of the GSO
+        antenna_gain: peak gain of the antena on the direction of the GSO
         """
-        self.__diameter = diameter
-        self.__frequency = frequency
-        self.__peak_gain = peak_gain
+        self.diameter = params.diameter
+        self.frequency = params.frequency
+        self.antenna_gain = params.antenna_gain
+        self.azimuth = params.azimuth
+        self.elevation = params.elevation
         
-    def get_gain(self, phi_list: np.array, theta_list: np.array) -> np.array:
+    def calculate_gain(self, *args, **kwargs) -> np.array:        
         """
         Calculates the gain of the antenna af arrays of angles.
         
         Parameters
         ----------
-            phi_list (numpy.array): list of azimuth angle [degrees]
-            theta_list (numpy.array) : list of elevation angle [degrees]
+            phi_vec (numpy.array): list of azimuth angle [degrees]
+            theta_vec (numpy.array) : list of elevation angle [degrees]
             
         Returns
         -------
             gain (numpy.array): gain array in given directions
         """
-        phi_len = phi_list.size
-        theta_len = theta_list.size
-        response = np.zeros((phi_len, theta_len), dtype = np.float)
         
-        for i in range(phi_len):
-            for j in range (theta_len):
-                response[i, j] = self.get_gain_pair(phi_list[i], theta_list[j])
-        return response        
+        phi_list = kwargs["phi_vec"]
+        theta_list = kwargs["theta_vec"]
+        
+        gain = np.empty(phi_list.shape, dtype = np.float)
+        
+        for i in range(len(phi_list)):
+            gain[i] = self.get_gain_pair(phi_list[i], theta_list[i])
+
+        return gain        
         
         
     def get_gain_pair(self, phi: np.float, theta: np.float) -> np.float:
@@ -76,8 +80,8 @@ class AntennaS1855(Antenna):
             gain (float): gain value in given direction
         """
         gain = None
-        wavelength = 3e8 / (self.__frequency * 1000000)
-        d_to_wavel = self.__diameter/wavelength
+        wavelength = 3e8 / (self.frequency * 1000000)
+        d_to_wavel = self.diameter/wavelength
         phimin1 = 15.85 * math.pow(d_to_wavel, -0.6)
         phimin2 = 118 * math.pow(d_to_wavel, -1.06)
         if phimin1 > phimin2:
@@ -88,7 +92,7 @@ class AntennaS1855(Antenna):
         
         if d_to_wavel >= 46.8:
             if   phi < phimin:
-                gain = self.__peak_gain
+                gain = self.antenna_gain
             elif phi >= phimin and phi <= 7:
                 gain = 29 + 3 * np.power(np.sin(theta * math.pi / 180) , 2) - 25 * np.log10(phi)
             elif phi > 7 and phi <= 9.2:
@@ -99,7 +103,7 @@ class AntennaS1855(Antenna):
                 return -10  
         elif d_to_wavel < 46.8 and d_to_wavel >= 15:
             if   phi < phimin:
-                gain = self.__peak_gain            
+                gain = self.antenna_gain            
             elif phi >= phimin and phi <= 7:
                 gain = 29 + 3 * np.pow(np.sin(theta * np.pi / 180),2) - 25 * np.log10(phi)
             elif phi > 7 and phi <= 9.2: 
