@@ -64,7 +64,7 @@ class ParametersImt(object):
     # The load probability (or activity factor) models the statistical
     # variation of the network load by defining the number of fully loaded
     # base stations that are simultaneously transmitting
-    bs_load_probability = .2
+    bs_load_probability = .5
 
     ###########################################################################
     # Conducted power per antenna element [dBm/200 MHz]

@@ -20,7 +20,7 @@ class ParametersHotspot(object):
 
     ###########################################################################
     # Number of hotspots per macro cell (sector)
-    num_hotspots_per_cell = 4
+    num_hotspots_per_cell = 1
     
     ###########################################################################
     # Maximum 2D distance between hotspot and UE [m]
