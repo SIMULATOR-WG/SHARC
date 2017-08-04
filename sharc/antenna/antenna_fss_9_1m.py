@@ -32,7 +32,7 @@ class AntennaFss_9_1(Antenna):
 
         self.__peak_gain = peak_gain
         
-    def get_gain(self) -> np.array:
+    def calculate_gain(self, *args, **kwargs) -> np.array: 
         """
         Calculates the gain of the antenna af arrays of angles.
             
