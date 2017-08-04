@@ -39,9 +39,7 @@ class SimulationDownlink(Simulation):
                                                             self.topology)      
         
         # Create the other system (FSS, HAPS, etc...)
-        # Currently it supports only FSS space station
-        self.system = StationFactory.generate_fss_space_station(self.param_system)
-        #self.system = StationFactory.generate_fss_earth_station(self.param_system)
+        self.system = StationFactory.generate_system(self.param_system)
 
         # Create IMT user equipments
         self.ue = StationFactory.generate_imt_ue(self.param_imt,
@@ -181,12 +179,13 @@ class SimulationDownlink(Simulation):
                           10*math.log10(self.param_system.bandwidth * 1e6)
 
         # calculate INR at the system
-        self.system.inr = self.system.rx_interference - self.system.thermal_noise
+        self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
         
         
     def collect_results(self, write_to_file: bool, snapshot_number: int):
-        self.results.system_inr.extend([self.system.inr])
-        self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.sat_inr_scaling)])
+        if not self.param_imt.interfered_with:
+            self.results.system_inr.extend(self.system.inr.tolist())
+            self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.sat_inr_scaling)])
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
@@ -197,25 +196,31 @@ class SimulationDownlink(Simulation):
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
             
-            active_beams = [i for i in range(bs*self.param_imt.ue_k, (bs+1)*self.param_imt.ue_k)]
-            self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
-            self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
             
             tput = self.calculate_imt_tput(self.ue.sinr[ue],
                                            self.param_imt.dl_sinr_min,
                                            self.param_imt.dl_sinr_max,
                                            self.param_imt.dl_attenuation_factor)
             self.results.imt_dl_tput.extend(tput.tolist())
-#            tput_ext = self.calculate_imt_tput(self.ue.sinr_ext[ue],
-#                                               self.param_imt.dl_sinr_min,
-#                                               self.param_imt.dl_sinr_max,
-#                                               self.param_imt.dl_attenuation_factor)
-#            self.results.imt_dl_tput_ext.extend(tput_ext.tolist()) 
+
+            if self.param_imt.interfered_with:
+                tput_ext = self.calculate_imt_tput(self.ue.sinr_ext[ue],
+                                                   self.param_imt.dl_sinr_min,
+                                                   self.param_imt.dl_sinr_max,
+                                                   self.param_imt.dl_attenuation_factor)
+                self.results.imt_dl_tput_ext.extend(tput_ext.tolist()) 
+                self.results.imt_dl_sinr_ext.extend(self.ue.sinr_ext[ue].tolist())
+                
+                self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
+                self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])                
+            else:
+                active_beams = [i for i in range(bs*self.param_imt.ue_k, (bs+1)*self.param_imt.ue_k)]
+                self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
+                self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
 
             self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
             #imt_dl_tx_power_density = 10*np.log10(np.power(10, 0.1*self.bs.tx_power[bs])/(self.num_rb_per_ue*self.param_imt.rb_bandwidth*1e6))
             #self.results.imt_dl_tx_power_density.extend(imt_dl_tx_power_density.tolist())
-            #self.results.imt_dl_sinr_ext.extend(self.ue.sinr_ext[ue].tolist())
             self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
             self.results.imt_dl_snr.extend(self.ue.snr[ue].tolist())
             
