@@ -24,9 +24,9 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        if ParametersGeneral.system == "FSS-SS":
+        if ParametersGeneral().system == "FSS_SS":
             param_system = ParametersFss()
-        if ParametersGeneral.system == "FSS-ES":
+        if ParametersGeneral().system == "FSS_ES":
             param_system = ParametersFssEs()
         
         if ParametersGeneral.imt_link == "DOWNLINK":

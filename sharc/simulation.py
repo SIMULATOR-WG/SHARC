@@ -128,8 +128,12 @@ class Simulation(ABC, Observable):
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
 
-        if station_a.station_type is StationType.FSS_SS:
+        if station_a.station_type is StationType.FSS_SS :
             elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
+        else:
+            elevation_angles = None
+
+        if station_a.station_type is StationType.FSS_SS or station_a.station_type is StationType.FSS_ES:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
@@ -247,7 +251,7 @@ class Simulation(ABC, Observable):
         if(station_1.station_type is StationType.IMT_BS):
             if(station_2.station_type is StationType.IMT_UE):
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
-            elif(station_2.station_type is StationType.FSS_SS):
+            elif(station_2.station_type is StationType.FSS_SS or station_2.station_type is StationType.FSS_ES):
                 phi = np.repeat(phi,self.param_imt.ue_k,0)
                 theta = np.repeat(theta,self.param_imt.ue_k,0)
                 beams_idx = np.tile(np.arange(self.param_imt.ue_k),self.bs.num_stations)
@@ -266,6 +270,13 @@ class Simulation(ABC, Observable):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]))
+        elif (station_1.station_type is StationType.FSS_ES and station_2.station_type is StationType.IMT_UE):
+            phi = station_1.get_off_axis_angle(station_2)
+            distance = station_1.get_distance_to(station_2)
+            theta = station_1.elevation - np.arctan(np.degrees((station_1.height - station_2.height)/distance))
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active],
+                                                                            theta_vec=theta[0,station_2_active],
+                                                                            beams_l=beams_idx)            
         else:
             for k in station_1_active:
                 gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],

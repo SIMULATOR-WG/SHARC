@@ -10,12 +10,14 @@ import sys
 import math
 
 from sharc.support.enumerations import StationType
+from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss import ParametersFss
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna_s1855 import AntennaS1855
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 
@@ -39,10 +41,12 @@ class StationFactory(object):
         imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
         imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.rx_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.ext_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.total_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         
         imt_base_stations.snr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.sinr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.sinr_ext = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
         par = param_ant.get_antenna_parameters("BS", "RX")
@@ -144,6 +148,7 @@ class StationFactory(object):
         imt_ue.indoor = np.random.random(num_ue) <= param.ue_indoor_percent
         imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
+        imt_ue.ext_interference = -500*np.ones(num_ue)
 
         # TODO: this piece of code works only for uplink
         par = param_ant.get_antenna_parameters("UE","TX")
@@ -156,6 +161,17 @@ class StationFactory(object):
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         return imt_ue
 
+        
+    @staticmethod
+    def generate_system(param):
+        if ParametersGeneral().system == "FSS_ES":
+            return StationFactory.generate_fss_earth_station(param)
+        elif ParametersGeneral().system == "FSS_SS":
+            return StationFactory.generate_fss_space_station(param)
+        else:
+            sys.stderr.write("ERROR\nInvalid system: " + ParametersGeneral().system)
+            sys.exit(1)            
+        
         
     @staticmethod
     def generate_fss_space_station(param: ParametersFss):
@@ -190,18 +206,12 @@ class StationFactory(object):
         fss_space_station.elevation = np.array([0])
 
         fss_space_station.active = np.array([True])
-        fss_space_station.tx_power = None
-        fss_space_station.rx_power = None
         fss_space_station.rx_interference = -500
         fss_space_station.antenna = np.array([AntennaOmni(param.sat_rx_antenna_gain)])
         fss_space_station.bandwidth = param.bandwidth
-        fss_space_station.noise_figure = None
         fss_space_station.noise_temperature = param.sat_noise_temperature
         fss_space_station.thermal_noise = -500
         fss_space_station.total_interference = -500
-        fss_space_station.snr = None
-        fss_space_station.sinr = None
-        fss_space_station.inr = None
         
         return fss_space_station
 
@@ -223,6 +233,8 @@ class StationFactory(object):
         
         if param.antenna_pattern == "OMNI":
             fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        elif param.antenna_pattern == "ITU-R S.1855":
+            fss_earth_station.antenna = np.array([AntennaS1855(param)])
         else:
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
             sys.exit(1)

@@ -28,5 +28,5 @@ class ParametersGeneral(object):
     
     ###########################################################################
     # The chosen system for sharing study
-    # FSS-SS, FSS-ES
-    system = "FSS-SS"
+    # FSS_SS, FSS_ES
+    system = "FSS_SS"

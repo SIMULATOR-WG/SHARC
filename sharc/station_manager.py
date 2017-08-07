@@ -6,6 +6,7 @@ Created on Fri Feb  3 15:29:48 2017
 """
 
 import numpy as np
+import math
 
 from sharc.support.enumerations import StationType
 from sharc.station import Station
@@ -135,3 +136,19 @@ class StationManager(object):
         
         return phi, theta
 
+    def get_off_axis_angle(self, station) -> np.array:
+        """
+        Calculates the off-axis angle between this station and the input station
+        """
+        Az, b = self.get_pointing_vector_to(station)
+        Az0 = self.azimuth
+
+        a = 90 - self.elevation
+        C = Az0 - Az
+        
+        phi = np.arccos(np.cos(np.radians(a))*np.cos(np.radians(b)) \
+                        + np.sin(np.radians(a))*np.sin(np.radians(b))*np.cos(np.radians(C)))
+        phi_deg = np.degrees(phi)
+
+        return phi_deg
+        

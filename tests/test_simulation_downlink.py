@@ -135,7 +135,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param_fss_es.elevation = 20
         self.param_fss_es.azimuth = 0
         self.param_fss_es.frequency = 10000
-        self.param_fss_es.bandwidth = 200
+        self.param_fss_es.bandwidth = 100
         self.param_fss_es.tx_power_density = -60
         self.param_fss_es.antenna_gain = 50
         self.param_fss_es.antenna_pattern = "OMNI"
@@ -144,12 +144,11 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param_fss_es.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param_fss_es.EARTH_RADIUS = 6371000        
 
-    
+
+    def test_simulation_2bs_4ue_fss_ss(self):
         self.simulation = SimulationDownlink(self.param, self.param_fss_ss, self.param_ant)
         self.simulation.initialize()
 
-
-    def test_simulation_2bs_4ue(self):
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
         
@@ -247,9 +246,67 @@ class SimulationDownlinkTest(unittest.TestCase):
                                delta=.01)      
         # check INR at FSS space station
         self.assertAlmostEqual(self.simulation.system.inr, 
-                               -144.448 - (-88.821),
+                               np.array([ -144.448 - (-88.821) ]),
                                delta=.01)        
+       
+        
+    def test_simulation_2bs_4ue_fss_es(self):
+        self.simulation = SimulationDownlink(self.param, self.param_fss_es, self.param_ant)
+        self.simulation.initialize()
+        
+        
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param,
+                                                                       self.param_ant,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param,
+                                                            self.param_ant,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        
+        self.simulation.connect_ue_to_bs()
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        self.simulation.scheduler()
+        self.simulation.power_control()
+        self.simulation.calculate_sinr()
+        # check SINR
+        npt.assert_allclose(self.simulation.ue.sinr, 
+                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            atol=1e-2)        
 
+        self.simulation.system = StationFactory.generate_fss_earth_station(self.param_fss_es)
+        self.simulation.system.x = np.array([-2000])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param_fss_es.height])
+        
+        self.simulation.calculate_sinr_ext()
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
+                            np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]), 
+                            atol=1e-2)
+
+        bw = 100*1e6*0.9/2
+        system_tx_power = -60 + 10*math.log10(bw) + 30
+        npt.assert_allclose(self.simulation.ue.ext_interference, 
+                            np.array([system_tx_power - (118.55-50-10) - 7,  system_tx_power - (118.76-50-11) - 7,  system_tx_power - (118.93-50-22) - 7,  system_tx_power - (119.17-50-23) - 7]), 
+                            atol=1e-2)
+        
+        interference = 10*np.log10(np.power(10, 0.1*np.array([ -85.49, -83.19, -73.15, -75.82 ])) \
+                                 + np.power(10, 0.1*np.array([ -19.02, -18.23,  -7.40,  -6.64 ])))
+        
+        npt.assert_allclose(self.simulation.ue.sinr_ext, 
+                            np.array([-70.48, -80.36, -70.54, -60.00]) - interference, 
+                            atol=1e-2)       
+        
         
 if __name__ == '__main__':
     unittest.main()
