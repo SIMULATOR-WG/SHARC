@@ -264,20 +264,22 @@ class Simulation(ABC, Observable):
         
         gains = np.zeros(phi.shape)
         
-        if(station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS):
+        if station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS:
             for k in station_1_active:
                 for b in range(k*self.param_imt.ue_k,(k+1)*self.param_imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]))
-        elif (station_1.station_type is StationType.FSS_ES and station_2.station_type is StationType.IMT_UE):
+        elif station_1.station_type is StationType.FSS_ES:
             phi = station_1.get_off_axis_angle(station_2)
             distance = station_1.get_distance_to(station_2)
             theta = station_1.elevation - np.arctan(np.degrees((station_1.height - station_2.height)/distance))
             gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active],
-                                                                            theta_vec=theta[0,station_2_active],
-                                                                            beams_l=beams_idx)            
-        else:
+                                                                            theta_vec=theta[0,station_2_active])
+        elif station_1.station_type is StationType.FSS_SS:
+            phi = station_1.get_off_axis_angle(station_2)
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active])
+        else: # for IMT <-> IMT
             for k in station_1_active:
                 gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
                                                                             theta_vec=theta[k,station_2_active],
