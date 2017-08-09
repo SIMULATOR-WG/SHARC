@@ -362,7 +362,7 @@ class StationManagerTest(unittest.TestCase):
         phi_ref = np.array([[0, 45, 90, 45, 54.73, 54.73]])
         npt.assert_allclose(phi_ref, sm1.get_off_axis_angle(sm2), atol=1e-2)
         
-        
+        #######################################################################
         sm3 = StationManager(1)
         sm3.x = np.array([0])
         sm3.y = np.array([0])
@@ -380,7 +380,7 @@ class StationManagerTest(unittest.TestCase):
         phi_ref = np.array([[35.26, 45.57]])
         npt.assert_allclose(phi_ref, sm3.get_off_axis_angle(sm4), atol=1e-2)        
         
-        
+        #######################################################################
         sm5 = StationManager(1)
         sm5.x = np.array([0])
         sm5.y = np.array([0])
@@ -396,7 +396,25 @@ class StationManagerTest(unittest.TestCase):
         sm6.elevation = np.array([0, 0])
         
         phi_ref = np.array([[0, 0]])
-        npt.assert_allclose(phi_ref, sm5.get_off_axis_angle(sm6), atol=1e-2)          
+        npt.assert_allclose(phi_ref, sm5.get_off_axis_angle(sm6), atol=1e-2)    
+        
+        #######################################################################
+        sm6 = StationManager(1)
+        sm6.x = np.array([0])
+        sm6.y = np.array([0])
+        sm6.height = np.array([100])
+        sm6.azimuth = np.array([0])
+        sm6.elevation = np.array([270])
+        
+        sm7 = StationManager(2)
+        sm7.x = np.array([0, 100])
+        sm7.y = np.array([0, 0])
+        sm7.height = np.array([0, 0])
+        sm7.azimuth = np.array([180, 180])
+        sm7.elevation = np.array([0, 0])
+        
+        phi_ref = np.array([[0, 45]])
+        npt.assert_allclose(phi_ref, sm6.get_off_axis_angle(sm7), atol=1e-2)          
         
         
 if __name__ == '__main__':

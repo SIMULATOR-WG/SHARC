@@ -5,7 +5,7 @@ Created on Thu Apr 13 13:16:02 2017
 @author: edgar
 """
 
-class ParametersFss(object):
+class ParametersFssSs(object):
 
     __instance = None
 
@@ -14,9 +14,9 @@ class ParametersFss(object):
         This is the Singleton Pattern to ensure that this class will have only
         one instance
         """
-        if ParametersFss.__instance is None:
-            ParametersFss.__instance = object.__new__(cls)
-        return ParametersFss.__instance
+        if ParametersFssSs.__instance is None:
+            ParametersFssSs.__instance = object.__new__(cls)
+        return ParametersFssSs.__instance
 
     ###########################################################################
     # satellite center frequency [MHz]
@@ -28,28 +28,37 @@ class ParametersFss(object):
 
     ###########################################################################
     # satellite altitude [m] and latitude [deg]
-    sat_altitude = 35780000
-    sat_lat_deg = 0
+    altitude = 35780000
+    lat_deg = 0
 
     ###########################################################################
+    # Elevation angle [deg]
+    elevation = 270
+    
+    ###########################################################################
+    # Azimuth angle [deg]
+    azimuth = 0    
+    
+    ###########################################################################
     # System receive noise temperature [K]
-    sat_noise_temperature = 950
+    noise_temperature = 950
 
     ###########################################################################
     # Interference protection criteria [dB]
-    sat_interference_noise_ratio = -12.2
+    interference_noise_ratio = -12.2
 
     ###########################################################################
     # INR scaling factor (to estimate INR for larger number of interfering stations)
-    sat_inr_scaling = 14.95
+    inr_scaling = 14.95
     
     ###########################################################################
     # Satellite peak reeive antenna gain [dBi]
-    sat_rx_antenna_gain = 51
+    antenna_gain = 51
     
     ###########################################################################
     # Satellite antenna pattern in the fixed-satellite service
-    sat_rx_antenna_pattern = "ITU-R S.672-4"
+    # Possible values: "ITU-R S.672-4", "FSS_SS", "OMNI"
+    antenna_pattern = "FSS_SS"
 
     # IMT parameters relevant to the satellite system
     imt_altitude = 0   # altitude of IMT system (in meters)
@@ -79,11 +88,11 @@ class ParametersFss(object):
 
     # The required near-in-side-lobe level (dB) relative to peak gain
     # according to ITU-R S.672-4
-    sat_rx_antenna_l_s = -20    
+    antenna_l_s = -20    
     
     ###########################################################################
     # 3 dB beamwidth angle (3 dB below maximum gain) [degrees]
-    sat_rx_antenna_3_dB = 0.65
+    antenna_3_dB = 0.65
     
     ###########################################################################
     # Constants

@@ -115,8 +115,8 @@ class StationManager(object):
             tau_fs3 = 0.01727 + 0.008288 * theta_0
 
             # change in elevation angle due to refraction
-            tau_fs_deg = 1/(tau_fs1 + sat_params.sat_altitude*tau_fs2 +
-                            sat_params.sat_altitude**2*tau_fs3)
+            tau_fs_deg = 1/(tau_fs1 + sat_params.altitude*tau_fs2 +
+                            sat_params.altitude**2*tau_fs3)
             tau_fs = tau_fs_deg / 180. * np.pi
 
             angle[i] = np.degrees(theta_0 + tau_fs)
