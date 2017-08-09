@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
     ax = plt.gca()
     ax.set_yticks([-30, -20, -10, 0])
-    ax.set_xticks([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+    ax.set_xticks(np.linspace(1, 9, 9).tolist() + np.linspace(10, 100, 10).tolist())
 
     plt.grid()
     plt.show()        
