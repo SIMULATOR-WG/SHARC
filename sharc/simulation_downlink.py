@@ -11,7 +11,7 @@ import math
 from sharc.simulation import Simulation
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.station_factory import StationFactory
 
 class SimulationDownlink(Simulation):
@@ -19,7 +19,7 @@ class SimulationDownlink(Simulation):
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, param_imt: ParametersImt, param_system: ParametersFss, param_ant: ParametersAntennaImt):
+    def __init__(self, param_imt: ParametersImt, param_system: ParametersFssSs, param_ant: ParametersAntennaImt):
         super().__init__(param_imt, param_system, param_ant)
 
         
@@ -175,7 +175,7 @@ class SimulationDownlink(Simulation):
         # calculate N
         self.system.thermal_noise = \
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
-                          self.param_system.sat_noise_temperature*1e3) + \
+                          self.param_system.noise_temperature*1e3) + \
                           10*math.log10(self.param_system.bandwidth * 1e6)
 
         # calculate INR at the system
@@ -185,7 +185,7 @@ class SimulationDownlink(Simulation):
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         if not self.param_imt.interfered_with:
             self.results.system_inr.extend(self.system.inr.tolist())
-            self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.sat_inr_scaling)])
+            self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:

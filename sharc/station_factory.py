@@ -13,10 +13,12 @@ from sharc.support.enumerations import StationType
 from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna_s672 import AntennaS672
+from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_s1855 import AntennaS1855
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
@@ -174,7 +176,7 @@ class StationFactory(object):
         
         
     @staticmethod
-    def generate_fss_space_station(param: ParametersFss):
+    def generate_fss_space_station(param: ParametersFssSs):
         fss_space_station = StationManager(1)
         fss_space_station.station_type = StationType.FSS_SS
 
@@ -182,11 +184,11 @@ class StationFactory(object):
         # ITU-R P619-1, Attachment A
 
         # calculate distances to the centre of the Earth
-        dist_sat_centre_earth = param.EARTH_RADIUS + param.sat_altitude
+        dist_sat_centre_earth = param.EARTH_RADIUS + param.altitude
         dist_imt_centre_earth = param.EARTH_RADIUS + param.imt_altitude
 
         # calculate Cartesian coordinates of satellite, with origin at centre of the Earth
-        sat_lat_rad = param.sat_lat_deg * np.pi / 180.
+        sat_lat_rad = param.lat_deg * np.pi / 180.
         imt_long_diff_rad = param.imt_long_diff_deg * np.pi / 180.
         x1 = dist_sat_centre_earth * np.cos(sat_lat_rad) * np.cos(imt_long_diff_rad)
         y1 = dist_sat_centre_earth * np.cos(sat_lat_rad) * np.sin(imt_long_diff_rad)
@@ -207,9 +209,19 @@ class StationFactory(object):
 
         fss_space_station.active = np.array([True])
         fss_space_station.rx_interference = -500
-        fss_space_station.antenna = np.array([AntennaOmni(param.sat_rx_antenna_gain)])
+        
+        if param.antenna_pattern == "OMNI":
+            fss_space_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        elif param.antenna_pattern == "ITU-R S.672-4":
+            fss_space_station.antenna = np.array([AntennaS672(param)])
+        elif param.antenna_pattern == "FSS_SS":
+            fss_space_station.antenna = np.array([AntennaFssSs(param)])            
+        else:
+            sys.stderr.write("ERROR\nInvalid FSS SS antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)        
+        
         fss_space_station.bandwidth = param.bandwidth
-        fss_space_station.noise_temperature = param.sat_noise_temperature
+        fss_space_station.noise_temperature = param.noise_temperature
         fss_space_station.thermal_noise = -500
         fss_space_station.total_interference = -500
         

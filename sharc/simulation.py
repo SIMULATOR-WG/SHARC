@@ -20,14 +20,14 @@ from sharc.topology.topology_factory import TopologyFactory
 from sharc.propagation.propagation_factory import PropagationFactory
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.propagation.propagation import Propagation
 from sharc.station_manager import StationManager
 from sharc.results import Results
  
 class Simulation(ABC, Observable):
     
-    def __init__(self, param_imt: ParametersImt, param_system: ParametersFss, param_ant: ParametersAntennaImt):
+    def __init__(self, param_imt: ParametersImt, param_system: ParametersFssSs, param_ant: ParametersAntennaImt):
         ABC.__init__(self)
         Observable.__init__(self)
 

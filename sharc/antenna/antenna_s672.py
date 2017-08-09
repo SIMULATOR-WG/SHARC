@@ -6,7 +6,7 @@ Created on Thu Apr 13 17:18:59 2017
 """
 
 from sharc.antenna.antenna import Antenna
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 
 import numpy as np
 import sys
@@ -17,10 +17,10 @@ class AntennaS672(Antenna):
     according to Recommendation ITU-R S.672-4 Annex 1
     """
     
-    def __init__(self, param: ParametersFss):
+    def __init__(self, param: ParametersFssSs):
         super().__init__()
-        self.peak_gain = param.sat_rx_antenna_gain
-        self.l_s = param.sat_rx_antenna_l_s
+        self.peak_gain = param.antenna_gain
+        self.l_s = param.antenna_l_s
         
         if self.l_s == -20:
             self.a = 2.58
@@ -34,7 +34,7 @@ class AntennaS672(Antenna):
 
         self.b = 6.32
         
-        self.psi_0 = param.sat_rx_antenna_3_dB/2
+        self.psi_0 = param.antenna_3_dB/2
         self.psi_1 = self.psi_0 * np.power(10, (self.peak_gain + self.l_s + 20)/25)
             
         
@@ -62,29 +62,29 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     # initialize antenna parameters
-    param = ParametersFss()
-    param.sat_rx_antenna_gain = 50
-    param.sat_rx_antenna_pattern = "ITU-R S.672-4"
-    param.sat_rx_antenna_3_dB = 2
+    param = ParametersFssSs()
+    param.antenna_gain = 50
+    param.antenna_pattern = "ITU-R S.672-4"
+    param.antenna_3_dB = 2
     psi = np.linspace(1, 30, num = 1000)
     
-    param.sat_rx_antenna_l_s = -20
+    param.antenna_l_s = -20
     antenna = AntennaS672(param)
     gain20 = antenna.calculate_gain(phi_vec=psi)
     
-    param.sat_rx_antenna_l_s = -25    
+    param.antenna_l_s = -25    
     antenna = AntennaS672(param)    
     gain25 = antenna.calculate_gain(phi_vec=psi)
     
-    param.sat_rx_antenna_l_s = -30  
+    param.antenna_l_s = -30  
     antenna = AntennaS672(param)    
     gain30 = antenna.calculate_gain(phi_vec=psi)
 
     fig = plt.figure(figsize=(12,7), facecolor='w', edgecolor='k')  # create a figure object
     
-    plt.semilogx(psi, gain20 - param.sat_rx_antenna_gain, "-b", label="$L_S = -20$ dB")
-    plt.semilogx(psi, gain25 - param.sat_rx_antenna_gain, "-r", label="$L_S = -25$ dB")
-    plt.semilogx(psi, gain30 - param.sat_rx_antenna_gain, "-g", label="$L_S = -30$ dB")
+    plt.semilogx(psi, gain20 - param.antenna_gain, "-b", label="$L_S = -20$ dB")
+    plt.semilogx(psi, gain25 - param.antenna_gain, "-r", label="$L_S = -25$ dB")
+    plt.semilogx(psi, gain30 - param.antenna_gain, "-g", label="$L_S = -30$ dB")
 
     plt.ylim((-33.8, 0))
     plt.xlim((1, 100))    

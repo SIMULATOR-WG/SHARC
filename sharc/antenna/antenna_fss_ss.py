@@ -6,7 +6,7 @@ Created on Wed Aug  9 14:16:29 2017
 """
 
 from sharc.antenna.antenna import Antenna
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 
 import numpy as np
 import sys
@@ -25,10 +25,10 @@ class AntennaFssSs(Antenna):
     
     """
     
-    def __init__(self, param: ParametersFss):
+    def __init__(self, param: ParametersFssSs):
         super().__init__()
-        self.peak_gain = param.sat_rx_antenna_gain
-        self.l_s = param.sat_rx_antenna_l_s
+        self.peak_gain = param.antenna_gain
+        self.l_s = param.antenna_l_s
         
         if self.l_s == -20:
             self.a = 2.58
@@ -42,7 +42,7 @@ class AntennaFssSs(Antenna):
 
         self.b = 6.32
         
-        self.psi_0 = param.sat_rx_antenna_3_dB/2
+        self.psi_0 = param.antenna_3_dB/2
         self.psi_1 = self.psi_0 * np.power(10, (self.peak_gain + self.l_s + 20)/25)
             
         
@@ -68,13 +68,13 @@ if __name__ == '__main__':
     from sharc.antenna.antenna_s672 import AntennaS672
 
     # initialize antenna parameters
-    param = ParametersFss()
-    param.sat_rx_antenna_gain = 50
-    param.sat_rx_antenna_pattern = "FSS_SS"
-    param.sat_rx_antenna_3_dB = 2
+    param = ParametersFssSs()
+    param.antenna_gain = 50
+    param.antenna_pattern = "FSS_SS"
+    param.antenna_3_dB = 2
     psi = np.linspace(0.1, 30, num = 1000)
     
-    param.sat_rx_antenna_l_s = -25    
+    param.antenna_l_s = -25    
     antenna_fss = AntennaFssSs(param)    
     gain_fss = antenna_fss.calculate_gain(phi_vec=psi)
 
@@ -83,8 +83,8 @@ if __name__ == '__main__':
     
     fig = plt.figure(figsize=(12,7), facecolor='w', edgecolor='k')  # create a figure object
     
-    plt.semilogx(psi, gain_672 - param.sat_rx_antenna_gain, "-b", label="ITU-R S.672-4")
-    plt.semilogx(psi, gain_fss - param.sat_rx_antenna_gain, "-r", label="FSS SS")
+    plt.semilogx(psi, gain_672 - param.antenna_gain, "-b", label="ITU-R S.672-4")
+    plt.semilogx(psi, gain_fss - param.antenna_gain, "-r", label="FSS SS")
 
     plt.ylim((-40, 0.3))
     plt.xlim((0.1, 100))    

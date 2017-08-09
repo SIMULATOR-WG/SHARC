@@ -13,7 +13,7 @@ from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 
 class Model(Observable):
@@ -25,7 +25,7 @@ class Model(Observable):
     def __init__(self):
         super(Model, self).__init__()
         if ParametersGeneral().system == "FSS_SS":
-            param_system = ParametersFss()
+            param_system = ParametersFssSs()
         if ParametersGeneral().system == "FSS_ES":
             param_system = ParametersFssEs()
         
