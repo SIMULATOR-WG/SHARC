@@ -12,7 +12,7 @@ import math
 
 from sharc.simulation_downlink import SimulationDownlink
 from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.antenna.antenna_omni import AntennaOmni
@@ -107,15 +107,15 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param_ant.ue_rx_element_horiz_spacing = 1
         self.param_ant.ue_rx_element_vert_spacing = 1
         
-        self.param_fss_ss = ParametersFss()
+        self.param_fss_ss = ParametersFssSs()
         self.param_fss_ss.frequency = 10000
         self.param_fss_ss.bandwidth = 100
-        self.param_fss_ss.sat_altitude = 35786000
-        self.param_fss_ss.sat_lat_deg = 0
-        self.param_fss_ss.sat_noise_temperature = 950
-        self.param_fss_ss.sat_interference_noise_ratio = -12.2
-        self.param_fss_ss.sat_rx_antenna_gain = 51
-        self.param_fss_ss.sat_rx_antenna_pattern = "OMNI"
+        self.param_fss_ss.altitude = 35786000
+        self.param_fss_ss.lat_deg = 0
+        self.param_fss_ss.noise_temperature = 950
+        self.param_fss_ss.interference_noise_ratio = -12.2
+        self.param_fss_ss.antenna_gain = 51
+        self.param_fss_ss.antenna_pattern = "OMNI"
         self.param_fss_ss.imt_altitude = 1000
         self.param_fss_ss.imt_lat_deg = -23.5629739
         self.param_fss_ss.imt_long_diff_deg = (-46.6555132-75)
@@ -124,7 +124,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param_fss_ss.surf_water_vapour_density = 7.5
         self.param_fss_ss.specific_gaseous_att = 0.1
         self.param_fss_ss.time_ratio = 0.5
-        self.param_fss_ss.sat_rx_antenna_l_s = -20    
+        self.param_fss_ss.antenna_l_s = -20    
         self.param_fss_ss.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param_fss_ss.EARTH_RADIUS = 6371000        
         
@@ -225,7 +225,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.system = StationFactory.generate_fss_space_station(self.param_fss_ss)
         self.simulation.system.x = np.array([0])
         self.simulation.system.y = np.array([0])
-        self.simulation.system.height = np.array([self.param_fss_ss.sat_altitude])
+        self.simulation.system.height = np.array([self.param_fss_ss.altitude])
         
         # test the method that calculates interference from IMT UE to FSS space station
         self.simulation.calculate_external_interference()

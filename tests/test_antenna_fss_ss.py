@@ -8,7 +8,7 @@ Created on Wed Aug  9 16:49:23 2017
 import unittest
 
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 
 import numpy as np
 import numpy.testing as npt
@@ -16,15 +16,15 @@ import numpy.testing as npt
 class AntennaFssTest(unittest.TestCase):
     
     def setUp(self):
-        param = ParametersFss()
-        param.sat_rx_antenna_gain = 50
-        param.sat_rx_antenna_pattern = "FSS_SS"
-        param.sat_rx_antenna_3_dB = 2
+        param = ParametersFssSs()
+        param.antenna_gain = 50
+        param.antenna_pattern = "FSS_SS"
+        param.antenna_3_dB = 2
         
-        param.sat_rx_antenna_l_s = -25
+        param.antenna_l_s = -25
         self.antenna25 = AntennaFssSs(param)
         
-        param.sat_rx_antenna_l_s = -30    
+        param.antenna_l_s = -30    
         self.antenna30 = AntennaFssSs(param)
         
         

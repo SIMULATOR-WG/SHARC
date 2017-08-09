@@ -12,7 +12,7 @@ import math
 
 from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
@@ -107,7 +107,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param_ant.ue_rx_element_horiz_spacing = 1
         self.param_ant.ue_rx_element_vert_spacing = 1
         
-        self.param_service = ParametersFss()
+        self.param_service = ParametersFssSs()
         self.param_service.frequency = 10000
         self.param_service.bandwidth = 100
         self.param_service.sat_altitude = 35786000
