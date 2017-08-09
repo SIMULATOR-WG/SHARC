@@ -204,8 +204,8 @@ class StationFactory(object):
         #fss_space_station.y = np.array([0])
         #fss_space_station.height = np.array([param.sat_altitude])
 
-        fss_space_station.azimuth = np.array([0])
-        fss_space_station.elevation = np.array([0])
+        fss_space_station.azimuth = param.azimuth
+        fss_space_station.elevation = param.elevation
 
         fss_space_station.active = np.array([True])
         fss_space_station.rx_interference = -500

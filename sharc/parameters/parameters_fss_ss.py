@@ -32,6 +32,14 @@ class ParametersFssSs(object):
     lat_deg = 0
 
     ###########################################################################
+    # Elevation angle [deg]
+    elevation = 270
+    
+    ###########################################################################
+    # Azimuth angle [deg]
+    azimuth = 0    
+    
+    ###########################################################################
     # System receive noise temperature [K]
     noise_temperature = 950
 
@@ -50,7 +58,7 @@ class ParametersFssSs(object):
     ###########################################################################
     # Satellite antenna pattern in the fixed-satellite service
     # Possible values: "ITU-R S.672-4", "FSS_SS", "OMNI"
-    antenna_pattern = "ITU-R S.672-4"
+    antenna_pattern = "FSS_SS"
 
     # IMT parameters relevant to the satellite system
     imt_altitude = 0   # altitude of IMT system (in meters)
