@@ -16,16 +16,46 @@ class AntennaImtTest(unittest.TestCase):
     def setUp(self):
         #Element parameters
         self.param = ParametersAntennaImt()
-        self.param.bs_tx_element_max_g = 5
-        self.param.bs_tx_element_phi_3db = 80
+        
+        self.param.bs_tx_element_max_g    = 5
+        self.param.bs_tx_element_phi_3db  = 80
         self.param.bs_tx_element_theta_3db = 60
-        self.param.bs_tx_element_am = 30
-        self.param.bs_tx_element_sla_v = 30
-        self.param.ue_rx_element_max_g = 10
-        self.param.ue_rx_element_phi_3db = 75
+        self.param.bs_tx_element_am       = 30
+        self.param.bs_tx_element_sla_v    = 30
+        self.param.bs_tx_n_rows           = 8
+        self.param.bs_tx_n_columns        = 8
+        self.param.bs_tx_element_horiz_spacing = 0.5
+        self.param.bs_tx_element_vert_spacing = 0.5
+        
+        self.param.bs_rx_element_max_g    = 5
+        self.param.bs_rx_element_phi_3db  = 80
+        self.param.bs_rx_element_theta_3db = 60
+        self.param.bs_rx_element_am       = 30
+        self.param.bs_rx_element_sla_v    = 30
+        self.param.bs_rx_n_rows           = 8
+        self.param.bs_rx_n_columns        = 8
+        self.param.bs_rx_element_horiz_spacing = 0.5
+        self.param.bs_rx_element_vert_spacing = 0.5
+        
+        self.param.ue_tx_element_max_g    = 10
+        self.param.ue_tx_element_phi_3db  = 75
+        self.param.ue_tx_element_theta_3db = 65
+        self.param.ue_tx_element_am       = 25
+        self.param.ue_tx_element_sla_v    = 35
+        self.param.ue_tx_n_rows           = 4
+        self.param.ue_tx_n_columns        = 4
+        self.param.ue_tx_element_horiz_spacing = 0.5
+        self.param.ue_tx_element_vert_spacing = 0.5
+        
+        self.param.ue_rx_element_max_g    = 10
+        self.param.ue_rx_element_phi_3db  = 75
         self.param.ue_rx_element_theta_3db = 65
-        self.param.ue_rx_element_am = 25
-        self.param.ue_rx_element_sla_v = 35
+        self.param.ue_rx_element_am       = 25
+        self.param.ue_rx_element_sla_v    = 35
+        self.param.ue_rx_n_rows           = 4
+        self.param.ue_rx_n_columns        = 4
+        self.param.ue_rx_element_horiz_spacing = 0.5
+        self.param.ue_rx_element_vert_spacing = 0.5
         
         # Create antenna IMT objects
         par = self.param.get_antenna_parameters("BS","TX")
