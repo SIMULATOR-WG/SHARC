@@ -9,16 +9,15 @@ from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
 from sharc.topology.topology_hotspot import TopologyHotspot
 from sharc.topology.topology_single_base_station import TopologySingleBaseStation
-from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_hotspot import ParametersHotspot
+from sharc.parameters.parameters import Parameters
 
 class TopologyFactory(object):
     
     @staticmethod
-    def createTopology(param: ParametersImt) -> Topology:
-        if param.topology == "SINGLE_BS":
-            return TopologySingleBaseStation(param.intersite_distance*2/3, param.num_clusters)
-        elif param.topology == "MACROCELL":
-            return TopologyMacrocell(param.intersite_distance, param.num_clusters)
-        elif param.topology == "HOTSPOT":
-            return TopologyHotspot(ParametersHotspot(), param.intersite_distance, param.num_clusters)            
+    def createTopology(parameters: Parameters) -> Topology:
+        if parameters.imt.topology == "SINGLE_BS":
+            return TopologySingleBaseStation(parameters.imt.intersite_distance*2/3, parameters.imt.num_clusters)
+        elif parameters.imt.topology == "MACROCELL":
+            return TopologyMacrocell(parameters.imt.intersite_distance, parameters.imt.num_clusters)
+        elif parameters.imt.topology == "HOTSPOT":
+            return TopologyHotspot(parameters.hotspot, parameters.imt.intersite_distance, parameters.imt.num_clusters)            

@@ -38,8 +38,10 @@ class ThreadSafeScrolledText(tkinter.scrolledtext.ScrolledText):
         try:
             while 1:
                 line = self.__queue.get_nowait()
-                self.insert(tkinter.INSERT, str(line))
+                self.config(state = tkinter.NORMAL)
+                self.insert(tkinter.END, str(line))
                 self.see(tkinter.END)
+                self.config(state = tkinter.DISABLED)
                 self.update_idletasks()
         except queue.Empty:
             pass

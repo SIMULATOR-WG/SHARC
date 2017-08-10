@@ -10,7 +10,7 @@ import sys
 import math
 
 from sharc.support.enumerations import StationType
-from sharc.parameters.parameters_general import ParametersGeneral
+from sharc.parameters.parameters import Parameters
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
@@ -165,13 +165,13 @@ class StationFactory(object):
 
         
     @staticmethod
-    def generate_system(param):
-        if ParametersGeneral().system == "FSS_ES":
-            return StationFactory.generate_fss_earth_station(param)
-        elif ParametersGeneral().system == "FSS_SS":
-            return StationFactory.generate_fss_space_station(param)
+    def generate_system(parameters: Parameters):
+        if parameters.general.system == "FSS_ES":
+            return StationFactory.generate_fss_earth_station(parameters.fss_es)
+        elif parameters.general.system == "FSS_SS":
+            return StationFactory.generate_fss_space_station(parameters.fss_ss)
         else:
-            sys.stderr.write("ERROR\nInvalid system: " + ParametersGeneral().system)
+            sys.stderr.write("ERROR\nInvalid system: " + parameters.general.system)
             sys.exit(1)            
         
         
