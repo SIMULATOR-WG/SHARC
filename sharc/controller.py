@@ -42,7 +42,11 @@ class Controller:
             self.model.set_param_file(kwargs["param_file"])
             self.simulation_thread = ThreadSimulation(self.model)
             self.simulation_thread.start()
-#            self.simulation_thread.run()
+        if action is Action.START_SIMULATION_SINGLE_THREAD:
+            self.model.set_param_file(kwargs["param_file"])
+            self.simulation_thread = ThreadSimulation(self.model)
+            # call run method directly, without starting a new thread
+            self.simulation_thread.run()        
         if action is Action.STOP_SIMULATION:
             if self.simulation_thread.is_alive():
                 self.simulation_thread.stop()
