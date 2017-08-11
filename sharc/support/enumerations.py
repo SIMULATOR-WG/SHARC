@@ -12,7 +12,8 @@ class Action( Enum ):
     The action that is sent to controller in order to control the simulation
     """
     START_SIMULATION = 1
-    STOP_SIMULATION  = 2
+    START_SIMULATION_SINGLE_THREAD = 2
+    STOP_SIMULATION  = 3
     
 class State( Enum ):
     """
