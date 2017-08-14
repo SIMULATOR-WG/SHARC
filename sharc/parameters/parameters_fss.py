@@ -42,17 +42,17 @@ class ParametersFss(object):
     ###########################################################################
     # INR scaling factor (to estimate INR for larger number of interfering stations)
     sat_inr_scaling = 14.95
-    
+
     ###########################################################################
     # Satellite peak reeive antenna gain [dBi]
     sat_rx_antenna_gain = 51
-    
+
     ###########################################################################
     # Satellite antenna pattern in the fixed-satellite service
     sat_rx_antenna_pattern = "ITU-R S.672-4"
 
     # IMT parameters relevant to the satellite system
-    imt_altitude = 0   # altitude of IMT system (in meters)
+    imt_altitude = 1000   # altitude of IMT system (in meters)
     imt_lat_deg = 0   # latitude of IMT system (in degrees)
     imt_long_diff_deg = 0 # difference between longitudes of IMT and satellite system
                              # positive if space-station is to the East of earth-station
@@ -68,23 +68,23 @@ class ParametersFss(object):
     # channel model, possible values are "FSPL" (free-space path loss),
     #                                    "SatelliteSimple" (FSPL + 4 or 24dB (LOS or NLOS)
     #                                    "P619" (ITU-R P.619-1)
-    channel_model = "SatelliteSimple"
+    channel_model = "P619"
     line_of_sight_prob = 1 # probability of line-of-sight between UE and satellite
 
-    surf_water_vapour_density = 7.5 #g/m^3
-    specific_gaseous_att = 0.1 #db/km
+    surf_water_vapour_density = 15 #g/m^3 # actual values can be found in ITU-R P-836
+
     time_ratio = 0.5 #transmission loss not exceeded for time_ratio*100 % of time
 
     ###########################################################################
 
     # The required near-in-side-lobe level (dB) relative to peak gain
     # according to ITU-R S.672-4
-    sat_rx_antenna_l_s = -20    
-    
+    sat_rx_antenna_l_s = -20
+
     ###########################################################################
     # 3 dB beamwidth angle (3 dB below maximum gain) [degrees]
     sat_rx_antenna_3_dB = 0.65
-    
+
     ###########################################################################
     # Constants
     BOLTZMANN_CONSTANT = 1.38064852e-23

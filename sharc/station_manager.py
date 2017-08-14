@@ -107,7 +107,7 @@ class StationManager(object):
             free_space_angle[i] = np.degrees(theta_0)
 
             ##
-            # calculate apparent elevation angle according to Attachment B
+            # calculate apparent elevation angle according to ITU-R P619, Attachment B
 
             tau_fs1 = 1.728 + 0.5411 * theta_0 + 0.03723 * theta_0**2
             tau_fs2 = 0.1815 + 0.06272 * theta_0 + 0.01380 * theta_0**2
@@ -121,17 +121,17 @@ class StationManager(object):
             angle[i] = np.degrees(theta_0 + tau_fs)
 
         return{'free_space': free_space_angle, 'apparent': angle}
-    
+
     def get_pointing_vector_to(self, station) -> tuple:
 
         point_vec_x = station.x- self.x[:,np.newaxis]
         point_vec_y = station.y - self.y[:,np.newaxis]
         point_vec_z = station.height - self.height[:,np.newaxis]
-            
+
         dist = self.get_3d_distance_to(station)
-        
+
         phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
         theta = np.rad2deg(np.arccos(point_vec_z/dist))
-        
+
         return phi, theta
 
