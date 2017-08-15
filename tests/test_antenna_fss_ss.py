@@ -13,7 +13,7 @@ from sharc.parameters.parameters_fss_ss import ParametersFssSs
 import numpy as np
 import numpy.testing as npt
 
-class AntennaFssTest(unittest.TestCase):
+class AntennaFssSsTest(unittest.TestCase):
     
     def setUp(self):
         param = ParametersFssSs()
