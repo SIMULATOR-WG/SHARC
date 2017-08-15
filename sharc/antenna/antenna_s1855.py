@@ -9,6 +9,7 @@ import math
 import numpy as np
 
 from sharc.antenna.antenna import Antenna
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 
 class AntennaS1855(Antenna):
     """"
@@ -25,21 +26,20 @@ class AntennaS1855(Antenna):
         frequency (float): frequency of operation [MHz]
     """
     
-    def __init__(self, params):
+    def __init__(self, params: ParametersFssSs):
         """
         Constructs an AntennaS1855 object.
         
         Parameters
         ---------
-        diameter: diameter of the earth station antenna
-        frequency: operation frequency of the antena of the earth station
-        antenna_gain: peak gain of the antena on the direction of the GSO
+            diameter: diameter of the earth station antenna
+            frequency: operation frequency of the antena of the earth station
+            antenna_gain: peak gain of the antena on the direction of the GSO
         """
         self.diameter = params.diameter
         self.frequency = params.frequency
         self.antenna_gain = params.antenna_gain
-        self.azimuth = params.azimuth
-        self.elevation = params.elevation
+
         
     def calculate_gain(self, *args, **kwargs) -> np.array:        
         """
@@ -47,8 +47,12 @@ class AntennaS1855(Antenna):
         
         Parameters
         ----------
-            phi_vec (numpy.array): list of azimuth angle [degrees]
-            theta_vec (numpy.array) : list of elevation angle [degrees]
+            phi_vec (numpy.array): the off-axis angle between the direction of 
+                interest and the boresight axis [degrees]
+            theta_vec (numpy.array) : the angle between the plane containing 
+                the boresight and the dimension D_GSO, and the plane of interest, 
+                where the plane of interest passes through the boresight and the 
+                direction of interest [degrees]
             
         Returns
         -------
@@ -72,9 +76,12 @@ class AntennaS1855(Antenna):
         
         Parameters
         ----------
-            phi (float): azimuth angle [degrees]
-            theta (float) : elevation angle [degrees]
-            
+            phi_vec (numpy.array): the off-axis angle between the direction of 
+                interest and the boresight axis [degrees]
+            theta_vec (numpy.array) : the angle between the plane containing 
+                the boresight and the dimension D_GSO, and the plane of interest, 
+                where the plane of interest passes through the boresight and the 
+                direction of interest [degrees]
         Returns
         -------
             gain (float): gain value in given direction
@@ -117,3 +124,42 @@ class AntennaS1855(Antenna):
         else:
             gain = 0
         return gain
+        
+        
+if __name__ == '__main__':
+    
+    import matplotlib.pyplot as plt
+    
+    params_fss_ss = ParametersFssSs()
+    params_fss_ss.diameter = 9.1
+    params_fss_ss.frequency = 24250
+    params_fss_ss.antenna_gain = 62
+    
+    antenna = AntennaS1855(params_fss_ss)
+        
+    # Plot radiation pattern for theta = 90 degrees
+    phi_vec = np.linspace(0.01, 180, num = 10000)
+    theta_90 = 90*np.ones(phi_vec.shape)
+    theta = 0*np.ones(phi_vec.shape)
+
+    gain_90 = antenna.calculate_gain(phi_vec = phi_vec, theta_vec = theta_90)
+    gain = antenna.calculate_gain(phi_vec = phi_vec, theta_vec = theta)
+
+    fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')
+    plt.semilogx(phi_vec, gain_90, "-b", label = "$\\theta = 90$ deg")
+    plt.semilogx(phi_vec, gain, "-r", label = "$\\theta = 0$ deg")
+    
+    plt.xlabel("Off-axis angle, $\\varphi$ [deg]")
+    plt.ylabel("Gain [dBi]")
+    plt.title("ITU-R S.1855 Radiation Pattern")     
+    plt.ylim((-15, 65))
+    plt.xlim((0.01, 180))
+    plt.legend(loc="upper right")
+
+    plt.grid()
+    plt.show()        
+    
+#    gain_dir = "/Users/edgar/Desktop/"
+#    file_name = gain_dir + "S1855.png"
+#    plt.savefig(file_name)        
+    
