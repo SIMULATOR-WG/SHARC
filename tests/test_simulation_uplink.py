@@ -130,8 +130,23 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.fss_ss.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param.fss_ss.EARTH_RADIUS = 6371000        
 
+        self.param.fss_es.x = -5000
+        self.param.fss_es.y = 0
+        self.param.fss_es.height = 10
+        self.param.fss_es.elevation = 20
+        self.param.fss_es.azimuth = 0
+        self.param.fss_es.frequency = 10000
+        self.param.fss_es.bandwidth = 100
+        self.param.fss_es.tx_power_density = -60
+        self.param.fss_es.antenna_gain = 50
+        self.param.fss_es.antenna_pattern = "OMNI"
+        self.param.fss_es.channel_model = "FSPL"
+        self.param.fss_es.line_of_sight_prob = 1 
+        self.param.fss_es.BOLTZMANN_CONSTANT = 1.38064852e-23
+        self.param.fss_es.EARTH_RADIUS = 6371000  
         
-    def test_simulation_2bs_4ue(self):
+        
+    def test_simulation_2bs_4ue_ss(self):
         self.param.general.system = "FSS_SS"
 
         self.simulation = SimulationUplink(self.param)
@@ -251,6 +266,99 @@ class SimulationUplinkTest(unittest.TestCase):
                                np.array([ -117.18 - (-88.82) ]),
                                delta=.01)        
         
+
+    def test_simulation_2bs_4ue_es(self):
+        self.param.general.system = "FSS_ES"
+
+        self.simulation = SimulationUplink(self.param)
+        self.simulation.initialize()
+        
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+                                                                       self.param.antenna_imt,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
+                                                            self.param.antenna_imt,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        
+        self.simulation.connect_ue_to_bs()
+        
+        # We do not test the selection method here because in this specific 
+        # scenario we do not want to change the order of the UE's 
+        #self.simulation.select_ue()
+        
+        # test coupling loss method
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        
+        self.simulation.scheduler()
+        bandwidth_per_ue = math.trunc((1 - 0.1)*100/2)       
+        self.simulation.power_control()
+        
+        self.simulation.calculate_sinr()
+        # check BS thermal noise
+        thermal_noise = 10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 7
+        npt.assert_allclose(self.simulation.bs.thermal_noise, 
+                            thermal_noise,
+                            atol=1e-2)
+
+        # check SINR 
+        npt.assert_allclose(self.simulation.bs.sinr[0], 
+                            np.array([-57.47 - (-60.27),  -67.35 - (-63.05)]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.sinr[1], 
+                            np.array([-57.53 - (-75.41),  -46.99 - (-71.67)]),
+                            atol=1e-2)
+
+        self.simulation.system = StationFactory.generate_fss_earth_station(self.param.fss_es)
+        self.simulation.system.x = np.array([-2000])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param.fss_es.height])
+        
+        # coupling loss FSS_ES <-> IMT BS
+        self.simulation.calculate_sinr_ext()
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
+                            np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
+                            atol=1e-2)
+
+        # external interference
+        system_tx_power = -60 + 10*math.log10(bandwidth_per_ue*1e6) + 30
+        npt.assert_allclose(self.simulation.bs.ext_interference[0], 
+                            np.array([system_tx_power - (118.47-50-1) - 3,  system_tx_power - (118.47-50-1) - 3]), 
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.ext_interference[1], 
+                            np.array([system_tx_power - (119.29-50-2) - 3,  system_tx_power - (119.29-50-2) - 3]), 
+                            atol=1e-2)        
+
+        # SINR with external interference
+        interference = 10*np.log10(np.power(10, 0.1*np.array([ -60.27, -63.05, -75.41, -71.67 ])) \
+                                 + np.power(10, 0.1*np.array([ -23.93, -23.93,  -23.757,  -23.757 ])))
+        
+        npt.assert_allclose(self.simulation.bs.sinr_ext[0], 
+                            np.array([-57.47, -67.35]) - interference[[0,1]], 
+                            atol=1e-2)       
+        npt.assert_allclose(self.simulation.bs.sinr_ext[1], 
+                    np.array([-57.53, -46.99]) - interference[[2,3]], 
+                    atol=1e-2)
+        
+        # INR
+        npt.assert_allclose(self.simulation.bs.inr[0], 
+                            interference[[0,1]] - thermal_noise, 
+                            atol=1e-2)       
+        npt.assert_allclose(self.simulation.bs.inr[1], 
+                            interference[[2,3]] - thermal_noise, 
+                            atol=1e-2)          
+
         
     def test_beamforming_gains(self):
         self.param.general.system = "FSS_SS"

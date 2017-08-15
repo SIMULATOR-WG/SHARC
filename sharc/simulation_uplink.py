@@ -155,6 +155,7 @@ class SimulationUplink(Simulation):
 
             self.bs.sinr_ext[bs] = self.bs.rx_power[bs] \
                 - (10*np.log10(np.power(10, 0.1*self.bs.total_interference[bs]) + np.power(10, 0.1*self.bs.ext_interference[bs])))
+            self.bs.inr[bs] = self.bs.ext_interference[bs] - self.bs.thermal_noise[bs]
 
 
     def calculate_external_interference(self):
@@ -215,6 +216,7 @@ class SimulationUplink(Simulation):
                                                       self.parameters.imt.ul_attenuation_factor)
                 self.results.imt_ul_tput_ext.extend(tput_ext.tolist())  
                 self.results.imt_ul_sinr_ext.extend(self.bs.sinr_ext[bs].tolist())
+                self.results.imt_ul_inr.extend(self.bs.inr[bs].tolist())
                 
                 active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
