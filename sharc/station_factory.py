@@ -16,9 +16,10 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.station_manager import StationManager
+from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_s672 import AntennaS672
-from sharc.antenna.antenna_fss_ss import AntennaFssSs
+from sharc.antenna.antenna_s1528 import AntennaS1528
 from sharc.antenna.antenna_s1855 import AntennaS1855
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
@@ -214,6 +215,8 @@ class StationFactory(object):
             fss_space_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
         elif param.antenna_pattern == "ITU-R S.672-4":
             fss_space_station.antenna = np.array([AntennaS672(param)])
+        elif param.antenna_pattern == "ITU-R S.1528-0":
+            fss_space_station.antenna = np.array([AntennaS1528(param)])            
         elif param.antenna_pattern == "FSS_SS":
             fss_space_station.antenna = np.array([AntennaFssSs(param)])            
         else:
