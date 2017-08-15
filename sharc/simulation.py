@@ -270,7 +270,8 @@ class Simulation(ABC, Observable):
         
         gains = np.zeros(phi.shape)
         
-        if station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS:
+        if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES):
             for k in station_1_active:
                 for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
