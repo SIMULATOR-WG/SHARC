@@ -145,7 +145,7 @@ class View(tkinter.Tk, Observer):
 
     def __plot_results(self, results: Results):
         file_extension = ".png"
-        transparent_figure = True
+        transparent_figure = False
         
         for plot in results.plot_list:
             plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')

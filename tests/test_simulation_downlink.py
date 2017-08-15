@@ -283,6 +283,14 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.scheduler()
         self.simulation.power_control()
         self.simulation.calculate_sinr()
+        
+        # check UE thermal noise
+        bandwidth_per_ue = math.trunc((1 - 0.1)*100/2) 
+        thermal_noise = 10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9
+        npt.assert_allclose(self.simulation.ue.thermal_noise, 
+                            thermal_noise,
+                            atol=1e-2)
+        
         # check SINR
         npt.assert_allclose(self.simulation.ue.sinr, 
                             np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
@@ -298,8 +306,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]), 
                             atol=1e-2)
 
-        bw = 100*1e6*0.9/2
-        system_tx_power = -60 + 10*math.log10(bw) + 30
+        system_tx_power = -60 + 10*math.log10(bandwidth_per_ue*1e6) + 30
         npt.assert_allclose(self.simulation.ue.ext_interference, 
                             np.array([system_tx_power - (118.55-50-10) - 7,  system_tx_power - (118.76-50-11) - 7,  system_tx_power - (118.93-50-22) - 7,  system_tx_power - (119.17-50-23) - 7]), 
                             atol=1e-2)
@@ -309,6 +316,10 @@ class SimulationDownlinkTest(unittest.TestCase):
         
         npt.assert_allclose(self.simulation.ue.sinr_ext, 
                             np.array([-70.48, -80.36, -70.54, -60.00]) - interference, 
+                            atol=1e-2)       
+        
+        npt.assert_allclose(self.simulation.ue.inr, 
+                            interference - thermal_noise, 
                             atol=1e-2)       
         
         
