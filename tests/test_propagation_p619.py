@@ -17,7 +17,7 @@ class TestPropagationP619(unittest.TestCase):
     def setUp(self):
         self.p619 = PropagationP619()
 
-    def test_specific_attenuation(self, plotFlag = False):
+    def test_specific_attenuation(self, plot_flag = False):
         temperature = 15 + 273.15 # K
         vapour_density = 7.5 # g/m**3
         pressure_hPa = 1013.25
@@ -37,7 +37,7 @@ class TestPropagationP619(unittest.TestCase):
         npt.assert_array_less(specific_att_p676_lower, specific_att)
         npt.assert_array_less(specific_att, specific_att_p676_upper)
 
-        if plotFlag:
+        if plot_flag:
             # generate plot
             f_GHz_vec = range(1,1000)
             specific_att = np.zeros(len(f_GHz_vec))
@@ -51,8 +51,9 @@ class TestPropagationP619(unittest.TestCase):
             plt.semilogy( f_GHz_vec, specific_att )
             plt.xlabel('frequency(GHz)')
             plt.xlabel('Specific attenuation (dB/km)')
+            plt.title("Atmospheric Specific Attenuation")
 
-    def test_atmospheric_gasses_loss (self, plotFlag = False):
+    def test_atmospheric_gasses_loss (self, plot_flag = False):
         # compare with benchmark from ITU-R P-619 Fig. 3
         frequency_MHz = 30000.
         sat_params = ParametersFss()
@@ -74,7 +75,7 @@ class TestPropagationP619(unittest.TestCase):
             self.assertLessEqual(loss_lower, loss)
             self.assertGreaterEqual(loss_upper, loss)
 
-        if plotFlag:
+        if plot_flag:
             apparent_elevation = range(-1, 90, 2)
             loss_2_5 = np.zeros(len(apparent_elevation))
             loss_12_5 = np.zeros(len(apparent_elevation))
@@ -97,7 +98,57 @@ class TestPropagationP619(unittest.TestCase):
 
             plt.xlabel("apparent elevation (deg)")
             plt.ylabel("Loss (dB)")
+            plt.title("Atmospheric Gasses Attenuation")
             plt.legend()
+
+    def test_beam_spreading_attenuation(self, plot_flag=False):
+        # compare with benchmark from ITU-R P-619 Fig. 7
+
+        altitude_vec = np.array([0,1,2,3,4,6]) * 1000
+        elevation_vec = [0,.5,1,2,3,5]
+        att_lower_vec = [.8, .6 , .4, .2, .1, .05]
+        att_upper_vec = [.9, .7, .5, .3, .2, .1]
+        earth_to_space_vec = [True, False, True, False, True, False]
+
+        for altitude, elevation, lower, upper, earth_to_space in zip(altitude_vec,
+                                                                     elevation_vec,
+                                                                     att_lower_vec,
+                                                                     att_upper_vec,
+                                                                     earth_to_space_vec):
+
+            attenuation = self.p619._get_beam_spreading_att(elevation, altitude, earth_to_space)
+            self.assertLessEqual(lower, abs(attenuation))
+            self.assertGreaterEqual(upper, abs(attenuation))
+
+            if earth_to_space:
+                self.assertGreater(attenuation, 0)
+            else:
+                self.assertLess(attenuation, 0)
+
+        earth_to_space = False
+
+        if plot_flag:
+            altitude_vec = np.arange(0, 6.1, .5) * 1000
+            elevation_vec = np.array([0, .5, 1, 2, 3, 5])
+            attenuation = np.empty([len(altitude_vec), len(elevation_vec)])
+
+            plt.figure()
+            for index in range(len(altitude_vec)):
+                attenuation[index, :] = self.p619._get_beam_spreading_att(elevation_vec,
+                                                                          altitude_vec[index],
+                                                                          earth_to_space)
+
+            handles = plt.plot( altitude_vec / 1000, np.abs(attenuation))
+            plt.xlabel("altitude (km)")
+            plt.ylabel("Attenuation (dB)")
+            plt.title("Beam Spreading Attenuation")
+
+            for line_handle, elevation in zip(handles, elevation_vec):
+                line_handle.set_label("{}deg".format(elevation))
+
+            plt.legend(title="Elevation")
+
+            plt.grid(True)
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
 from sharc.support.enumerations import StationType
 
+
 class PropagationP619(Propagation):
     """
     Implements the earth-to-space channel model from ITU-R P.619
@@ -257,6 +258,37 @@ class PropagationP619(Propagation):
 
         return a_acc
 
+    @staticmethod
+    def _get_beam_spreading_att(elevation, altitude, earth_to_space) -> np.array:
+        """
+        Calculates beam spreading attenuation based on ITU-R P.619, Section 2.4.2
+
+        Parameters
+        ----------
+            elevation (np.array) : free space elevation (degrees)
+            altitude (float) : altitude of earth station (m)
+            earth_to_space (bool) : True if earth-to-space link
+
+        Returns
+        -------
+            attenuation (np.array): attenuation (dB) with dimensions equal to "elevation"
+        """
+
+        altitude_km = altitude / 1000
+
+        numerator = .5411 + .07446 * elevation + altitude_km * (.06272 + .0276 * elevation) \
+                    + altitude_km ** 2 * .008288
+        denominator = (1.728 + .5411 * elevation + .03723 * elevation **2 +
+                       altitude_km * (.1815 + .06272 * elevation + .0138 * elevation ** 2) +
+                       (altitude_km ** 2) * (.01727 + .008288 * elevation))**2
+
+        attenuation = 10 * np.log10(1 - numerator/denominator)
+
+        if earth_to_space:
+            attenuation = -attenuation
+
+        return attenuation
+
     def get_loss(self, *args, **kwargs) -> np.array:
         """
         Calculates path loss for earth-space link
@@ -283,6 +315,7 @@ class PropagationP619(Propagation):
         indoor_stations = kwargs["indoor_stations"]
         elevation = kwargs["elevation"]
         sat_params = kwargs["sat_params"]
+        earth_to_space = kwargs["earth_to_space"]
 
         free_space_loss = self.free_space.get_loss(distance_3D=d,
                                                    frequency=f)
@@ -299,9 +332,11 @@ class PropagationP619(Propagation):
 
         atmospheric_gasses_loss = self._get_atmospheric_gasses_loss(freq_set, np.mean(elevation["apparent"]),
                                                                     sat_params)
+        beam_spreading_attenuation = self._get_beam_spreading_att(elevation["free_space"],
+                                                                  sat_params.imt_altitude,
+                                                                  earth_to_space)
 
-        loss = (free_space_loss + clutter_loss + building_loss +
-                self.polarization_loss + atmospheric_gasses_loss +
-                atmospheric_gasses_loss)
+        loss = (free_space_loss + clutter_loss + building_loss + self.polarization_loss +
+                atmospheric_gasses_loss + beam_spreading_attenuation + atmospheric_gasses_loss)
 
         return loss
