@@ -156,7 +156,6 @@ class Parameters(object):
         self.fss_ss.elevation               = config.getfloat("FSS_SS", "elevation")
         self.fss_ss.azimuth                 = config.getfloat("FSS_SS", "azimuth")    
         self.fss_ss.noise_temperature       = config.getfloat("FSS_SS", "noise_temperature")
-        self.fss_ss.interference_noise_ratio = config.getfloat("FSS_SS", "interference_noise_ratio")
         self.fss_ss.inr_scaling             = config.getfloat("FSS_SS", "inr_scaling")
         self.fss_ss.antenna_gain            = config.getfloat("FSS_SS", "antenna_gain")
         self.fss_ss.antenna_pattern         = config.get("FSS_SS", "antenna_pattern")
