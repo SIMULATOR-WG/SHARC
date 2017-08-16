@@ -12,6 +12,7 @@ from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_close_in import PropagationCloseIn
 from sharc.propagation.propagation_p619 import PropagationP619
 from sharc.propagation.propagation_sat_simple import PropagationSatSimple
+from sharc.propagation.propagation_ter_simple import PropagationTerSimple
 from sharc.propagation.propagation_uma import PropagationUMa
 from sharc.propagation.propagation_umi import PropagationUMi
 from sharc.propagation.propagation_abg import PropagationABG
@@ -32,6 +33,8 @@ class PropagationFactory(object):
             return PropagationCloseIn()
         elif channel_model == "SatelliteSimple":
             return PropagationSatSimple()
+        elif channel_model == "TerrestrialSimple":
+            return PropagationTerSimple()
         elif channel_model == "P619":
             return PropagationP619()
         else:

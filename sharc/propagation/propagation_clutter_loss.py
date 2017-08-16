@@ -60,12 +60,18 @@ class PropagationClutterLoss(Propagation):
             else:
                 d = kwargs["distance_3D"]            
             
-            Lt = 23.5 + 9.6*np.log10(f*1e-3)
-            Ls = 32.98 + 23.9*np.log10(d*1e-3) + 3*np.log10(f*1e-3)
+            # minimum path length for the correction to be applied at only one end of the path
+            idx = np.where(d > 250)[0]
+
+            Lt = 23.5 + 9.6*np.log10(f[idx]*1e-3)
+            Ls = 32.98 + 23.9*np.log10(d[idx]*1e-3) + 3*np.log10(f[idx]*1e-3)
             
             Q = np.sqrt(2)*scipy.special.erfcinv(2*(p))
 
-            Lctt = -5*np.log10(10**(-0.2*Lt)+ 10**(-0.2*Ls)) - 6*Q 
+            loss = -5*np.log10(10**(-0.2*Lt)+ 10**(-0.2*Ls)) - 6*Q 
+
+            Lctt = np.zeros(d.shape)
+            Lctt[idx] = loss
  
         else:
             # Clutter Loss item 3.3 
