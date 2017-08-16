@@ -114,7 +114,6 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.fss_ss.azimuth = 0
         self.param.fss_ss.elevation = 270
         self.param.fss_ss.noise_temperature = 950
-        self.param.fss_ss.interference_noise_ratio = -12.2
         self.param.fss_ss.antenna_gain = 51
         self.param.fss_ss.antenna_pattern = "OMNI"
         self.param.fss_ss.imt_altitude = 1000

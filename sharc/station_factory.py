@@ -214,9 +214,9 @@ class StationFactory(object):
         
         if param.antenna_pattern == "OMNI":
             fss_space_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
-        elif param.antenna_pattern == "ITU-R S.672-4":
+        elif param.antenna_pattern == "ITU-R S.672":
             fss_space_station.antenna = np.array([AntennaS672(param)])
-        elif param.antenna_pattern == "ITU-R S.1528-0":
+        elif param.antenna_pattern == "ITU-R S.1528":
             fss_space_station.antenna = np.array([AntennaS1528(param)])            
         elif param.antenna_pattern == "FSS_SS":
             fss_space_station.antenna = np.array([AntennaFssSs(param)])            
