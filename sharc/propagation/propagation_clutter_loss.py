@@ -50,7 +50,7 @@ class PropagationClutterLoss(Propagation):
         if loc_per == "RANDOM":
             p = np.random.random(f.shape)
         else:
-            p = loc_per
+            p = loc_per*np.ones(f.shape)
 
         if type is StationType.IMT_BS or type is StationType.IMT_UE or type is StationType.FSS_ES:
             # Clutter Loss item 3.2 
@@ -62,16 +62,19 @@ class PropagationClutterLoss(Propagation):
             
             # minimum path length for the correction to be applied at only one end of the path
             idx = np.where(d > 250)[0]
-
-            Lt = 23.5 + 9.6*np.log10(f[idx]*1e-3)
-            Ls = 32.98 + 23.9*np.log10(d[idx]*1e-3) + 3*np.log10(f[idx]*1e-3)
             
-            Q = np.sqrt(2)*scipy.special.erfcinv(2*(p))
-
-            loss = -5*np.log10(10**(-0.2*Lt)+ 10**(-0.2*Ls)) - 6*Q 
-
-            Lctt = np.zeros(d.shape)
-            Lctt[idx] = loss
+            if len(idx):
+                Lt = 23.5 + 9.6*np.log10(f[idx]*1e-3)
+                Ls = 32.98 + 23.9*np.log10(d[idx]*1e-3) + 3*np.log10(f[idx]*1e-3)
+                
+                Q = np.sqrt(2)*scipy.special.erfcinv(2*(p[idx]))
+    
+                loss = -5*np.log10(10**(-0.2*Lt)+ 10**(-0.2*Ls)) - 6*Q 
+    
+                Lctt = np.zeros(d.shape)
+                Lctt[idx] = loss
+            else:
+                Lctt = np.zeros(d.shape)
  
         else:
             # Clutter Loss item 3.3 
@@ -136,7 +139,7 @@ if __name__ == '__main__':
     clutter_loss_ter = np.empty([len(frequency), len(distance)])
     
     for i in range(len(frequency)):
-            clutter_loss_ter[i,:] = cl.get_loss(frequency = frequency[i],
+            clutter_loss_ter[i,:] = cl.get_loss(frequency = frequency[i] * np.ones(distance.shape),
                                             distance_2D = distance,
                                             loc_percentage = 0.5,
                                             station_type = StationType.FSS_ES)           
