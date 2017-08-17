@@ -26,7 +26,11 @@ class PropagationTerSimple(Propagation):
 
         
     def get_loss(self, *args, **kwargs) -> np.array:
-        d = kwargs["distance_2D"]
+        if "distance_2D" in kwargs:
+            d = kwargs["distance_2D"]
+        else:
+            d = kwargs["distance_3D"]
+
         f = kwargs["frequency"]
         p = kwargs["loc_percentage"]
         indoor_stations = kwargs["indoor_stations"]
