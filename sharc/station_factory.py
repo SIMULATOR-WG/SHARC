@@ -210,6 +210,7 @@ class StationFactory(object):
         fss_space_station.elevation = param.elevation
 
         fss_space_station.active = np.array([True])
+        fss_space_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
         fss_space_station.rx_interference = -500
         
         if param.antenna_pattern == "OMNI":
@@ -246,6 +247,7 @@ class StationFactory(object):
 
         fss_earth_station.active = np.array([True])
         fss_earth_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
+        fss_earth_station.rx_interference = -500
         
         if param.antenna_pattern == "OMNI":
             fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])

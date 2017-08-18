@@ -169,7 +169,7 @@ class SimulationDownlink(Simulation):
                                 + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth)
                                 
             self.system.rx_interference = 10*math.log10( \
-                    np.power(10, 0.1*self.system.rx_interference) + np.sum(np.power(10, 0.1*interference)))
+                    math.pow(10, 0.1*self.system.rx_interference) + np.sum(np.power(10, 0.1*interference)))
 
         # calculate N
         self.system.thermal_noise = \
