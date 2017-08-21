@@ -18,6 +18,7 @@ class Results(object):
         self.imt_ul_sinr_ext = list()
         self.imt_ul_sinr = list()
         self.imt_ul_snr = list()
+        self.imt_ul_inr = list()
         self.imt_ul_tput_ext = list()
         self.imt_ul_tput = list()
 
@@ -34,6 +35,7 @@ class Results(object):
         self.imt_dl_sinr_ext = list()
         self.imt_dl_sinr = list()
         self.imt_dl_snr = list()
+        self.imt_dl_inr = list()
         self.imt_dl_tput_ext = list()
         self.imt_dl_tput = list()
         
@@ -157,6 +159,18 @@ class Results(object):
             x_limits = (-15, 20)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_ul_inr) > 0:
+            values, base = np.histogram(self.imt_ul_inr, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of UL interference-to-noise ratio"
+            x_label = "$I/N$ [dB]"
+            y_label = "Probability of $I/N$ < $X$"
+            file_name = title
+            #x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_ul_tput_ext) > 0:
             values, base = np.histogram(self.imt_ul_tput_ext, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -250,6 +264,18 @@ class Results(object):
             x_limits = (-20, 80)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_dl_inr) > 0:
+            values, base = np.histogram(self.imt_dl_inr, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of DL interference-to-noise ratio"
+            x_label = "$I/N$ [dB]"
+            y_label = "Probability of $I/N$ < $X$"
+            file_name = title
+            #x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_dl_tput_ext) > 0:
             values, base = np.histogram(self.imt_dl_tput_ext, bins=n_bins)
             cumulative = np.cumsum(values)

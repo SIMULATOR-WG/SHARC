@@ -5,6 +5,7 @@ Created on Tue May 16 16:59:40 2017
 @author: edgar
 """
 
+import sys
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -30,6 +31,9 @@ class TopologyHotspot(Topology):
 
     # Posible values for base station elevation [degrees]
     ELEVATION = -10 
+    
+    # Maximum number of tentatives when creating hotspots and checking if they overlap
+    MAX_NUM_LOOPS = 1000
     
     def __init__(self, param: ParametersHotspot, intersite_distance: float, num_clusters: int):
         """
@@ -66,6 +70,7 @@ class TopologyHotspot(Topology):
             macro_cell_y = cell_y + self.macrocell.intersite_distance/3*math.sin(math.radians(cell_azimuth))
             # generate hotspots center coordinates
             hotspots_validated = False
+            num_loops = 0
             while(not hotspots_validated):
                 # Hotspots are generated inside an inscribed circle of a regular hexagon (sector).
                 # The backoff factor (1.0) controls the overlapping rate between hotspots
@@ -87,6 +92,10 @@ class TopologyHotspot(Topology):
                                                                             self.macrocell.x, 
                                                                             self.macrocell.y, 
                                                                             self.param.min_dist_bs_hotspot)
+                num_loops = num_loops + 1
+                if num_loops > TopologyHotspot.MAX_NUM_LOOPS:
+                    sys.stderr.write("ERROR\nInfinite loop while creating hotspots.\nTry less hotspots per cell or greater macro cell intersite distance.\n")
+                    sys.exit(1)
             x = np.concatenate([x, hotspot_x])
             y = np.concatenate([y, hotspot_y])   
             azimuth = np.concatenate([azimuth, hotspot_azimuth])   

@@ -57,7 +57,7 @@ class ThreadSimulation(Thread):
         # calculates simulation time when it finishes and sets the elapsed time
         end = time.perf_counter()
         elapsed_time = time.gmtime(end - start)
-        self.model.set_elapsed_time(time.strftime("%M min %S seg", elapsed_time))
+        self.model.set_elapsed_time(time.strftime("%H h %M min %S seg", elapsed_time))
         
         
         

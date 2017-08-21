@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 17 15:47:05 2017
+Created on Thu Apr 13 13:16:02 2017
 
 @author: edgar
 """
 
-class ParametersHotspot(object):
+class ParametersFssSs(object):
 
     def __init__(self):
         pass

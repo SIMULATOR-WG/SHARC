@@ -18,26 +18,27 @@ import matplotlib.pyplot as plt
 from sharc.support.enumerations import StationType
 from sharc.topology.topology_factory import TopologyFactory
 from sharc.propagation.propagation_factory import PropagationFactory
-from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.parameters.parameters_fss import ParametersFss
+from sharc.parameters.parameters import Parameters
 from sharc.propagation.propagation import Propagation
 from sharc.station_manager import StationManager
 from sharc.results import Results
 
 class Simulation(ABC, Observable):
 
-    def __init__(self, param_imt: ParametersImt, param_system: ParametersFss, param_ant: ParametersAntennaImt):
+    def __init__(self, parameters: Parameters):
         ABC.__init__(self)
         Observable.__init__(self)
 
-        self.param_imt = param_imt
-        self.param_system = param_system
-        self.param_imt_antenna = param_ant
+        self.parameters = parameters
 
-        self.topology = TopologyFactory.createTopology(self.param_imt)
+        if self.parameters.general.system == "FSS_SS":
+            self.param_system = self.parameters.fss_ss
+        if self.parameters.general.system == "FSS_ES":
+            self.param_system = self.parameters.fss_es
 
-        self.propagation_imt = PropagationFactory.createPropagation(self.param_imt.channel_model)
+        self.topology = TopologyFactory.createTopology(self.parameters)
+
+        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)
         self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
 
         self.bs_power_gain = 0
@@ -68,16 +69,21 @@ class Simulation(ABC, Observable):
         self.results = None
 
 
+    def add_observer_list(self, observers: list):
+        for o in observers:
+            self.add_observer(o)
+
+
     def initialize(self, *args, **kwargs):
         """
         This method is executed only once to initialize the simulation variables.
         """
         self.topology.calculate_coordinates()
         num_bs = self.topology.num_base_stations
-        num_ue = num_bs*self.param_imt.ue_k*self.param_imt.ue_k_m
+        num_ue = num_bs*self.parameters.imt.ue_k*self.parameters.imt.ue_k_m
 
-        self.bs_power_gain = 10*math.log10(self.param_imt_antenna.bs_tx_n_rows*self.param_imt_antenna.bs_tx_n_columns)
-        self.ue_power_gain = 10*math.log10(self.param_imt_antenna.ue_tx_n_rows*self.param_imt_antenna.ue_tx_n_columns)
+        self.bs_power_gain = 10*math.log10(self.parameters.antenna_imt.bs_tx_n_rows*self.parameters.antenna_imt.bs_tx_n_columns)
+        self.ue_power_gain = 10*math.log10(self.parameters.antenna_imt.ue_tx_n_rows*self.parameters.antenna_imt.ue_tx_n_columns)
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
         self.path_loss_imt = np.empty([num_bs, num_ue])
@@ -98,10 +104,10 @@ class Simulation(ABC, Observable):
         self.link = dict([(bs,list()) for bs in range(num_bs)])
 
         # calculates the number of RB per BS
-        self.num_rb_per_bs = math.trunc((1-self.param_imt.guard_band_ratio)* \
-                            self.param_imt.bandwidth /self.param_imt.rb_bandwidth)
+        self.num_rb_per_bs = math.trunc((1-self.parameters.imt.guard_band_ratio)* \
+                            self.parameters.imt.bandwidth /self.parameters.imt.rb_bandwidth)
         # calculates the number of RB per UE on a given BS
-        self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.param_imt.ue_k)
+        self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.parameters.imt.ue_k)
 
         self.results = Results()
 
@@ -121,15 +127,19 @@ class Simulation(ABC, Observable):
         """
         Calculates the path coupling loss from each station_a to all station_b.
         Result is returned as a numpy array with dimensions num_a x num_b
-        TODO: calculate coupling loss between active stations only
+        TODO: calculate coupling loss between activa stations only
         """
         # Calculate distance from transmitters to receivers. The result is a
         # num_bs x num_ue array
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
 
-        if station_a.station_type is StationType.FSS_SS:
+        if station_a.station_type is StationType.FSS_SS :
             elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
+        else:
+            elevation_angles = None
+
+        if station_a.station_type is StationType.FSS_SS or station_a.station_type is StationType.FSS_ES:
 
             if station_b.station_type is StationType.IMT_UE:
                 # define antenna gains
@@ -137,32 +147,30 @@ class Simulation(ABC, Observable):
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a))
             else:
                 # define antenna gains
-                gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.param_imt.ue_k, 1)
+                gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.parameters.imt.ue_k, 1)
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a))
 
             path_loss = propagation.get_loss(distance_3D=d_3D,
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles,
-                                             loc_percentage="RANDOM",
                                              sat_params = self.param_system,
-                                             earth_to_space = True,
-                                             single_entry = False,
-                                             line_of_sight_prob=self.param_system.line_of_sight_prob,
-                                             earth_station_antenna_gain = gain_b)
+                                             earth_to_space = False,
+                                             earth_station_antenna_gain=gain_b,
+                                             single_entry=True)
 
-            if not (station_b.station_type is StationType.IMT_UE):
-                path_loss = np.repeat(path_loss, self.param_imt.ue_k, 1)
+            if station_b.station_type is StationType.IMT_UE:
+                path_loss = np.repeat(path_loss, self.parameters.imt.ue_k, 1)
 
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D,
                                              distance_2D=d_2D,
-                                             frequency=self.param_imt.frequency*np.ones(d_2D.shape),
+                                             frequency=self.parameters.imt.frequency*np.ones(d_2D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              bs_height=station_a.height,
                                              ue_height=station_b.height,
-                                             shadowing=self.param_imt.shadowing,
-                                             line_of_sight_prob=self.param_imt.line_of_sight_prob)
+                                             shadowing=self.parameters.imt.shadowing,
+                                             line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
             # define antenna gains
             gain_a = self.calculate_gains(station_a, station_b)
             gain_b = np.transpose(self.calculate_gains(station_b, station_a))
@@ -191,7 +199,7 @@ class Simulation(ABC, Observable):
         user equipments are distributed and pointed to a certain base station
         according to the decisions taken at TG 5/1 meeting
         """
-        num_ue_per_bs = self.param_imt.ue_k*self.param_imt.ue_k_m
+        num_ue_per_bs = self.parameters.imt.ue_k*self.parameters.imt.ue_k_m
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue_list = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]
@@ -210,7 +218,7 @@ class Simulation(ABC, Observable):
         for bs in bs_active:
             # select K UE's among the ones that are connected to BS
             random.shuffle(self.link[bs])
-            K = self.param_imt.ue_k
+            K = self.parameters.imt.ue_k
             del self.link[bs][K:]
             # Activate the selected UE's and create beams
             if self.bs.active[bs]:
@@ -234,8 +242,8 @@ class Simulation(ABC, Observable):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
-            self.bs.bandwidth[bs] = self.num_rb_per_ue*self.param_imt.rb_bandwidth
-            self.ue.bandwidth[ue] = self.num_rb_per_ue*self.param_imt.rb_bandwidth
+            self.bs.bandwidth[bs] = self.num_rb_per_ue*self.parameters.imt.rb_bandwidth
+            self.ue.bandwidth[ue] = self.num_rb_per_ue*self.parameters.imt.rb_bandwidth
 
 
 
@@ -254,10 +262,10 @@ class Simulation(ABC, Observable):
         if(station_1.station_type is StationType.IMT_BS):
             if(station_2.station_type is StationType.IMT_UE):
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
-            elif(station_2.station_type is StationType.FSS_SS):
-                phi = np.repeat(phi,self.param_imt.ue_k,0)
-                theta = np.repeat(theta,self.param_imt.ue_k,0)
-                beams_idx = np.tile(np.arange(self.param_imt.ue_k),self.bs.num_stations)
+            elif(station_2.station_type is StationType.FSS_SS or station_2.station_type is StationType.FSS_ES):
+                phi = np.repeat(phi,self.parameters.imt.ue_k,0)
+                theta = np.repeat(theta,self.parameters.imt.ue_k,0)
+                beams_idx = np.tile(np.arange(self.parameters.imt.ue_k),self.bs.num_stations)
 
         elif(station_1.station_type is StationType.IMT_UE):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
@@ -267,13 +275,23 @@ class Simulation(ABC, Observable):
 
         gains = np.zeros(phi.shape)
 
-        if(station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS):
+        if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES):
             for k in station_1_active:
-                for b in range(k*self.param_imt.ue_k,(k+1)*self.param_imt.ue_k):
+                for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]))
-        else:
+        elif station_1.station_type is StationType.FSS_ES:
+            phi = station_1.get_off_axis_angle(station_2)
+            distance = station_1.get_distance_to(station_2)
+            theta = station_1.elevation - np.arctan(np.degrees((station_1.height - station_2.height)/distance))
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active],
+                                                                            theta_vec=theta[0,station_2_active])
+        elif station_1.station_type is StationType.FSS_SS:
+            phi = station_1.get_off_axis_angle(station_2)
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active])
+        else: # for IMT <-> IMT
             for k in station_1_active:
                 gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
                                                                             theta_vec=theta[k,station_2_active],

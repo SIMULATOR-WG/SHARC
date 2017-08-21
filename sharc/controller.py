@@ -24,9 +24,9 @@ class Controller:
         self.model = model
 
     def get_model(self):
-        return self.__model
+        return self.model
         
-    def action(self, *args):
+    def action(self, *args, **kwargs):
         """
         Receives the user action that is captured by view and maps it to the 
         appropriate action. Currently, the only supported actions are the ones
@@ -36,11 +36,18 @@ class Controller:
         ----------
             Action: this non-keyworded argument indicates the action to be taken
         """
-        if Action.START_SIMULATION in args:
+        action = kwargs["action"]
+        
+        if action is Action.START_SIMULATION:
+            self.model.set_param_file(kwargs["param_file"])
             self.simulation_thread = ThreadSimulation(self.model)
             self.simulation_thread.start()
-#            self.simulation_thread.run()
-        if Action.STOP_SIMULATION in args:
+        if action is Action.START_SIMULATION_SINGLE_THREAD:
+            self.model.set_param_file(kwargs["param_file"])
+            self.simulation_thread = ThreadSimulation(self.model)
+            # call run method directly, without starting a new thread
+            self.simulation_thread.run()        
+        if action is Action.STOP_SIMULATION:
             if self.simulation_thread.is_alive():
                 self.simulation_thread.stop()
                 

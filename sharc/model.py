@@ -6,15 +6,11 @@ Created on Mon Dec 26 17:03:51 2016
 """
 
 from sharc.support.observable import Observable
-#from support.observer import Observer
+from support.observer import Observer
 from sharc.support.enumerations import State
 from sharc.simulation_downlink import SimulationDownlink
 from sharc.simulation_uplink import SimulationUplink
-from sharc.parameters.parameters_general import ParametersGeneral
-from sharc.parameters.parameters_imt import ParametersImt
-from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.parameters.parameters_fss import ParametersFss
-from sharc.parameters.parameters_fss_es import ParametersFssEs
+from sharc.parameters.parameters import Parameters
 
 class Model(Observable):
     """
@@ -24,29 +20,65 @@ class Model(Observable):
     
     def __init__(self):
         super(Model, self).__init__()
-        if ParametersGeneral.system == "FSS-SS":
-            param_system = ParametersFss()
-        if ParametersGeneral.system == "FSS-ES":
-            param_system = ParametersFssEs()
+        self.simulation = None
+        self.parameters = None
+        self.param_file = None
         
-        if ParametersGeneral.imt_link == "DOWNLINK":
-            self.simulation = SimulationDownlink(ParametersImt(), param_system, ParametersAntennaImt())
-        else:
-            self.simulation = SimulationUplink(ParametersImt(), param_system, ParametersAntennaImt())
 
-    def add_observer(self, observer):
+    def add_observer(self, observer: Observer):
         Observable.add_observer(self, observer)
-        self.simulation.add_observer(observer)
+        
+        
+    def set_param_file(self, param_file):
+        self.param_file = param_file
+        self.notify_observers(source = __name__,
+                              message = "Loading file:\n" + self.param_file)
+        
         
     def initialize(self):
         """
-        Initializes the simulation and performs all pre-simulation tasks
+        Initializes the simulation and performs all pre-simulation tasks, such 
+        as loading parameters.
         """
+        self.parameters = Parameters()
+        self.parameters.set_file_name(self.param_file)
+        self.parameters.read_params()
+        
+        if self.parameters.general.imt_link == "DOWNLINK":
+            self.simulation = SimulationDownlink(self.parameters)
+        else:
+            self.simulation = SimulationUplink(self.parameters)
+        self.simulation.add_observer_list(self.observers)
+
+        description = self.get_description()
+            
         self.notify_observers(source=__name__,
-                              message="Simulation is running...",
+                              message=description + "\nSimulation is running...",
                               state=State.RUNNING )
         self.current_snapshot = 0
         self.simulation.initialize()
+        
+        
+    def get_description(self) -> str:
+        if self.parameters.general.system == "FSS_SS":
+            param_system = self.parameters.fss_ss
+        if self.parameters.general.system == "FSS_ES":
+            param_system = self.parameters.fss_es        
+        
+        description = "\nIMT:\n" \
+                            + "\tinterfered with: {:s}\n".format(str(self.parameters.imt.interfered_with)) \
+                            + "\tdirection: {:s}\n".format(self.parameters.general.imt_link) \
+                            + "\tfrequency: {:.3f} GHz\n".format(self.parameters.imt.frequency*1e-3) \
+                            + "\tbandwidth: {:.0f} MHz\n".format(self.parameters.imt.bandwidth) \
+                            + "\ttopology: {:s}\n".format(self.parameters.imt.topology) \
+                            + "\tpath loss model: {:s}\n".format(self.parameters.imt.channel_model)  \
+                    + "{:s}:\n".format(self.parameters.general.system) \
+                            + "\tfrequency: {:.3f} GHz\n".format(param_system.frequency*1e-3) \
+                            + "\tbandwidth: {:.0f} MHz\n".format(param_system.bandwidth) \
+                            + "\tpath loss model: {:s}\n".format(param_system.channel_model) \
+                            + "\tantenna pattern: {:s}\n".format(param_system.antenna_pattern)
+                        
+        return description
         
     def snapshot(self):
         """
@@ -72,7 +104,7 @@ class Model(Observable):
         -------
             True if simulation is finished; False otherwise.
         """
-        if self.current_snapshot < ParametersGeneral.num_snapshots:
+        if self.current_snapshot < self.parameters.general.num_snapshots:
             return False
         else:
             return True

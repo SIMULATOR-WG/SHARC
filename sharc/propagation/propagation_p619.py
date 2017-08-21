@@ -14,6 +14,7 @@ from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
 from sharc.support.enumerations import StationType
 from scipy.stats import norm
 import matplotlib.pyplot as plt
+import os
 
 class PropagationP619(Propagation):
     """
@@ -252,8 +253,6 @@ class PropagationP619(Propagation):
              specific_attenuation (float): specific gaseous attenuation (dB/km)
          """
 
-
-
         oxygen_f0 = np.array(
                     [50.474214, 50.987745, 51.503360, 52.021429, 52.542418, 53.066934, 53.595775,
                      54.130025, 54.671180, 55.221384, 55.783815, 56.264774, 56.363399, 56.968211,
@@ -404,13 +403,13 @@ class PropagationP619(Propagation):
         return [temperature, pressure, water_vapour_pressure, refractive_index, specific_attenuation]
 
     @staticmethod
-    def _get_atmospheric_gasses_loss(frequency_MHz, apparent_elevation, sat_params) -> float:
+    def _get_atmospheric_gasses_loss(*args, **kwargs) -> float:
         """
         Calculates atmospheric gasses loss based on ITU-R P.619, Attachment C
 
         Parameters
         ----------
-            frequency (float) : center frequencies [MHz]
+            frequency_MHz (float) : center frequencies [MHz]
             apparent_elevation (float) : apparent elevation angle (degrees)
             sat_params (ParametersFss) : parameters of satellite system
 
@@ -419,14 +418,21 @@ class PropagationP619(Propagation):
             path_loss (float): scalar with atmospheric loss
         """
 
+        frequency_MHz = kwargs["frequency_MHz"]
+        apparent_elevation = kwargs["apparent_elevation"]
+        sat_params = kwargs["sat_params"]
+
+        surf_water_vapour_density = kwargs.pop("surf_water_vapour_density", False)
+
         earth_radius_km = sat_params.EARTH_RADIUS/1000
         a_acc = 0. # accumulated attenuation (in dB)
         h = sat_params.imt_altitude/1000 # ray altitude in km
         beta = (90-abs(apparent_elevation)) * np.pi / 180. # incidence angle
 
-        dummy, dummy, surf_water_vapour_density = \
-            PropagationP619._get_reference_atmosphere_p835(sat_params.imt_lat_deg,
-                                                           0, season="summer")
+        if not surf_water_vapour_density:
+            dummy, dummy, surf_water_vapour_density = \
+                PropagationP619._get_reference_atmosphere_p835(sat_params.imt_lat_deg,
+                                                               0, season="summer")
 
         rho_s = surf_water_vapour_density * np.exp(h/2) # water vapour density at h
         if apparent_elevation < 0:
@@ -566,7 +572,7 @@ class PropagationP619(Propagation):
         scintillation_intensity = (sigma_ref * f_GHz**(7/12) * antenna_averaging_factor
                                    / np.sin(elevation_rad)**1.2)
 
-        if time_ratio == "random":
+        if time_ratio.lower() == "random":
             time_ratio = np.random.rand(len(elevation_rad))
 
         # tropospheric scintillation attenuation not exceeded for time_percentage percent time
@@ -623,7 +629,7 @@ class PropagationP619(Propagation):
 
         f_GHz = frequency_MHz/1000
 
-        if prob == "random":
+        if prob.lower() == "random":
             prob = np.random.random(elevation.shape)
 
         if building_class == "traditional":
@@ -678,8 +684,6 @@ class PropagationP619(Propagation):
             distance_3D (np.array) : distances between stations [m]
             frequency (np.array) : center frequencies [MHz]
             indoor_stations (np.array) : array indicating stations that are indoor
-            loc_percentage (np.array) : Percentage locations range [0, 1[
-                                        "RANDOM" for random percentage
             elevation (dict) : elevation["apparent"](array): apparent elevation angles (degrees)
                                elevation["free_space"](array): free-space elevation angles (degrees)
             sat_params (ParametersFss) : parameters of satellite system
@@ -692,7 +696,6 @@ class PropagationP619(Propagation):
         """
         d = kwargs["distance_3D"]
         f = kwargs["frequency"]
-        p = kwargs["loc_percentage"]
         indoor_stations = kwargs["indoor_stations"]
         elevation = kwargs["elevation"]
         sat_params = kwargs["sat_params"]
@@ -708,8 +711,9 @@ class PropagationP619(Propagation):
             error_message = "different frequencies not supported in P619"
             raise ValueError(error_message)
 
-        atmospheric_gasses_loss = self._get_atmospheric_gasses_loss(freq_set, np.mean(elevation["apparent"]),
-                                                                    sat_params)
+        atmospheric_gasses_loss = self._get_atmospheric_gasses_loss(frequency_MHz=freq_set,
+                                                                    apparent_elevation=np.mean(elevation["apparent"]),
+                                                                    sat_params=sat_params)
         beam_spreading_attenuation = self._get_beam_spreading_att(elevation["free_space"],
                                                                   sat_params.imt_altitude,
                                                                   earth_to_space)
@@ -728,7 +732,6 @@ class PropagationP619(Propagation):
         else:
             clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
                                                                elevation=elevation["free_space"],
-                                                               loc_percentage=p,
                                                                station_type=StationType.FSS_SS))
             building_loss = self._get_building_entry_loss(f, elevation["apparent"])* indoor_stations
 
@@ -738,7 +741,18 @@ class PropagationP619(Propagation):
         return loss
 
 if __name__ == '__main__':
-    from sharc.parameters.parameters_fss import ParametersFss
+    from sharc.parameters.parameters import Parameters
+
+    params = Parameters()
+
+    propagation_path = os.getcwd()
+    sharc_path = os.path.dirname(propagation_path)
+    param_file = os.path.join(sharc_path, "parameters", "parameters.ini")
+
+    params.set_file_name(param_file)
+    params.read_params()
+
+    sat_params = params.fss_ss
 
     propagation = PropagationP619()
 
@@ -753,6 +767,8 @@ if __name__ == '__main__':
     # generate plot
     f_GHz_vec = range(1, 1000)
     specific_att = np.zeros(len(f_GHz_vec))
+
+    print("Plotting specific attenuation:")
 
     for index in range(len(f_GHz_vec)):
         specific_att[index] = propagation._get_specific_attenuation(pressure_hPa,
@@ -769,32 +785,102 @@ if __name__ == '__main__':
     # Plot atmospheric loss
     # compare with benchmark from ITU-R P-619 Fig. 3
     frequency_MHz = 30000.
-    sat_params = ParametersFss()
     sat_params.imt_altitude = 1000
 
-    apparent_elevation = range(-1, 90, 2)
+    #apparent_elevation = range(-1, 90, 2)
+    apparent_elevation = range(10, 90, 2)
+
     loss_2_5 = np.zeros(len(apparent_elevation))
     loss_12_5 = np.zeros(len(apparent_elevation))
 
+    print("Plotting atmospheric loss:")
     for index in range(len(apparent_elevation)):
-        print("Apparent Elevation: {} degrees".format(apparent_elevation[index]))
+        print("\tApparent Elevation: {} degrees".format(apparent_elevation[index]))
 
-        sat_params.surf_water_vapour_density = 2.5
-        loss_2_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz,
-                                                                 apparent_elevation[index],
-                                                                 sat_params)
-        sat_params.surf_water_vapour_density = 12.5
-        loss_12_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz,
-                                                                  apparent_elevation[index],
-                                                                  sat_params)
+        surf_water_vapour_density = 2.5
+        loss_2_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz=frequency_MHz,
+                                                                   apparent_elevation=apparent_elevation[index],
+                                                                   sat_params=sat_params,
+                                                                   surf_water_vapour_density=surf_water_vapour_density)
+        surf_water_vapour_density = 12.5
+        loss_12_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz=frequency_MHz,
+                                                                    apparent_elevation=apparent_elevation[index],
+                                                                    sat_params=sat_params,
+                                                                    surf_water_vapour_density=surf_water_vapour_density)
 
     plt.figure()
     plt.semilogy(apparent_elevation, loss_2_5, label='2.5 g/m^3')
     plt.semilogy(apparent_elevation, loss_12_5, label='12.5 g/m^3')
 
+    plt.grid(True)
+
+
     plt.xlabel("apparent elevation (deg)")
     plt.ylabel("Loss (dB)")
     plt.title("Atmospheric Gasses Attenuation")
     plt.legend()
+
+    altitude_vec = np.arange(0, 6.1, .5) * 1000
+    elevation_vec = np.array([0, .5, 1, 2, 3, 5])
+    attenuation = np.empty([len(altitude_vec), len(elevation_vec)])
+
+    #################################
+    # Plot beam spreading attenuation
+    # compare with benchmark from ITU-R P-619 Fig. 7
+
+    earth_to_space = False
+    print("Plotting beam spreading attenuation:")
+
+    plt.figure()
+    for index in range(len(altitude_vec)):
+        attenuation[index, :] = propagation._get_beam_spreading_att(elevation_vec,
+                                                                    altitude_vec[index],
+                                                                    earth_to_space)
+
+    handles = plt.plot(altitude_vec / 1000, np.abs(attenuation))
+    plt.xlabel("altitude (km)")
+    plt.ylabel("Attenuation (dB)")
+    plt.title("Beam Spreading Attenuation")
+
+    for line_handle, elevation in zip(handles, elevation_vec):
+        line_handle.set_label("{}deg".format(elevation))
+
+    plt.legend(title="Elevation")
+
+    plt.grid(True)
+
+    #################################
+    # Plot troposcatter scintillation attenuation
+    # compare with benchmark from ITU-R P-619 Fig. 8
+
+    percentage_fading_exceeded = 10 ** np.arange(-2, 1.1, .1)
+    antenna_gain = 0.
+    frequency_MHz = 30000.
+    wet_refractivity = 42.5
+
+    elevation_vec = np.array([5., 10., 20., 35., 90.])
+
+    print("Plotting troposcatter scintillation attenuation:")
+
+    plt.figure()
+    for elevation in elevation_vec:
+        attenuation = propagation._get_tropospheric_scintillation(elevation=elevation,
+                                                                  frequency_MHz=frequency_MHz,
+                                                                  antenna_gain_dB=antenna_gain,
+                                                                  time_ratio=1 - (percentage_fading_exceeded / 100),
+                                                                  wet_refractivity=wet_refractivity)
+        plt.semilogx(percentage_fading_exceeded, attenuation, label="{} deg".format(elevation))
+
+    percentage_gain_exceeded = 10 ** np.arange(-2, 1.1, .1)
+    for elevation in elevation_vec:
+        attenuation = propagation._get_tropospheric_scintillation(elevation=elevation,
+                                                                  frequency_MHz=frequency_MHz,
+                                                                  antenna_gain_dB=antenna_gain,
+                                                                  time_ratio=percentage_gain_exceeded / 100,
+                                                                  wet_refractivity=wet_refractivity)
+        plt.loglog(percentage_gain_exceeded, np.abs(attenuation), ':', label="{} deg".format(elevation))
+
+    plt.legend(title='elevation')
+    plt.grid(True)
 
     plt.show()

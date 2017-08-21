@@ -12,12 +12,12 @@ from sharc.gui.thread_safe_scrolled_text import ThreadSafeScrolledText
 from sharc.results import Results
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 import os
 import queue
 import logging
 import tkinter
+import tkinter.filedialog
 import tkinter.scrolledtext
 
 class View(tkinter.Tk, Observer):
@@ -87,21 +87,31 @@ class View(tkinter.Tk, Observer):
         self.update()
         self.geometry(self.geometry())
 
-        self.__insert_text(__name__, "Ready to run!")
+        self.__insert_text(__name__, "Ready to run!\n")
         self.__set_state(State.INITIAL)
 
     def __on_start_button_click(self, *args):
         """
         This method is called when start button is clicked
         """
-        self.__controller.action(Action.START_SIMULATION)
+        default_file = os.path.join(os.getcwd(), "parameters", "parameters.ini")
+        default_dir = os.path.join(os.getcwd(), "parameters")
+        param_file = tkinter.filedialog.askopenfilename(title = "Select parameters file",
+                                                              initialdir = default_dir,
+                                                              initialfile = default_file,
+                                                              filetypes = (("Simulation parameters", "*.ini"),
+                                                                           ("All files", "*.*") ))
+        if param_file:
+            self.__controller.action(action = Action.START_SIMULATION, 
+                                     param_file = param_file)
+            
 
     def __on_stop_button_click(self, *args):
         """
         This method is called when stop button is clicked
         """
         self.__insert_text(__name__, "STOPPED BY USER, FINALIZING SIMULATION")
-        self.__controller.action(Action.STOP_SIMULATION)
+        self.__controller.action(action = Action.STOP_SIMULATION)
         self.__set_state(State.STOPPING)
 
     def __on_results_button_click(self, *args):
@@ -119,19 +129,23 @@ class View(tkinter.Tk, Observer):
         """
         This method is called when clear button is clicked
         """
+        self.__scrolledtext.config(state = tkinter.NORMAL)
         self.__scrolledtext.delete(1.0, tkinter.END)
+        self.__scrolledtext.config(state = tkinter.DISABLED)
 
     def __on_copy_button_click(self):
         """
         This method is called when copy button is clicked
         """
         self.clipboard_clear()
+        self.__scrolledtext.config(state = tkinter.NORMAL)
         self.clipboard_append(self.__scrolledtext.get(1.0, tkinter.END))
+        self.__scrolledtext.config(state = tkinter.DISABLED)
         self.__popup("Copied to clipboard.")
 
     def __plot_results(self, results: Results):
         file_extension = ".png"
-        transparent_figure = True
+        transparent_figure = False
         
         for plot in results.plot_list:
             plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')

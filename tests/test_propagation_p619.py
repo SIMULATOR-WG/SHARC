@@ -9,9 +9,6 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 from sharc.propagation.propagation_p619 import PropagationP619
-from sharc.parameters.parameters_fss import ParametersFss
-import matplotlib.pyplot as plt
-
 
 class TestPropagationP619(unittest.TestCase):
 
@@ -60,31 +57,6 @@ class TestPropagationP619(unittest.TestCase):
             self.assertLessEqual(loss_lower, loss)
             self.assertGreaterEqual(loss_upper, loss)
 
-        if plot_flag:
-            apparent_elevation = range(-1, 90, 2)
-            loss_2_5 = np.zeros(len(apparent_elevation))
-            loss_12_5 = np.zeros(len(apparent_elevation))
-
-            for index in range(len(apparent_elevation)):
-                print("Apparent Elevation: {} degrees".format(apparent_elevation[index]))
-
-                sat_params.surf_water_vapour_density = 2.5
-                loss_2_5[index] = self.p619._get_atmospheric_gasses_loss(frequency_MHz,
-                                                                         apparent_elevation[index],
-                                                                         sat_params)
-                sat_params.surf_water_vapour_density = 12.5
-                loss_12_5[index] = self.p619._get_atmospheric_gasses_loss(frequency_MHz,
-                                                                         apparent_elevation[index],
-                                                                         sat_params)
-
-            plt.figure()
-            plt.semilogy(apparent_elevation, loss_2_5, label='2.5 g/m^3')
-            plt.semilogy(apparent_elevation, loss_12_5, label='12.5 g/m^3')
-
-            plt.xlabel("apparent elevation (deg)")
-            plt.ylabel("Loss (dB)")
-            plt.title("Atmospheric Gasses Attenuation")
-            plt.legend()
 
     def test_beam_spreading_attenuation(self, plot_flag=False):
         # compare with benchmark from ITU-R P-619 Fig. 7
@@ -110,31 +82,6 @@ class TestPropagationP619(unittest.TestCase):
             else:
                 self.assertLess(attenuation, 0)
 
-        earth_to_space = False
-
-        if plot_flag:
-            altitude_vec = np.arange(0, 6.1, .5) * 1000
-            elevation_vec = np.array([0, .5, 1, 2, 3, 5])
-            attenuation = np.empty([len(altitude_vec), len(elevation_vec)])
-
-            plt.figure()
-            for index in range(len(altitude_vec)):
-                attenuation[index, :] = self.p619._get_beam_spreading_att(elevation_vec,
-                                                                          altitude_vec[index],
-                                                                          earth_to_space)
-
-            handles = plt.plot( altitude_vec / 1000, np.abs(attenuation))
-            plt.xlabel("altitude (km)")
-            plt.ylabel("Attenuation (dB)")
-            plt.title("Beam Spreading Attenuation")
-
-            for line_handle, elevation in zip(handles, elevation_vec):
-                line_handle.set_label("{}deg".format(elevation))
-
-            plt.legend(title="Elevation")
-
-            plt.grid(True)
-
     def test_tropo_scintillation_attenuation(self, plot_flag=False):
         # compare with benchmark from ITU-R P-619 Fig. 8
 
@@ -157,33 +104,6 @@ class TestPropagationP619(unittest.TestCase):
         npt.assert_array_less(np.abs(attenuation), attenuation_upper)
 
         npt.assert_array_equal(np.sign(attenuation), sign)
-
-        elevation_vec = np.array([5., 10., 20., 35., 90.])
-        if plot_flag:
-
-            percentage_fading_exceeded = 10 ** np.arange(-2, 1.1, .1)
-
-            plt.figure()
-            for elevation in elevation_vec:
-                attenuation = self.p619._get_tropospheric_scintillation(elevation = elevation,
-                                                                        frequency_MHz = frequency_MHz,
-                                                                        antenna_gain_dB = antenna_gain,
-                                                                        time_ratio = 1 - (percentage_fading_exceeded / 100),
-                                                                        wet_refractivity = wet_refractivity)
-                plt.semilogx(percentage_fading_exceeded, attenuation,
-                             label="{} deg".format(elevation))
-
-            percentage_gain_exceeded = 10 ** np.arange(-2, 1.1, .1)
-            for elevation in elevation_vec:
-                attenuation = self.p619._get_tropospheric_scintillation(elevation = elevation,
-                                                                        frequency_MHz = frequency_MHz,
-                                                                        antenna_gain_dB = antenna_gain,
-                                                                        time_ratio = percentage_gain_exceeded / 100,
-                                                                        wet_refractivity = wet_refractivity)
-                plt.loglog(percentage_gain_exceeded, np.abs(attenuation), ':',
-                           label = "{} deg".format(elevation))
-
-            plt.legend(title = 'elevation')
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,7 +3,8 @@ version: 1
 disable_existing_loggers: False
 formatters:
     simple:
-        format: "%(asctime)s - %(name)s - %(message)s"
+        format: "%(message)s"
+#        format: "%(asctime)s - %(name)s - %(message)s"
 
 handlers:
     console:
