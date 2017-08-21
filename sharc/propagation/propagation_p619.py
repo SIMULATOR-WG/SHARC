@@ -12,6 +12,7 @@ import numpy as np
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
 from sharc.support.enumerations import StationType
+from sharc.parameters.parameters_fss import ParametersFss
 
 
 class PropagationP619(Propagation):
@@ -26,8 +27,213 @@ class PropagationP619(Propagation):
         super().__init__()
         self.clutter = PropagationClutterLoss()
         self.free_space = PropagationFreeSpace()
-        self.polarization_loss = 3
+        self.depolarization_loss = 1.5
+        self.polarization_mismatch_loss = 3.
         self.building_loss = 20
+
+    @staticmethod
+    def _get_reference_atmosphere_p835 (latitude, altitude = 1000, season = "summer"):
+        """
+        Returns reference atmosphere parameters based on ITU-R P835-5
+
+        Parameters
+         ----------
+             latitude (float): latitude (degrees)
+             altitude (float): altitude (m)
+             season (string): season of the year, "summer"/"winter"
+
+         Returns
+         -------
+             temperature (float): temperature (K)
+             pressure_hPa (float): air pressure (hPa)
+             water_vapour_density (float): density of water vapour (g/m**3)
+        """
+
+        h_km = altitude / 1000
+
+        if latitude <= 22:
+            # low latitude
+            if h_km < 17.:
+                temperature = 300.4222 - 6.3533 * h_km + .005886 * h_km **2
+            elif h_km < 47:
+                temperature = 194 + (h_km - 17) * 2.533
+            elif h_km < 52:
+                temperature = 270.
+            elif h_km < 80:
+                temperature = 270. - (h_km - 52) * 3.0714
+            elif h_km <= 100:
+                temperature = 184.
+            else:
+                error_message = "altitude > 100km not supported"
+                raise ValueError(error_message)
+
+            if h_km < 10.:
+                pressure_hPa = 1012.0306 - 109.0338 * h_km + 3.6316 * h_km ** 2
+            elif h_km <= 72.:
+                p10 = 1012.0306 - 109.0338 * 10 + 3.6316 * 10 ** 2
+                pressure_hPa = p10 * np.exp(-.147 * (h_km - 10.))
+            elif h_km <= 100:
+                p72 = ( 1012.0306 - 109.0338 * 10 + 3.6316 * 10 ** 2 ) * np.exp(-.147 * (72 - 10))
+                pressure_hPa = p72 * np.exp(-.165 * (h - 72))
+            else:
+                error_message = "altitude > 100km not supported"
+                raise ValueError(error_message)
+
+            if h_km <= 15.:
+                water_vapour_density = 19.6542 * np.exp( -.2313 * h_km - .1122 * h_km ** 2
+                                                          + .01351 * h_km **3 - .0005923 * h_km ** 4)
+            else:
+                water_vapour_density = 0
+
+        elif latitude <= 45.:
+            # mid-latitude
+            if season == "summer":
+                if h_km < 13.:
+                    temperature = 294.9838 - 5.2159 * h_km - .07109 * h_km ** 2
+                elif h_km < 17.:
+                    temperature = 215.15
+                elif h_km < 47:
+                    temperature = 215.15 * np.exp((h_km - 17.) * .008128)
+                elif h_km < 53.:
+                    temperature = 275.
+                elif h_km < 80.:
+                    temperature = 275 + (1 - np.exp((h - 53.)*.06)) * 20.
+                elif h_km <= 100:
+                    temperature = 175.
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 10:
+                    pressure_hPa = 1012.8186 - 111.5569 * h_km + 3.8646 * h_km ** 2
+                elif h_km <=72.:
+                    p10 = 1012.8186 - 111.5569 * 10 + 3.8646 * 10 ** 2
+                    pressure_hPa = p10 * np.exp(-.147 * (h_km-10))
+                elif h_km <= 100.:
+                    p72 = (1012.8186 - 111.5569 * 10 + 3.8646 * 10 ** 2) * np.exp(-.147 * (72-10))
+                    pressure_hPa = p72 * np.exp(-.165 * (h_km - 72))
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 15.:
+                    water_vapour_density = 14.3542 * np.exp(-.4174 * h_km - .02290 * h_km ** 2
+                                                             + .001007 * h_km ** 3)
+                else:
+                    water_vapour_density = 0
+
+            elif season == "winter":
+                if h_km < 13.:
+                    temperature = 272.7241 - 3.6217 * h_km - .1759 * h_km ** 2
+                elif h_km < 33.:
+                    temperature = 218.
+                elif h_km < 47:
+                    temperature = 218. * (h_km - 33.) * 3.3571
+                elif h_km < 53.:
+                    temperature = 265.
+                elif h_km < 80.:
+                    temperature = 265 + (h_km - 53.) * 2.037
+                elif h_km <= 100:
+                    temperature = 210.
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 10:
+                    pressure_hPa = 1018.8627 - 124.2954 * h_km + 4.8307 * h_km ** 2
+                elif h_km <=72.:
+                    p10 = 1018.8627 - 124.2954 * 10 + 4.8307 * 10 ** 2
+                    pressure_hPa = p10 * np.exp(-.147 * (h_km-10))
+                elif h_km <= 100.:
+                    p72 = (1018.8627 - 124.2954 * 10 + 4.8307 * 10 ** 2) * np.exp(-.147 * (72-10))
+                    pressure_hPa = p72 * np.exp(-.155 * (h_km - 72))
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 15.:
+                    water_vapour_density = 3.4742 * np.exp(-.2697 * h_km - .03604 * h_km ** 2
+                                                             + .0004489 * h_km ** 3)
+                else:
+                    water_vapour_density = 0
+            else:
+                error_message = ("season {} not supported".format(season))
+                raise ValueError(error_message)
+        else:
+            # high latitude (>45 deg)
+            if season == "summer":
+                if h_km < 13.:
+                    temperature = 286.8374 - 4.7805 * h_km - 0.1402 * h_km ** 2
+                elif h_km < 23.:
+                    temperature = 225.
+                elif h_km < 48:
+                    temperature = 225. * np.exp((h_km - 23.) * .008317)
+                elif h_km < 53.:
+                    temperature = 277.
+                elif h_km < 79.:
+                    temperature = 277 - (h_km - 53.) * 4.0769
+                elif h_km <= 100:
+                    temperature = 171.
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 10:
+                    pressure_hPa = 1008.0278 - 113.2494 * h_km + 3.9408 * h_km ** 2
+                elif h_km <= 72.:
+                    p10 = 1008.0278 - 113.2494 * 10 + 3.9408 * (10 ** 2)
+                    pressure_hPa = p10 * np.exp(-.140 * (h_km - 10))
+                elif h_km <= 100.:
+                    p72 = (1008.0278 - 113.2494 * 10 + 3.9408 * (10 ** 2)) * np.exp(-.140 * (72 - 10))
+                    pressure_hPa = p72 * np.exp(-.165 * (h_km - 72))
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 15.:
+                    water_vapour_density = 8.988 * np.exp(-.3614 * h_km - .005402 * h_km ** 2
+                                                             + .001955 * h_km ** 3)
+                else:
+                    water_vapour_density = 0
+
+            elif season == "winter":
+                if h_km < 8.5:
+                    temperature = (257.4345 + 2.3474 * h_km - .15479 * h_km ** 2
+                                   + .08473 * h_km ** 3)
+                elif h_km < 30.:
+                    temperature = 217.5
+                elif h_km < 50:
+                    temperature = 217.5 * (h_km - 30.) * 2.125
+                elif h_km < 54.:
+                    temperature = 260.
+                elif h_km <= 100:
+                    temperature = 260. - (h_km - 54.) * 1.667
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 10:
+                    pressure_hPa = 1010.8828 - 122.2411 * h_km + 4.554 * h_km ** 2
+                elif h_km <= 72.:
+                    p10 = 1010.8828 - 122.2411 * 10 + 4.554 * 10 ** 2
+                    pressure_hPa = p10 * np.exp(-.147 * (h_km - 10))
+                elif h_km <= 100.:
+                    p72 = (1010.8828 - 122.2411 * 10 + 4.554 * 10 ** 2) * np.exp(-.147 * (72 - 10))
+                    pressure_hPa = p72 * np.exp(-.150 * (h_km - 72))
+                else:
+                    error_message = "altitude > 100km not supported"
+                    raise ValueError(error_message)
+
+                if h_km <= 15.:
+                    water_vapour_density = 1.2319 * np.exp(.07481 * h_km - .0981 * h_km ** 2
+                                                            + .00281 * h_km ** 3)
+                else:
+                    water_vapour_density = 0
+            else:
+                error_message = ("season {} not supported".format(season))
+                raise ValueError(error_message)
+
+        return temperature, pressure_hPa, water_vapour_density
 
     @staticmethod
     def _get_specific_attenuation(pressure, water_vapour_pressure, temperature, frequency_MHz):
@@ -215,7 +421,12 @@ class PropagationP619(Propagation):
         a_acc = 0. # accumulated attenuation (in dB)
         h = sat_params.imt_altitude/1000 # ray altitude in km
         beta = (90-abs(apparent_elevation)) * np.pi / 180. # incidence angle
-        rho_s = sat_params.surf_water_vapour_density * np.exp(h/2) # water vapour density at h
+
+        dummy, dummy, surf_water_vapour_density = \
+            PropagationP619._get_reference_atmosphere_p835(sat_params.imt_lat_deg,
+                                                           0, season="summer")
+
+        rho_s = surf_water_vapour_density * np.exp(h/2) # water vapour density at h
         if apparent_elevation < 0:
             # get temperature (t), dry-air pressure (p), water-vapour pressure (e),
             #     refractive index (n) and specific attenuation (gamma)
@@ -267,13 +478,14 @@ class PropagationP619(Propagation):
         ----------
             elevation (np.array) : free space elevation (degrees)
             altitude (float) : altitude of earth station (m)
-            earth_to_space (bool) : True if earth-to-space link
+            sat_params (ParametersFss) : parameters of satellite system
 
         Returns
         -------
             attenuation (np.array): attenuation (dB) with dimensions equal to "elevation"
         """
 
+        # calculate scintillation intensity, based on ITU-R P.618-12
         altitude_km = altitude / 1000
 
         numerator = .5411 + .07446 * elevation + altitude_km * (.06272 + .0276 * elevation) \
@@ -289,6 +501,105 @@ class PropagationP619(Propagation):
 
         return attenuation
 
+    @staticmethod
+    def _get_tropospheric_scintillation(*args, **kwargs)-> np.array:
+        """
+        Calculates tropospheric scintillation based on ITU-R P.619, Appendix D
+
+        Parameters
+        ----------
+            elevation (np.array) : free space elevation (degrees)
+            frequency_MHz (float) : carrier frequency (MHz)
+            antenna_gain_dB (np.array) : antenna gains at earth station (dBi)
+            time_ratio (np.array / string) : percentage time that gain is exceeded
+                                             if "random", then random values are chosen for each link
+                                             default = "random"
+            wet_refractivity (float) : wet term of the radio refractivity - optional
+                                       if not given, then it is calculated from sat_params
+            sat_params (ParametersFss) : satellite channel parameters - optional
+                                         needed only if wet_refractivity is not given
+
+
+        Returns
+        -------
+            attenuation (np.array): attenuation (dB) with dimensions equal to "elevation"
+        """
+
+        f_GHz = kwargs["frequency_MHz"] / 1000.
+        elevation_rad = kwargs["elevation"] / 180. * np.pi
+        antenna_gain_dB = kwargs["antenna_gain_dB"]
+        if not np.isscalar(antenna_gain_dB):
+            antenna_gain_dB = antenna_gain_dB.flatten()
+        time_ratio = kwargs.pop("time_ratio", "random")
+        wet_refractivity = kwargs.pop("wet_refractivity", False)
+
+        if not wet_refractivity:
+            sat_params = kwargs["sat_params"]
+
+            temperature, \
+            pressure, \
+            water_vapour_density = PropagationP619._get_reference_atmosphere_p835 (sat_params.imt_lat_deg,
+                                                                                   sat_params.imt_altitude,
+                                                                                   sat_params.season)
+
+            # calculate saturation water vapour pressure according to ITU-R P.453-12
+            # water coefficients (ice disregarded)
+            coef_a = 6.1121
+            coef_b = 18.678
+            coef_c = 257.14
+            coef_d = 234.5
+            EF_water = 1 + 1e-4 * (7.2 + pressure * (.032 + 5.9e-6*temperature**2))
+            vapour_pressure = water_vapour_density * temperature / 216.7 # eq 10 in P453
+            wet_refractivity = (72 * vapour_pressure / temperature
+                                + 3.75e5 * vapour_pressure / temperature ** 2)
+
+        sigma_ref = 3.6e-3 + 1e-4 * wet_refractivity
+        h_l = 1000
+        path_length = 2 * h_l / (np.sqrt(np.sin(elevation_rad)**2 + 2.35e-4) + np.sin(elevation_rad))
+        eff_antenna_diameter = .3 * 10 ** (.05 * antenna_gain_dB) / ( np.pi * f_GHz )
+
+        x = 1.22 * eff_antenna_diameter ** 2 * (f_GHz / path_length)
+        antenna_averaging_factor = np.sqrt(3.86*(x**2  + 1)**(11/12) *
+                                           np.sin(11/6 * np.arctan(1/x)) - 7.08 * x**5/6)
+        scintillation_intensity = (sigma_ref * f_GHz**(7/12) * antenna_averaging_factor
+                                   / np.sin(elevation_rad)**1.2)
+
+        if time_ratio == "random":
+            time_ratio = np.random.rand(len(elevation_rad))
+
+        # tropospheric scintillation attenuation not exceeded for time_percentage percent time
+        time_percentage = time_ratio * 100.
+
+        num_el = 1
+        if np.isscalar(scintillation_intensity):
+            if not np.isscalar(time_percentage):
+                num_el = time_percentage.size
+                scintillation_intensity = np.ones(num_el) * scintillation_intensity
+        else:
+            num_el = scintillation_intensity.size
+            if np.isscalar(time_percentage):
+                time_percentage = np.ones(num_el) * time_percentage
+
+        attenuation = np.empty(num_el)
+
+        a_ste = (2.672 - 1.258 * np.log10(time_percentage) -
+                 .0835 * np.log10(time_percentage) ** 2 -
+                 .0597 * np.log10(time_percentage) ** 3)
+
+        a_stf = (3. - 1.71 * np.log10(100 - time_percentage) +
+                 .072 * np.log10(100 - time_percentage) ** 2 -
+                 .061 * np.log10(100 - time_percentage) ** 3)
+
+        gain_indices = np.where(time_percentage <= 50.)[0]
+        if gain_indices.size:
+            attenuation[gain_indices] = - scintillation_intensity[gain_indices] * a_ste[gain_indices]
+        fade_indices = np.where(time_percentage > 50.)[0]
+        if fade_indices.size:
+            attenuation[fade_indices] = scintillation_intensity[fade_indices] * a_stf[fade_indices]
+
+        return attenuation
+
+
     def get_loss(self, *args, **kwargs) -> np.array:
         """
         Calculates path loss for earth-space link
@@ -303,6 +614,7 @@ class PropagationP619(Propagation):
             elevation (dict) : elevation["apparent"](array): apparent elevation angles (degrees)
                                elevation["free_space"](array): free-space elevation angles (degrees)
             sat_params (ParametersFss) : parameters of satellite system
+            single_entry (bool): True for single-entry interference, False for multiple-entry (default = False)
 
         Returns
         -------
@@ -316,14 +628,12 @@ class PropagationP619(Propagation):
         elevation = kwargs["elevation"]
         sat_params = kwargs["sat_params"]
         earth_to_space = kwargs["earth_to_space"]
+        earth_station_antenna_gain = kwargs["earth_station_antenna_gain"]
+        single_entry = kwargs.pop("single_entry", False)
 
         free_space_loss = self.free_space.get_loss(distance_3D=d,
                                                    frequency=f)
-        clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
-                                                           elevation=elevation["free_space"],
-                                                           loc_percentage=p,
-                                                           station_type=StationType.FSS_SS))
-        building_loss = self.building_loss * indoor_stations
+
 
         freq_set = np.unique(f)
         if len(freq_set) > 1:
@@ -335,8 +645,27 @@ class PropagationP619(Propagation):
         beam_spreading_attenuation = self._get_beam_spreading_att(elevation["free_space"],
                                                                   sat_params.imt_altitude,
                                                                   earth_to_space)
+        diffraction_loss = 0
 
-        loss = (free_space_loss + clutter_loss + building_loss + self.polarization_loss +
-                atmospheric_gasses_loss + beam_spreading_attenuation + atmospheric_gasses_loss)
+        if single_entry:
+            tropo_scintillation_loss = \
+                self._get_tropospheric_scintillation(elevation = elevation["free_space"],
+                                                     antenna_gain_dB = earth_station_antenna_gain,
+                                                     frequency_MHz = freq_set,
+                                                     sat_params = sat_params)
+
+            loss = (free_space_loss + self.depolarization_loss +
+                    atmospheric_gasses_loss + beam_spreading_attenuation + tropo_scintillation_loss +
+                    diffraction_loss)
+        else:
+            clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
+                                                               elevation=elevation["free_space"],
+                                                               loc_percentage=p,
+                                                               station_type=StationType.FSS_SS))
+            building_loss = self.building_loss * indoor_stations
+
+            loss = (free_space_loss + clutter_loss + building_loss + self.polarization_mismatch_loss +
+                    atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
+
 
         return loss

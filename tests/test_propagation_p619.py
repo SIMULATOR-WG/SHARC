@@ -150,6 +150,55 @@ class TestPropagationP619(unittest.TestCase):
 
             plt.grid(True)
 
+    def test_tropo_scintillation_attenuation(self, plot_flag=False):
+        # compare with benchmark from ITU-R P-619 Fig. 8
+
+        antenna_gain = 0.
+        frequency_MHz = 30000.
+        wet_refractivity = 42.5
+
+        elevation_vec = np.array([5., 10., 20., 90., 35., 5., 10., 20., 35., 90.])
+        percentage_gain_exceeded = np.array([.01, .1, 1, 3, 10, 90, 98, 99, 99.9, 99.99])
+        attenuation_lower = [5, 1, .5, .1, .1, 1, 1, .5, .4, .3]
+        attenuation_upper = [7, 2, .6, .2, .2, 2, 2, .7, .6, .5]
+        sign = [-1, -1, -1, -1, -1, +1, +1, +1, +1, +1]
+        attenuation = self.p619._get_tropospheric_scintillation(elevation=elevation_vec,
+                                                                frequency_MHz=frequency_MHz,
+                                                                antenna_gain_dB=antenna_gain,
+                                                                time_ratio=percentage_gain_exceeded / 100,
+                                                                wet_refractivity=wet_refractivity)
+
+        npt.assert_array_less(attenuation_lower, np.abs(attenuation))
+        npt.assert_array_less(np.abs(attenuation), attenuation_upper)
+
+        npt.assert_array_equal(np.sign(attenuation), sign)
+
+        elevation_vec = np.array([5., 10., 20., 35., 90.])
+        if plot_flag:
+
+            percentage_fading_exceeded = 10 ** np.arange(-2, 1.1, .1)
+
+            plt.figure()
+            for elevation in elevation_vec:
+                attenuation = self.p619._get_tropospheric_scintillation(elevation = elevation,
+                                                                        frequency_MHz = frequency_MHz,
+                                                                        antenna_gain_dB = antenna_gain,
+                                                                        time_ratio = 1 - (percentage_fading_exceeded / 100),
+                                                                        wet_refractivity = wet_refractivity)
+                plt.semilogx(percentage_fading_exceeded, attenuation,
+                             label="{} deg".format(elevation))
+
+            percentage_gain_exceeded = 10 ** np.arange(-2, 1.1, .1)
+            for elevation in elevation_vec:
+                attenuation = self.p619._get_tropospheric_scintillation(elevation = elevation,
+                                                                        frequency_MHz = frequency_MHz,
+                                                                        antenna_gain_dB = antenna_gain,
+                                                                        time_ratio = percentage_gain_exceeded / 100,
+                                                                        wet_refractivity = wet_refractivity)
+                plt.loglog(percentage_gain_exceeded, np.abs(attenuation), ':',
+                           label = "{} deg".format(elevation))
+
+            plt.legend(title = 'elevation')
 
 if __name__ == '__main__':
     unittest.main()

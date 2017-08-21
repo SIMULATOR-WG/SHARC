@@ -69,11 +69,12 @@ class ParametersFss(object):
     #                                    "SatelliteSimple" (FSPL + 4 or 24dB (LOS or NLOS)
     #                                    "P619" (ITU-R P.619-1)
     channel_model = "P619"
+    season = "summer" # "summer" or "winter"
     line_of_sight_prob = 1 # probability of line-of-sight between UE and satellite
 
-    surf_water_vapour_density = 15 #g/m^3 # actual values can be found in ITU-R P-836
-
-    time_ratio = 0.5 #transmission loss not exceeded for time_ratio*100 % of time
+    # tropospheric scintillation attenuation not exceeded for time ratio of the time
+    # if "random", then choose percentage randomly
+    scintillation_time_ratio = "random"
 
     ###########################################################################
 
