@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar  13 15:14:34 2017
+Created on Mon Aug 21 12:17:34 2017
 
-@author: edgar
+@author: Andre Barreto
 """
 
 import unittest
@@ -11,6 +11,7 @@ import numpy.testing as npt
 from sharc.propagation.propagation_p619 import PropagationP619
 from sharc.parameters.parameters_fss import ParametersFss
 import matplotlib.pyplot as plt
+
 
 class TestPropagationP619(unittest.TestCase):
 
@@ -36,22 +37,6 @@ class TestPropagationP619(unittest.TestCase):
                                                                       float(f_GHz_vec[index]) * 1000)
         npt.assert_array_less(specific_att_p676_lower, specific_att)
         npt.assert_array_less(specific_att, specific_att_p676_upper)
-
-        if plot_flag:
-            # generate plot
-            f_GHz_vec = range(1,1000)
-            specific_att = np.zeros(len(f_GHz_vec))
-
-            for index in range(len(f_GHz_vec)):
-                specific_att[index] = self.p619._get_specific_attenuation(pressure_hPa,
-                                                                          vapour_pressure_hPa,
-                                                                          temperature,
-                                                                          float(f_GHz_vec[index]) * 1000)
-            plt.figure()
-            plt.semilogy( f_GHz_vec, specific_att )
-            plt.xlabel('frequency(GHz)')
-            plt.xlabel('Specific attenuation (dB/km)')
-            plt.title("Atmospheric Specific Attenuation")
 
     def test_atmospheric_gasses_loss (self, plot_flag = False):
         # compare with benchmark from ITU-R P-619 Fig. 3

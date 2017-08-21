@@ -7,5 +7,6 @@ p619.test_specific_attenuation(True)
 p619.test_atmospheric_gasses_loss(True)
 p619.test_beam_spreading_attenuation(True)
 p619.test_tropo_scintillation_attenuation(True)
+p619.test_building_entry_loss(True)
 
 plt.show()

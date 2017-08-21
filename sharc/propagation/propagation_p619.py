@@ -12,8 +12,8 @@ import numpy as np
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
 from sharc.support.enumerations import StationType
-from sharc.parameters.parameters_fss import ParametersFss
-
+from scipy.stats import norm
+import matplotlib.pyplot as plt
 
 class PropagationP619(Propagation):
     """
@@ -251,6 +251,8 @@ class PropagationP619(Propagation):
          -------
              specific_attenuation (float): specific gaseous attenuation (dB/km)
          """
+
+
 
         oxygen_f0 = np.array(
                     [50.474214, 50.987745, 51.503360, 52.021429, 52.542418, 53.066934, 53.595775,
@@ -599,6 +601,73 @@ class PropagationP619(Propagation):
 
         return attenuation
 
+    @staticmethod
+    def _get_building_entry_loss(frequency_MHz, elevation, prob = "random",
+                                 building_class = "traditional") -> np.array:
+        """
+        Calculates building loss according to ITU-R P.2109
+
+        Parameters
+        ----------
+            frequency_MHz (np.array) : carrier frequencies (MHz)
+            elevation (np.array) : apparent elevation angles
+            prob (np.array / string) : the probability with which the loss is not exceeded;
+                                    if "random", then different values are chosen for each user
+            building_class (string) : type of construction material, "traditional" or "thermally-efficient"
+
+        Returns
+        -------
+            array with building loss values with dimensions of elevation
+
+        """
+
+        f_GHz = frequency_MHz/1000
+
+        if prob == "random":
+            prob = np.random.random(elevation.shape)
+
+        if building_class == "traditional":
+            r = 12.64
+            s = 3.72
+            t = .96
+            u = 9.6
+            v = 2.
+            w = 9.1
+            x = -3.
+            y = 4.5
+            z = -2.
+        elif building_class == "thermally-efficient":
+            r = 28.19
+            s = -3.
+            t = 8.48
+            u = 13.5
+            v = 3.8
+            w = 27.8
+            x = -2.9
+            y = 9.4
+            z = -2.1
+        else:
+            error_message = "building_class not supported"
+            raise ValueError(error_message)
+        c_dB = -3.
+        hor_loss = r + s * np.log10(f_GHz) + t * np.log10(f_GHz) ** 2
+        angle_correction = .212 * np.abs(elevation)
+        mu_1 = hor_loss + angle_correction
+        mu_2 = w + x * np.log10(f_GHz)
+        sigma_1 = u + v * np.log10(f_GHz)
+        sigma_2 = y + z * np.log10(f_GHz)
+
+        a_dB = norm.ppf(prob) * sigma_1 + mu_1
+        b_dB = norm.ppf(prob) * sigma_2 + mu_2
+
+        a_lin = 10**(a_dB/10)
+        b_lin = 10**(b_dB/10)
+        c_lin = 10**(c_dB/10)
+
+        loss = 10*np.log10(a_lin + b_lin + c_lin)
+
+        return loss
+
 
     def get_loss(self, *args, **kwargs) -> np.array:
         """
@@ -634,7 +703,6 @@ class PropagationP619(Propagation):
         free_space_loss = self.free_space.get_loss(distance_3D=d,
                                                    frequency=f)
 
-
         freq_set = np.unique(f)
         if len(freq_set) > 1:
             error_message = "different frequencies not supported in P619"
@@ -662,10 +730,71 @@ class PropagationP619(Propagation):
                                                                elevation=elevation["free_space"],
                                                                loc_percentage=p,
                                                                station_type=StationType.FSS_SS))
-            building_loss = self.building_loss * indoor_stations
+            building_loss = self._get_building_entry_loss(f, elevation["apparent"])* indoor_stations
 
             loss = (free_space_loss + clutter_loss + building_loss + self.polarization_mismatch_loss +
                     atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
 
-
         return loss
+
+if __name__ == '__main__':
+    from sharc.parameters.parameters_fss import ParametersFss
+
+    propagation = PropagationP619()
+
+    ##########################
+    # Plot specific attenuation
+    # compare with benchmark from ITU-R P-676-11 Figs. 1 and 2
+    temperature = 15 + 273.15  # K
+    vapour_density = 7.5  # g/m**3
+    pressure_hPa = 1013.25
+    vapour_pressure_hPa = vapour_density * temperature / 216.7
+
+    # generate plot
+    f_GHz_vec = range(1, 1000)
+    specific_att = np.zeros(len(f_GHz_vec))
+
+    for index in range(len(f_GHz_vec)):
+        specific_att[index] = propagation._get_specific_attenuation(pressure_hPa,
+                                                                    vapour_pressure_hPa,
+                                                                    temperature,
+                                                                    float(f_GHz_vec[index]) * 1000)
+    plt.figure()
+    plt.semilogy(f_GHz_vec, specific_att)
+    plt.xlabel('frequency(GHz)')
+    plt.xlabel('Specific attenuation (dB/km)')
+    plt.title("Atmospheric Specific Attenuation")
+
+    ##########################
+    # Plot atmospheric loss
+    # compare with benchmark from ITU-R P-619 Fig. 3
+    frequency_MHz = 30000.
+    sat_params = ParametersFss()
+    sat_params.imt_altitude = 1000
+
+    apparent_elevation = range(-1, 90, 2)
+    loss_2_5 = np.zeros(len(apparent_elevation))
+    loss_12_5 = np.zeros(len(apparent_elevation))
+
+    for index in range(len(apparent_elevation)):
+        print("Apparent Elevation: {} degrees".format(apparent_elevation[index]))
+
+        sat_params.surf_water_vapour_density = 2.5
+        loss_2_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz,
+                                                                 apparent_elevation[index],
+                                                                 sat_params)
+        sat_params.surf_water_vapour_density = 12.5
+        loss_12_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz,
+                                                                  apparent_elevation[index],
+                                                                  sat_params)
+
+    plt.figure()
+    plt.semilogy(apparent_elevation, loss_2_5, label='2.5 g/m^3')
+    plt.semilogy(apparent_elevation, loss_12_5, label='12.5 g/m^3')
+
+    plt.xlabel("apparent elevation (deg)")
+    plt.ylabel("Loss (dB)")
+    plt.title("Atmospheric Gasses Attenuation")
+    plt.legend()
+
+    plt.show()

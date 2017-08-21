@@ -147,7 +147,7 @@ class Simulation(ABC, Observable):
                                              loc_percentage="RANDOM",
                                              sat_params = self.param_system,
                                              earth_to_space = True,
-                                             single_entry = True,
+                                             single_entry = False,
                                              line_of_sight_prob=self.param_system.line_of_sight_prob,
                                              earth_station_antenna_gain = gain_b)
 
