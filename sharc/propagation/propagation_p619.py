@@ -688,6 +688,7 @@ class PropagationP619(Propagation):
                                elevation["free_space"](array): free-space elevation angles (degrees)
             sat_params (ParametersFss) : parameters of satellite system
             single_entry (bool): True for single-entry interference, False for multiple-entry (default = False)
+            number_of_sectors (int): number of sectors in a node (default = 1)
 
         Returns
         -------
@@ -702,9 +703,9 @@ class PropagationP619(Propagation):
         earth_to_space = kwargs["earth_to_space"]
         earth_station_antenna_gain = kwargs["earth_station_antenna_gain"]
         single_entry = kwargs.pop("single_entry", False)
+        number_of_sectors = kwargs["number_of_sectors"]
 
-        free_space_loss = self.free_space.get_loss(distance_3D=d,
-                                                   frequency=f)
+        free_space_loss = self.free_space.get_loss(distance_3D=d, frequency=f)
 
         freq_set = np.unique(f)
         if len(freq_set) > 1:
@@ -720,15 +721,16 @@ class PropagationP619(Propagation):
         diffraction_loss = 0
 
         if single_entry:
+            elevation_sectors = np.repeat(elevation["free_space"], number_of_sectors)
             tropo_scintillation_loss = \
-                self._get_tropospheric_scintillation(elevation = elevation["free_space"],
+                self._get_tropospheric_scintillation(elevation = elevation_sectors,
                                                      antenna_gain_dB = earth_station_antenna_gain,
                                                      frequency_MHz = freq_set,
                                                      sat_params = sat_params)
 
             loss = (free_space_loss + self.depolarization_loss +
-                    atmospheric_gasses_loss + beam_spreading_attenuation + tropo_scintillation_loss +
-                    diffraction_loss)
+                    atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
+            loss = np.repeat(loss, number_of_sectors, 1) + tropo_scintillation_loss
         else:
             clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
                                                                elevation=elevation["free_space"],
@@ -737,6 +739,7 @@ class PropagationP619(Propagation):
 
             loss = (free_space_loss + clutter_loss + building_loss + self.polarization_mismatch_loss +
                     atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
+            loss = np.repeat(loss, number_of_sectors, 1)
 
         return loss
 

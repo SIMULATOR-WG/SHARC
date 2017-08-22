@@ -151,6 +151,7 @@ class Parameters(object):
         #######################################################################
         self.fss_ss.frequency               = config.getfloat("FSS_SS", "frequency")
         self.fss_ss.bandwidth               = config.getfloat("FSS_SS", "bandwidth")
+        self.fss_ss.tx_power_density        = config.getfloat("FSS_ES", "tx_power_density")
         self.fss_ss.altitude                = config.getfloat("FSS_SS", "altitude")
         self.fss_ss.lat_deg                 = config.getfloat("FSS_SS", "lat_deg")
         self.fss_ss.elevation               = config.getfloat("FSS_SS", "elevation")

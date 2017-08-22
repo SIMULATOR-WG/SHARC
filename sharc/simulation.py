@@ -145,22 +145,30 @@ class Simulation(ABC, Observable):
                 # define antenna gains
                 gain_a = self.calculate_gains(station_a, station_b)
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+                sectors_in_node=1
+
             else:
                 # define antenna gains
                 gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.parameters.imt.ue_k, 1)
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+                sectors_in_node = self.parameters.imt.ue_k
+
+            if self.parameters.imt.interfered_with:
+                earth_to_space = False
+                single_entry = True
+            else:
+                earth_to_space = True
+                single_entry = False
 
             path_loss = propagation.get_loss(distance_3D=d_3D,
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles,
                                              sat_params = self.param_system,
-                                             earth_to_space = False,
+                                             earth_to_space = earth_to_space,
                                              earth_station_antenna_gain=gain_b,
-                                             single_entry=True)
-
-            if station_b.station_type is StationType.IMT_UE:
-                path_loss = np.repeat(path_loss, self.parameters.imt.ue_k, 1)
+                                             single_entry=single_entry,
+                                             number_of_sectors=sectors_in_node)
 
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D,
