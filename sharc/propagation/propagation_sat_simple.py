@@ -28,19 +28,21 @@ class PropagationSatSimple(Propagation):
     def get_loss(self, *args, **kwargs) -> np.array:
         d = kwargs["distance_3D"]
         f = kwargs["frequency"]
-        p = kwargs["loc_percentage"]
         indoor_stations = kwargs["indoor_stations"]
         elevation = kwargs["elevation"]
+        number_of_sectors = kwargs["number_of_sectors"]
 
         free_space_loss = self.free_space.get_loss(distance_3D=d,
                                                    frequency=f)
         clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
                                                            elevation=elevation["free_space"],
-                                                           loc_percentage=p,
+                                                           loc_percentage="RANDOM",
                                                            station_type=StationType.FSS_SS))
         building_loss = self.building_loss*indoor_stations
 
         loss = (free_space_loss + clutter_loss + building_loss +
                 self.polarization_loss + self.atmospheric_loss)
+
+        loss = np.repeat(loss, number_of_sectors, 1)
 
         return loss

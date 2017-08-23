@@ -31,6 +31,10 @@ class PropagationP619(Propagation):
         self.depolarization_loss = 1.5
         self.polarization_mismatch_loss = 3.
         self.building_loss = 20
+        self.elevation_has_atmospheric_loss = []
+        self.freq_has_atmospheric_loss = []
+        self.atmospheric_loss = []
+        self.elevation_delta = .01
 
     @staticmethod
     def _get_reference_atmosphere_p835 (latitude, altitude = 1000, season = "summer"):
@@ -402,8 +406,7 @@ class PropagationP619(Propagation):
 
         return [temperature, pressure, water_vapour_pressure, refractive_index, specific_attenuation]
 
-    @staticmethod
-    def _get_atmospheric_gasses_loss(*args, **kwargs) -> float:
+    def _get_atmospheric_gasses_loss(self, *args, **kwargs) -> float:
         """
         Calculates atmospheric gasses loss based on ITU-R P.619, Attachment C
 
@@ -421,6 +424,16 @@ class PropagationP619(Propagation):
         frequency_MHz = kwargs["frequency_MHz"]
         apparent_elevation = kwargs["apparent_elevation"]
         sat_params = kwargs["sat_params"]
+
+        # first, check if atmospheric loss was already calculated
+        if len(self.elevation_has_atmospheric_loss):
+            elevation_diff = np.abs(apparent_elevation - np.array(self.elevation_has_atmospheric_loss))
+            indices = np.where(elevation_diff <= self.elevation_delta)
+            if indices[0].size:
+                index = np.argmin(elevation_diff)
+            if self.freq_has_atmospheric_loss[index] == frequency_MHz:
+                loss = self.atmospheric_loss[index]
+                return loss
 
         surf_water_vapour_density = kwargs.pop("surf_water_vapour_density", False)
 
@@ -474,6 +487,10 @@ class PropagationP619(Propagation):
                                                                             frequency_MHz)
             beta = np.arcsin(n/n_new * np.sin(alpha))
             n = n_new
+
+        self.atmospheric_loss.append(a_acc)
+        self.elevation_has_atmospheric_loss.append(apparent_elevation)
+        self.freq_has_atmospheric_loss.append(frequency_MHz)
 
         return a_acc
 
@@ -572,7 +589,7 @@ class PropagationP619(Propagation):
         scintillation_intensity = (sigma_ref * f_GHz**(7/12) * antenna_averaging_factor
                                    / np.sin(elevation_rad)**1.2)
 
-        if time_ratio.lower() == "random":
+        if isinstance(time_ratio, str) and time_ratio.lower() == "random":
             time_ratio = np.random.rand(len(elevation_rad))
 
         # tropospheric scintillation attenuation not exceeded for time_percentage percent time
@@ -629,7 +646,7 @@ class PropagationP619(Propagation):
 
         f_GHz = frequency_MHz/1000
 
-        if prob.lower() == "random":
+        if isinstance(prob, str) and prob.lower() == "random":
             prob = np.random.random(elevation.shape)
 
         if building_class == "traditional":
@@ -790,8 +807,7 @@ if __name__ == '__main__':
     frequency_MHz = 30000.
     sat_params.imt_altitude = 1000
 
-    #apparent_elevation = range(-1, 90, 2)
-    apparent_elevation = range(10, 90, 2)
+    apparent_elevation = range(-1, 90, 2)
 
     loss_2_5 = np.zeros(len(apparent_elevation))
     loss_12_5 = np.zeros(len(apparent_elevation))
@@ -885,5 +901,9 @@ if __name__ == '__main__':
 
     plt.legend(title='elevation')
     plt.grid(True)
+
+    #################################
+    # Plot building-entry loss
+    # compare with benchmark from ITU-R P-2109 Fig. 8
 
     plt.show()

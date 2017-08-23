@@ -45,7 +45,7 @@ class PropagationClutterLoss(Propagation):
         loc_per = kwargs.pop("loc_percentage","RANDOM")
         type = kwargs["station_type"]
 
-        if loc_per.upper() == "RANDOM":
+        if isinstance(loc_per, str) and loc_per.upper() == "RANDOM":
             p = np.random.random(f.shape)
         else:
             p = loc_per*np.ones(f.shape)
