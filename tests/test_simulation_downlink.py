@@ -113,6 +113,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.fss_ss.lat_deg = 0
         self.param.fss_ss.azimuth = 0
         self.param.fss_ss.elevation = 270
+        self.param.fss_ss.tx_power_density = -30
         self.param.fss_ss.noise_temperature = 950
         self.param.fss_ss.antenna_gain = 51
         self.param.fss_ss.antenna_pattern = "OMNI"
@@ -135,6 +136,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.fss_es.azimuth = 0
         self.param.fss_es.frequency = 10000
         self.param.fss_es.bandwidth = 100
+        self.param.fss_es.noise_temperature = 100
         self.param.fss_es.tx_power_density = -60
         self.param.fss_es.antenna_gain = 50
         self.param.fss_es.antenna_pattern = "OMNI"
@@ -300,6 +302,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param.fss_es.height])
         
+        # what if FSS ES is the interferer?
         self.simulation.calculate_sinr_ext()
         npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
                             np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]), 
@@ -319,7 +322,28 @@ class SimulationDownlinkTest(unittest.TestCase):
         
         npt.assert_allclose(self.simulation.ue.inr, 
                             interference - thermal_noise, 
-                            atol=1e-2)       
+                            atol=1e-2)
+        
+        # what if IMT is interferer?
+        self.simulation.calculate_external_interference()
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
+                            np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
+                            atol=1e-2)
+
+        interference = 10 - 10*np.log10(2) - np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2])- 3 + 10*math.log10(45/100)
+        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
+        self.assertAlmostEqual(self.simulation.system.rx_interference,
+                               rx_interference,
+                               delta=.01)
+        # check FSS Earth station thermal noise
+        thermal_noise = 10*np.log10(1.38064852e-23*100*1e3*100*1e6)
+        self.assertAlmostEqual(self.simulation.system.thermal_noise, 
+                               thermal_noise,
+                               delta=.01)      
+        # check INR at FSS Earth station
+        self.assertAlmostEqual(self.simulation.system.inr, 
+                               np.array([ rx_interference - (-98.599) ]),
+                               delta=.01)        
         
         
 if __name__ == '__main__':

@@ -245,11 +245,13 @@ class PlotAntennaPattern(object):
             gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
             antenna.add_beam(phi_escan, theta_tilt)
-            gain = antenna.calculate_gain(phi, theta,np.zeros_like(phi, dtype=int))
+            gain = antenna.calculate_gain(phi_vec = phi, 
+                                          theta_vec = theta, 
+                                          beams_l = np.zeros_like(phi, dtype=int))
             
         top_y_lim = np.ceil(np.max(gain)/10)*10
 
-        fig = plt.figure(figsize=(15,8))
+        fig = plt.figure(figsize=(15,5), facecolor='w', edgecolor='k')
         ax1 = fig.add_subplot(121)
 
         ax1.plot(phi,gain)
@@ -258,9 +260,9 @@ class PlotAntennaPattern(object):
         ax1.set_ylabel("Gain [dB]")
         
         if plot_type == "ELEMENT":
-            ax1.set_title("Element Horizontal Radiation Pattern")
+            ax1.set_title("IMT " + sta_type + " element horizontal antenna pattern")
         elif plot_type == "ARRAY":
-            ax1.set_title("Array Horizontal Radiation Pattern")
+            ax1.set_title("IMT " + sta_type + " horizontal antenna pattern")
             
         ax1.set_xlim(-180, 180)
 
@@ -271,7 +273,9 @@ class PlotAntennaPattern(object):
         if plot_type == "ELEMENT":
             gain = antenna.element.element_pattern(phi, theta)
         elif plot_type == "ARRAY":
-            gain = antenna.calculate_gain(phi, theta, np.zeros_like(phi, dtype=int))
+            gain = antenna.calculate_gain(phi_vec = phi, 
+                                          theta_vec = theta, 
+                                          beams_l = np.zeros_like(phi, dtype=int))
 
         ax2 = fig.add_subplot(122, sharey = ax1)
 
@@ -281,9 +285,9 @@ class PlotAntennaPattern(object):
         ax2.set_ylabel("Gain [dB]")
         
         if plot_type == "ELEMENT":
-            ax2.set_title("Element Vertical Radiation Pattern")
+            ax2.set_title("IMT " + sta_type + " element vertical antenna pattern")
         elif plot_type == "ARRAY":
-            ax2.set_title("Array Vertical Radiation Pattern")
+            ax2.set_title("IMT " + sta_type + " vertical antenna pattern")
         
         ax2.set_xlim(0, 180)
         if(np.max(gain) > top_y_lim): top_y_lim = np.ceil(np.max(gain)/10)*10
@@ -304,7 +308,7 @@ class PlotAntennaPattern(object):
         elif plot_type == "ARRAY":
             file_name = file_name + "array_pattern.png"
         
-        plt.savefig(file_name)
+        #plt.savefig(file_name)
         plt.show()
         
 if __name__ == '__main__':
@@ -312,6 +316,28 @@ if __name__ == '__main__':
     figs_dir = "figs/"
 
     param = ParametersAntennaImt()
+    
+    param.bs_tx_element_max_g    = 5
+    param.bs_tx_element_phi_3db  = 65
+    param.bs_tx_element_theta_3db = 65
+    param.bs_tx_element_am       = 30
+    param.bs_tx_element_sla_v    = 30
+    param.bs_tx_n_rows           = 8
+    param.bs_tx_n_columns        = 8
+    param.bs_tx_element_horiz_spacing = 0.5
+    param.bs_tx_element_vert_spacing = 0.5
+    
+    param.ue_tx_element_max_g    = 5
+    param.ue_tx_element_phi_3db  = 90
+    param.ue_tx_element_theta_3db = 90
+    param.ue_tx_element_am       = 25
+    param.ue_tx_element_sla_v    = 25
+    param.ue_tx_n_rows           = 4
+    param.ue_tx_n_columns        = 4
+    param.ue_tx_element_horiz_spacing = 0.5
+    param.ue_tx_element_vert_spacing = 0.5
+
+    
     plot = PlotAntennaPattern(figs_dir)
 
     # Plot BS TX radiation patterns
@@ -326,16 +352,6 @@ if __name__ == '__main__':
     plot.plot_element_pattern(ue_array,"UE","TX","ELEMENT")
     plot.plot_element_pattern(ue_array,"UE","TX","ARRAY")
     
-    # Plot BS RX radiation patterns
-    par = param.get_antenna_parameters("BS","RX")
-    bs_array = AntennaBeamformingImt(par,0,0)
-    plot.plot_element_pattern(bs_array,"BS","RX","ELEMENT")
-    plot.plot_element_pattern(bs_array,"BS","RX","ARRAY")
-    
-    # Plot UE RX radiation patterns
-    par = param.get_antenna_parameters("UE","RX")
-    ue_array = AntennaBeamformingImt(par,0,0)
-    plot.plot_element_pattern(ue_array,"UE","RX","ELEMENT")
-    plot.plot_element_pattern(ue_array,"UE","RX","ARRAY")
+
     
     print('END')

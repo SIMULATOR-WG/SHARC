@@ -18,6 +18,7 @@ from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_s672 import AntennaS672
 from sharc.antenna.antenna_s1528 import AntennaS1528
 from sharc.antenna.antenna_s1855 import AntennaS1855
@@ -210,6 +211,7 @@ class StationFactory(object):
         fss_space_station.elevation = param.elevation
 
         fss_space_station.active = np.array([True])
+        fss_space_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
         fss_space_station.rx_interference = -500
         
         if param.antenna_pattern == "OMNI":
@@ -246,11 +248,14 @@ class StationFactory(object):
 
         fss_earth_station.active = np.array([True])
         fss_earth_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
+        fss_earth_station.rx_interference = -500
         
         if param.antenna_pattern == "OMNI":
             fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
         elif param.antenna_pattern == "ITU-R S.1855":
             fss_earth_station.antenna = np.array([AntennaS1855(param)])
+        elif param.antenna_pattern == "ITU-R S.465":
+            fss_earth_station.antenna = np.array([AntennaS465(param)])            
         else:
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
