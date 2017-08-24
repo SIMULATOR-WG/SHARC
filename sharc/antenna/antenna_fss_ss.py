@@ -51,10 +51,10 @@ class AntennaFssSs(Antenna):
         
         gain = np.zeros(len(psi))
         
-        idx_1 = np.where(psi <= self.a * self.psi_0 / 2)[0]
-        gain[idx_1] = self.peak_gain - 12 * np.power(psi[idx_1]/self.psi_0, 2)
+        idx_1 = np.where(psi <= self.a * self.psi_0)[0]
+        gain[idx_1] = self.peak_gain - 12 * np.power(psi[idx_1]/(2*self.psi_0), 2)
             
-        idx_2 = np.where((self.a * self.psi_0 / 2 < psi) & (psi <= self.b * self.psi_0 ))[0]
+        idx_2 = np.where((self.a * self.psi_0 < psi) & (psi <= self.b * self.psi_0 ))[0]
         gain[idx_2] = self.peak_gain + self.l_s - 3
         
         idx_3 = np.where((self.b * self.psi_0 < psi) & (psi <= self.psi_1))[0]
