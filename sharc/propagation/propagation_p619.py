@@ -33,6 +33,7 @@ class PropagationP619(Propagation):
         self.building_loss = 20
         self.elevation_has_atmospheric_loss = []
         self.freq_has_atmospheric_loss = []
+        self.surf_water_dens_has_atmospheric_loss = []
         self.atmospheric_loss = []
         self.elevation_delta = .01
 
@@ -425,15 +426,6 @@ class PropagationP619(Propagation):
         apparent_elevation = kwargs["apparent_elevation"]
         sat_params = kwargs["sat_params"]
 
-        # first, check if atmospheric loss was already calculated
-        if len(self.elevation_has_atmospheric_loss):
-            elevation_diff = np.abs(apparent_elevation - np.array(self.elevation_has_atmospheric_loss))
-            indices = np.where(elevation_diff <= self.elevation_delta)
-            if indices[0].size:
-                index = np.argmin(elevation_diff)
-            if self.freq_has_atmospheric_loss[index] == frequency_MHz:
-                loss = self.atmospheric_loss[index]
-                return loss
 
         surf_water_vapour_density = kwargs.pop("surf_water_vapour_density", False)
 
@@ -446,6 +438,17 @@ class PropagationP619(Propagation):
             dummy, dummy, surf_water_vapour_density = \
                 PropagationP619._get_reference_atmosphere_p835(sat_params.imt_lat_deg,
                                                                0, season="summer")
+
+        # first, check if atmospheric loss was already calculated
+        if len(self.elevation_has_atmospheric_loss):
+            elevation_diff = np.abs(apparent_elevation - np.array(self.elevation_has_atmospheric_loss))
+            indices = np.where(elevation_diff <= self.elevation_delta)
+            if indices[0].size:
+                index = np.argmin(elevation_diff)
+                if self.freq_has_atmospheric_loss[index] == frequency_MHz and \
+                   self.surf_water_dens_has_atmospheric_loss[index] == surf_water_vapour_density:
+                    loss = self.atmospheric_loss[index]
+                    return loss
 
         rho_s = surf_water_vapour_density * np.exp(h/2) # water vapour density at h
         if apparent_elevation < 0:
@@ -491,6 +494,7 @@ class PropagationP619(Propagation):
         self.atmospheric_loss.append(a_acc)
         self.elevation_has_atmospheric_loss.append(apparent_elevation)
         self.freq_has_atmospheric_loss.append(frequency_MHz)
+        self.surf_water_dens_has_atmospheric_loss.append(surf_water_vapour_density)
 
         return a_acc
 
@@ -807,7 +811,7 @@ if __name__ == '__main__':
     frequency_MHz = 30000.
     sat_params.imt_altitude = 1000
 
-    apparent_elevation = range(-1, 90, 2)
+    apparent_elevation = range(-2, 90, 2)
 
     loss_2_5 = np.zeros(len(apparent_elevation))
     loss_12_5 = np.zeros(len(apparent_elevation))
@@ -872,7 +876,7 @@ if __name__ == '__main__':
     # Plot troposcatter scintillation attenuation
     # compare with benchmark from ITU-R P-619 Fig. 8
 
-    percentage_fading_exceeded = 10 ** np.arange(-2, 1.1, .1)
+    percentage_fading_exceeded = 10 ** np.arange(-1, 1.1, .1)
     antenna_gain = 0.
     frequency_MHz = 30000.
     wet_refractivity = 42.5
@@ -902,8 +906,5 @@ if __name__ == '__main__':
     plt.legend(title='elevation')
     plt.grid(True)
 
-    #################################
-    # Plot building-entry loss
-    # compare with benchmark from ITU-R P-2109 Fig. 8
 
     plt.show()
