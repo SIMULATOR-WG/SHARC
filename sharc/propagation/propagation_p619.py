@@ -811,7 +811,7 @@ if __name__ == '__main__':
     frequency_MHz = 30000.
     sat_params.imt_altitude = 1000
 
-    apparent_elevation = range(-2, 90, 2)
+    apparent_elevation = range(-1, 90, 2)
 
     loss_2_5 = np.zeros(len(apparent_elevation))
     loss_12_5 = np.zeros(len(apparent_elevation))
@@ -905,6 +905,5 @@ if __name__ == '__main__':
 
     plt.legend(title='elevation')
     plt.grid(True)
-
 
     plt.show()
