@@ -181,6 +181,8 @@ class Parameters(object):
         self.fss_es.frequency = config.getfloat("FSS_ES", "frequency")
         self.fss_es.bandwidth = config.getfloat("FSS_ES", "bandwidth")
         self.fss_es.tx_power_density = config.getfloat("FSS_ES", "tx_power_density")
+        self.fss_es.noise_temperature = config.getfloat("FSS_ES", "noise_temperature")
+        self.fss_es.inr_scaling = config.getfloat("FSS_ES", "inr_scaling")
         self.fss_es.antenna_gain = config.getfloat("FSS_ES", "antenna_gain")
         self.fss_es.antenna_pattern = config.get("FSS_ES", "antenna_pattern")
         self.fss_es.diameter = config.getfloat("FSS_ES", "diameter")
