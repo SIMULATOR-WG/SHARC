@@ -906,4 +906,8 @@ if __name__ == '__main__':
     plt.legend(title='elevation')
     plt.grid(True)
 
+    plt.title("troposcatter scintillation attenuation")
+    plt.xlabel("Percentage time fades and enhancements exceeded")
+    plt.ylabel("Enhancement/Fade (dB)")
+
     plt.show()
