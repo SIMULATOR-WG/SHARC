@@ -150,7 +150,7 @@ class StationFactory(object):
 
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
-        imt_ue.indoor = np.random.random(num_ue) <= param.ue_indoor_percent
+        imt_ue.indoor = np.random.random(num_ue) <= (param.ue_indoor_percent/100)
         imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
@@ -246,13 +246,13 @@ class StationFactory(object):
         fss_earth_station.active = np.array([True])
         fss_earth_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
         fss_earth_station.rx_interference = -500
-        
+
         if param.antenna_pattern == "OMNI":
             fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
         elif param.antenna_pattern == "ITU-R S.1855":
             fss_earth_station.antenna = np.array([AntennaS1855(param)])
         elif param.antenna_pattern == "ITU-R S.465":
-            fss_earth_station.antenna = np.array([AntennaS465(param)])            
+            fss_earth_station.antenna = np.array([AntennaS465(param)])
         else:
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
