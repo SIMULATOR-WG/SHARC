@@ -199,8 +199,8 @@ class StationFactory(object):
 
         # rotate axis and calculate coordinates with origin at IMT system
         imt_lat_rad = param.imt_lat_deg * np.pi / 180.
-        fss_space_station.x = np.array([x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)])
-        fss_space_station.y = np.array([y1])
+        fss_space_station.x = np.array([x1 * np.sin(imt_lat_rad) - z1 * np.cos(imt_lat_rad)]) * 1000
+        fss_space_station.y = np.array([y1]) * 1000
         fss_space_station.height = np.array([(z1 * np.sin(imt_lat_rad) + x1 * np.cos(imt_lat_rad)
                                              - dist_imt_centre_earth_km) * 1000])
 
