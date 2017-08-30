@@ -15,7 +15,7 @@ class TestPropagationP619(unittest.TestCase):
     def setUp(self):
         self.p619 = PropagationP619()
 
-    def test_specific_attenuation(self, plot_flag = False):
+    def test_specific_attenuation(self):
         temperature = 15 + 273.15 # K
         vapour_density = 7.5 # g/m**3
         pressure_hPa = 1013.25
@@ -35,7 +35,7 @@ class TestPropagationP619(unittest.TestCase):
         npt.assert_array_less(specific_att_p676_lower, specific_att)
         npt.assert_array_less(specific_att, specific_att_p676_upper)
 
-    def test_atmospheric_gasses_loss (self, plot_flag = False):
+    def test_atmospheric_gasses_loss (self):
         # compare with benchmark from ITU-R P-619 Fig. 3
         frequency_MHz = 30000.
         sat_params = ParametersFss()
@@ -58,7 +58,7 @@ class TestPropagationP619(unittest.TestCase):
             self.assertGreaterEqual(loss_upper, loss)
 
 
-    def test_beam_spreading_attenuation(self, plot_flag=False):
+    def test_beam_spreading_attenuation(self):
         # compare with benchmark from ITU-R P-619 Fig. 7
 
         altitude_vec = np.array([0,1,2,3,4,6]) * 1000
@@ -82,7 +82,7 @@ class TestPropagationP619(unittest.TestCase):
             else:
                 self.assertLess(attenuation, 0)
 
-    def test_tropo_scintillation_attenuation(self, plot_flag=False):
+    def test_tropo_scintillation_attenuation(self):
         # compare with benchmark from ITU-R P-619 Fig. 8
 
         antenna_gain = 0.

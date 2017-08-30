@@ -11,10 +11,12 @@ import math
 import numpy as np
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
+from sharc.propagation.propagation_building_entry_loss import PropagationBuildingEntryLoss
+
 from sharc.support.enumerations import StationType
-from scipy.stats import norm
 import matplotlib.pyplot as plt
 import os
+
 
 class PropagationP619(Propagation):
     """
@@ -28,9 +30,10 @@ class PropagationP619(Propagation):
         super().__init__()
         self.clutter = PropagationClutterLoss()
         self.free_space = PropagationFreeSpace()
+        self.building_entry = PropagationBuildingEntryLoss()
+
         self.depolarization_loss = 1.5
         self.polarization_mismatch_loss = 3.
-        self.building_loss = 20
         self.elevation_has_atmospheric_loss = []
         self.freq_has_atmospheric_loss = []
         self.surf_water_dens_has_atmospheric_loss = []
@@ -628,73 +631,6 @@ class PropagationP619(Propagation):
 
         return attenuation
 
-    @staticmethod
-    def _get_building_entry_loss(frequency_MHz, elevation, prob = "random",
-                                 building_class = "traditional") -> np.array:
-        """
-        Calculates building loss according to ITU-R P.2109
-
-        Parameters
-        ----------
-            frequency_MHz (np.array) : carrier frequencies (MHz)
-            elevation (np.array) : apparent elevation angles
-            prob (np.array / string) : the probability with which the loss is not exceeded;
-                                    if "random", then different values are chosen for each user
-            building_class (string) : type of construction material, "traditional" or "thermally-efficient"
-
-        Returns
-        -------
-            array with building loss values with dimensions of elevation
-
-        """
-
-        f_GHz = frequency_MHz/1000
-
-        if isinstance(prob, str) and prob.lower() == "random":
-            prob = np.random.random(elevation.shape)
-
-        if building_class == "traditional":
-            r = 12.64
-            s = 3.72
-            t = .96
-            u = 9.6
-            v = 2.
-            w = 9.1
-            x = -3.
-            y = 4.5
-            z = -2.
-        elif building_class == "thermally-efficient":
-            r = 28.19
-            s = -3.
-            t = 8.48
-            u = 13.5
-            v = 3.8
-            w = 27.8
-            x = -2.9
-            y = 9.4
-            z = -2.1
-        else:
-            error_message = "building_class not supported"
-            raise ValueError(error_message)
-        c_dB = -3.
-        hor_loss = r + s * np.log10(f_GHz) + t * np.log10(f_GHz) ** 2
-        angle_correction = .212 * np.abs(elevation)
-        mu_1 = hor_loss + angle_correction
-        mu_2 = w + x * np.log10(f_GHz)
-        sigma_1 = u + v * np.log10(f_GHz)
-        sigma_2 = y + z * np.log10(f_GHz)
-
-        a_dB = norm.ppf(prob) * sigma_1 + mu_1
-        b_dB = norm.ppf(prob) * sigma_2 + mu_2
-
-        a_lin = 10**(a_dB/10)
-        b_lin = 10**(b_dB/10)
-        c_lin = 10**(c_dB/10)
-
-        loss = 10*np.log10(a_lin + b_lin + c_lin)
-
-        return loss
-
 
     def get_loss(self, *args, **kwargs) -> np.array:
         """
@@ -756,7 +692,7 @@ class PropagationP619(Propagation):
             clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
                                                                elevation=elevation["free_space"],
                                                                station_type=StationType.FSS_SS))
-            building_loss = self._get_building_entry_loss(f, elevation["apparent"])* indoor_stations
+            building_loss = self.building_entry.get_loss(f, elevation["apparent"]) * indoor_stations
 
             loss = (free_space_loss + clutter_loss + building_loss + self.polarization_mismatch_loss +
                     atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
