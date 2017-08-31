@@ -16,9 +16,10 @@ from sharc.propagation.propagation_ter_simple import PropagationTerSimple
 from sharc.propagation.propagation_uma import PropagationUMa
 from sharc.propagation.propagation_umi import PropagationUMi
 from sharc.propagation.propagation_abg import PropagationABG
+from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
 
 class PropagationFactory(object):
-    
+
     @staticmethod
     def createPropagation(channel_model: str) -> Propagation:
         if channel_model == "FSPL":
@@ -28,7 +29,7 @@ class PropagationFactory(object):
         elif channel_model == "UMa":
             return PropagationUMa()
         elif channel_model == "UMi":
-            return PropagationUMi()            
+            return PropagationUMi()
         elif channel_model == "CI":
             return PropagationCloseIn()
         elif channel_model == "SatelliteSimple":
@@ -37,6 +38,8 @@ class PropagationFactory(object):
             return PropagationTerSimple()
         elif channel_model == "P619":
             return PropagationP619()
+        elif channel_model == "P452":
+            return PropagationClearAir()
         else:
             sys.stderr.write("ERROR\nInvalid channel_model: " + channel_model)
             sys.exit(1)

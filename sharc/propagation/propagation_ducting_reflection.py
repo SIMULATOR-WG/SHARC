@@ -4,7 +4,7 @@ Created on Tue Mai 08 12:05:38 2017
 @author: LeticiaValle_Mac
 """
 from sharc.propagation.propagation import Propagation
-from sharc.propagation.P452.propagation_gases_attenuation import PropagationGasesAttenuation
+from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
 
 import numpy as np
 
@@ -16,7 +16,7 @@ class PropagationDuctingReflection(Propagation):
 
 
     def __init__(self):
-        super(PropagationDutingReflection, self).__init__()
+        super(PropagationDuctingReflection, self).__init__()
         np.random.seed(0)
 
         #self.param = param

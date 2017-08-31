@@ -8,10 +8,10 @@ Created on Mon May 22 15:10:11 2017
 @author: LeticiaValle_Mac
 """
 from sharc.propagation.propagation import Propagation
-from sharc.propagation.P452.propagation_gases_attenuation import PropagationGasesAttenuation
-from sharc.propagation.P452.propagation_duting_reflection import PropagationDutingReflection
-from sharc.propagation.P452.propagation_troposcatter import PropagationTropScatter
-from sharc.propagation.P452.propagation_diffraction import PropagationDiffraction
+from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
+from sharc.propagation.propagation_ducting_reflection import PropagationDuctingReflection
+from sharc.propagation.propagation_troposcatter import PropagationTropScatter
+from sharc.propagation.propagation_diffraction import PropagationDiffraction
 
 import numpy as np
 
@@ -24,17 +24,18 @@ class PropagationClearAir(Propagation):
         np.random.seed(0)
 
         self.propagationAg = PropagationGasesAttenuation()
-        self.propagationDucting = PropagationDutingReflection()
+        self.propagationDucting = PropagationDuctingReflection()
         self.propagationTropoScatter = PropagationTropScatter()
         self.propagationDiffraction = PropagationDiffraction()
 
     def get_loss(self, *args, **kwargs) -> np.array:
 
-        d = np.asarray(kwargs["distance"])*(1e-3)   #Km
+        d_km = np.asarray(kwargs["distance"])*(1e-3)   #Km
         f = np.asarray(kwargs["frequency"])*(1e-3)  #GHz
         Ph = np.asarray(kwargs["atmospheric_pressure"])
         T = np.asarray(kwargs["air_temperature"])
         ro = np.asarray(kwargs["water_vapour"])
+
         Dlt = np.asarray(kwargs["Dlt"])
         Dlr = np.asarray(kwargs["Dlr"])
         Dct = np.asarray(kwargs["Dct"])
@@ -103,12 +104,12 @@ class PropagationClearAir(Propagation):
 
         val_hi =len(hi)
         for i in range(0, val_hi,1):
-            Stim_old = (hi[i] + 500*Ce*di[i]*(d - di[i]) - Hts)/di[i]
+            Stim_old = (hi[i] + 500*Ce*di[i]*(d_km - di[i]) - Hts)/di[i]
 
             if Stim_old>Stim:
                Stim = Stim_old
 
-        Str = (Hrs - Hts)/d
+        Str = (Hrs - Hts)/d_km
 
         #Approximation to the inverse cumulative normal distribution function
         Tx1 = np.sqrt((-2*np.log(p/100)))
@@ -123,7 +124,7 @@ class PropagationClearAir(Propagation):
 
 
         Fj = 1.0 - 0.5*(1.0 + np.tanh(3.0*ep*(Stim - Str)/thetaJ))
-        Fk = 1.0 - 0.5*(1.0 + np.tanh(3.0*k*(d - dsw)/dsw))
+        Fk = 1.0 - 0.5*(1.0 + np.tanh(3.0*k*(d_km - dsw)/dsw))
 
         Lbfsg = self.propagationAg.get_loss_Ag(distance=d, frequency=f,
                                                atmospheric_pressure=Ph,
@@ -149,8 +150,21 @@ class PropagationClearAir(Propagation):
         Lb0p = Lbfsg + Esp
         Lb0beta = Lbfsg + Esbeta
 
-        Ld50, Ldbeta,Ldp, Ldb  = self.propagationDiffraction.get_loss(beta = beta0, distance=d*1000, frequency=f*1000, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=Hrs, Hts=Hts, Hte=Hte, Hre=Hre, Hsr=Hsr, Hst=Hst, H0=H0, Hn=Hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=Dlt ,Dlr=Dlr, percentage_p=p,C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
-
+        Ld50, Ldbeta,Ldp, Ldb  = self.propagationDiffraction.get_loss(beta = beta0,
+                                                                      distance=d*1000,
+                                                                      frequency=f*1000,
+                                                                      atmospheric_pressure=Ph,
+                                                                      air_temperature=T,
+                                                                      water_vapour=ro,
+                                                                      delta_N=deltaN,
+                                                                      Hrs=Hrs, Hts=Hts,
+                                                                      Hte=Hte, Hre=Hre,
+                                                                      Hsr=Hsr, Hst=Hst,
+                                                                      H0=H0, Hn=Hn,
+                                                                      dist_di=di, hight_hi=hi,
+                                                                      omega=omega, Dlt=Dlt ,Dlr=Dlr,
+                                                                      percentage_p=p,
+                                                                      C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
 
         Lbd50 = Lbfsg + Ld50
         Lbd = Lb0p + Ldp
