@@ -41,7 +41,7 @@ class PropagationTropScatter(Propagation):
         p = np.asarray(kwargs["percentage_p"])
 
 
-        loss_Ag = self.propagation.get_loss_Ag(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
+        loss_Ag = self.propagation.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
 
         Lf = 25*np.log10(f) - 2.5*(np.log10(f/2))**2      #Frequency dependent loss (dB)
         Lc = 0.051*np.exp(0.055*(Gt + Gr))                #Aperture to medium coupling loss (dB)

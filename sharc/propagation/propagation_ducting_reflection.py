@@ -57,7 +57,7 @@ class PropagationDuctingReflection(Propagation):
         #100 N-units/km can be expected in the first 100 m of the lower atmosphere,
         tau = 1 - np.exp(-(4.12*(10**-4)*dlm**2.41))
         alpha = -0.6 - epsilon*(10**-9)*(d**3.1)*tau
-        dI = min(d - Dlt - Dlr, 40)
+        dI = np.minimum(d - Dlt - Dlr, 40)
 
         k50 = 157/(157 - deltaN)
         Ae = 6371*k50               #Effective earth radius
@@ -146,7 +146,7 @@ class PropagationDuctingReflection(Propagation):
         Ad = Yd*teta_line + Ap
 
         #Atmospheric gases attenuation
-        loss_Ag = self.propagation.get_loss_Ag(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
+        loss_Ag = self.propagation.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
 
 
         loss = Af + Ad + loss_Ag

@@ -12,6 +12,7 @@ from sharc.propagation.propagation_gases_attenuation import PropagationGasesAtte
 from sharc.propagation.propagation_ducting_reflection import PropagationDuctingReflection
 from sharc.propagation.propagation_troposcatter import PropagationTropScatter
 from sharc.propagation.propagation_diffraction import PropagationDiffraction
+from sharc.propagation.propagation_free_space import PropagationFreeSpace
 
 import numpy as np
 
@@ -27,61 +28,91 @@ class PropagationClearAir(Propagation):
         self.propagationDucting = PropagationDuctingReflection()
         self.propagationTropoScatter = PropagationTropScatter()
         self.propagationDiffraction = PropagationDiffraction()
+        self.free_space = PropagationFreeSpace()
+
+        ###########################################################################
+        # Model coeficients
+        self.coeff_r = 12.64
+        self.coeff_s = 3.72
+        self.coeff_t = 0.96
+        self.coeff_u = 9.6
+        self.coeff_v = 2
+        self.coeff_w = 9.1
+        self.coeff_x = -3
+        self.coeff_y = 4.5
+        self.coeff_z = -2
+
+        ###########################################################################
+        # Coeficients for the Approximation to the inverse cumulative normal distribution function
+        self.C0 = 2.515516698
+        self.C1 = 0.802853
+        self.C2 = 0.010328
+        self.D1 = 1.432788
+        self.D2 = 0.189269
+        self.D3 = 0.001308
+
+        ###########################################################################
+        # The distance of the i-th profile point
+        self.dist_di = [0,0,0]
+
+        ###########################################################################
+        #Height of the i-th profile point
+        self.height_hi = [2.2,4.3,6.4]
 
     def get_loss(self, *args, **kwargs) -> np.array:
 
-        d_km = np.asarray(kwargs["distance"])*(1e-3)   #Km
+        d_km = np.asarray(kwargs["distance_3D"])*(1e-3)   #Km
         f = np.asarray(kwargs["frequency"])*(1e-3)  #GHz
-        Ph = np.asarray(kwargs["atmospheric_pressure"])
-        T = np.asarray(kwargs["air_temperature"])
-        ro = np.asarray(kwargs["water_vapour"])
 
-        Dlt = np.asarray(kwargs["Dlt"])
-        Dlr = np.asarray(kwargs["Dlr"])
-        Dct = np.asarray(kwargs["Dct"])
-        Dcr = np.asarray(kwargs["Dcr"])
+        f = np.unique(f)
+        if len(f) > 1:
+            error_message = "different frequencies not supported in P619"
+            raise ValueError(error_message)
 
-        Hts = np.asarray(kwargs["Hts"])
-        Hrs = np.asarray(kwargs["Hrs"])
-        Hte = np.asarray(kwargs["Hte"])
-        Hre = np.asarray(kwargs["Hre"])
-        thetaT = np.asarray(kwargs["theta_tx"])
-        thetaR = np.asarray(kwargs["theta_rx"])
-        N0 = np.asarray(kwargs["N0"])
-        deltaN = np.asarray(kwargs["delta_N"])
-        p = np.asarray(kwargs["percentage_p"])
+        es_params =kwargs["es_params"]
+        Ph = np.asarray(es_params.atmospheric_pressure)
+        T = np.asarray(es_params.air_temperature)
+        ro = np.asarray(es_params.water_vapour)
 
-        omega = np.asarray(kwargs["omega"])
-        phi = np.asarray(kwargs["phi"])
-        dtm = np.asarray(kwargs["dtm"])
-        dlm = np.asarray(kwargs["dlm"])
-        epsilon = np.asarray(kwargs["epsilon"])
-        hm = np.asarray(kwargs["hm"])
+        Dlt = np.asarray(es_params.Dlt)
+        Dlr = np.asarray(es_params.Dlr)
+        Dct = np.asarray(es_params.Dct)
+        Dcr = np.asarray(es_params.Dcr)
+
+        Hts = np.asarray(es_params.Hts)
+        Hrs = np.asarray(es_params.Hrs)
+        Hte = np.asarray(es_params.Hte)
+        Hre = np.asarray(es_params.Hre)
+        thetaT = np.asarray(es_params.theta_tx)
+        thetaR = np.asarray(es_params.theta_rx)
+        N0 = np.asarray(es_params.N0)
+        deltaN = np.asarray(es_params.delta_N)
+        p = np.asarray(es_params.percentage_p)
+
+        omega = np.asarray(es_params.omega)
+        phi = np.asarray(es_params.phi)
+        dtm = np.asarray(es_params.dtm)
+        dlm = np.asarray(es_params.dlm)
+        epsilon = np.asarray(es_params.epsilon)
+        hm = np.asarray(es_params.hm)
         Gt = np.asarray(kwargs["tx_gain"])
         Gr = np.asarray(kwargs["rx_gain"])
 
-        Hsr = np.asarray(kwargs["Hsr"])
-        Hst = np.asarray(kwargs["Hst"])
-        H0 = np.asarray(kwargs["H0"])
-        Hn = np.asarray(kwargs["Hn"])
-        thetaJ = np.asarray(kwargs["thetaJ"])
-        ep = np.asarray(kwargs["par_ep"])
-        dsw = np.asarray(kwargs["dsw"])
-        k = np.asarray(kwargs["k"])
-        di = np.asarray(kwargs["dist_di"])
-        hi = np.asarray(kwargs["hight_hi"])
-        n = np.asarray(kwargs["eta"])
-        Aht = np.asarray(kwargs["Aht"])
-        Ahr = np.asarray(kwargs["Ahr"])
+        Hsr = np.asarray(es_params.Hsr)
+        Hst = np.asarray(es_params.Hst)
+        H0 = np.asarray(es_params.H0)
+        Hn = np.asarray(es_params.Hn)
+        thetaJ = np.asarray(es_params.thetaJ)
+        ep = np.asarray(es_params.par_ep)
+        dsw = np.asarray(es_params.dsw)
+        k = np.asarray(es_params.k)
+        di = self.dist_di
+        hi = self.height_hi
+        n = np.asarray(es_params.eta)
+        Aht = np.asarray(es_params.Aht)
+        Ahr = np.asarray(es_params.Ahr)
 
-        C0 = np.asarray(kwargs["C0"])
-        C1 = np.asarray(kwargs["C1"])
-        C2 = np.asarray(kwargs["C2"])
-        D1 = np.asarray(kwargs["D1"])
-        D2 = np.asarray(kwargs["D2"])
-        D3 = np.asarray(kwargs["D3"])
-
-        Stim = -np.inf
+        Stim = -np.inf * np.ones(d_km.size)
 
         #To find beta value
         tau = 1 - np.exp(-(4.12*(10**-4)*dlm**2.41))
@@ -103,20 +134,22 @@ class PropagationClearAir(Propagation):
         Ce = 1/ae
 
         val_hi =len(hi)
-        for i in range(0, val_hi,1):
-            Stim_old = (hi[i] + 500*Ce*di[i]*(d_km - di[i]) - Hts)/di[i]
 
-            if Stim_old>Stim:
-               Stim = Stim_old
+        for k in range(len(d_km)):
+            for i in range(0, val_hi,1):
+                Stim_old = (hi[i] + 500*Ce*di[i]*(d_km[0,k] - di[i]) - Hts)/di[i]
+
+                if Stim_old>Stim[k]:
+                   Stim[k] = Stim_old
 
         Str = (Hrs - Hts)/d_km
 
         #Approximation to the inverse cumulative normal distribution function
         Tx1 = np.sqrt((-2*np.log(p/100)))
-        Ex1 = (((C2*Tx1+C1)*Tx1) +C0)/(((D3*Tx1 + D2)*Tx1 + D1)*Tx1 + 1)
+        Ex1 = (((self.C2*Tx1+self.C1)*Tx1) +self.C0)/(((self.D3*Tx1 + self.D2)*Tx1 + self.D1)*Tx1 + 1)
 
         Tx2 = np.sqrt((-2*np.log(beta0/100)))
-        Ex2 = (((C2*Tx2+C1)*Tx2) +C0)/(((D3*Tx2 + D2)*Tx2 + D1)*Tx2 + 1)
+        Ex2 = (((self.C2*Tx2+self.C1)*Tx2) +self.C0)/(((self.D3*Tx2 + self.D2)*Tx2 + self.D1)*Tx2 + 1)
 
         I1 = Ex1 - Tx1
         I2 = Ex2 - Tx2
@@ -126,19 +159,19 @@ class PropagationClearAir(Propagation):
         Fj = 1.0 - 0.5*(1.0 + np.tanh(3.0*ep*(Stim - Str)/thetaJ))
         Fk = 1.0 - 0.5*(1.0 + np.tanh(3.0*k*(d_km - dsw)/dsw))
 
-        Lbfsg = self.propagationAg.get_loss_Ag(distance=d, frequency=f,
+        Lbfsg = self.propagationAg.get_loss(distance=d_km, frequency=f,
                                                atmospheric_pressure=Ph,
                                                air_temperature=T,
                                                water_vapour=ro)
         # Ducting/layer reflection
-        Lba =  self.propagationDucting.get_loss(distance=d*1000,frequency=f*1000,
+        Lba =  self.propagationDucting.get_loss(distance=d_km*1000,frequency=f*1000,
                                                 atmospheric_pressure=Ph, air_temperature= T,
                                                 water_vapour=ro, Dlt = Dlt, Dlr=Dlr, Dct=Dct,
                                                 Dcr=Dcr, Hts=Hts, Hrs=Hrs, Hte=Hte, Hre=Hre,
                                                 theta_tx = thetaT, theta_rx = thetaR, N0 = N0,
                                                 delta_N = deltaN, percentage_p = p, omega=omega,
                                                 phi=phi, dtm=dtm, dlm=dlm, epsilon=epsilon, hm=hm)
-        Lbs = self.propagationTropoScatter.get_loss(distance=d*1000, frequency=f*1000,
+        Lbs = self.propagationTropoScatter.get_loss(distance=d_km*1000, frequency=f*1000,
                                                     atmospheric_pressure=Ph, air_temperature= T,
                                                     water_vapour=ro, tx_gain = Gt, rx_gain = Gr,
                                                     theta_tx = thetaT, theta_rx = thetaR, N0 = N0,
@@ -150,21 +183,29 @@ class PropagationClearAir(Propagation):
         Lb0p = Lbfsg + Esp
         Lb0beta = Lbfsg + Esbeta
 
-        Ld50, Ldbeta,Ldp, Ldb  = self.propagationDiffraction.get_loss(beta = beta0,
-                                                                      distance=d*1000,
-                                                                      frequency=f*1000,
-                                                                      atmospheric_pressure=Ph,
-                                                                      air_temperature=T,
-                                                                      water_vapour=ro,
-                                                                      delta_N=deltaN,
-                                                                      Hrs=Hrs, Hts=Hts,
-                                                                      Hte=Hte, Hre=Hre,
-                                                                      Hsr=Hsr, Hst=Hst,
-                                                                      H0=H0, Hn=Hn,
-                                                                      dist_di=di, hight_hi=hi,
-                                                                      omega=omega, Dlt=Dlt ,Dlr=Dlr,
-                                                                      percentage_p=p,
-                                                                      C0=C0,C1=C1,C2=C2,D1=D1,D2=D2,D3=D3)
+
+        Ld50 = np.empty(d_km.size)
+        Ldbeta = np.empty(d_km.size)
+        Ldp = np.empty(d_km.size)
+        Ldb = np.empty(d_km.size)
+
+        for index in range(d_km.size):
+            Ld50[index], Ldbeta[index],Ldp[index], Ldb[index]  = \
+                self.propagationDiffraction.get_loss(beta = beta0, distance=d_km[0,index]*1000,
+                                                                   frequency=f*1000,
+                                                                   atmospheric_pressure=Ph,
+                                                                   air_temperature=T,
+                                                                   water_vapour=ro,
+                                                                   delta_N=deltaN,
+                                                                   Hrs=Hrs, Hts=Hts,
+                                                                   Hte=Hte, Hre=Hre,
+                                                                   Hsr=Hsr, Hst=Hst,
+                                                                   H0=H0, Hn=Hn,
+                                                                   dist_di=di, hight_hi=hi,
+                                                                   omega=omega, Dlt=Dlt ,Dlr=Dlr,
+                                                                   percentage_p=p,
+                                                                   C0=self.C0,C1=self.C1,C2=self.C2,
+                                                                   D1=self.D1,D2=self.D2,D3=self.D3)
 
         Lbd50 = Lbfsg + Ld50
         Lbd = Lb0p + Ldp
@@ -177,16 +218,22 @@ class PropagationClearAir(Propagation):
 
         Lminbap = n*np.log(np.exp(Lba/n) + np.exp(Lb0p/n))
 
-        if (Lminbap > Lbd):
-            Lbda = Lbd
-        if (Lminbap <= Lbd):
-            Lbda = Lminbap + (Lbd - Lminbap)*Fk
+
+        Lbda = Lbd
+        index = np.where(Lminbap[0,:] <= Lbd[0,:])
+        if index[0].size:
+            Lbda[index] = Lminbap + (Lbd[index] - Lminbap)*Fk
+
+        # if (Lminbap <= Lbd):
+        #     Lbda = Lminbap + (Lbd - Lminbap)*Fk
 
         Lbam = Lbda + (Lminb0p - Lbda)*Fj
+        free_space_loss = self.free_space.get_loss(distance_2D=d_km * 1000,
+                                                   frequency=f*1000)
 
-        Lb = -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam)) + Aht + Ahr
+        Lb = free_space_loss -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam)) + Aht + Ahr
 
-        Loss = Lb - Gt - Gr
+
 
         #print(Lb)
         return Lb

@@ -94,6 +94,7 @@ class PropagationDiffraction(Propagation):
             Hi[i] = hi[i] - (hts*(d - di[i]) + hrs*di[i])/d
             aobt_1[i] = (Hi[i]/di[i])
 
+            index = np.where(di[i]-d == 0)
             if (di[i]-d == 0):
                 aobr_1[i] = Hi[i]
             else:
@@ -304,7 +305,7 @@ class PropagationDiffraction(Propagation):
          else:
             Fi =1
 
-         Ag = self.propagationAg.get_loss_Ag(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
+         Ag = self.propagationAg.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
 
          Lbfgs = 92.5 + 20*np.log10(f) + 20*np.log10(d) +Ag
          Esp = 2.6*(1 - np.exp(-0.1*(dlr+dlt)))*np.log10(p/50)

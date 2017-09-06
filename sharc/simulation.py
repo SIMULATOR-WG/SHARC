@@ -160,7 +160,8 @@ class Simulation(ABC, Observable):
                 earth_to_space = True
                 single_entry = False
 
-            path_loss = propagation.get_loss(distance_3D=d_3D,
+            if station_a.station_type is StationType.FSS_SS:
+                path_loss = propagation.get_loss(distance_3D=d_3D,
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles,
@@ -169,6 +170,13 @@ class Simulation(ABC, Observable):
                                              earth_station_antenna_gain=gain_b,
                                              single_entry=single_entry,
                                              number_of_sectors=sectors_in_node)
+            else:
+                path_loss = propagation.get_loss(distance_3D=d_3D,
+                                             frequency=self.param_system.frequency*np.ones(d_3D.shape),
+                                             indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
+                                             elevation=elevation_angles,
+                                             es_params=self.param_system,
+                                             tx_gain = gain_a, rx_gain = gain_b)
 
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D,
