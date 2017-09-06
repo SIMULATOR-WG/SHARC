@@ -60,10 +60,7 @@ class Model(Observable):
         
         
     def get_description(self) -> str:
-        if self.parameters.general.system == "FSS_SS":
-            param_system = self.parameters.fss_ss
-        if self.parameters.general.system == "FSS_ES":
-            param_system = self.parameters.fss_es        
+        param_system = self.simulation.param_system
         
         description = "\nIMT:\n" \
                             + "\tinterfered with: {:s}\n".format(str(self.parameters.imt.interfered_with)) \

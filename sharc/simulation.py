@@ -33,8 +33,10 @@ class Simulation(ABC, Observable):
         
         if self.parameters.general.system == "FSS_SS":
             self.param_system = self.parameters.fss_ss
-        if self.parameters.general.system == "FSS_ES":
+        elif self.parameters.general.system == "FSS_ES":
             self.param_system = self.parameters.fss_es
+        elif self.parameters.general.system == "FS":
+            self.param_system = self.parameters.fs
         
         self.topology = TopologyFactory.createTopology(self.parameters)
 
@@ -139,7 +141,9 @@ class Simulation(ABC, Observable):
         else:
             elevation_angles = None
 
-        if station_a.station_type is StationType.FSS_SS or station_a.station_type is StationType.FSS_ES:
+        if station_a.station_type is StationType.FSS_SS or \
+           station_a.station_type is StationType.FSS_ES or \
+           station_a.station_type is StationType.FS:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
@@ -157,6 +161,8 @@ class Simulation(ABC, Observable):
                 gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.parameters.imt.ue_k, 1)
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a))
                 path_loss = np.repeat(path_loss, self.parameters.imt.ue_k, 1)                
+            self.system_imt_antenna_gain = gain_a
+            self.imt_system_antenna_gain = gain_b
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D, 
                                              distance_2D=d_2D, 
@@ -170,17 +176,10 @@ class Simulation(ABC, Observable):
             gain_a = self.calculate_gains(station_a, station_b)
             gain_b = np.transpose(self.calculate_gains(station_b, station_a))
         
-        # collect IMT BS and UE antenna gain samples
-        if station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_UE:
+            # collect IMT BS and UE antenna gain samples
             self.path_loss_imt = path_loss
             self.imt_bs_antenna_gain = gain_a
             self.imt_ue_antenna_gain = gain_b
-        elif (station_a.station_type is StationType.FSS_SS and station_b.station_type is StationType.IMT_UE) or \
-             (station_a.station_type is StationType.FSS_SS and station_b.station_type is StationType.IMT_BS) or \
-             (station_a.station_type is StationType.FSS_ES and station_b.station_type is StationType.IMT_UE) or \
-             (station_a.station_type is StationType.FSS_ES and station_b.station_type is StationType.IMT_BS):
-            self.system_imt_antenna_gain = gain_a
-            self.imt_system_antenna_gain = gain_b
             
         # calculate coupling loss
         coupling_loss = np.squeeze(path_loss - gain_a - gain_b)
@@ -257,7 +256,9 @@ class Simulation(ABC, Observable):
         if(station_1.station_type is StationType.IMT_BS):
             if(station_2.station_type is StationType.IMT_UE):
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
-            elif(station_2.station_type is StationType.FSS_SS or station_2.station_type is StationType.FSS_ES):
+            elif(station_2.station_type is StationType.FSS_SS or \
+                 station_2.station_type is StationType.FSS_ES or \
+                 station_2.station_type is StationType.FS):
                 phi = np.repeat(phi,self.parameters.imt.ue_k,0)
                 theta = np.repeat(theta,self.parameters.imt.ue_k,0)
                 beams_idx = np.tile(np.arange(self.parameters.imt.ue_k),self.bs.num_stations)
@@ -265,27 +266,30 @@ class Simulation(ABC, Observable):
         elif(station_1.station_type is StationType.IMT_UE):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
             
-        elif(station_1.station_type is StationType.FSS_SS or station_1.station_type is StationType.FSS_ES):
+        elif(station_1.station_type is StationType.FSS_SS or \
+             station_1.station_type is StationType.FSS_ES or \
+             station_1.station_type is StationType.FS):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
         
         gains = np.zeros(phi.shape)
         
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
-           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES):
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS):
             for k in station_1_active:
                 for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]))
-        elif station_1.station_type is StationType.FSS_ES:
+        elif station_1.station_type is StationType.FSS_SS or \
+             station_1.station_type is StationType.FSS_ES or \
+             station_1.station_type is StationType.FS:
             phi = station_1.get_off_axis_angle(station_2)
             distance = station_1.get_distance_to(station_2)
             theta = station_1.elevation - np.arctan(np.degrees((station_1.height - station_2.height)/distance))
             gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active],
                                                                             theta_vec=theta[0,station_2_active])
-        elif station_1.station_type is StationType.FSS_SS:
-            phi = station_1.get_off_axis_angle(station_2)
-            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active])
+
         else: # for IMT <-> IMT
             for k in station_1_active:
                 gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
