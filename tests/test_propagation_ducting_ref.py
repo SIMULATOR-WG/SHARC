@@ -9,7 +9,7 @@ class PropagationDuctingReflectionTest(unittest.TestCase):
 
     def setUp(self):
         self.__dutingRef = PropagationDuctingReflection()
-        
+
     def test_loss(self):
 
 

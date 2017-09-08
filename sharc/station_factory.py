@@ -13,11 +13,13 @@ from sharc.support.enumerations import StationType
 from sharc.parameters.parameters import Parameters
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna_f699 import AntennaF699
 from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_s672 import AntennaS672
 from sharc.antenna.antenna_s1528 import AntennaS1528
@@ -173,6 +175,8 @@ class StationFactory(object):
             return StationFactory.generate_fss_earth_station(parameters.fss_es)
         elif parameters.general.system == "FSS_SS":
             return StationFactory.generate_fss_space_station(parameters.fss_ss)
+        elif parameters.general.system == "FS":
+            return StationFactory.generate_fs_station(parameters.fs)            
         else:
             sys.stderr.write("ERROR\nInvalid system: " + parameters.general.system)
             sys.exit(1)
@@ -258,5 +262,34 @@ class StationFactory(object):
             sys.exit(1)
 
         fss_earth_station.bandwidth = np.array([param.bandwidth])
-
+        
         return fss_earth_station
+        
+        
+    @staticmethod
+    def generate_fs_station(param: ParametersFs):
+        fs_station = StationManager(1)
+        fs_station.station_type = StationType.FS
+
+        fs_station.x = np.array([param.x])
+        fs_station.y = np.array([param.y])
+        fs_station.height = np.array([param.height])
+
+        fs_station.azimuth = np.array([param.azimuth])
+        fs_station.elevation = np.array([param.elevation])
+
+        fs_station.active = np.array([True])
+        fs_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
+        fs_station.rx_interference = -500
+        
+        if param.antenna_pattern == "OMNI":
+            fs_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        elif param.antenna_pattern == "ITU-R F.699":
+            fs_station.antenna = np.array([AntennaF699(param)])
+        else:
+            sys.stderr.write("ERROR\nInvalid FS antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+            
+        fs_station.bandwidth = np.array([param.bandwidth])
+        
+        return fs_station

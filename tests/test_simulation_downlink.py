@@ -226,7 +226,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)        
 
         self.simulation.system = StationFactory.generate_fss_space_station(self.param.fss_ss)
-        self.simulation.system.x = np.array([0])
+        self.simulation.system.x = np.array([0.01]) # avoids zero-division
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param.fss_ss.altitude])
         

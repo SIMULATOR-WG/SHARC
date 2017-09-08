@@ -11,6 +11,7 @@ from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_hotspot import ParametersHotspot
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 
@@ -27,6 +28,7 @@ class Parameters(object):
         self.imt = ParametersImt()
         self.antenna_imt = ParametersAntennaImt()
         self.hotspot = ParametersHotspot()
+        self.fs = ParametersFs()
         self.fss_ss = ParametersFssSs()
         self.fss_es = ParametersFssEs()
 
@@ -228,3 +230,25 @@ class Parameters(object):
         self.fss_es.Aht = config.getfloat("FSS_ES", "Aht")
         self.fss_es.Ahr = config.getfloat("FSS_ES", "Ahr")
         self.fss_es.Beta_0 = config.getfloat("FSS_ES", "Beta_0")
+
+        #######################################################################
+        # Fixed wireless service
+        #######################################################################
+        self.fs.x                       = config.getfloat("FS", "x")
+        self.fs.y                       = config.getfloat("FS", "y")
+        self.fs.height                  = config.getfloat("FS", "height")
+        self.fs.elevation               = config.getfloat("FS", "elevation")
+        self.fs.azimuth                 = config.getfloat("FS", "azimuth")
+        self.fs.frequency               = config.getfloat("FS", "frequency")
+        self.fs.bandwidth               = config.getfloat("FS", "bandwidth")
+        self.fs.noise_temperature       = config.getfloat("FS", "noise_temperature")
+        self.fs.tx_power_density        = config.getfloat("FS", "tx_power_density")
+        self.fs.inr_scaling             = config.getfloat("FS", "inr_scaling")
+        self.fs.antenna_gain            = config.getfloat("FS", "antenna_gain")
+        self.fs.antenna_pattern         = config.get("FS", "antenna_pattern")
+        self.fs.diameter                = config.getfloat("FS", "diameter")
+        self.fs.channel_model           = config.get("FS", "channel_model")
+        self.fs.line_of_sight_prob      = config.getfloat("FS", "line_of_sight_prob")
+        self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
+        self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
+
