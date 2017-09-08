@@ -63,6 +63,7 @@ class PropagationClearAir(Propagation):
 
         d_km = np.asarray(kwargs["distance_3D"])*(1e-3)   #Km
         f = np.asarray(kwargs["frequency"])*(1e-3)  #GHz
+        number_of_sectors = kwargs["number_of_sectors"]
 
         f = np.unique(f)
         if len(f) > 1:
@@ -174,8 +175,9 @@ class PropagationClearAir(Propagation):
         Lbs = self.propagationTropoScatter.get_loss(distance=d_km*1000, frequency=f*1000,
                                                     atmospheric_pressure=Ph, air_temperature= T,
                                                     water_vapour=ro, tx_gain = Gt, rx_gain = Gr,
-                                                    theta_tx = thetaT, theta_rx = thetaR, N0 = N0,
-                                                    delta_N = deltaN, percentage_p = p)       #Tropospheric scatter
+                                                    theta_tx=thetaT, theta_rx=thetaR, N0=N0,
+                                                    delta_N=deltaN, percentage_p=p,
+                                                    number_of_sectors=number_of_sectors)       #Tropospheric scatter
 
 
         Esp = 2.6*(1 - np.exp(-0.1*(Dlt + Dlr)))*np.log10(p/50)

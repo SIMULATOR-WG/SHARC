@@ -37,7 +37,7 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.fss_es
         elif self.parameters.general.system == "FS":
             self.param_system = self.parameters.fs
-        
+
         self.topology = TopologyFactory.createTopology(self.parameters)
 
         self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)
@@ -168,19 +168,15 @@ class Simulation(ABC, Observable):
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
-                                             elevation=elevation_angles,
-                                             sat_params = self.param_system,
-                                             earth_to_space = earth_to_space,
-                                             earth_station_antenna_gain=gain_b,
-                                             single_entry=single_entry,
-                                             number_of_sectors=sectors_in_node)
+                                             elevation=elevation_angles, sat_params = self.param_system,
+                                             earth_to_space = earth_to_space, earth_station_antenna_gain=gain_b,
+                                             single_entry=single_entry, number_of_sectors=sectors_in_node)
             else:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
-                                             elevation=elevation_angles,
-                                             es_params=self.param_system,
-                                             tx_gain = gain_a, rx_gain = gain_b)
+                                             elevation=elevation_angles, es_params=self.param_system,
+                                             tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node)
 
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b

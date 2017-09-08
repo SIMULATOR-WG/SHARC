@@ -39,7 +39,7 @@ class PropagationTropScatter(Propagation):
         No = np.asarray(kwargs["N0"])
         deltaN = np.asarray(kwargs["delta_N"])
         p = np.asarray(kwargs["percentage_p"])
-
+        number_of_sectors = kwargs["number_of_sectors"]
 
         loss_Ag = self.propagation.get_loss(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro)
 
@@ -50,6 +50,11 @@ class PropagationTropScatter(Propagation):
         k50 = 157/(157 - deltaN)
         Ae = 6371*k50
         teta = d*(10**3)/Ae +thetaT + thetaR
+
+        if number_of_sectors > 1:
+            d = np.repeat(d, number_of_sectors, 1)
+            teta = np.repeat(teta, number_of_sectors, 1)
+            loss_Ag = np.repeat(loss_Ag, number_of_sectors, 1)
 
         loss = 190 + Lf + 20*np.log10(d) +0.573*teta - 0.15*No + Lc + loss_Ag - 10.1*(-np.log10(p/50))**0.7
 
