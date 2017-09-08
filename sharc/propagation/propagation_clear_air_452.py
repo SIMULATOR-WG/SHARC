@@ -233,6 +233,10 @@ class PropagationClearAir(Propagation):
         free_space_loss = self.free_space.get_loss(distance_2D=d_km * 1000,
                                                    frequency=f*1000)
 
+        if number_of_sectors > 1:
+            free_space_loss = np.repeat(free_space_loss, number_of_sectors, 1)
+            Lbam = np.repeat(Lbam, number_of_sectors, 1)
+
         Lb = free_space_loss -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam)) + Aht + Ahr
 
 
