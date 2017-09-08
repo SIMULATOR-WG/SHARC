@@ -346,5 +346,103 @@ class SimulationDownlinkTest(unittest.TestCase):
                                delta=.01)        
         
         
+    def test_calculate_bw_weights(self):
+        self.param.general.system = "FSS_ES"
+        self.simulation = SimulationDownlink(self.param)
+        
+        bw_imt = 200
+        bw_sys = 33.33
+        ue_k = 3
+        ref_weights = np.array([ 0.5, 0, 0])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2) 
+
+        bw_imt = 100
+        bw_sys = 25
+        ue_k = 3
+        ref_weights = np.array([ 0.75, 0, 0])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2) 
+        
+        bw_imt = 200
+        bw_sys = 66.67
+        ue_k = 3
+        ref_weights = np.array([ 1, 0, 0])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2) 
+        
+        bw_imt = 400
+        bw_sys = 200
+        ue_k = 3
+        ref_weights = np.array([ 1, 0.49, 0])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)
+
+        bw_imt = 200
+        bw_sys = 133.33
+        ue_k = 3
+        ref_weights = np.array([ 1, 1, 0])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2) 
+        
+        bw_imt = 200
+        bw_sys = 150
+        ue_k = 3
+        ref_weights = np.array([ 1, 1, 0.25])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2) 
+        
+        bw_imt = 150
+        bw_sys = 150
+        ue_k = 3
+        ref_weights = np.array([ 1, 1, 1])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)    
+        
+        bw_imt = 200
+        bw_sys = 300
+        ue_k = 3
+        ref_weights = np.array([ 1, 1, 1])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)   
+        
+        bw_imt = 200
+        bw_sys = 50
+        ue_k = 2
+        ref_weights = np.array([ 0.5, 0])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)         
+        
+        bw_imt = 100
+        bw_sys = 60
+        ue_k = 2
+        ref_weights = np.array([ 1, 0.2])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)    
+        
+        bw_imt = 300
+        bw_sys = 300
+        ue_k = 2
+        ref_weights = np.array([ 1, 1])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)    
+        
+        bw_imt = 100
+        bw_sys = 50
+        ue_k = 1
+        ref_weights = np.array([ 0.5 ])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)  
+        
+        bw_imt = 200
+        bw_sys = 180
+        ue_k = 1
+        ref_weights = np.array([ 0.9])
+        weights = self.simulation.calculate_bw_weights(bw_imt, bw_sys, ue_k)
+        npt.assert_allclose(ref_weights, weights, atol=1e-2)    
+        
+        
+        
+        
 if __name__ == '__main__':
     unittest.main()

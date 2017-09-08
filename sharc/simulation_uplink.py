@@ -170,14 +170,18 @@ class SimulationUplink(Simulation):
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
         # calculate interference only from active UE's
-        ue_active = np.where(self.ue.active)[0]
-        interference_ue = self.ue.tx_power[ue_active] \
-                            - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
-                            - self.coupling_loss_imt_system[ue_active] \
-                            + 10*np.log10(self.ue.bandwidth[ue_active]/self.param_system.bandwidth) \
-
-        # calculate the aggregate interference on system
-        self.system.rx_interference = 10*np.log10(np.sum(np.power(10, 0.1*interference_ue)))
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
+            ue = self.link[bs]
+            interference_ue = self.ue.tx_power[ue] \
+                                - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
+                                - self.coupling_loss_imt_system[ue] \
+                                + 10*np.log10(self.ue.bandwidth[ue]/self.param_system.bandwidth)
+            weights = self.calculate_bw_weights(self.parameters.imt.bandwidth, 
+                                                self.param_system.bandwidth,
+                                                self.parameters.imt.ue_k)
+            self.system.rx_interference = 10*math.log10( \
+                    math.pow(10, 0.1*self.system.rx_interference) + np.sum(weights*np.power(10, 0.1*interference_ue)))
 
         # calculate N
         self.system.thermal_noise = \

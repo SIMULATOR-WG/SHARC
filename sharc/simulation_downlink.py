@@ -167,9 +167,11 @@ class SimulationDownlink(Simulation):
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
             interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[active_beams] \
                                 + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth)
-                                
+            weights = self.calculate_bw_weights(self.parameters.imt.bandwidth, 
+                                                self.param_system.bandwidth,
+                                                self.parameters.imt.ue_k)
             self.system.rx_interference = 10*math.log10( \
-                    math.pow(10, 0.1*self.system.rx_interference) + np.sum(np.power(10, 0.1*interference)))
+                    math.pow(10, 0.1*self.system.rx_interference) + np.sum(weights*np.power(10, 0.1*interference)))
 
         # calculate N
         self.system.thermal_noise = \
