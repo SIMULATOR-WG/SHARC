@@ -45,18 +45,22 @@ class PropagationClutterLoss(Propagation):
         loc_per = kwargs.pop("loc_percentage","RANDOM")
         type = kwargs["station_type"]
 
-        if isinstance(loc_per, str) and loc_per.upper() == "RANDOM":
-            p = np.random.random(f.shape)
+        if "distance_2D" in kwargs:
+            d = kwargs["distance_2D"]
         else:
-            p = loc_per*np.ones(f.shape)
+            d = kwargs["distance_3D"]
+
+        if f.size == 1:
+            f = f * np.ones(d.shape)
+
+        if isinstance(loc_per, str) and loc_per.upper() == "RANDOM":
+            p = np.random.random(d.shape)
+        else:
+            p = loc_per*np.ones(d.shape)
 
         if type is StationType.IMT_BS or type is StationType.IMT_UE or type is StationType.FSS_ES:
             # Clutter Loss item 3.2
             # Statistical clutter loss model for terrestrial paths
-            if "distance_2D" in kwargs:
-                d = kwargs["distance_2D"]
-            else:
-                d = kwargs["distance_3D"]
 
             # minimum path length for the correction to be applied at only one end of the path
             idx = np.where(d > 250)[0]

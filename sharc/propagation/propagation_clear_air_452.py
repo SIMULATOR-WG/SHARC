@@ -237,12 +237,8 @@ class PropagationClearAir(Propagation):
         if index[0].size:
             Lbda[index] = Lminbap + (Lbd[index] - Lminbap)*Fk
 
-        # if (Lminbap <= Lbd):
-        #     Lbda = Lminbap + (Lbd - Lminbap)*Fk
-
         Lbam = Lbda + (Lminb0p - Lbda)*Fj
-        #free_space_loss = self.free_space.get_loss(distance_2D=d_km * 1000,
-        #                                          frequency=f*1000)
+
 
         clutter_loss = self.clutter.get_loss(frequency=f * 1000,
                                              distance_2D=d_km * 1000,
@@ -251,13 +247,11 @@ class PropagationClearAir(Propagation):
         building_loss = self.building_loss*indoor_stations
 
         if number_of_sectors > 1:
-            #free_space_loss = np.repeat(free_space_loss, number_of_sectors, 1)
             Lbam = np.repeat(Lbam, number_of_sectors, 1)
             clutter_loss = np.repeat(clutter_loss, number_of_sectors, 1)
             building_loss = np.repeat(building_loss, number_of_sectors, 1)
 
 
-        #Lb = free_space_loss -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam)) + Aht + Ahr
         Lb = -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam))  + clutter_loss + building_loss
 
 
