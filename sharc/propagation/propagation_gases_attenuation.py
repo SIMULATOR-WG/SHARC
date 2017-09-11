@@ -18,7 +18,6 @@ class PropagationGasesAttenuation(Propagation):
 
         d = np.asarray(kwargs["distance"]) #Km
         f = np.asarray(kwargs["frequency"]) #GHz
-        f
 
         Ph = np.asarray(kwargs["atmospheric_pressure"])
         T = np.asarray(kwargs["air_temperature"])

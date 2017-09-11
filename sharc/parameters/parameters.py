@@ -224,11 +224,6 @@ class Parameters(object):
         self.fss_es.probability_loss_notExceeded = config.getfloat("FSS_ES", "probability_loss_notExceeded")
         self.fss_es.thetaJ = config.getfloat("FSS_ES", "thetaJ")
         self.fss_es.par_ep = config.getfloat("FSS_ES", "par_ep")
-        self.fss_es.dsw = config.getfloat("FSS_ES", "dsw")
-        self.fss_es.k = config.getfloat("FSS_ES", "k")
-        self.fss_es.eta = config.getfloat("FSS_ES", "eta")
-        self.fss_es.Aht = config.getfloat("FSS_ES", "Aht")
-        self.fss_es.Ahr = config.getfloat("FSS_ES", "Ahr")
         self.fss_es.Beta_0 = config.getfloat("FSS_ES", "Beta_0")
 
         #######################################################################

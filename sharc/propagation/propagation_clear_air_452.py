@@ -12,7 +12,8 @@ from sharc.propagation.propagation_gases_attenuation import PropagationGasesAtte
 from sharc.propagation.propagation_ducting_reflection import PropagationDuctingReflection
 from sharc.propagation.propagation_troposcatter import PropagationTropScatter
 from sharc.propagation.propagation_diffraction import PropagationDiffraction
-from sharc.propagation.propagation_free_space import PropagationFreeSpace
+from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
+from sharc.support.enumerations import StationType
 
 import numpy as np
 
@@ -28,7 +29,10 @@ class PropagationClearAir(Propagation):
         self.propagationDucting = PropagationDuctingReflection()
         self.propagationTropoScatter = PropagationTropScatter()
         self.propagationDiffraction = PropagationDiffraction()
-        self.free_space = PropagationFreeSpace()
+        self.clutter = PropagationClutterLoss()
+
+        self.building_loss = 20
+
 
         ###########################################################################
         # Model coeficients
@@ -51,19 +55,27 @@ class PropagationClearAir(Propagation):
         self.D2 = 0.189269
         self.D3 = 0.001308
 
+        self.dsw = 20
+        self.k = 0.5
+        self.eta = 2.5
+
         ###########################################################################
         # The distance of the i-th profile point
         self.dist_di = [0,0,0]
+        #self.dist_di = [.1,.2,.5]
+
 
         ###########################################################################
         #Height of the i-th profile point
         self.height_hi = [2.2,4.3,6.4]
+        #self.height_hi = [22, 100, 64]
 
     def get_loss(self, *args, **kwargs) -> np.array:
 
         d_km = np.asarray(kwargs["distance_3D"])*(1e-3)   #Km
         f = np.asarray(kwargs["frequency"])*(1e-3)  #GHz
         number_of_sectors = kwargs["number_of_sectors"]
+        indoor_stations = kwargs["indoor_stations"]
 
         f = np.unique(f)
         if len(f) > 1:
@@ -105,13 +117,11 @@ class PropagationClearAir(Propagation):
         Hn = np.asarray(es_params.Hn)
         thetaJ = np.asarray(es_params.thetaJ)
         ep = np.asarray(es_params.par_ep)
-        dsw = np.asarray(es_params.dsw)
-        k = np.asarray(es_params.k)
+        dsw = np.asarray(self.dsw)
+        k = np.asarray(self.k)
         di = self.dist_di
         hi = self.height_hi
-        n = np.asarray(es_params.eta)
-        Aht = np.asarray(es_params.Aht)
-        Ahr = np.asarray(es_params.Ahr)
+        n = np.asarray(self.eta)
 
         Stim = -np.inf * np.ones(d_km.size)
 
@@ -160,10 +170,11 @@ class PropagationClearAir(Propagation):
         Fj = 1.0 - 0.5*(1.0 + np.tanh(3.0*ep*(Stim - Str)/thetaJ))
         Fk = 1.0 - 0.5*(1.0 + np.tanh(3.0*k*(d_km - dsw)/dsw))
 
-        Lbfsg = self.propagationAg.get_loss(distance=d_km, frequency=f,
+        Ag = self.propagationAg.get_loss(distance=d_km, frequency=f,
                                                atmospheric_pressure=Ph,
                                                air_temperature=T,
                                                water_vapour=ro)
+        Lbfsg = 92.5 + 20 * np.log10(f) + 20*np.log10(d_km) + Ag
         # Ducting/layer reflection
         Lba =  self.propagationDucting.get_loss(distance=d_km*1000,frequency=f*1000,
                                                 atmospheric_pressure=Ph, air_temperature= T,
@@ -230,14 +241,25 @@ class PropagationClearAir(Propagation):
         #     Lbda = Lminbap + (Lbd - Lminbap)*Fk
 
         Lbam = Lbda + (Lminb0p - Lbda)*Fj
-        free_space_loss = self.free_space.get_loss(distance_2D=d_km * 1000,
-                                                   frequency=f*1000)
+        #free_space_loss = self.free_space.get_loss(distance_2D=d_km * 1000,
+        #                                          frequency=f*1000)
+
+        clutter_loss = self.clutter.get_loss(frequency=f * 1000,
+                                             distance_2D=d_km * 1000,
+                                             station_type=StationType.FSS_ES)
+
+        building_loss = self.building_loss*indoor_stations
 
         if number_of_sectors > 1:
-            free_space_loss = np.repeat(free_space_loss, number_of_sectors, 1)
+            #free_space_loss = np.repeat(free_space_loss, number_of_sectors, 1)
             Lbam = np.repeat(Lbam, number_of_sectors, 1)
+            clutter_loss = np.repeat(clutter_loss, number_of_sectors, 1)
+            building_loss = np.repeat(building_loss, number_of_sectors, 1)
 
-        Lb = free_space_loss -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam)) + Aht + Ahr
+
+        #Lb = free_space_loss -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam)) + Aht + Ahr
+        Lb = -5*np.log10(10**(-0.2*Lbs) + 10**(-0.2*Lbam))  + clutter_loss + building_loss
+
 
 
 
