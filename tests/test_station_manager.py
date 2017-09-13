@@ -69,6 +69,7 @@ class StationManagerTest(unittest.TestCase):
         # this is for downlink
         self.station_manager.tx_power = dict({0: [27, 30], 1: [35], 2: [40]})
         self.station_manager.rx_power = np.array([-50, -35, -10])
+        self.station_manager.sic = np.array([75, 50, 110])
         par = self.param.get_antenna_parameters("BS","TX")
         self.station_manager.antenna = np.array([AntennaBeamformingImt(par,60,-10), AntennaBeamformingImt(par,180,-10), AntennaBeamformingImt(par,300,-10)])
         self.station_manager.station_type = StationType.IMT_BS
@@ -80,6 +81,7 @@ class StationManagerTest(unittest.TestCase):
         # this is for downlink
         self.station_manager2.tx_power = dict({0: [25], 1: [28,35]})
         self.station_manager2.rx_power = np.array([-50, -35])
+        self.station_manager2.sic = np.array([60, 90])
         par = self.param.get_antenna_parameters("BS","RX")
         self.station_manager2.antenna = np.array([AntennaBeamformingImt(par,0,-5), AntennaBeamformingImt(par,180,-5)])
         self.station_manager2.station_type = StationType.IMT_BS
@@ -91,6 +93,7 @@ class StationManagerTest(unittest.TestCase):
         # this is for uplink
         self.station_manager3.tx_power = 22
         self.station_manager3.rx_power = np.array([-50,-35])
+        self.station_manager3.sic = np.array([60, 130])
         par = self.param.get_antenna_parameters("UE","TX")
         self.station_manager3.antenna = np.array([AntennaBeamformingImt(par,0,-30), AntennaBeamformingImt(par,35,45)])
         self.station_manager3.station_type = StationType.IMT_UE
@@ -204,6 +207,22 @@ class StationManagerTest(unittest.TestCase):
         # set two values and then get all values
         self.station_manager.rx_power[[0,1]] = [-60,-30]
         npt.assert_array_equal(self.station_manager.rx_power, [-60,-30,-15])
+        
+    def test_sic(self):
+        # get a single value from the original array
+        self.assertEqual(self.station_manager.sic[2], 110)
+        # get two specific values
+        npt.assert_array_equal(self.station_manager.sic[[0,1]], [75, 50])
+        # get values in reverse order
+        npt.assert_array_equal(self.station_manager.sic[[2,1,0]], [110, 50, 75])
+        # get all values (no need to specify the id's)
+        npt.assert_array_equal(self.station_manager.sic, [75, 50, 110])
+        # set a single value and get it
+        self.station_manager.sic[2] = 15
+        npt.assert_array_equal(self.station_manager.sic[[2,0]], [15, 75])
+        # set two values and then get all values
+        self.station_manager.sic[[0,1]] = [60, 30]
+        npt.assert_array_equal(self.station_manager.sic, [60, 30, 15])
         
     def test_antenna(self):
         self.assertEqual(self.station_manager.antenna[0].azimuth, 60)
