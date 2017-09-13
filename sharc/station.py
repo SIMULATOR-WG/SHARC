@@ -27,11 +27,13 @@ class Station(object):
         self.noise_figure = 0
         self.noise_temperature = 0
         self.thermal_noise = 0
+        self.self_interference = 0
         self.total_interference = 0
         self.snr = 0
         self.sinr = 0
         self.sinr_ext = 0
         self.inr = 0
+        self.sic = 0
         self.station_type = StationType.NONE
         
         
