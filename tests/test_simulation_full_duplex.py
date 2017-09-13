@@ -209,7 +209,35 @@ class SimulationFullDuplexTest(unittest.TestCase):
         
         
     def test_simulation_2bs_4ue_fss_es(self):
-        pass
+        self.param.general.system = "FSS_ES"
+        
+        self.simulation = SimulationFullDuplex(self.param)
+        self.simulation.initialize()
+        
+        
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+                                                                       self.param.antenna_imt,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
+                                                            self.param.antenna_imt,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        
+        self.simulation.connect_ue_to_bs()
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        self.simulation.scheduler()
+        self.simulation.power_control()
         
         
 if __name__ == '__main__':
