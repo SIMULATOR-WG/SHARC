@@ -22,7 +22,36 @@ class SimulationFullDuplex(Simulation):
 
         
     def snapshot(self, *args, **kwargs):
-        pass
+        write_to_file = kwargs["write_to_file"]
+        snapshot_number = kwargs["snapshot_number"]
+        
+        # In case of hotspots, base stations coordinates have to be calculated
+        # on every snapshot. Anyway, let topology decide whether to calculate
+        # or not
+        self.topology.calculate_coordinates()
+        
+        # Create the base stations (remember that it takes into account the
+        # network load factor)
+        self.bs = StationFactory.generate_imt_base_stations(self.parameters.imt,
+                                                            self.parameters.antenna_imt,
+                                                            self.topology)      
+        
+        # Create the other system (FSS, HAPS, etc...)
+        self.system = StationFactory.generate_system(self.parameters)
+
+        # Create IMT user equipments
+        self.ue = StationFactory.generate_imt_ue(self.parameters.imt,
+                                                 self.parameters.antenna_imt,
+                                                 self.topology)
+        #self.plot_scenario()
+        
+        self.connect_ue_to_bs()
+        self.select_ue()
+        
+        # Calculate coupling loss after beams are created
+        self.coupling_loss_imt = self.calculate_coupling_loss(self.bs, 
+                                                              self.ue,
+                                                              self.propagation_imt)
 
 
     def power_control(self):

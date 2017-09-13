@@ -16,7 +16,7 @@ from sharc.parameters.parameters import Parameters
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.station_factory import StationFactory
 
-class SimulationDownlinkTest(unittest.TestCase):
+class SimulationFullDuplexTest(unittest.TestCase):
 
     def setUp(self):
         self.param = Parameters()
@@ -148,7 +148,44 @@ class SimulationDownlinkTest(unittest.TestCase):
 
 
     def test_simulation_2bs_4ue_fss_ss(self):
-        pass        
+        self.param.general.system = "FSS_SS"
+
+        self.simulation = SimulationFullDuplex(self.param)
+        self.simulation.initialize()
+
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+                                                                       self.param.antenna_imt,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
+                                                            self.param.antenna_imt,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        
+        # test connection method
+        self.simulation.connect_ue_to_bs()
+        self.assertEqual(self.simulation.link, {0: [0,1], 1: [2,3]})
+        
+        # We do not test the selection method here because in this specific 
+        # scenario we do not want to change the order of the UE's 
+        #self.simulation.select_ue()
+        
+        # test coupling loss method
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        npt.assert_allclose(self.simulation.coupling_loss_imt, 
+                            np.array([[78.47-1-10,  89.35-1-11,  93.27-1-22,  97.05-1-23], 
+                                      [97.55-2-10,  94.72-2-11,  91.53-2-22,  81.99-2-23]]), 
+                            atol=1e-2)        
        
         
     def test_simulation_2bs_4ue_fss_es(self):
