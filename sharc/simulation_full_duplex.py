@@ -58,7 +58,35 @@ class SimulationFullDuplex(Simulation):
 
 
     def power_control(self):
-        pass
+        """
+        Apply downling and uplink power control algorithm
+        """
+        # Downlink Power Control:
+        # Currently, the maximum transmit power of the base station is equaly
+        # divided among the selected UEs
+        tx_power = self.parameters.imt.bs_conducted_power + self.bs_power_gain \
+                    - self.parameters.imt.bs_feed_loss - 10*math.log10(self.parameters.imt.ue_k) 
+        # calculate tansmit powers to have a structure such as
+        # {bs_1: [pwr_1, pwr_2,...], ...}, where bs_1 is the base station id,
+        # pwr_1 is the transmit power from bs_1 to ue_1, pwr_2 is the transmit
+        # power from bs_1 to ue_2, etc
+        bs_active = np.where(self.bs.active)[0]
+        self.bs.tx_power = dict([(bs, tx_power*np.ones(self.parameters.imt.ue_k)) for bs in bs_active])
+        
+        # Uplink power control
+        if self.parameters.imt.ue_tx_power_control == "OFF":
+            ue_active = np.where(self.ue.active)[0]
+            self.ue.tx_power[ue_active] = self.parameters.imt.ue_p_cmax * np.ones(len(ue_active))
+        else:
+            bs_active = np.where(self.bs.active)[0]
+            for bs in bs_active:
+                ue = self.link[bs]
+                p_cmax = self.parameters.imt.ue_p_cmax
+                m_pusch = self.num_rb_per_ue
+                p_o_pusch = self.parameters.imt.ue_p_o_pusch
+                alpha = self.parameters.imt.ue_alfa
+                cl = self.coupling_loss_imt[bs,ue] + self.ue_power_gain
+                self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*cl)
     
         
     def calculate_sinr(self):
