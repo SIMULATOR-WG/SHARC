@@ -52,6 +52,9 @@ class SimulationFullDuplex(Simulation):
         self.coupling_loss_imt = self.calculate_coupling_loss(self.bs, 
                                                               self.ue,
                                                               self.propagation_imt)
+        
+        # Scheduler which divides the band equally among BSs and UEs
+        self.scheduler()
 
 
     def power_control(self):

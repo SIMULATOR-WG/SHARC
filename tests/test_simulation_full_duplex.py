@@ -187,6 +187,12 @@ class SimulationFullDuplexTest(unittest.TestCase):
                                       [97.55-2-10,  94.72-2-11,  91.53-2-22,  81.99-2-23]]), 
                             atol=1e-2)        
        
+        # test scheduler and bandwidth allocation
+        self.simulation.scheduler()
+        bandwidth_per_ue = math.trunc((1 - 0.1)*100/2)       
+        npt.assert_allclose(self.simulation.ue.bandwidth, bandwidth_per_ue*np.ones(4), atol=1e-2)
+        bandwidth_per_ue = math.trunc((1 - 0.1)*100/2)       
+        npt.assert_allclose(self.simulation.ue.bandwidth, bandwidth_per_ue*np.ones(4), atol=1e-2)
         
     def test_simulation_2bs_4ue_fss_es(self):
         pass
