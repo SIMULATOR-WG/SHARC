@@ -45,6 +45,7 @@ class StationFactory(object):
         imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
         imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.rx_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.self_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.ext_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.total_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
 
@@ -64,6 +65,7 @@ class StationFactory(object):
         #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
+        imt_base_stations.sic = param.bs_sic*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
         return imt_base_stations
 
@@ -153,6 +155,7 @@ class StationFactory(object):
         imt_ue.indoor = np.random.random(num_ue) <= (param.ue_indoor_percent/100)
         imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
+        imt_ue.self_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
 
         # TODO: this piece of code works only for uplink
