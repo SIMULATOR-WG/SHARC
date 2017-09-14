@@ -324,6 +324,13 @@ class StationManagerTest(unittest.TestCase):
         distance = self.station_manager.get_distance_to(self.station_manager2)
         npt.assert_allclose(distance, ref_distance, atol=1e-2)
         
+        # Self distance
+        distance = self.station_manager2.get_distance_to(self.station_manager2)
+        ref_distance = np.asarray([[ np.nan ,  176.139],
+                                   [ 176.139,  np.nan ]])
+        npt.assert_allclose(distance, ref_distance, atol=1e-2)
+        
+        
     def test_3d_distance_to(self):
         ref_distance = np.asarray([[ 356.411,  180.302]])
         distance = self.station_manager3.get_3d_distance_to(self.station_manager2)
@@ -333,6 +340,12 @@ class StationManagerTest(unittest.TestCase):
                                    [ 113.154,  288.156],
                                    [  99,  274.096]])
         distance = self.station_manager.get_3d_distance_to(self.station_manager2)
+        npt.assert_allclose(distance, ref_distance, atol=1e-2)
+        
+        # Self distance
+        distance = self.station_manager2.get_3d_distance_to(self.station_manager2)
+        ref_distance = np.asarray([[ np.nan ,  176.142],
+                                   [ 176.142,  np.nan ]])
         npt.assert_allclose(distance, ref_distance, atol=1e-2)
         
     def test_pointing_vector_to(self):
@@ -362,6 +375,13 @@ class StationManagerTest(unittest.TestCase):
         phi, theta = self.station_manager2.get_pointing_vector_to(self.station_manager3)
         npt.assert_allclose(phi,np.array([[55.86], [56.31]]),atol=eps)
         npt.assert_allclose(theta,np.array([[90.32], [90.95]]),atol=eps)
+        
+        # Test 5
+        phi, theta = self.station_manager2.get_pointing_vector_to(self.station_manager2)
+        npt.assert_allclose(phi,np.array([[0,        55.407],
+                                          [-124.592, 0     ]]),atol=eps)
+        npt.assert_allclose(theta,np.array([[np.nan, 89.675],
+                                            [90.325, np.nan]]),atol=eps)
         
     def test_off_axis_angle(self):
         sm1 = StationManager(1)

@@ -88,6 +88,8 @@ class StationManager(object):
         for i in range(self.num_stations):
             distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) +
                            np.power(self.y[i] - station.y, 2))
+        idx0 = np.where(distance == 0)
+        distance[idx0] = np.nan
         return distance
 
     def get_3d_distance_to(self, station) -> np.array:
@@ -96,6 +98,8 @@ class StationManager(object):
             distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) +
                            np.power(self.y[i] - station.y, 2) +
                             np.power(self.height[i] - station.height, 2))
+        idx0 = np.where(distance == 0)
+        distance[idx0] = np.nan
         return distance
 
     def get_elevation_angle(self, station, sat_params) -> dict:
