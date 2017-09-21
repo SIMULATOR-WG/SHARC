@@ -241,7 +241,7 @@ class PropagationClearAir(Propagation):
 
 
         clutter_loss = self.clutter.get_loss(frequency=f * 1000,
-                                             distance_2D=d_km * 1000,
+                                             distance=d_km * 1000,
                                              station_type=StationType.FSS_ES)
 
         building_loss = self.building_loss*indoor_stations

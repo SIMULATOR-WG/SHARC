@@ -25,8 +25,7 @@ class PropagationClutterLoss(Propagation):
 
         Parameters
         ----------
-            distance_3D (np.array) : 3D distances between stations [m]
-            distance_2D (np.array) : 2D distances between stations [m]
+            distance (np.array) : distances between stations [m]
             frequency (np.array) : center frequency [MHz]
             elevation (np.array) : elevation angles [deg]
             loc_percentage (np.array) : Percentage locations range [0, 1[
@@ -45,10 +44,7 @@ class PropagationClutterLoss(Propagation):
         loc_per = kwargs.pop("loc_percentage","RANDOM")
         type = kwargs["station_type"]
 
-        if "distance_2D" in kwargs:
-            d = kwargs["distance_2D"]
-        else:
-            d = kwargs["distance_3D"]
+        d = kwargs["distance"]
 
         if f.size == 1:
             f = f * np.ones(d.shape)

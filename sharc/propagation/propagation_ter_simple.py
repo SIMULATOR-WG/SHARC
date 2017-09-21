@@ -40,7 +40,7 @@ class PropagationTerSimple(Propagation):
                                                    frequency=f)
 
         clutter_loss = self.clutter.get_loss(frequency=f,
-                                             distance_2D=d,
+                                             distance=d,
                                              loc_percentage=p,
                                              station_type=StationType.FSS_ES)
 

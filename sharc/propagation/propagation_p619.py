@@ -220,7 +220,7 @@ class PropagationP619(Propagation):
                     atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
             loss = np.repeat(loss, number_of_sectors, 1) + tropo_scintillation_loss
         else:
-            clutter_loss = self.clutter.get_loss(frequency=f,
+            clutter_loss = self.clutter.get_loss(frequency=f, distance=d,
                                                  elevation=elevation["free_space"],
                                                  station_type=StationType.FSS_SS)
             building_loss = self.building_entry.get_loss(f, elevation["apparent"]) * indoor_stations
