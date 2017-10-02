@@ -187,7 +187,11 @@ class SimulationFullDuplexTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.coupling_loss_imt, 
                             np.array([[78.47-1-10,  89.35-1-11,  93.27-1-22,  97.05-1-23], 
                                       [97.55-2-10,  94.72-2-11,  91.53-2-22,  81.99-2-23]]), 
-                            atol=1e-2)        
+                            atol=1e-2)
+
+        self.simulation.coupling_loss_imt_ue_ue =   self.simulation.calculate_coupling_loss(self.simulation.ue, 
+                                                                                            self.simulation.ue,
+                                                                                            self.simulation.propagation_imt)  
        
         # test scheduler and bandwidth allocation
         self.simulation.scheduler()

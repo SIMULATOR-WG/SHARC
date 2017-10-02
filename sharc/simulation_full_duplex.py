@@ -19,6 +19,8 @@ class SimulationFullDuplex(Simulation):
 
     def __init__(self, parameters: Parameters):
         super().__init__(parameters)
+        self.coupling_loss_imt_bs_bs = np.empty(0)
+        self.coupling_loss_imt_ue_ue = np.empty(0)
 
         
     def snapshot(self, *args, **kwargs):
@@ -52,6 +54,7 @@ class SimulationFullDuplex(Simulation):
         self.coupling_loss_imt = self.calculate_coupling_loss(self.bs, 
                                                               self.ue,
                                                               self.propagation_imt)
+        
         
         # Scheduler which divides the band equally among BSs and UEs
         self.scheduler()
@@ -93,8 +96,36 @@ class SimulationFullDuplex(Simulation):
         """
         Calculates the downlink and uplink SINR for each UE and BS.
         Self-interference is considered
-        """        
-        pass
+        """    
+        # Downlink SNIR
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
+            ue = self.link[bs]
+            self.ue.rx_power[ue] = self.bs.tx_power[bs] - self.coupling_loss_imt[bs,ue] \
+                                     - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+
+            # create a list with base stations that generate interference in ue_list
+            bs_interf = [b for b in bs_active if b not in [bs]]
+
+            # calculate intra system interference
+            for bi in bs_interf:
+                interference = self.bs.tx_power[bi] - self.coupling_loss_imt[bi,ue] \
+                                 - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                self.ue.rx_interference[ue] = 10*np.log10( \
+                    np.power(10, 0.1*self.ue.rx_interference[ue]) + np.power(10, 0.1*interference))
+
+        self.ue.thermal_noise = \
+            10*math.log10(self.parameters.imt.BOLTZMANN_CONSTANT*self.parameters.imt.noise_temperature*1e3) + \
+            10*np.log10(self.ue.bandwidth * 1e6) + \
+            self.ue.noise_figure
+            
+        # TODO Add Self Interference to this sum
+        self.ue.total_interference = \
+            10*np.log10(np.power(10, 0.1*self.ue.rx_interference) + \
+                        np.power(10, 0.1*self.ue.thermal_noise))
+            
+        self.ue.sinr = self.ue.rx_power - self.ue.total_interference
+        self.ue.snr = self.ue.rx_power - self.ue.thermal_noise
 
         
     def calculate_sinr_ext(self):
