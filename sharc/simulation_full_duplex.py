@@ -55,6 +55,11 @@ class SimulationFullDuplex(Simulation):
                                                               self.ue,
                                                               self.propagation_imt)
         
+        # UE to UE coupling loss
+        self.coupling_loss_imt_ue_ue = self.calculate_coupling_loss(self.ue,
+                                                                    self.ue,
+                                                                    self.propagation_imt)
+        
         
         # Scheduler which divides the band equally among BSs and UEs
         self.scheduler()
@@ -76,7 +81,7 @@ class SimulationFullDuplex(Simulation):
         bs_active = np.where(self.bs.active)[0]
         self.bs.tx_power = dict([(bs, tx_power*np.ones(self.parameters.imt.ue_k)) for bs in bs_active])
         
-        # Uplink power control
+        # Uplink power control:
         if self.parameters.imt.ue_tx_power_control == "OFF":
             ue_active = np.where(self.ue.active)[0]
             self.ue.tx_power[ue_active] = self.parameters.imt.ue_p_cmax * np.ones(len(ue_active))
