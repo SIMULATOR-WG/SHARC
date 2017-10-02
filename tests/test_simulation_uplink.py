@@ -43,6 +43,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.bs_noise_figure = 7
         self.param.imt.bs_noise_temperature = 290
         self.param.imt.bs_feed_loss = 3
+        self.param.imt.bs_sic = 100
         self.param.imt.ul_attenuation_factor = 0.4
         self.param.imt.ul_sinr_min = -10
         self.param.imt.ul_sinr_max = 22
@@ -62,6 +63,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.ue_noise_figure = 9
         self.param.imt.ue_feed_loss = 3
         self.param.imt.ue_body_loss = 4
+        self.param.imt.ue_sic = 100
         self.param.imt.dl_attenuation_factor = 0.6
         self.param.imt.dl_sinr_min = -10
         self.param.imt.dl_sinr_max = 30
