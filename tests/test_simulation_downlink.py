@@ -213,7 +213,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.ue.thermal_noise, 
                             10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9,
                             atol=1e-2)
-        # check BS thermal noise + interference
+        # check UE thermal noise + interference
         npt.assert_allclose(self.simulation.ue.total_interference, 
                             10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7])) +
                                         np.power(10, 0.1*(-88.44))),

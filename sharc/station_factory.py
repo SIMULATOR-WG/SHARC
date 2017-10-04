@@ -167,6 +167,7 @@ class StationFactory(object):
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
+        imt_ue.sic = param.ue_sic*np.ones(num_ue)
         return imt_ue
 
 

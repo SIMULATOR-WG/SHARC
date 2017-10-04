@@ -21,6 +21,7 @@ class SimulationFullDuplexTest(unittest.TestCase):
     def setUp(self):
         self.param = Parameters()
         
+        # TODO Change the link type
         self.param.general.imt_link = "DOWNLINK"
         
         self.param.imt.topology = "SINGLE_BS"
@@ -224,7 +225,43 @@ class SimulationFullDuplexTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.bs.tx_power[1], np.array([p_tx, p_tx]), atol=1e-2)
         npt.assert_allclose(self.simulation.ue.tx_power, 20*np.ones(4))
         
+        # test method that calculates SINR 
+        self.simulation.calculate_sinr()
         
+        # check UE received power
+        npt.assert_allclose(self.simulation.ue.rx_power, 
+                            np.array([-70.48, -80.36, -70.55, -60.00]), 
+                            atol=1e-2)
+        
+        # check UE received interference
+        npt.assert_allclose(self.simulation.ue.rx_interference,
+                            np.array([-53.53, -52.45, -53.49, -52.44]),
+                            atol=1e-2)
+
+        # check UE thermal noise
+        npt.assert_allclose(self.simulation.ue.thermal_noise, 
+                            np.array([-88.44, -88.44, -88.44, -88.44]),
+                            atol=1e-2)
+        
+        # check UE thermal noise + interference
+        npt.assert_allclose(self.simulation.ue.total_interference, 
+                            np.array([-53.52, -52.44, -53.48, -52.42]),
+                            atol=1e-2)
+        
+        # check self-interference
+        npt.assert_allclose(self.simulation.ue.self_interference, 
+                            np.array([-80, -80, -80, -80]),
+                            atol=1e-2)
+        
+        # check SNR 
+        npt.assert_allclose(self.simulation.ue.snr, 
+                            np.array([-70.48 - (-88.44),  -80.36 - (-88.44), -70.55 - (-88.44),  -60.00 - (-88.44)]),
+                            atol=1e-2)
+        
+        # check SINR
+        npt.assert_allclose(self.simulation.ue.sinr, 
+                            np.array([-70.48 - (-53.52), -80.36 - (-52.45), -70.54 - (-53.49), -60.00 - (-52.44)]),
+                            atol=5e-2)
         
         
     def test_simulation_2bs_4ue_fss_es(self):
@@ -261,3 +298,8 @@ class SimulationFullDuplexTest(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
+    # Run single test
+#    suite = unittest.TestSuite()
+#    suite.addTest(SimulationFullDuplexTest("test_simulation_2bs_4ue_fss_ss"))
+#    runner = unittest.TextTestRunner()
+#    runner.run(suite)
