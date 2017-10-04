@@ -170,7 +170,7 @@ class Simulation(ABC, Observable):
                                              single_entry=single_entry,
                                              number_of_sectors=sectors_in_node)
 
-        else:
+        else: # IMT <-> IMT
             path_loss = propagation.get_loss(distance_3D=d_3D,
                                              distance_2D=d_2D,
                                              frequency=self.parameters.imt.frequency*np.ones(d_2D.shape),
@@ -181,7 +181,14 @@ class Simulation(ABC, Observable):
                                              line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
             # define antenna gains
             gain_a = self.calculate_gains(station_a, station_b)
-            gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+            if station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_BS:
+                # BS <-> BS
+                path_loss = np.repeat(path_loss,self.parameters.imt.ue_k,1)
+                gain_b = np.zeros_like(gain_a)
+                for k in range(gain_b.shape[0]):
+                    gain_b[k,:] = np.ravel(gain_a[:,np.arange(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k)])
+            else:
+                gain_b = np.transpose(self.calculate_gains(station_b, station_a))
 
         # collect IMT BS and UE antenna gain samples
         if station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_UE:
@@ -273,6 +280,11 @@ class Simulation(ABC, Observable):
             elif(station_2.station_type is StationType.FSS_SS or station_2.station_type is StationType.FSS_ES):
                 phi = np.repeat(phi,self.parameters.imt.ue_k,0)
                 theta = np.repeat(theta,self.parameters.imt.ue_k,0)
+                beams_idx = np.tile(np.arange(self.parameters.imt.ue_k),self.bs.num_stations)
+            elif(station_2.station_type is StationType.IMT_BS):
+                phi = np.repeat(phi,self.parameters.imt.ue_k,1)
+                theta = np.repeat(theta,self.parameters.imt.ue_k,1)
+                station_2_active = np.where(np.repeat(station_2.active,self.parameters.imt.ue_k,0))[0]
                 beams_idx = np.tile(np.arange(self.parameters.imt.ue_k),self.bs.num_stations)
 
         elif(station_1.station_type is StationType.IMT_UE):
