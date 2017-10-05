@@ -263,6 +263,59 @@ class SimulationFullDuplexTest(unittest.TestCase):
                             np.array([-70.48 - (-53.52), -80.36 - (-52.45), -70.54 - (-53.49), -60.00 - (-52.44)]),
                             atol=5e-2)
         
+        # check BS received power
+        npt.assert_allclose(self.simulation.bs.rx_power[0], 
+                            np.array([-57.47, -67.35]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.rx_power[1], 
+                            np.array([-57.54, -46.99]),
+                            atol=1e-2)
+        
+        # check BS received interference
+        npt.assert_allclose(self.simulation.bs.rx_interference[0], 
+                            np.array([-60.28, -63.06]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.rx_interference[1], 
+                            np.array([-75.53, -71.72]),
+                            atol=1e-2)  
+
+        # check BS thermal noise
+        npt.assert_allclose(self.simulation.bs.thermal_noise, 
+                            np.array([-90.44, -90.44]),
+                            atol=1e-2)
+        
+        # check BS thermal noise + interference
+        npt.assert_allclose(self.simulation.bs.total_interference[0], 
+                            np.array([-60.27, -63.04]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.total_interference[1], 
+                            np.array([-75.35, -71.64]),
+                            atol=1e-2)  
+        
+        # check self-interference
+        npt.assert_allclose(self.simulation.bs.self_interference[0], 
+                            np.array([-96.01, -96.01]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.self_interference[1], 
+                            np.array([-96.01, -96.01]),
+                            atol=1e-2)
+        
+        # check SNR 
+        npt.assert_allclose(self.simulation.bs.snr[0], 
+                            np.array([32.97, 23.09]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.snr[1], 
+                            np.array([32.91, 43.45]),
+                            atol=1e-2)
+        
+        # check SINR
+        npt.assert_allclose(self.simulation.bs.sinr[0], 
+                            np.array([ 2.80, -4.31]),
+                            atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.sinr[1], 
+                            np.array([17.82, 24.65]),
+                            atol=1e-2)
+        
         
     def test_simulation_2bs_4ue_fss_es(self):
         self.param.general.system = "FSS_ES"

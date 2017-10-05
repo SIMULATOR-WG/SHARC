@@ -113,7 +113,7 @@ class SimulationFullDuplex(Simulation):
         Calculates the downlink and uplink SINR for each UE and BS.
         Self-interference is considered
         """    
-        # Downlink SNIR
+        ### Downlink SNIR
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
@@ -152,6 +152,50 @@ class SimulationFullDuplex(Simulation):
             
         self.ue.sinr = self.ue.rx_power - self.ue.total_interference
         self.ue.snr = self.ue.rx_power - self.ue.thermal_noise
+        
+        ### Uplink SNIR
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
+            ue = self.link[bs]
+            self.bs.rx_power[bs] = self.ue.tx_power[ue]  \
+                                        - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
+                                        - self.coupling_loss_imt[bs,ue] - self.parameters.imt.bs_feed_loss
+            # create a list of BSs that serve the interfering UEs
+            bs_interf = [b for b in bs_active if b not in [bs]]
+
+            # calculate intra system interference
+            for bi in bs_interf:
+                ui = self.link[bi]
+                interference_ue = self.ue.tx_power[ui] \
+                                - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
+                                - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_feed_loss
+                                
+                interference_bs = self.bs.tx_power[bi] - 2*self.parameters.imt.bs_feed_loss \
+                                - self.coupling_loss_imt_bs_bs[bs,np.arange(bi*self.parameters.imt.ue_k,(bi+1)*self.parameters.imt.ue_k)]
+                                
+                self.bs.rx_interference[bs] = 10*np.log10( \
+                    np.power(10, 0.1*self.bs.rx_interference[bs])
+                    + np.power(10, 0.1*interference_ue) \
+                    + np.power(10, 0.1*interference_bs))
+                
+            # calculate self interference
+            self.bs.self_interference[bs] = self.bs.tx_power[bs] - self.bs.sic[bs]
+            
+            # calculate N
+            self.bs.thermal_noise[bs] = \
+                10*np.log10(self.parameters.imt.BOLTZMANN_CONSTANT*self.parameters.imt.noise_temperature*1e3) + \
+                10*np.log10(self.bs.bandwidth[bs] * 1e6) + \
+                self.bs.noise_figure[bs]
+    
+            # calculate I+N
+            self.bs.total_interference[bs] = \
+                10*np.log10(np.power(10, 0.1*self.bs.rx_interference[bs]) + \
+                            np.power(10, 0.1*self.bs.thermal_noise[bs])   + \
+                            np.power(10, 0.1*self.bs.self_interference[bs]))
+                
+            # calculate SNR and SINR
+            self.bs.sinr[bs] = self.bs.rx_power[bs] - self.bs.total_interference[bs]
+            self.bs.snr[bs] = self.bs.rx_power[bs] - self.bs.thermal_noise[bs]
 
         
     def calculate_sinr_ext(self):
