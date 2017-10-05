@@ -247,7 +247,45 @@ class SimulationFullDuplex(Simulation):
         """
         Calculates interference that IMT system generates on other system
         """
-        pass
+        ### Downlink & Uplink
+        self.coupling_loss_imt_bs_system = self.calculate_coupling_loss(self.system, 
+                                                                        self.bs,
+                                                                        self.propagation_system)
+        self.coupling_loss_imt_ue_system = self.calculate_coupling_loss(self.system, 
+                                                                        self.ue,
+                                                                        self.propagation_system)
+
+        # applying a bandwidth scaling factor since UE transmits on a portion
+        # of the satellite's bandwidth
+        # calculate interference only from active UE's
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
+            active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
+            interference_bs = self.bs.tx_power[bs] - self.coupling_loss_imt_bs_system[active_beams] \
+                                + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth)
+                                
+            self.system.rx_interference = 10*math.log10( \
+                    math.pow(10, 0.1*self.system.rx_interference) + \
+                    np.sum(np.power(10, 0.1*interference_bs)))
+        
+        # UE interference
+        ue_active = np.where(self.ue.active)[0]
+        interference_ue = self.ue.tx_power[ue_active] \
+                            - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
+                            - self.coupling_loss_imt_ue_system[ue_active] \
+                            + 10*np.log10(self.ue.bandwidth[ue_active]/self.param_system.bandwidth) \
+                            
+        self.system.rx_interference = 10*np.log10(np.power(10, 0.1*self.system.rx_interference) + \
+                                                  np.sum(np.power(10, 0.1*interference_ue)))
+
+        # calculate N
+        self.system.thermal_noise = \
+            10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
+                          self.param_system.noise_temperature*1e3) + \
+                          10*math.log10(self.param_system.bandwidth * 1e6)
+
+        # calculate INR at the system
+        self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
         
         
     def collect_results(self, write_to_file: bool, snapshot_number: int):
