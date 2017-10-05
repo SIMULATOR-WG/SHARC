@@ -316,6 +316,12 @@ class SimulationFullDuplexTest(unittest.TestCase):
                             np.array([17.82, 24.65]),
                             atol=1e-2)
         
+        # Create system
+        self.simulation.system = StationFactory.generate_fss_space_station(self.param.fss_ss)
+        self.simulation.system.x = np.array([0])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param.fss_ss.altitude])
+        
         
     def test_simulation_2bs_4ue_fss_es(self):
         self.param.general.system = "FSS_ES"
