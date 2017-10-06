@@ -320,7 +320,7 @@ class SimulationFullDuplex(Simulation):
             
             ue_ue_cl = np.ravel(self.coupling_loss_imt_ue_ue[ue])
             ue_ue_cl = ue_ue_cl[~np.isnan(ue_ue_cl)]
-            self.results.imt_coupling_loss_bs_bs.extend(ue_ue_cl)
+            self.results.imt_coupling_loss_ue_ue.extend(ue_ue_cl)
             
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
