@@ -28,6 +28,7 @@ class PropagationFreeSpace(Propagation):
 
         loss = 20*np.log10(d) + 20*np.log10(f) - 27.55
 
-        loss = np.repeat(loss, number_of_sectors, 1)
+        if number_of_sectors > 1:
+            loss = np.repeat(loss, number_of_sectors, 1)
 
         return loss

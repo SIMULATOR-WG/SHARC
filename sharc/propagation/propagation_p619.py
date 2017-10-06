@@ -13,7 +13,6 @@ from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
 from sharc.propagation.propagation_building_entry_loss import PropagationBuildingEntryLoss
 from sharc.propagation.atmosphere import ReferenceAtmosphere
-from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.support.enumerations import StationType
 from sharc.propagation.scintillation import Scintillation
 
