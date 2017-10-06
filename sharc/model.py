@@ -10,6 +10,7 @@ from support.observer import Observer
 from sharc.support.enumerations import State
 from sharc.simulation_downlink import SimulationDownlink
 from sharc.simulation_uplink import SimulationUplink
+from sharc.simulation_full_duplex import SimulationFullDuplex
 from sharc.parameters.parameters import Parameters
 
 class Model(Observable):
@@ -46,8 +47,10 @@ class Model(Observable):
         
         if self.parameters.general.imt_link == "DOWNLINK":
             self.simulation = SimulationDownlink(self.parameters)
-        else:
+        elif self.parameters.general.imt_link == "UPLINK":
             self.simulation = SimulationUplink(self.parameters)
+        else self.parameters.general.imt_link == "FULLDUPLEX":
+            self.simulation = SimulationFullDuplex(self.parameters)
         self.simulation.add_observer_list(self.observers)
 
         description = self.get_description()

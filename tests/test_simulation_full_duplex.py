@@ -22,7 +22,7 @@ class SimulationFullDuplexTest(unittest.TestCase):
         self.param = Parameters()
         
         # TODO Change the link type
-        self.param.general.imt_link = "DOWNLINK"
+        self.param.general.imt_link = "FULLDUPLEX"
         
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19
