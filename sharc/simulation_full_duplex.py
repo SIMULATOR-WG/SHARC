@@ -62,8 +62,8 @@ class SimulationFullDuplex(Simulation):
                                                                     self.ue,
                                                                     self.propagation_imt)
         
-        # UE to UE coupling loss
-        self.coupling_loss_imt_ue_ue = self.calculate_coupling_loss(self.bs,
+        # BS to BS coupling loss
+        self.coupling_loss_imt_bs_bs = self.calculate_coupling_loss(self.bs,
                                                                     self.bs,
                                                                     self.propagation_imt)
         
@@ -76,6 +76,22 @@ class SimulationFullDuplex(Simulation):
         
         # Calculate intra IMT interference
         self.calculate_sinr()
+        
+        if self.parameters.imt.interfered_with:
+            # Execute this piece of code if the other system generates 
+            # interference into IMT
+            self.calculate_sinr_ext()
+            #self.recalculate_sinr()
+            #self.calculate_imt_degradation()
+            pass
+        else:
+            # Execute this piece of code if IMT generates interference into
+            # the other system
+            self.calculate_external_interference()
+            #self.calculate_external_degradation()
+            pass
+        
+        self.collect_results(write_to_file, snapshot_number)
 
 
     def power_control(self):
@@ -289,5 +305,72 @@ class SimulationFullDuplex(Simulation):
         
         
     def collect_results(self, write_to_file: bool, snapshot_number: int):
-        pass
+        if not self.parameters.imt.interfered_with:
+            self.results.system_inr.extend(self.system.inr.tolist())
+            self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
+        
+        bs_active = np.where(self.bs.active)[0]
+        for bs in bs_active:
+            ue = self.link[bs]
+            self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
+            self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+            
+            bs_bs_cl = self.coupling_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
+            self.results.imt_coupling_loss_bs_bs.extend(bs_bs_cl)
+            
+            ue_ue_cl = np.ravel(self.coupling_loss_imt_ue_ue[ue])
+            ue_ue_cl = ue_ue_cl[~np.isnan(ue_ue_cl)]
+            self.results.imt_coupling_loss_bs_bs.extend(ue_ue_cl)
+            
+            self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
+            self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
+            
+            
+            tput = self.calculate_imt_tput(self.ue.sinr[ue],
+                                           self.parameters.imt.dl_sinr_min,
+                                           self.parameters.imt.dl_sinr_max,
+                                           self.parameters.imt.dl_attenuation_factor)
+            self.results.imt_dl_tput.extend(tput.tolist())
+            
+            tput = self.calculate_imt_tput(self.bs.sinr[bs],
+                                           self.parameters.imt.ul_sinr_min,
+                                           self.parameters.imt.ul_sinr_max,
+                                           self.parameters.imt.ul_attenuation_factor)
+            self.results.imt_ul_tput.extend(tput.tolist())
+
+            if self.parameters.imt.interfered_with:
+                tput_ext = self.calculate_imt_tput(self.ue.sinr_ext[ue],
+                                                   self.parameters.imt.dl_sinr_min,
+                                                   self.parameters.imt.dl_sinr_max,
+                                                   self.parameters.imt.dl_attenuation_factor)
+                self.results.imt_dl_tput_ext.extend(tput_ext.tolist()) 
+                self.results.imt_dl_sinr_ext.extend(self.ue.sinr_ext[ue].tolist())
+                self.results.imt_dl_inr.extend(self.ue.inr[ue].tolist())
+                
+                tput_ext = self.calculate_imt_tput(self.bs.sinr_ext[bs],
+                                                      self.parameters.imt.ul_sinr_min,
+                                                      self.parameters.imt.ul_sinr_max,
+                                                      self.parameters.imt.ul_attenuation_factor)
+                self.results.imt_ul_tput_ext.extend(tput_ext.tolist())  
+                self.results.imt_ul_sinr_ext.extend(self.bs.sinr_ext[bs].tolist())
+                self.results.imt_ul_inr.extend(self.bs.inr[bs].tolist())
+                
+            self.results.system_imt_ue_antenna_gain.extend(self.system_imt_ue_antenna_gain[0,ue])
+            self.results.imt_ue_system_antenna_gain.extend(self.imt_ue_system_antenna_gain[0,ue])                
+                
+            active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
+            self.results.system_imt_bs_antenna_gain.extend(self.system_imt_bs_antenna_gain[0,active_beams])
+            self.results.imt_bs_system_antenna_gain.extend(self.imt_bs_system_antenna_gain[0,active_beams])
+
+            self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
+            self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
+            self.results.imt_dl_snr.extend(self.ue.snr[ue].tolist())
+            
+            self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
+            self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
+            self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
+            
+        if write_to_file:
+            self.results.write_files(snapshot_number)
+            self.notify_observers(source=__name__, results=self.results)
 

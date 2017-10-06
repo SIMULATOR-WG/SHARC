@@ -48,6 +48,11 @@ class Simulation(ABC, Observable):
         self.imt_ue_antenna_gain = list()
         self.system_imt_antenna_gain = list()
         self.imt_system_antenna_gain = list()
+        
+        self.system_imt_bs_antenna_gain = list()
+        self.imt_bs_system_antenna_gain = list()
+        self.system_imt_ue_antenna_gain = list()
+        self.imt_ue_system_antenna_gain = list()
 
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
@@ -201,6 +206,13 @@ class Simulation(ABC, Observable):
              (station_a.station_type is StationType.FSS_ES and station_b.station_type is StationType.IMT_BS):
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b
+            
+            if(station_b.station_type is StationType.IMT_BS):
+                self.system_imt_bs_antenna_gain = gain_a
+                self.imt_bs_system_antenna_gain = gain_b
+            if(station_b.station_type is StationType.IMT_UE):
+                self.system_imt_ue_antenna_gain = gain_a
+                self.imt_ue_system_antenna_gain = gain_b
 
         # calculate coupling loss
         coupling_loss = np.squeeze(path_loss - gain_a - gain_b)
