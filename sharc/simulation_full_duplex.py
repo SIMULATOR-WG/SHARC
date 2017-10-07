@@ -38,15 +38,16 @@ class SimulationFullDuplex(Simulation):
         # network load factor)
         self.bs = StationFactory.generate_imt_base_stations(self.parameters.imt,
                                                             self.parameters.antenna_imt,
-                                                            self.topology)      
-        
-        # Create the other system (FSS, HAPS, etc...)
-        self.system = StationFactory.generate_system(self.parameters)
+                                                            self.topology)
 
         # Create IMT user equipments
         self.ue = StationFactory.generate_imt_ue(self.parameters.imt,
                                                  self.parameters.antenna_imt,
                                                  self.topology)
+        
+        # Create the other system (FSS, HAPS, etc...)
+        self.system = StationFactory.generate_system(self.parameters)
+        
         #self.plot_scenario()
         
         self.connect_ue_to_bs()
@@ -74,12 +75,10 @@ class SimulationFullDuplex(Simulation):
         # Stations power control
         self.power_control()
         
-        # Calculate intra IMT interference
-        self.calculate_sinr()
-        
         if self.parameters.imt.interfered_with:
             # Execute this piece of code if the other system generates 
             # interference into IMT
+            self.calculate_sinr()
             self.calculate_sinr_ext()
             #self.recalculate_sinr()
             #self.calculate_imt_degradation()
@@ -87,6 +86,7 @@ class SimulationFullDuplex(Simulation):
         else:
             # Execute this piece of code if IMT generates interference into
             # the other system
+            self.calculate_sinr()
             self.calculate_external_interference()
             #self.calculate_external_degradation()
             pass

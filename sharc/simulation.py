@@ -123,6 +123,7 @@ class Simulation(ABC, Observable):
         """
         snapshot_number = kwargs["snapshot_number"]
         self.results.write_files(snapshot_number)
+        self.notify_observers(source=__name__, results=self.results)
 
 
     def calculate_coupling_loss(self,

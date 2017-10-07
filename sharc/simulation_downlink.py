@@ -74,10 +74,6 @@ class SimulationDownlink(Simulation):
         self.collect_results(write_to_file, snapshot_number)
 
 
-        
-    def finalize(self, *args, **kwargs):
-        self.notify_observers(source=__name__, results=self.results)
-
 
     def power_control(self):
         """

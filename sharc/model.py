@@ -49,7 +49,7 @@ class Model(Observable):
             self.simulation = SimulationDownlink(self.parameters)
         elif self.parameters.general.imt_link == "UPLINK":
             self.simulation = SimulationUplink(self.parameters)
-        else self.parameters.general.imt_link == "FULLDUPLEX":
+        elif self.parameters.general.imt_link == "FULLDUPLEX":
             self.simulation = SimulationFullDuplex(self.parameters)
         self.simulation.add_observer_list(self.observers)
 
