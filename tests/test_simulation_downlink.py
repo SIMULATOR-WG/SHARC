@@ -207,7 +207,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)
         # check UE received interference
         npt.assert_allclose(self.simulation.ue.rx_interference, 
-                            np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7]),
+                            np.array([p_tx-(97.55-2-10)-7 - 3,  p_tx-(94.72-2-11)-7 - 3, p_tx-(93.27-1-22)-7 - 3, p_tx-(97.05-1-23)-7 - 3]),
                             atol=1e-2)
         # check UE thermal noise
         npt.assert_allclose(self.simulation.ue.thermal_noise, 
@@ -215,7 +215,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)
         # check UE thermal noise + interference
         npt.assert_allclose(self.simulation.ue.total_interference, 
-                            10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7])) +
+                            10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-7 - 3,  p_tx-(94.72-2-11)-7 - 3, p_tx-(93.27-1-22)-7 - 3, p_tx-(97.05-1-23)-7 - 3])) +
                                         np.power(10, 0.1*(-88.44))),
                             atol=1e-2)
         # check SNR 
@@ -224,7 +224,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)        
         # check SINR
         npt.assert_allclose(self.simulation.ue.sinr, 
-                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            np.array([ 16.24,   4.70,   5.49,  18.59]),
                             atol=1e-2)        
 
         self.simulation.system = StationFactory.generate_fss_space_station(self.param.fss_ss)
@@ -296,7 +296,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         
         # check SINR
         npt.assert_allclose(self.simulation.ue.sinr, 
-                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            np.array([ 16.24,   4.70,   5.49,  18.59]),
                             atol=1e-2)        
 
         self.simulation.system = StationFactory.generate_fss_earth_station(self.param.fss_es)
