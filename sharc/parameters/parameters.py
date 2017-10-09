@@ -20,10 +20,10 @@ class Parameters(object):
     """
     Reads parameters from input file.
     """
-    
+
     def __init__(self):
         self.file_name = None
-        
+
         self.general = ParametersGeneral()
         self.imt = ParametersImt()
         self.antenna_imt = ParametersAntennaImt()
@@ -31,25 +31,25 @@ class Parameters(object):
         self.fs = ParametersFs()
         self.fss_ss = ParametersFssSs()
         self.fss_es = ParametersFssEs()
-    
-        
+
+
     def set_file_name(self, file_name: str):
         self.file_name = file_name
-        
-    
+
+
     def read_params(self):
         config = configparser.ConfigParser()
         config.read(self.file_name)
-        
+
         #######################################################################
-        # GENERAL 
+        # GENERAL
         #######################################################################
         self.general.num_snapshots   = config.getint("GENERAL", "num_snapshots")
         self.general.imt_link        = config.get("GENERAL", "imt_link")
         self.general.system          = config.get("GENERAL", "system")
 
         #######################################################################
-        # IMT 
+        # IMT
         #######################################################################
         self.imt.topology                = config.get("IMT", "topology")
         self.imt.num_macrocell_sites     = config.getint("IMT", "num_macrocell_sites")
@@ -80,7 +80,7 @@ class Parameters(object):
         self.imt.ue_tx_power_control     = config.get("IMT", "ue_tx_power_control")
         self.imt.ue_p_o_pusch            = config.getfloat("IMT", "ue_p_o_pusch")
         self.imt.ue_alfa                 = config.getfloat("IMT", "ue_alfa")
-        self.imt.ue_p_cmax               = config.getfloat("IMT", "ue_p_cmax")    
+        self.imt.ue_p_cmax               = config.getfloat("IMT", "ue_p_cmax")
         self.imt.ue_conducted_power      = config.getfloat("IMT", "ue_conducted_power")
         self.imt.ue_height               = config.getfloat("IMT", "ue_height")
         self.imt.ue_aclr                 = config.getfloat("IMT", "ue_aclr")
@@ -109,7 +109,7 @@ class Parameters(object):
         self.antenna_imt.bs_tx_n_columns        = config.getfloat("IMT_ANTENNA", "bs_tx_n_columns")
         self.antenna_imt.bs_tx_element_horiz_spacing = config.getfloat("IMT_ANTENNA", "bs_tx_element_horiz_spacing")
         self.antenna_imt.bs_tx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "bs_tx_element_vert_spacing")
-        
+
         self.antenna_imt.bs_rx_element_max_g    = config.getfloat("IMT_ANTENNA", "bs_rx_element_max_g")
         self.antenna_imt.bs_rx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "bs_rx_element_phi_3db")
         self.antenna_imt.bs_rx_element_theta_3db = config.getfloat("IMT_ANTENNA", "bs_rx_element_theta_3db")
@@ -119,7 +119,7 @@ class Parameters(object):
         self.antenna_imt.bs_rx_n_columns        = config.getfloat("IMT_ANTENNA", "bs_rx_n_columns")
         self.antenna_imt.bs_rx_element_horiz_spacing = config.getfloat("IMT_ANTENNA", "bs_rx_element_horiz_spacing")
         self.antenna_imt.bs_rx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "bs_rx_element_vert_spacing")
-        
+
         self.antenna_imt.ue_tx_element_max_g    = config.getfloat("IMT_ANTENNA", "ue_tx_element_max_g")
         self.antenna_imt.ue_tx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "ue_tx_element_phi_3db")
         self.antenna_imt.ue_tx_element_theta_3db = config.getfloat("IMT_ANTENNA", "ue_tx_element_theta_3db")
@@ -129,7 +129,7 @@ class Parameters(object):
         self.antenna_imt.ue_tx_n_columns        = config.getfloat("IMT_ANTENNA", "ue_tx_n_columns")
         self.antenna_imt.ue_tx_element_horiz_spacing = config.getfloat("IMT_ANTENNA", "ue_tx_element_horiz_spacing")
         self.antenna_imt.ue_tx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "ue_tx_element_vert_spacing")
-        
+
         self.antenna_imt.ue_rx_element_max_g    = config.getfloat("IMT_ANTENNA", "ue_rx_element_max_g")
         self.antenna_imt.ue_rx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "ue_rx_element_phi_3db")
         self.antenna_imt.ue_rx_element_theta_3db = config.getfloat("IMT_ANTENNA", "ue_rx_element_theta_3db")
@@ -139,9 +139,9 @@ class Parameters(object):
         self.antenna_imt.ue_rx_n_columns        = config.getfloat("IMT_ANTENNA", "ue_rx_n_columns")
         self.antenna_imt.ue_rx_element_horiz_spacing = config.getfloat("IMT_ANTENNA", "ue_rx_element_horiz_spacing")
         self.antenna_imt.ue_rx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "ue_rx_element_vert_spacing")
-        
+
         #######################################################################
-        # HOTSPOT 
+        # HOTSPOT
         #######################################################################
         self.hotspot.num_hotspots_per_cell = config.getint("HOTSPOT", "num_hotspots_per_cell")
         self.hotspot.max_dist_hotspot_ue   = config.getfloat("HOTSPOT", "max_dist_hotspot_ue")
@@ -149,53 +149,51 @@ class Parameters(object):
         self.hotspot.min_dist_hotspots     = config.getfloat("HOTSPOT", "min_dist_hotspots")
 
         #######################################################################
-        # FSS space station 
+        # FSS space station
         #######################################################################
         self.fss_ss.frequency               = config.getfloat("FSS_SS", "frequency")
         self.fss_ss.bandwidth               = config.getfloat("FSS_SS", "bandwidth")
+        self.fss_ss.tx_power_density        = config.getfloat("FSS_ES", "tx_power_density")
         self.fss_ss.altitude                = config.getfloat("FSS_SS", "altitude")
         self.fss_ss.lat_deg                 = config.getfloat("FSS_SS", "lat_deg")
         self.fss_ss.elevation               = config.getfloat("FSS_SS", "elevation")
-        self.fss_ss.azimuth                 = config.getfloat("FSS_SS", "azimuth")    
+        self.fss_ss.azimuth                 = config.getfloat("FSS_SS", "azimuth")
         self.fss_ss.noise_temperature       = config.getfloat("FSS_SS", "noise_temperature")
-        self.fss_ss.tx_power_density        = config.getfloat("FSS_SS", "tx_power_density")
         self.fss_ss.inr_scaling             = config.getfloat("FSS_SS", "inr_scaling")
         self.fss_ss.antenna_gain            = config.getfloat("FSS_SS", "antenna_gain")
         self.fss_ss.antenna_pattern         = config.get("FSS_SS", "antenna_pattern")
         self.fss_ss.imt_altitude            = config.getfloat("FSS_SS", "imt_altitude")
         self.fss_ss.imt_lat_deg             = config.getfloat("FSS_SS", "imt_lat_deg")
         self.fss_ss.imt_long_diff_deg       = config.getfloat("FSS_SS", "imt_long_diff_deg")
+        self.fss_ss.season                  = config.get("FSS_SS", "season")
         self.fss_ss.channel_model           = config.get("FSS_SS", "channel_model")
-        self.fss_ss.line_of_sight_prob      = config.getfloat("FSS_SS", "line_of_sight_prob")
-        self.fss_ss.surf_water_vapour_density = config.getfloat("FSS_SS", "surf_water_vapour_density")
-        self.fss_ss.specific_gaseous_att    = config.getfloat("FSS_SS", "specific_gaseous_att")
-        self.fss_ss.time_ratio              = config.getfloat("FSS_SS", "time_ratio")
         self.fss_ss.antenna_l_s             = config.getfloat("FSS_SS", "antenna_l_s")
         self.fss_ss.antenna_3_dB            = config.getfloat("FSS_SS", "antenna_3_dB")
         self.fss_ss.BOLTZMANN_CONSTANT      = config.getfloat("FSS_SS", "BOLTZMANN_CONSTANT")
         self.fss_ss.EARTH_RADIUS            = config.getfloat("FSS_SS", "EARTH_RADIUS")
-        
+
         #######################################################################
-        # FSS earth station 
+        # FSS earth station
         #######################################################################
-        self.fss_es.x                       = config.getfloat("FSS_ES", "x")
-        self.fss_es.y                       = config.getfloat("FSS_ES", "y")
-        self.fss_es.height                  = config.getfloat("FSS_ES", "height")
-        self.fss_es.elevation               = config.getfloat("FSS_ES", "elevation")
-        self.fss_es.azimuth                 = config.getfloat("FSS_ES", "azimuth")
-        self.fss_es.frequency               = config.getfloat("FSS_ES", "frequency")
-        self.fss_es.bandwidth               = config.getfloat("FSS_ES", "bandwidth")
-        self.fss_es.noise_temperature       = config.getfloat("FSS_ES", "noise_temperature")
-        self.fss_es.tx_power_density        = config.getfloat("FSS_ES", "tx_power_density")
-        self.fss_es.inr_scaling             = config.getfloat("FSS_ES", "inr_scaling")
-        self.fss_es.antenna_gain            = config.getfloat("FSS_ES", "antenna_gain")
-        self.fss_es.antenna_pattern         = config.get("FSS_ES", "antenna_pattern")
-        self.fss_es.diameter                = config.getfloat("FSS_ES", "diameter")
-        self.fss_es.channel_model           = config.get("FSS_ES", "channel_model")
-        self.fss_es.line_of_sight_prob      = config.getfloat("FSS_ES", "line_of_sight_prob") 
-        self.fss_es.BOLTZMANN_CONSTANT      = config.getfloat("FSS_ES", "BOLTZMANN_CONSTANT")
-        self.fss_es.EARTH_RADIUS            = config.getfloat("FSS_ES", "EARTH_RADIUS")
-        
+        self.fss_es.x = config.getfloat("FSS_ES", "x")
+        self.fss_es.y = config.getfloat("FSS_ES", "y")
+        self.fss_es.height = config.getfloat("FSS_ES", "height")
+        self.fss_es.elevation = config.getfloat("FSS_ES", "elevation")
+        self.fss_es.azimuth = config.getfloat("FSS_ES", "azimuth")
+        self.fss_es.frequency = config.getfloat("FSS_ES", "frequency")
+        self.fss_es.bandwidth = config.getfloat("FSS_ES", "bandwidth")
+        self.fss_es.tx_power_density = config.getfloat("FSS_ES", "tx_power_density")
+        self.fss_es.noise_temperature = config.getfloat("FSS_ES", "noise_temperature")
+        self.fss_es.inr_scaling = config.getfloat("FSS_ES", "inr_scaling")
+        self.fss_es.antenna_gain = config.getfloat("FSS_ES", "antenna_gain")
+        self.fss_es.antenna_pattern = config.get("FSS_ES", "antenna_pattern")
+        self.fss_es.diameter = config.getfloat("FSS_ES", "diameter")
+        self.fss_es.channel_model = config.get("FSS_ES", "channel_model")
+        self.fss_es.line_of_sight_prob = config.getfloat("FSS_ES", "line_of_sight_prob")
+        self.fss_es.BOLTZMANN_CONSTANT = config.getfloat("FSS_ES", "BOLTZMANN_CONSTANT")
+        self.fss_es.EARTH_RADIUS = config.getfloat("FSS_ES", "EARTH_RADIUS")
+
+
         #######################################################################
         # Fixed wireless service
         #######################################################################
@@ -213,6 +211,7 @@ class Parameters(object):
         self.fs.antenna_pattern         = config.get("FS", "antenna_pattern")
         self.fs.diameter                = config.getfloat("FS", "diameter")
         self.fs.channel_model           = config.get("FS", "channel_model")
-        self.fs.line_of_sight_prob      = config.getfloat("FS", "line_of_sight_prob") 
+        self.fs.line_of_sight_prob      = config.getfloat("FS", "line_of_sight_prob")
         self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
-        self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")        
+        self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
+

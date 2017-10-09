@@ -18,7 +18,7 @@ from sharc.propagation.propagation_umi import PropagationUMi
 from sharc.propagation.propagation_abg import PropagationABG
 
 class PropagationFactory(object):
-    
+
     @staticmethod
     def createPropagation(channel_model: str) -> Propagation:
         if channel_model == "FSPL":
@@ -28,7 +28,7 @@ class PropagationFactory(object):
         elif channel_model == "UMa":
             return PropagationUMa()
         elif channel_model == "UMi":
-            return PropagationUMi()            
+            return PropagationUMi()
         elif channel_model == "CI":
             return PropagationCloseIn()
         elif channel_model == "SatelliteSimple":
