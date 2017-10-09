@@ -49,7 +49,7 @@ class AntennaFssSs(Antenna):
     def calculate_gain(self, *args, **kwargs) -> np.array:
         psi = np.absolute(kwargs["phi_vec"])
         
-        gain = np.zeros(len(psi))
+        gain = np.zeros(len(psi)) - 3
         
         idx_1 = np.where(psi <= self.a * self.psi_0)[0]
         gain[idx_1] = self.peak_gain - 12 * np.power(psi[idx_1]/(2*self.psi_0), 2)
@@ -67,34 +67,39 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from sharc.antenna.antenna_s672 import AntennaS672
 
+    psi = np.linspace(0.1, 180, num = 100000)
+
     # initialize antenna parameters
-    param = ParametersFssSs()
-    param.antenna_gain = 50
-    param.antenna_pattern = "FSS_SS"
-    param.antenna_3_dB = 2
-    psi = np.linspace(0.1, 30, num = 1000)
-    
-    param.antenna_l_s = -25    
-    antenna_fss = AntennaFssSs(param)    
+    param_ss = ParametersFssSs()
+    param_ss.antenna_gain = 46.6
+    param_ss.antenna_pattern = "FSS_SS"
+    param_ss.antenna_3_dB = 0.8
+    param_ss.antenna_l_s = -25    
+    antenna_fss = AntennaFssSs(param_ss)    
     gain_fss = antenna_fss.calculate_gain(phi_vec=psi)
 
-    antenna_672 = AntennaS672(param)    
+    param_672 = ParametersFssSs()
+    param_672.antenna_gain = 51
+    param_672.antenna_pattern = "FSS_SS"
+    param_672.antenna_3_dB = 0.65
+    param_672.antenna_l_s = -20    
+    antenna_672 = AntennaS672(param_672)    
     gain_672 = antenna_672.calculate_gain(phi_vec=psi)
     
-    fig = plt.figure(figsize=(12,7), facecolor='w', edgecolor='k')  # create a figure object
+    fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
     
-    plt.semilogx(psi, gain_672 - param.antenna_gain, "-b", label="ITU-R S.672-4")
-    plt.semilogx(psi, gain_fss - param.antenna_gain, "-r", label="FSS SS")
+    plt.semilogx(psi, gain_672, "-b", label="carrier #06")
+    plt.semilogx(psi, gain_fss, "-r", label="carrier #13")
 
-    plt.ylim((-40, 0.3))
-    plt.xlim((0.1, 100))    
+    plt.ylim((-10, 60))
+    plt.xlim((0.1, 180))    
     plt.title("FSS space station antenna pattern")
-    plt.xlabel("Relative off-axis angle, $\psi/\psi_0$")
-    plt.ylabel("Gain relative to $G_m$ [dB]")
+    plt.xlabel("Off-axis angle [deg]")
+    plt.ylabel("Gain [dBi]")
     plt.legend(loc="upper right")
 
     ax = plt.gca()
-    ax.set_yticks([-40, -30, -20, -10, 0])
+    #ax.set_yticks([-40, -30, -20, -10, 0])
     ax.set_xticks(np.linspace(0.1, 0.9, 9).tolist() + np.linspace(1, 9, 9).tolist() + np.linspace(10, 100, 10).tolist())
 
     plt.grid()

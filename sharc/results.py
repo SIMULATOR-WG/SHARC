@@ -128,7 +128,7 @@ class Results(object):
             cumulative = np.cumsum(values)
             x = base[:-1]
             y = cumulative / cumulative[-1]
-            x_label = "UL SINR [dB]"
+            x_label = "SINR [dB]"
             y_label = "Probability of SINR < $X$"
             title = "[IMT] CDF of UL SINR with external interference"
             file_name = title
@@ -140,7 +140,7 @@ class Results(object):
             cumulative = np.cumsum(values)
             x = base[:-1]
             y = cumulative / cumulative[-1]
-            x_label = "UL SINR [dB]"
+            x_label = "SINR [dB]"
             y_label = "Probability of SINR < $X$"
             title = "[IMT] CDF of UL SINR"
             file_name = title
@@ -153,7 +153,7 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of UL SNR"
-            x_label = "UL SNR [dB]"
+            x_label = "SNR [dB]"
             y_label = "Probability of SNR < $X$"
             file_name = title
             x_limits = (-15, 20)
@@ -177,7 +177,7 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of UL throughput with external interference"
-            x_label = "UL throughput [bits/s/Hz]"
+            x_label = "Throughput [bits/s/Hz]"
             y_label = "Probability of UL throughput < $X$"
             file_name = title
             y_limits = (0, 1)
@@ -188,7 +188,7 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of UL throughput"
-            x_label = "UL throughput [bits/s/Hz]"
+            x_label = "Throughput [bits/s/Hz]"
             y_label = "Probability of UL throughput < $X$"
             file_name = title
             y_limits = (0, 1)
