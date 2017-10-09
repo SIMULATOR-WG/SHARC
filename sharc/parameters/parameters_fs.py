@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jul 24 15:30:49 2017
+Created on Wed Aug  9 19:35:52 2017
 
 @author: edgar
 """
 
 class ParametersFs(object):
     """
-    Simulation parameters for FS
+    Simulation parameters for Fixed Services
     """
 
     def __init__(self):

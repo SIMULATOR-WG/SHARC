@@ -337,7 +337,45 @@ class Simulation(ABC, Observable):
         return tput
 
 
+    def calculate_bw_weights(self, bw_imt: float, bw_sys: float, ue_k: int) -> np.array:
+        """
+        Calculates the weight that each resource block group of IMT base stations
+        will have when estimating the interference to other systems based on 
+        the bandwidths of both systems. 
+        
+        Parameters
+        ----------
+            bw_imt : bandwidth of IMT system
+            bw_sys : bandwidth of other system
+            ue_k : number of UE's allocated to each IMT base station; it also
+                corresponds to the number of resource block groups
+            
+        Returns
+        -------
+            K-dimentional array of weights
+        """
+        
+        if bw_imt <= bw_sys:
+            weights = np.ones(ue_k)
 
+        elif bw_imt > bw_sys:
+            weights = np.zeros(ue_k)
+            
+            bw_per_rbg = bw_imt / ue_k
+
+            # number of resource block groups that will have weight equal to 1
+            rb_ones = math.floor( bw_sys / bw_per_rbg )
+            
+            # weight of the rbg that will generate partial interference
+            rb_partial = np.mod( bw_sys, bw_per_rbg ) / bw_per_rbg
+
+            # assign value to weight array
+            weights[:rb_ones] = 1
+            weights[rb_ones] = rb_partial
+        
+        return weights
+        
+        
     def plot_scenario(self):
         fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
         ax = fig.gca()
