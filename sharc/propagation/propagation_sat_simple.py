@@ -16,7 +16,7 @@ class PropagationSatSimple(Propagation):
     """
     Implements the simplified satellite propagation model
     """
-    
+
     def __init__(self):
         super().__init__()
         self.clutter = PropagationClutterLoss()
@@ -25,23 +25,31 @@ class PropagationSatSimple(Propagation):
         self.polarization_loss = 3
         self.building_loss = 20
 
-        
     def get_loss(self, *args, **kwargs) -> np.array:
         d = kwargs["distance_3D"]
         f = kwargs["frequency"]
-        p = kwargs["loc_percentage"]
         indoor_stations = kwargs["indoor_stations"]
         elevation = kwargs["elevation"]
-        
+        number_of_sectors = kwargs.pop("number_of_sectors", 1)
+        enable_clutter_loss = kwargs.pop("enable_clutter_loss", True)
+
         free_space_loss = self.free_space.get_loss(distance_3D=d,
                                                    frequency=f)
-        clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f,
-                                                           elevation=elevation["free_space"],
-                                                           loc_percentage=p,
-                                                           station_type=StationType.FSS_SS))
+
+        if enable_clutter_loss:
+            clutter_loss = np.maximum(0, self.clutter.get_loss(frequency=f, distance=d,
+                                                               elevation=elevation["free_space"],
+                                                               loc_percentage="RANDOM",
+                                                               station_type=StationType.FSS_SS))
+        else:
+            clutter_loss = 0
+
         building_loss = self.building_loss*indoor_stations
-        
-        loss = (free_space_loss + clutter_loss + building_loss + 
+
+        loss = (free_space_loss + clutter_loss + building_loss +
                 self.polarization_loss + self.atmospheric_loss)
-        
+
+        if number_of_sectors > 1:
+            loss = np.repeat(loss, number_of_sectors, 1)
+
         return loss
