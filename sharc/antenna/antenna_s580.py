@@ -9,7 +9,6 @@ from sharc.antenna.antenna import Antenna
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 
 import numpy as np
-import math
 
 class AntennaS580(Antenna):
     """
@@ -21,12 +20,10 @@ class AntennaS580(Antenna):
         super().__init__()
         self.peak_gain = param.antenna_gain
         lmbda = 3e8 / ( param.frequency * 1e6 )
-        D_lmbda = param.diameter / lmbda
-        
-        if 1 <=D_lmbda * 100:
-            self.phi_min = 1
-        else:
-           self.phi_min = D_lmbda * 100
+
+        self.phi_min = 1
+        if 100 * lmbda / param.diameter > 1:
+           self.phi_min = 100 * lmbda / param.diameter
         
     def calculate_gain(self, *args, **kwargs) -> np.array:
         phi = np.absolute(kwargs["phi_vec"])
@@ -60,18 +57,18 @@ if __name__ == '__main__':
 
     gain27 = antenna27.calculate_gain(phi_vec=phi)
     
-    param43 = ParametersFssEs()
-    param43.antenna_pattern = "ITU-R S.580-6"
-    param43.frequency = 43000
-    param43.antenna_gain = 50
-    param43.diameter = 1.8
-    antenna43 = AntennaS580(param43)
-    gain43 = antenna43.calculate_gain(phi_vec=phi)
+    param = ParametersFssEs()
+    param.antenna_pattern = "ITU-R S.580-6"
+    param.frequency = 27000
+    param.antenna_gain = 50
+    param.diameter = 0.45
+    antenna = AntennaS580(param)
+    gain = antenna.calculate_gain(phi_vec=phi)
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
     
     plt.semilogx(phi, gain27 - param27.antenna_gain, "-b", label = "$f = 27$ $GHz,$ $D = 9.6$ $m$")
- #   plt.semilogx(phi, gain43 - param43.antenna_gain, "-r", label = "$f = 43$ $GHz,$ $D = 1.8$ $m$")
+    plt.semilogx(phi, gain - param.antenna_gain, "-r", label = "$f = 27$ $GHz,$ $D = 0.45$ $m$")
 
     plt.title("ITU-R S.580 antenna radiation pattern")
     plt.xlabel("Off-axis angle $\phi$ [deg]")
