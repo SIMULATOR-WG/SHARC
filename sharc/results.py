@@ -273,6 +273,30 @@ class Results(object):
             x_limits = (60, 160)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.system_dl_coupling_loss) > 0:
+            values, base = np.histogram(self.system_dl_coupling_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of System to BS coupling loss"
+            x_label = "Coupling loss [dB]"
+            y_label = "Probability of coupling loss < $X$"
+            file_name = title
+            x_limits = (60, 160)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.system_ul_coupling_loss) > 0:
+            values, base = np.histogram(self.system_ul_coupling_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of System to UE coupling loss"
+            x_label = "Coupling loss [dB]"
+            y_label = "Probability of coupling loss < $X$"
+            file_name = title
+            x_limits = (60, 160)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_coupling_loss_ue_ue) > 0:
             values, base = np.histogram(self.imt_coupling_loss_ue_ue, bins=n_bins)
             cumulative = np.cumsum(values)

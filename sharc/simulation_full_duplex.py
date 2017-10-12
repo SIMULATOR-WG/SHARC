@@ -361,6 +361,9 @@ class SimulationFullDuplex(Simulation):
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
             self.results.system_imt_bs_antenna_gain.extend(self.system_imt_bs_antenna_gain[0,active_beams])
             self.results.imt_bs_system_antenna_gain.extend(self.imt_bs_system_antenna_gain[0,active_beams])
+            
+            self.results.system_ul_coupling_loss.extend(self.coupling_loss_imt_ue_system[ue])
+            self.results.system_dl_coupling_loss.extend([self.coupling_loss_imt_bs_system[bs]])
 
             self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
             self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
