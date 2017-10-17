@@ -201,11 +201,11 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.calculate_sinr()
         # check UE received power
         npt.assert_allclose(self.simulation.ue.rx_power, 
-                            np.array([p_tx-(78.47-1-10)-7, p_tx-(89.35-1-11)-7, p_tx-(91.53-2-22)-7, p_tx-(81.99-2-23)-7]),
+                            np.array([p_tx-(78.47-1-10)-4-3-3, p_tx-(89.35-1-11)-4-3-3, p_tx-(91.53-2-22)-4-3-3, p_tx-(81.99-2-23)-4-3-3]),
                             atol=1e-2)
         # check UE received interference
         npt.assert_allclose(self.simulation.ue.rx_interference, 
-                            np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7]),
+                            np.array([p_tx-(97.55-2-10)-4-3-3,  p_tx-(94.72-2-11)-4-3-3, p_tx-(93.27-1-22)-4-3-3, p_tx-(97.05-1-23)-4-3-3]),
                             atol=1e-2)
         # check UE thermal noise
         npt.assert_allclose(self.simulation.ue.thermal_noise, 
@@ -213,16 +213,16 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)
         # check BS thermal noise + interference
         npt.assert_allclose(self.simulation.ue.total_interference, 
-                            10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-7,  p_tx-(94.72-2-11)-7, p_tx-(93.27-1-22)-7, p_tx-(97.05-1-23)-7])) +
+                            10*np.log10(np.power(10, 0.1*np.array([p_tx-(97.55-2-10)-4-3-3,  p_tx-(94.72-2-11)-4-3-3, p_tx-(93.27-1-22)-4-3-3, p_tx-(97.05-1-23)-4-3-3])) +
                                         np.power(10, 0.1*(-88.44))),
                             atol=1e-2)
         # check SNR 
         npt.assert_allclose(self.simulation.ue.snr, 
-                            np.array([-70.48 - (-88.44),  -80.36 - (-88.44), -70.54 - (-88.44),  -60.00 - (-88.44)]),
+                            np.array([-73.48 - (-88.44),  -83.36 - (-88.44), -73.54 - (-88.44),  -63.00 - (-88.44)]),
                             atol=1e-2)        
         # check SINR
         npt.assert_allclose(self.simulation.ue.sinr, 
-                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            np.array([-73.48 - (-86.71), -83.36 - (-85.06), -73.54 - (-76.03), -63.00 - (-78.59)]),
                             atol=1e-2)        
 
         self.simulation.system = StationFactory.generate_fss_space_station(self.param.fss_ss)
@@ -294,7 +294,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         
         # check SINR
         npt.assert_allclose(self.simulation.ue.sinr, 
-                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            np.array([-73.48 - (-86.71), -83.36 - (-85.06), -73.54 - (-76.03), -63.00 - (-78.59)]),
                             atol=1e-2)        
 
         self.simulation.system = StationFactory.generate_fss_earth_station(self.param.fss_es)
@@ -317,7 +317,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                                  + np.power(10, 0.1*np.array([ -19.02, -18.23,  -7.40,  -6.64 ])))
         
         npt.assert_allclose(self.simulation.ue.sinr_ext, 
-                            np.array([-70.48, -80.36, -70.54, -60.00]) - interference, 
+                            np.array([-73.48, -83.36, -73.54, -63.00]) - interference, 
                             atol=1e-2)       
         
         npt.assert_allclose(self.simulation.ue.inr, 
