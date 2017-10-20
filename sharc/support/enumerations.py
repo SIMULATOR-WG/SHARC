@@ -35,3 +35,4 @@ class StationType(Enum):
     FSS_SS = 3  # FSS Space Station
     FSS_ES = 4  # FSS Earth Station
     FS     = 5  # Fixed Service
+    HAPS   = 6  # HAPS (airbone) station
