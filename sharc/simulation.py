@@ -37,6 +37,8 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.fss_es
         elif self.parameters.general.system == "FS":
             self.param_system = self.parameters.fs
+        elif self.parameters.general.system == "HAPS":
+            self.param_system = self.parameters.haps
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 
@@ -136,13 +138,15 @@ class Simulation(ABC, Observable):
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
 
-        if station_a.station_type is StationType.FSS_SS :
+        if station_a.station_type is StationType.FSS_SS or \
+           station_a.station_type is StationType.HAPS:
             elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
         else:
             elevation_angles = None
 
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.FSS_ES or \
+           station_a.station_type is StationType.HAPS or \
            station_a.station_type is StationType.FS:
 
             if station_b.station_type is StationType.IMT_UE:
@@ -164,7 +168,8 @@ class Simulation(ABC, Observable):
                 earth_to_space = True
                 single_entry = False
 
-            if station_a.station_type is StationType.FSS_SS:
+            if station_a.station_type is StationType.FSS_SS or \
+               station_a.station_type is StationType.HAPS:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
@@ -275,6 +280,7 @@ class Simulation(ABC, Observable):
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
             elif(station_2.station_type is StationType.FSS_SS or \
                  station_2.station_type is StationType.FSS_ES or \
+                 station_2.station_type is StationType.HAPS or \
                  station_2.station_type is StationType.FS):
                 phi = np.repeat(phi,self.parameters.imt.ue_k,0)
                 theta = np.repeat(theta,self.parameters.imt.ue_k,0)
@@ -285,6 +291,7 @@ class Simulation(ABC, Observable):
 
         elif(station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
+             station_1.station_type is StationType.HAPS or \
              station_1.station_type is StationType.FS):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
 
@@ -292,6 +299,7 @@ class Simulation(ABC, Observable):
 
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.HAPS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS):
             for k in station_1_active:
                 for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
@@ -300,6 +308,7 @@ class Simulation(ABC, Observable):
                                                                             beams_l=np.array([beams_idx[b]]))
         elif station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
+             station_1.station_type is StationType.HAPS or \
              station_1.station_type is StationType.FS:
             phi = station_1.get_off_axis_angle(station_2)
             distance = station_1.get_distance_to(station_2)
