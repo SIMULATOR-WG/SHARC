@@ -49,9 +49,11 @@ class Results(object):
         
         self.system_ul_coupling_loss = list()
         self.system_ul_interf_power = list()
+        self.system_ul_inr_scaled = list()
 
         self.system_dl_coupling_loss = list()
         self.system_dl_interf_power = list()
+        self.system_dl_inr_scaled = list()
 
         self.system_inr = list()
         self.system_inr_scaled = list()
@@ -413,7 +415,31 @@ class Results(object):
             file_name = title
             x_limits = (-80, -20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.system_ul_inr_scaled) > 0:
+            values, base = np.histogram(self.system_ul_inr_scaled, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of scaled system UL INR"
+            x_label = "INR [dB]"
+            y_label = "Probability of INR < $X$"
+            file_name = title
+            x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.system_dl_inr_scaled) > 0:
+            values, base = np.histogram(self.system_dl_inr_scaled, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of scaled system DL INR"
+            x_label = "INR [dB]"
+            y_label = "Probability of INR < $X$"
+            file_name = title
+            x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))               
         if len(self.system_inr) > 0:
             values, base = np.histogram(self.system_inr, bins=n_bins)
             cumulative = np.cumsum(values)
