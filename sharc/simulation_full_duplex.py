@@ -356,19 +356,27 @@ class SimulationFullDuplex(Simulation):
                                            self.parameters.imt.dl_sinr_min,
                                            self.parameters.imt.dl_sinr_max,
                                            self.parameters.imt.dl_attenuation_factor)
+            tput = tput*self.ue.bandwidth[ue]
             self.results.imt_dl_tput.extend(tput.tolist())
+            
+            total_tput = np.sum(tput)
             
             tput = self.calculate_imt_tput(self.bs.sinr[bs],
                                            self.parameters.imt.ul_sinr_min,
                                            self.parameters.imt.ul_sinr_max,
                                            self.parameters.imt.ul_attenuation_factor)
+            tput = tput*self.bs.bandwidth[bs]
             self.results.imt_ul_tput.extend(tput.tolist())
+            
+            total_tput = np.sum(tput) + total_tput
+            self.results.imt_total_tput.extend([total_tput])
 
             if self.parameters.imt.interfered_with:
                 tput_ext = self.calculate_imt_tput(self.ue.sinr_ext[ue],
                                                    self.parameters.imt.dl_sinr_min,
                                                    self.parameters.imt.dl_sinr_max,
                                                    self.parameters.imt.dl_attenuation_factor)
+                tput_ext = tput*self.ue.bandwidth[ue]
                 self.results.imt_dl_tput_ext.extend(tput_ext.tolist()) 
                 self.results.imt_dl_sinr_ext.extend(self.ue.sinr_ext[ue].tolist())
                 self.results.imt_dl_inr.extend(self.ue.inr[ue].tolist())
@@ -377,7 +385,8 @@ class SimulationFullDuplex(Simulation):
                                                       self.parameters.imt.ul_sinr_min,
                                                       self.parameters.imt.ul_sinr_max,
                                                       self.parameters.imt.ul_attenuation_factor)
-                self.results.imt_ul_tput_ext.extend(tput_ext.tolist())  
+                tput_ext = tput*self.bs.bandwidth[bs]
+                self.results.imt_ul_tput_ext.extend([tput_ext])  
                 self.results.imt_ul_sinr_ext.extend(self.bs.sinr_ext[bs].tolist())
                 self.results.imt_ul_inr.extend(self.bs.inr[bs].tolist())
                 

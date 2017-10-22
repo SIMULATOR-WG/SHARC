@@ -21,6 +21,8 @@ class Results(object):
         self.imt_ul_inr = list()
         self.imt_ul_tput_ext = list()
         self.imt_ul_tput = list()
+        
+        self.imt_total_tput = list()
 
         self.imt_path_loss = list()
         self.imt_coupling_loss = list()
@@ -265,7 +267,7 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of UL throughput with external interference"
-            x_label = "UL throughput [bits/s/Hz]"
+            x_label = "UL throughput [Mbits/s]"
             y_label = "Probability of UL throughput < $X$"
             file_name = title
             y_limits = (0, 1)
@@ -276,7 +278,18 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of UL throughput"
-            x_label = "UL throughput [bits/s/Hz]"
+            x_label = "UL throughput [Mbits/s]"
+            y_label = "Probability of UL throughput < $X$"
+            file_name = title
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_total_tput) > 0:
+            values, base = np.histogram(self.imt_total_tput, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of IMT throughput"
+            x_label = "UL throughput [Mbits/s]"
             y_label = "Probability of UL throughput < $X$"
             file_name = title
             y_limits = (0, 1)
@@ -442,7 +455,7 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of DL throughput with external interference"
-            x_label = "Throughput [bits/s/Hz]"
+            x_label = "Throughput [Mbits/s]"
             y_label = "Probability of throughput < $X$"
             file_name = title
             y_limits = (0, 1)
@@ -453,7 +466,7 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of DL throughput"
-            x_label = "Throughput [bits/s/Hz]"
+            x_label = "Throughput [Mbits/s]"
             y_label = "Probability of throughput < $X$"
             file_name = title
             y_limits = (0, 1)
