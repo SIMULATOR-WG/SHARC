@@ -197,7 +197,10 @@ class SimulationDownlink(Simulation):
                                            self.parameters.imt.dl_sinr_min,
                                            self.parameters.imt.dl_sinr_max,
                                            self.parameters.imt.dl_attenuation_factor)
+            tput = tput*self.ue.bandwidth[ue]
             self.results.imt_dl_tput.extend(tput.tolist())
+            
+            self.results.imt_total_tput.extend([np.sum(tput)])
 
             if self.parameters.imt.interfered_with:
                 tput_ext = self.calculate_imt_tput(self.ue.sinr_ext[ue],

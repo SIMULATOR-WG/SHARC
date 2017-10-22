@@ -207,7 +207,10 @@ class SimulationUplink(Simulation):
                                            self.parameters.imt.ul_sinr_min,
                                            self.parameters.imt.ul_sinr_max,
                                            self.parameters.imt.ul_attenuation_factor)
+            tput = tput*self.bs.bandwidth[bs]
             self.results.imt_ul_tput.extend(tput.tolist())
+            
+            self.results.imt_total_tput.extend(np.sum(tput))
             
             if self.parameters.imt.interfered_with:
                 tput_ext = self.calculate_imt_tput(self.bs.sinr_ext[bs],
