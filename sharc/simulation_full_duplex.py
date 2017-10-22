@@ -304,16 +304,11 @@ class SimulationFullDuplex(Simulation):
                             - self.coupling_loss_imt_ue_system[ue_active] \
                             + 10*np.log10(self.ue.bandwidth[ue_active]/self.param_system.bandwidth)
                             
-        print("interference_ue")
-        print(interference_ue)
-                            
         self.system.rx_interference = 10*np.log10(np.power(10, 0.1*self.system.rx_interference) + \
                                                   np.sum(np.power(10, 0.1*interference_ue)))
         
         if not self.parameters.imt.interfered_with:
             self.system_ul_inr = np.array(interference_ue - self.system.thermal_noise)
-            print("self.system_ul_inr")
-            print(self.system_ul_inr)
 
         # calculate INR at the system
         self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
@@ -324,8 +319,6 @@ class SimulationFullDuplex(Simulation):
             self.results.system_inr.extend(self.system.inr.tolist())
             self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
             self.results.system_ul_inr_scaled.extend(self.system_ul_inr + 10*math.log10(self.param_system.inr_scaling))
-            print("self.results.system_ul_inr_scaled")
-            print(self.results.system_ul_inr_scaled)
             self.results.system_dl_inr_scaled.extend([self.system_dl_inr + 10*math.log10(self.param_system.inr_scaling)])
         
         bs_active = np.where(self.bs.active)[0]

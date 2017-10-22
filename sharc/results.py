@@ -471,8 +471,6 @@ class Results(object):
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.system_ul_inr_scaled) > 0:
-            print("self.system_ul_inr_scaled")
-            print(self.system_ul_inr_scaled)
             values, base = np.histogram(self.system_ul_inr_scaled, bins=n_bins)
             cumulative = np.cumsum(values)
             x = base[:-1]
