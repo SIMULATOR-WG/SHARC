@@ -57,6 +57,11 @@ class Simulation(ABC, Observable):
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
+        
+        self.path_loss_imt_bs_bs = np.empty(0)
+        self.path_loss_imt_ue_ue = np.empty(0)
+        self.imt_bs_bs_antenna_gain = list()
+        self.imt_ue_ue_antenna_gain = list()
 
         self.bs_to_ue_phi = np.empty(0)
         self.bs_to_ue_theta = np.empty(0)
@@ -201,6 +206,12 @@ class Simulation(ABC, Observable):
             self.path_loss_imt = path_loss
             self.imt_bs_antenna_gain = gain_a
             self.imt_ue_antenna_gain = gain_b
+        elif station_a.station_type is StationType.IMT_BS and station_b.station_type is StationType.IMT_BS:
+            self.path_loss_imt_bs_bs = path_loss
+            self.imt_bs_bs_antenna_gain = gain_a
+        elif station_a.station_type is StationType.IMT_UE and station_b.station_type is StationType.IMT_UE:
+            self.path_loss_imt_ue_ue = path_loss
+            self.imt_ue_ue_antenna_gain = gain_a
         elif (station_a.station_type is StationType.FSS_SS and station_b.station_type is StationType.IMT_UE) or \
              (station_a.station_type is StationType.FSS_SS and station_b.station_type is StationType.IMT_BS) or \
              (station_a.station_type is StationType.FSS_ES and station_b.station_type is StationType.IMT_UE) or \
