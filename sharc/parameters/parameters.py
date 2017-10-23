@@ -75,6 +75,7 @@ class Parameters(object):
         self.imt.ue_k                    = config.getint("IMT", "ue_k")
         self.imt.ue_k_m                  = config.getint("IMT", "ue_k_m")
         self.imt.ue_indoor_percent       = config.getfloat("IMT", "ue_indoor_percent")
+        self.imt.ue_distribution_type    = config.get("IMT", "ue_distribution_type")
         self.imt.ue_distribution_distance = config.get("IMT", "ue_distribution_distance")
         self.imt.ue_distribution_azimuth = config.get("IMT", "ue_distribution_azimuth")
         self.imt.ue_tx_power_control     = config.get("IMT", "ue_tx_power_control")
