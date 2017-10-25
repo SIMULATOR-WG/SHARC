@@ -152,7 +152,7 @@ class SimulationFullDuplex(Simulation):
                 ue_interf = self.link[bi]
                 # Interference from UEs
                 interference_ue = self.ue.tx_power[ue_interf] - self.coupling_loss_imt_ue_ue[ue_interf,ue] \
-                                 - 2*self.parameters.imt.ue_body_loss - 2*self.parameters.imt.ue_feed_loss
+                                 - 2*self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
            
                 self.ue.rx_interference[ue] = 10*np.log10( \
                     np.power(10, 0.1*self.ue.rx_interference[ue]) + \
@@ -191,7 +191,7 @@ class SimulationFullDuplex(Simulation):
                                 - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
                                 - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_feed_loss
                                 
-                interference_bs = self.bs.tx_power[bi] - 2*self.parameters.imt.bs_feed_loss \
+                interference_bs = self.bs.tx_power[bi] - self.parameters.imt.bs_feed_loss \
                                 - self.coupling_loss_imt_bs_bs[bs,np.arange(bi*self.parameters.imt.ue_k,(bi+1)*self.parameters.imt.ue_k)]
                                 
                 self.bs.rx_interference[bs] = 10*np.log10( \
