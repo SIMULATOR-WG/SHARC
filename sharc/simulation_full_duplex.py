@@ -334,6 +334,8 @@ class SimulationFullDuplex(Simulation):
             ue_ue_pl = ue_ue_pl[~np.isnan(ue_ue_pl)]
             self.results.imt_ue_ue_path_loss.extend(ue_ue_pl)
             
+            
+            
             bs_bs_cl = self.coupling_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
             self.results.imt_coupling_loss_bs_bs.extend(bs_bs_cl)
             
@@ -401,12 +403,16 @@ class SimulationFullDuplex(Simulation):
             self.results.system_dl_coupling_loss.extend([self.coupling_loss_imt_bs_system[bs]])
 
             self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
+            self.results.imt_dl_rx_power.extend(self.ue.rx_power[ue].tolist())
             self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
             self.results.imt_dl_snr.extend(self.ue.snr[ue].tolist())
+            self.results.imt_dl_ue_interf.extend(self.ue.total_interference[ue].tolist())
             
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
+            self.results.imt_ul_rx_power.extend(self.bs.rx_power[bs].tolist())
             self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
             self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
+            self.results.imt_ul_bs_interf.extend(self.bs.total_interference[bs].tolist())
             
         if write_to_file:
             self.results.write_files(snapshot_number)
