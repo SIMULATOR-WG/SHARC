@@ -96,7 +96,7 @@ class StationFactory(object):
         elevation_range = (-90, 90)
         elevation = (elevation_range[1] - elevation_range[0])*np.random.random(num_ue) + elevation_range[0]
 
-        if param.ue_distribution_type == "UNIFORM":
+        if param.ue_distribution_type.upper() == "UNIFORM":
 
             if not (type(topology) is TopologyMacrocell):
                 sys.stderr.write("ERROR\nUniform UE distribution is currently supported only with Macrocell topology")
@@ -140,11 +140,11 @@ class StationFactory(object):
             imt_ue.elevation = elevation + psi
 
 
-        elif param.ue_distribution_type == "ANGLE_AND_DISTANCE":
+        elif param.ue_distribution_type.upper() == "ANGLE_AND_DISTANCE":
             # The Rayleigh and Normal distribution parameters (mean, scale and cutoff)
             # were agreed in TG 5/1 meeting (May 2017).
 
-            if param.ue_distribution_distance == "RAYLEIGH":
+            if param.ue_distribution_distance.upper() == "RAYLEIGH":
                 # For the distance between UE and BS, it is desired that 99% of UE's
                 # are located inside the [soft] cell edge, i.e. Prob(d<d_edge) = 99%.
                 # Since the distance is modeled by a random variable with Rayleigh
@@ -153,13 +153,13 @@ class StationFactory(object):
                 # the requirement Prob(d<d_edge) = 99% for a given cell radius.
                 radius_scale = topology.cell_radius / 3.0345
                 radius = np.random.rayleigh(radius_scale, num_ue)
-            elif param.ue_distribution_distance == "UNIFORM":
+            elif param.ue_distribution_distance.upper() == "UNIFORM":
                 radius = topology.cell_radius * np.random.random(num_ue)
             else:
                 sys.stderr.write("ERROR\nInvalid UE distance distribution: " + param.ue_distribution_distance)
                 sys.exit(1)
 
-            if param.ue_distribution_azimuth == "NORMAL":
+            if param.ue_distribution_azimuth.upper() == "NORMAL":
                 # In case of the angles, we generate N times the number of UE's because
                 # the angle cutoff will discard 5% of the terminals whose angle is
                 # outside the angular sector defined by [-60, 60]. So, N = 1.4 seems to
@@ -172,7 +172,7 @@ class StationFactory(object):
                 angle_cutoff = 60
                 idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
                 angle = angle_n[idx]
-            elif param.ue_distribution_azimuth == "UNIFORM":
+            elif param.ue_distribution_azimuth.upper() == "UNIFORM":
                 azimuth_range = (-60, 60)
                 angle = (azimuth_range[1] - azimuth_range[0]) * np.random.random(num_ue) + azimuth_range[0]
             else:

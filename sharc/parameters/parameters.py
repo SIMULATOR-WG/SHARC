@@ -101,9 +101,11 @@ class Parameters(object):
         #######################################################################
         # IMT ANTENNA
         #######################################################################
-        self.antenna_imt.bs_tx_element_max_g    = config.getfloat("IMT_ANTENNA", "bs_tx_element_max_g")
-        self.antenna_imt.bs_tx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "bs_tx_element_phi_3db")
-        self.antenna_imt.bs_tx_element_theta_3db = config.getfloat("IMT_ANTENNA", "bs_tx_element_theta_3db")
+        self.antenna_imt.bs_element_pattern          = config.get("IMT_ANTENNA", "bs_element_pattern")
+        self.antenna_imt.ue_element_pattern          = config.get("IMT_ANTENNA", "ue_element_pattern")
+        self.antenna_imt.bs_tx_element_max_g         = config.getfloat("IMT_ANTENNA", "bs_tx_element_max_g")
+        self.antenna_imt.bs_tx_element_phi_deg_3db   = config.getfloat("IMT_ANTENNA", "bs_tx_element_phi_deg_3db")
+        self.antenna_imt.bs_tx_element_theta_deg_3db = config.getfloat("IMT_ANTENNA", "bs_tx_element_theta_deg_3db")
         self.antenna_imt.bs_tx_element_am       = config.getfloat("IMT_ANTENNA", "bs_tx_element_am")
         self.antenna_imt.bs_tx_element_sla_v    = config.getfloat("IMT_ANTENNA", "bs_tx_element_sla_v")
         self.antenna_imt.bs_tx_n_rows           = config.getfloat("IMT_ANTENNA", "bs_tx_n_rows")
@@ -112,8 +114,8 @@ class Parameters(object):
         self.antenna_imt.bs_tx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "bs_tx_element_vert_spacing")
 
         self.antenna_imt.bs_rx_element_max_g    = config.getfloat("IMT_ANTENNA", "bs_rx_element_max_g")
-        self.antenna_imt.bs_rx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "bs_rx_element_phi_3db")
-        self.antenna_imt.bs_rx_element_theta_3db = config.getfloat("IMT_ANTENNA", "bs_rx_element_theta_3db")
+        self.antenna_imt.bs_rx_element_phi_deg_3db  = config.getfloat("IMT_ANTENNA", "bs_rx_element_phi_deg_3db")
+        self.antenna_imt.bs_rx_element_theta_deg_3db = config.getfloat("IMT_ANTENNA", "bs_rx_element_theta_deg_3db")
         self.antenna_imt.bs_rx_element_am       = config.getfloat("IMT_ANTENNA", "bs_rx_element_am")
         self.antenna_imt.bs_rx_element_sla_v    = config.getfloat("IMT_ANTENNA", "bs_rx_element_sla_v")
         self.antenna_imt.bs_rx_n_rows           = config.getfloat("IMT_ANTENNA", "bs_rx_n_rows")
@@ -122,8 +124,8 @@ class Parameters(object):
         self.antenna_imt.bs_rx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "bs_rx_element_vert_spacing")
 
         self.antenna_imt.ue_tx_element_max_g    = config.getfloat("IMT_ANTENNA", "ue_tx_element_max_g")
-        self.antenna_imt.ue_tx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "ue_tx_element_phi_3db")
-        self.antenna_imt.ue_tx_element_theta_3db = config.getfloat("IMT_ANTENNA", "ue_tx_element_theta_3db")
+        self.antenna_imt.ue_tx_element_phi_deg_3db  = config.getfloat("IMT_ANTENNA", "ue_tx_element_phi_deg_3db")
+        self.antenna_imt.ue_tx_element_theta_deg_3db = config.getfloat("IMT_ANTENNA", "ue_tx_element_theta_deg_3db")
         self.antenna_imt.ue_tx_element_am       = config.getfloat("IMT_ANTENNA", "ue_tx_element_am")
         self.antenna_imt.ue_tx_element_sla_v    = config.getfloat("IMT_ANTENNA", "ue_tx_element_sla_v")
         self.antenna_imt.ue_tx_n_rows           = config.getfloat("IMT_ANTENNA", "ue_tx_n_rows")
@@ -132,14 +134,16 @@ class Parameters(object):
         self.antenna_imt.ue_tx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "ue_tx_element_vert_spacing")
 
         self.antenna_imt.ue_rx_element_max_g    = config.getfloat("IMT_ANTENNA", "ue_rx_element_max_g")
-        self.antenna_imt.ue_rx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "ue_rx_element_phi_3db")
-        self.antenna_imt.ue_rx_element_theta_3db = config.getfloat("IMT_ANTENNA", "ue_rx_element_theta_3db")
+        self.antenna_imt.ue_rx_element_phi_deg_3db  = config.getfloat("IMT_ANTENNA", "ue_rx_element_phi_deg_3db")
+        self.antenna_imt.ue_rx_element_theta_deg_3db = config.getfloat("IMT_ANTENNA", "ue_rx_element_theta_deg_3db")
         self.antenna_imt.ue_rx_element_am       = config.getfloat("IMT_ANTENNA", "ue_rx_element_am")
         self.antenna_imt.ue_rx_element_sla_v    = config.getfloat("IMT_ANTENNA", "ue_rx_element_sla_v")
         self.antenna_imt.ue_rx_n_rows           = config.getfloat("IMT_ANTENNA", "ue_rx_n_rows")
         self.antenna_imt.ue_rx_n_columns        = config.getfloat("IMT_ANTENNA", "ue_rx_n_columns")
         self.antenna_imt.ue_rx_element_horiz_spacing = config.getfloat("IMT_ANTENNA", "ue_rx_element_horiz_spacing")
         self.antenna_imt.ue_rx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "ue_rx_element_vert_spacing")
+
+        self.antenna_imt.bs_downtilt_deg = config.getfloat("IMT_ANTENNA", "bs_downtilt_deg")
 
         #######################################################################
         # HOTSPOT
