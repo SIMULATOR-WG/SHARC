@@ -326,6 +326,7 @@ class SimulationFullDuplex(Simulation):
             ue = self.link[bs]
             self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
             self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+            self.results.imt_coupling_loss_all.extend(self.coupling_loss_imt[bs,:])
             
             bs_bs_pl = self.path_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
             self.results.imt_bs_bs_path_loss.extend(bs_bs_pl)
@@ -333,8 +334,6 @@ class SimulationFullDuplex(Simulation):
             ue_ue_pl = np.ravel(self.path_loss_imt_ue_ue[ue])
             ue_ue_pl = ue_ue_pl[~np.isnan(ue_ue_pl)]
             self.results.imt_ue_ue_path_loss.extend(ue_ue_pl)
-            
-            
             
             bs_bs_cl = self.coupling_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
             self.results.imt_coupling_loss_bs_bs.extend(bs_bs_cl)
