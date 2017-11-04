@@ -25,6 +25,8 @@ from sharc.antenna.antenna_s580 import AntennaS580
 from sharc.antenna.antenna_s672 import AntennaS672
 from sharc.antenna.antenna_s1528 import AntennaS1528
 from sharc.antenna.antenna_s1855 import AntennaS1855
+from sharc.antenna.antenna_s509 import AntennaS509
+from sharc.antenna.antenna_rrappendix8 import AntennaRRAppendix8
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 
@@ -259,7 +261,11 @@ class StationFactory(object):
         elif param.antenna_pattern == "ITU-R S.465":
             fss_earth_station.antenna = np.array([AntennaS465(param)])
         elif param.antenna_pattern == "ITU-R S.580":
-            fss_earth_station.antenna = np.array([AntennaS580(param)])  
+            fss_earth_station.antenna = np.array([AntennaS580(param)])
+        elif param.antenna_pattern == "ITU-R S.509":
+            fss_earth_station.antenna = np.array([AntennaS509(param)])
+        elif param.antenna_pattern == "RR Appendix 8":
+            fss_earth_station.antenna = np.array([AntennaRRAppendix8(param)])       
         else:
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
