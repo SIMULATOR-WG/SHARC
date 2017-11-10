@@ -71,7 +71,7 @@ if __name__ == '__main__':
     plt.xlabel("Off-axis angle $\phi$ [deg]")
     plt.ylabel("Gain relative to $G_m$ [dB]")
     plt.legend(loc="lower left")
-    plt.xlim((phi[0], 18))
+    plt.xlim((phi[0], 17))
     plt.ylim((-80, 10))
     
     #ax = plt.gca()
