@@ -208,7 +208,7 @@ if __name__ == '__main__':
     plt.plot(theta_vec, pattern_ver_120deg, label='azimuth = 120 degrees')
 
     plt.title('downtilt = 0 degrees')
-    plt.xlabel('azimuth (degrees)')
+    plt.xlabel('elevation (degrees)')
     plt.ylabel('gain (dBi)')
 
     plt.legend()
@@ -249,7 +249,7 @@ if __name__ == '__main__':
     plt.plot(theta_vec, pattern_ver_120deg, label='azimuth = 120 degrees')
 
     plt.title('downtilt = {} degrees'.format(param.downtilt_deg))
-    plt.xlabel('azimuth (degrees)')
+    plt.xlabel('elevation (degrees)')
     plt.ylabel('gain (dBi)')
 
     plt.legend()

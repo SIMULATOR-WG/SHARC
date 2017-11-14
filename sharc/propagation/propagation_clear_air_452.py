@@ -239,10 +239,12 @@ class PropagationClearAir(Propagation):
 
         Lbam = Lbda + (Lminb0p - Lbda)*Fj
 
-
-        clutter_loss = self.clutter.get_loss(frequency=f * 1000,
-                                             distance=d_km * 1000,
-                                             station_type=StationType.FSS_ES)
+        if es_params.clutter_loss:
+            clutter_loss = self.clutter.get_loss(frequency=f * 1000,
+                                                 distance=d_km * 1000,
+                                                 station_type=StationType.FSS_ES)
+        else:
+            clutter_loss = np.zeros(d_km.shape)
 
         building_loss = self.building_loss*indoor_stations
 

@@ -377,19 +377,22 @@ if __name__ == '__main__':
 
     ant_param = ParametersAntennaImt()
 
+    ant_param.bs_element_pattern = "F1336"
     ant_param.bs_tx_element_max_g = 5
-    ant_param.bs_tx_element_phi_3db = 65
-    ant_param.bs_tx_element_theta_3db = 65
+    ant_param.bs_tx_element_phi_deg_3db = 65
+    ant_param.bs_tx_element_theta_deg_3db = 65
     ant_param.bs_tx_element_am = 30
     ant_param.bs_tx_element_sla_v = 30
     ant_param.bs_tx_n_rows = 8
     ant_param.bs_tx_n_columns = 8
     ant_param.bs_tx_element_horiz_spacing = 0.5
     ant_param.bs_tx_element_vert_spacing = 0.5
+    ant_param.bs_downtilt_deg = 10
 
+    ant_param.ue_element_pattern = "FIXED"
     ant_param.ue_tx_element_max_g = 5
-    ant_param.ue_tx_element_phi_3db = 90
-    ant_param.ue_tx_element_theta_3db = 90
+    ant_param.ue_tx_element_phi_deg_3db = 90
+    ant_param.ue_tx_element_theta_deg_3db = 90
     ant_param.ue_tx_element_am = 25
     ant_param.ue_tx_element_sla_v = 25
     ant_param.ue_tx_n_rows = 4
