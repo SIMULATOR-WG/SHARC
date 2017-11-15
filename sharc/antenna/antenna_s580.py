@@ -22,8 +22,8 @@ class AntennaS580(Antenna):
         lmbda = 3e8 / ( param.frequency * 1e6 )
 
         self.phi_min = 1
-        if 100 * lmbda / param.diameter > 1:
-           self.phi_min = 100 * lmbda / param.diameter
+        
+        self.phi_min = np.maximum([1], [100 * lmbda / param.diameter])
         
     def calculate_gain(self, *args, **kwargs) -> np.array:
         phi = np.absolute(kwargs["phi_vec"])
@@ -36,8 +36,11 @@ class AntennaS580(Antenna):
         idx_1 = np.where((self.phi_min <= phi) & (phi < 20))[0]
         gain[idx_1] = 29 - 25 * np.log10(phi[idx_1])
             
-        idx_2 = np.where((20 <= phi) & (phi <= 180))[0]
-        gain[idx_2] = -10
+        idx_2 = np.where((20 <= phi) & (phi < 48))[0]
+        gain[idx_2] = 32 - 25 * np.log10(phi[idx_2])
+        
+        idx_3 = np.where((48 <= phi) & (phi <= 180))[0]
+        gain[idx_3] = -10
         
         return gain
         

@@ -7,7 +7,7 @@ Created on Wed Nov  8 13:40:27 2017
 """
 
 from sharc.antenna.antenna import Antenna
-from sharc.parameters.parameters_fss_es import ParametersFssEs
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 
 import numpy as np
 
@@ -16,7 +16,7 @@ class AntennaRS1861FIG9b(Antenna):
     Implements the EESS sensor antenna for 23.6-24 GHz for Sensor type F2
     """
     
-    def __init__(self, param: ParametersFssEs):
+    def __init__(self, param: ParametersFssSs):
         super().__init__()
         self.peak_gain = param.antenna_gain
         
@@ -42,7 +42,7 @@ class AntennaRS1861FIG9b(Antenna):
         idx_1 = np.where((self.phi_1 <= phi) & (phi <= self.phi_2))[0]
         gain[idx_1] = self.peak_gain + m * phi[idx_1] + c
         
-        idx_2 = np.where((self.phi_2 <= phi) & (phi < 18))[0]
+        idx_2 = np.where((self.phi_2 <= phi) & (phi < 180))[0]
         gain[idx_2] = self.peak_gain - 65
          
         return gain

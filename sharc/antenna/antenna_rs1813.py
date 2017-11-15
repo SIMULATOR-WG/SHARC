@@ -7,17 +7,22 @@ Created on Fri Nov 10 16:45:35 2017
 """
 
 from sharc.antenna.antenna import Antenna
-from sharc.parameters.parameters_fss_es import ParametersFssEs
+from sharc.parameters.parameters_fss_ss import ParametersFssSs
 
 import numpy as np
 
 class AntennaRS1813(Antenna):
     """
     Implements the Earth station antenna pattern in the EESS/ISS service
-    according to Recommendation ITU-R S.580-6
+    according to Recommendation ITU-R RS.1813-1
+    Reference antenna pattern for passive sensors operating in the 
+    Earth exploration-satellite service (passive) to be used in 
+    compatibility analyses in the frequency range 1.4-100 GHz
+    
+    Implementation of item 1) of recommendation 
     """
     
-    def __init__(self, param: ParametersFssEs):
+    def __init__(self, param: ParametersFssSs):
         super().__init__()
         self.lmbda = 3e8 / ( param.frequency * 1e6 )
         self.peak_gain = 10 * np.log10(60 * np.power(3.141516,2) * np.power(param.diameter / self.lmbda,2))
@@ -36,7 +41,7 @@ class AntennaRS1813(Antenna):
         gain[idx_0] = self.peak_gain - 0.0018 * np.power(phi[idx_0] * self.d_to_lmbda, 2)
         
         idx_1 = np.where((self.phi_min <= phi) & (phi < 69))[0]
-        gain[idx_1] = np.amax([self.peak_gain - 0.0018 * np.power(phi[idx_1] * self.d_to_lmbda, 2), 33 - 5 * np.log10(self.d_to_lmbda) - 25 * np.log10(phi[idx_1])])
+        gain[idx_1] = np.maximum([self.peak_gain - 0.0018 * np.power(phi[idx_1] * self.d_to_lmbda, 2)],[ 33 - 5 * np.log10(self.d_to_lmbda) - 25 * np.log10(phi[idx_1])])
             
         idx_2 = np.where((69 <= phi) & (phi <= 180))[0]
         gain[idx_2] = -13 - 5 * np.log10(self.d_to_lmbda)
@@ -50,7 +55,7 @@ if __name__ == '__main__':
     phi = np.linspace(0.1, 10, num = 100000)
     
     # initialize antenna parameters
-    param26 = ParametersFssEs()
+    param26 = ParametersFssSs()
     param26.antenna_pattern = "ITU-R RS.1813-1"
     param26.frequency = 23800
     param26.diameter = 0.6
@@ -67,7 +72,7 @@ if __name__ == '__main__':
     plt.ylabel("Gain relative to $G_m$ [dB]")
     plt.legend(loc="lower left")
     plt.xlim((phi[0], phi[-1]))
-    plt.ylim((-40, 10))
+    plt.ylim((-100, 10))
     
     #ax = plt.gca()
     #ax.set_yticks([-30, -20, -10, 0])

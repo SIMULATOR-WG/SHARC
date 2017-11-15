@@ -14,7 +14,10 @@ import numpy as np
 class AntennaS509(Antenna):
     """
     Implements the Earth station antenna pattern in the SRS service
-    according to Recommendation ITU-R S.509-3
+    according to Recommendation ITU-R SA.509-3
+    
+    Implementation for multiple entry interference item 1.2 of Rec.
+    Recommendation for D/lamnda >=100 always
     """
     
     def __init__(self, param: ParametersFssEs):
@@ -22,13 +25,10 @@ class AntennaS509(Antenna):
         self.peak_gain = param.antenna_gain
         lmbda = 3e8 / ( param.frequency * 1e6 )
 
-        self.phi_0 = 1        
-        self.phi_1 = 1
-        self.phi_2 = 1
-        if 100 * lmbda / param.diameter > 1:
-           self.phi_0 = 20 * 1.732 * lmbda/param.diameter 
-           self.phi_1 = self.phi_0 * 2.582 
-           self.phi_2 = np.power(10,(49-self.peak_gain)/25)
+        
+        self.phi_0 = 20 * 1.732 * lmbda/param.diameter 
+        self.phi_1 = self.phi_0 * 2.582 
+        self.phi_2 = np.power(10,(49-self.peak_gain)/25)
         
     def calculate_gain(self, *args, **kwargs) -> np.array:
         phi = np.absolute(kwargs["phi_vec"])
