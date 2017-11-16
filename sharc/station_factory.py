@@ -72,7 +72,6 @@ class StationFactory(object):
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
         return imt_base_stations
 
-
     @staticmethod
     def generate_imt_ue(param: ParametersImt,
                         param_ant: ParametersAntennaImt,
@@ -92,7 +91,6 @@ class StationFactory(object):
         azimuth_range = (-60, 60)
         azimuth = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]
         # Remove the randomness from azimuth and you will have a perfect pointing
-        #azimuth = np.zeros(num_ue)
         elevation_range = (-90, 90)
         elevation = (elevation_range[1] - elevation_range[0])*np.random.random(num_ue) + elevation_range[0]
 
@@ -102,41 +100,10 @@ class StationFactory(object):
                 sys.stderr.write("ERROR\nUniform UE distribution is currently supported only with Macrocell topology")
                 sys.exit(1)
 
-            hexagon_radius = topology.intersite_distance / 3
-
-            # generate UE uniformily in a triangle
-            x = np.random.uniform(0, hexagon_radius * np.cos(np.pi/6), num_ue)
-            y = np.random.uniform(0, hexagon_radius / 2, num_ue)
-
-            invert_index = np.arctan(y/x) > np.pi/6
-            y[invert_index] = -( hexagon_radius / 2 - y[invert_index] )
-            x[invert_index] = (hexagon_radius * np.cos(np.pi/6) - x[invert_index])
-
-            # randomly choose an hextant
-            hextant = np.random.random_integers(0,5, num_ue)
-            hextant_angle = np.pi/6 + np.pi/3 * hextant
-
-            old_x = x
-            x = x * np.cos(hextant_angle) - y * np.sin(hextant_angle)
-            y = old_x * np.sin(hextant_angle) + y * np.cos(hextant_angle)
-
-            # randomly choose a cell
-            cell = np.random.random_integers(0,num_bs - 1, num_ue)
-
-            x = x + topology.x[cell] + hexagon_radius * np.cos(topology.azimuth[cell] * np.pi / 180)
-            y = y + topology.y[cell] + hexagon_radius * np.sin(topology.azimuth[cell] * np.pi / 180)
-
-            ue_x = list(x)
-            ue_y = list(y)
-
-            # calculate UE azimuth wrt serving BS
-            theta = np.arctan2( y - topology.y[cell], x - topology.x[cell])
-            imt_ue.azimuth = (azimuth + theta + np.pi/2)
-
-            # calculate elevation angle
-            # psi is the vertical angle of the UE wrt the serving BS
-            distance = np.sqrt((topology.x[cell] - x) ** 2 + (topology.y[cell] - y) ** 2)
+            [ue_x, ue_y, theta, distance] = StationFactory.get_random_position(num_ue, topology)
             psi = np.degrees(np.arctan((param.bs_height - param.ue_height) / distance))
+
+            imt_ue.azimuth = (azimuth + theta + np.pi/2)
             imt_ue.elevation = elevation + psi
 
 
@@ -201,7 +168,6 @@ class StationFactory(object):
             sys.stderr.write("ERROR\nInvalid UE distribution type: " + param.ue_distribution_type)
             sys.exit(1)
 
-
         imt_ue.x = np.array(ue_x)
         imt_ue.y = np.array(ue_y)
 
@@ -225,9 +191,9 @@ class StationFactory(object):
 
 
     @staticmethod
-    def generate_system(parameters: Parameters):
+    def generate_system(parameters: Parameters, topology: Topology):
         if parameters.general.system == "FSS_ES":
-            return StationFactory.generate_fss_earth_station(parameters.fss_es)
+            return StationFactory.generate_fss_earth_station(parameters.fss_es, topology)
         elif parameters.general.system == "FSS_SS":
             return StationFactory.generate_fss_space_station(parameters.fss_ss)
         elif parameters.general.system == "FS":
@@ -291,12 +257,25 @@ class StationFactory(object):
 
 
     @staticmethod
-    def generate_fss_earth_station(param: ParametersFssEs):
+    def generate_fss_earth_station(param: ParametersFssEs, topology: Topology):
         fss_earth_station = StationManager(1)
         fss_earth_station.station_type = StationType.FSS_ES
 
-        fss_earth_station.x = np.array([param.x])
-        fss_earth_station.y = np.array([param.y])
+        if param.location.upper() == "FIXED":
+            fss_earth_station.x = np.array([param.x])
+            fss_earth_station.y = np.array([param.y])
+        elif param.location.upper() == "CELL":
+            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, True )
+            fss_earth_station.x = np.array(x)
+            fss_earth_station.y = np.array(y)
+        elif param.location.upper() == "NETWORK":
+            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, False)
+            fss_earth_station.x = np.array(x)
+            fss_earth_station.y = np.array(y)
+        else:
+            sys.stderr.write("ERROR\nFSS-ES location type {} not supported".format(param.location))
+            sys.exit(1)
+
         fss_earth_station.height = np.array([param.height])
 
         fss_earth_station.azimuth = np.array([param.azimuth])
@@ -350,6 +329,51 @@ class StationFactory(object):
         fs_station.bandwidth = np.array([param.bandwidth])
 
         return fs_station
+
+    @staticmethod
+    def get_random_position( num_stas: int, topology: Topology, central_cell = False ):
+        hexagon_radius = topology.intersite_distance / 3
+
+        # generate UE uniformily in a triangle
+        x = np.random.uniform(0, hexagon_radius * np.cos(np.pi / 6), num_stas)
+        y = np.random.uniform(0, hexagon_radius / 2, num_stas)
+
+        invert_index = np.arctan(y / x) > np.pi / 6
+        y[invert_index] = -(hexagon_radius / 2 - y[invert_index])
+        x[invert_index] = (hexagon_radius * np.cos(np.pi / 6) - x[invert_index])
+
+        # randomly choose an hextant
+        hextant = np.random.random_integers(0, 5, num_stas)
+        hextant_angle = np.pi / 6 + np.pi / 3 * hextant
+
+        old_x = x
+        x = x * np.cos(hextant_angle) - y * np.sin(hextant_angle)
+        y = old_x * np.sin(hextant_angle) + y * np.cos(hextant_angle)
+
+        # randomly choose a cell
+        if central_cell:
+            cell_x = 0
+            cell_y = 0
+        else:
+            num_bs = topology.num_base_stations
+            cell = np.random.random_integers(0, num_bs - 1, num_stas)
+            cell_x = topology.x[cell]
+            cell_y = topology.y[cell]
+
+        x = x + cell_x + hexagon_radius * np.cos(topology.azimuth[cell] * np.pi / 180)
+        y = y + cell_y + hexagon_radius * np.sin(topology.azimuth[cell] * np.pi / 180)
+
+        x = list(x)
+        y = list(y)
+
+        # calculate UE azimuth wrt serving BS
+        theta = np.arctan2(y - cell_y, x - cell_x)
+
+        # calculate elevation angle
+        # psi is the vertical angle of the UE wrt the serving BS
+        distance = np.sqrt((cell_x - x) ** 2 + (cell_y - y) ** 2)
+
+        return x, y, theta, distance
 
 
 if __name__ == '__main__':

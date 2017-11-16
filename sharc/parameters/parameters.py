@@ -180,6 +180,7 @@ class Parameters(object):
         #######################################################################
         # FSS earth station
         #######################################################################
+        self.fss_es.location = config.get("FSS_ES", "location")
         self.fss_es.x = config.getfloat("FSS_ES", "x")
         self.fss_es.y = config.getfloat("FSS_ES", "y")
         self.fss_es.height = config.getfloat("FSS_ES", "height")
