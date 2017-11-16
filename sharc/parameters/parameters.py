@@ -14,6 +14,7 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
+from sharc.parameters.parameters_ras import ParametersRas
 
 
 class Parameters(object):
@@ -31,6 +32,7 @@ class Parameters(object):
         self.fs = ParametersFs()
         self.fss_ss = ParametersFssSs()
         self.fss_es = ParametersFssEs()
+        self.ras = ParametersRas()
 
 
     def set_file_name(self, file_name: str):
@@ -214,4 +216,21 @@ class Parameters(object):
         self.fs.line_of_sight_prob      = config.getfloat("FS", "line_of_sight_prob")
         self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
         self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
+        
+        #######################################################################
+        # RAS station
+        #######################################################################
+        self.ras.x = config.getfloat("RAS", "x")
+        self.ras.y = config.getfloat("RAS", "y")
+        self.ras.height = config.getfloat("RAS", "height")
+        self.ras.elevation = config.getfloat("RAS", "elevation")
+        self.ras.azimuth = config.getfloat("RAS", "azimuth")
+        self.ras.frequency = config.getfloat("RAS", "frequency")
+        self.ras.antenna_efficiency = config.getfloat("RAS", "antenna_efficiency")
+        self.ras.antenna_pattern = config.get("RAS", "antenna_pattern")
+        self.ras.diameter = config.getfloat("RAS", "diameter")
+        self.ras.channel_model = config.get("RAS", "channel_model")
+        self.ras.BOLTZMANN_CONSTANT = config.getfloat("RAS", "BOLTZMANN_CONSTANT")
+        self.ras.EARTH_RADIUS = config.getfloat("RAS", "EARTH_RADIUS")
+        self.ras.SPEED_OF_LIGHT = config.getfloat("RAS", "SPEED_OF_LIGHT")
 
