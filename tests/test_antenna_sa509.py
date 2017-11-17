@@ -35,8 +35,8 @@ class AntennaSA509Test(unittest.TestCase):
         self.assertAlmostEqual(self.antenna.phi_2,0.14531,delta=1e-4)
         
     def test_calculate_gain(self):
-        phi = np.array([0.03464, 0.1, 10, 50, 100, 150])
-        ref_gain = np.array([66.943, 49.943, 4, -13, -8, -13])
+        phi = np.array([0.03464, 0.05, 0.1, 10, 25, 50, 100, 150])
+        ref_gain = np.array([66.943, 63.693, 49.943, 4, -5.949, -13, -8, -13])
         
         gain = self.antenna.calculate_gain(phi_vec = phi)
         npt.assert_allclose(gain, ref_gain, atol=1e-2)
