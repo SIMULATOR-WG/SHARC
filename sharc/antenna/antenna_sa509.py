@@ -45,7 +45,7 @@ class AntenaSA509(Antenna):
         gain[interval_idx] = self.g_0 - 20
         # Third part
         interval_idx = np.where(np.logical_and(phi >= self.phi_2, phi < 48))
-        gain[interval_idx] = 29 - 25*np.log10(phi(interval_idx))
+        gain[interval_idx] = 29 - 25*np.log10(phi[interval_idx])
         # Fourth part
         interval_idx = np.where(np.logical_and(phi >= 48, phi < 80))
         gain[interval_idx] = -13
@@ -55,6 +55,8 @@ class AntenaSA509(Antenna):
         # Sixth part
         interval_idx = np.where(np.logical_and(phi >= 120, phi < 180))
         gain[interval_idx] = -13
+        
+        return gain
         
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
