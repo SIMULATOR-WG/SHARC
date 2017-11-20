@@ -10,7 +10,7 @@ from sharc.parameters.parameters_ras import ParametersRas
 
 import numpy as np
 
-class AntenaSA509(Antenna):
+class AntennaSA509(Antenna):
     """
     Implements the antenna pattern for the Radio Astronomy Service 
     according to recommendation ITU-R SA.509-3.

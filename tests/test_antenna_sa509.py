@@ -5,7 +5,7 @@ Created on Thu Nov 16 17:47:45 2017
 @author: Calil
 """
 
-from sharc.antenna.antenna_sa509 import AntenaSA509
+from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.parameters.parameters_ras import ParametersRas
 
 import numpy as np
@@ -21,7 +21,7 @@ class AntennaSA509Test(unittest.TestCase):
         self.par.frequency = 30000
         self.par.SPEED_OF_LIGHT = 3e8
         
-        self.antenna = AntenaSA509(self.par)
+        self.antenna = AntennaSA509(self.par)
         
     def test_construction(self):
         self.assertEqual(self.antenna.diameter,10)
