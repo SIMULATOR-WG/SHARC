@@ -321,9 +321,11 @@ class StationFactory(object):
         elif param.antenna_pattern == "ITU-R SA.509":
             ras_station.antenna = np.array([AntennaSA509(param)]) 
         else:
-            sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
+            sys.stderr.write("ERROR\nInvalid RAS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
 
+        ras_station.noise_temperature = np.array([param.antenna_noise_temperature + \
+                                                  param.receiver_noise_temperature])
         ras_station.bandwidth = np.array([param.bandwidth])
         
         return ras_station
