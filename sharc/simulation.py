@@ -37,6 +37,8 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.fss_es
         elif self.parameters.general.system == "FS":
             self.param_system = self.parameters.fs
+        elif self.parameters.general.system == "RAS":
+            self.param_system = self.parameters.ras
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 
