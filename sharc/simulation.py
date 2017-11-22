@@ -287,14 +287,16 @@ class Simulation(ABC, Observable):
 
         elif(station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
-             station_1.station_type is StationType.FS):
+             station_1.station_type is StationType.FS or \
+             station_1.station_type is StationType.RAS):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
 
         gains = np.zeros(phi.shape)
 
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
-           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS):
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.RAS):
             for k in station_1_active:
                 for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
@@ -302,7 +304,8 @@ class Simulation(ABC, Observable):
                                                                             beams_l=np.array([beams_idx[b]]))
         elif station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
-             station_1.station_type is StationType.FS:
+             station_1.station_type is StationType.FS or \
+             station_1.station_type is StationType.RAS:
             phi = station_1.get_off_axis_angle(station_2)
             distance = station_1.get_distance_to(station_2)
             theta = station_1.elevation - np.arctan(np.degrees((station_1.height - station_2.height)/distance))

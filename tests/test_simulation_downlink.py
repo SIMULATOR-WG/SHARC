@@ -410,6 +410,10 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.system.x = np.array([-2000])
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param.ras.height])
+        
+        # Test gain caltulation
+        gains = self.simulation.calculate_gains(self.simulation.system,self.simulation.bs)
+        npt.assert_equal(gains,np.array([[0, 0]]))
                               
         
     def test_calculate_bw_weights(self):
