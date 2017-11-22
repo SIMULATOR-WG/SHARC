@@ -192,6 +192,8 @@ class SimulationDownlink(Simulation):
         if not self.parameters.imt.interfered_with:
             self.results.system_inr.extend(self.system.inr.tolist())
             self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
+            if self.system.station_type is StationType.RAS:
+                self.results.system_pfd.extend(self.system.pfd)
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:

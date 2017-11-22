@@ -433,9 +433,9 @@ class SimulationDownlinkTest(unittest.TestCase):
         
         # Test RAS PFD
         pfd = 10*np.log10(10**(rx_interference/10)/54.9779)
-        npt.assert_allclose(self.simulation.system.pfd, 
+        self.assertAlmostEqual(self.simulation.system.pfd, 
                             pfd,
-                            atol=.01)  
+                            delta=.01)  
         
         # check RAS station thermal noise
         thermal_noise = 10*np.log10(1.38064852e-23*100*1e3*100*1e6)
