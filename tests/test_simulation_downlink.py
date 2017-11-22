@@ -361,6 +361,55 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertAlmostEqual(self.simulation.system.inr, 
                                np.array([ rx_interference - (-98.599) ]),
                                delta=.01)
+        
+    def test_simulation_2bs_4ue_ras(self):
+        self.param.general.system = "RAS"
+        
+        self.simulation = SimulationDownlink(self.param)
+        self.simulation.initialize()
+        
+        
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+                                                                       self.param.antenna_imt,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
+                                                            self.param.antenna_imt,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        
+        self.simulation.connect_ue_to_bs()
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        self.simulation.scheduler()
+        self.simulation.power_control()
+        self.simulation.calculate_sinr()
+        
+        # check UE thermal noise
+        bandwidth_per_ue = math.trunc((1 - 0.1)*100/2) 
+        thermal_noise = 10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9
+        npt.assert_allclose(self.simulation.ue.thermal_noise, 
+                            thermal_noise,
+                            atol=1e-2)
+        
+        # check SINR
+        npt.assert_allclose(self.simulation.ue.sinr, 
+                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            atol=1e-2)        
+
+        self.simulation.system = StationFactory.generate_ras_station(self.param.ras)
+        self.simulation.system.x = np.array([-2000])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param.ras.height])
                               
         
     def test_calculate_bw_weights(self):
