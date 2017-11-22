@@ -176,7 +176,7 @@ class SimulationDownlink(Simulation):
         # calculate N
         self.system.thermal_noise = \
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
-                          self.param_system.noise_temperature*1e3) + \
+                          self.system.noise_temperature*1e3) + \
                           10*math.log10(self.param_system.bandwidth * 1e6)
 
         # calculate INR at the system

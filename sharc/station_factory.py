@@ -268,6 +268,7 @@ class StationFactory(object):
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
 
+        fss_earth_station.noise_temperature = param.noise_temperature
         fss_earth_station.bandwidth = np.array([param.bandwidth])
         
         return fss_earth_station
@@ -296,7 +297,8 @@ class StationFactory(object):
         else:
             sys.stderr.write("ERROR\nInvalid FS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
-            
+        
+        fs_station.noise_temperature = param.noise_temperature
         fs_station.bandwidth = np.array([param.bandwidth])
         
         return fs_station

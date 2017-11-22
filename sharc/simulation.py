@@ -145,7 +145,8 @@ class Simulation(ABC, Observable):
 
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.FSS_ES or \
-           station_a.station_type is StationType.FS:
+           station_a.station_type is StationType.FS or \
+           station_a.station_type is StationType.RAS:
 
             if station_b.station_type is StationType.IMT_UE:
                 # define antenna gains

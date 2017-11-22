@@ -154,7 +154,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.ras.bandwidth = 100
         self.param.ras.antenna_noise_temperature = 50
         self.param.ras.receiver_noise_temperature = 50
-        self.param.ras.antenna_gain = 0
+        self.param.ras.antenna_gain = 50
         self.param.ras.antenna_pattern = "OMNI"
         self.param.ras.channel_model = "FSPL"
         self.param.ras.line_of_sight_prob = 1 
@@ -413,7 +413,12 @@ class SimulationDownlinkTest(unittest.TestCase):
         
         # Test gain caltulation
         gains = self.simulation.calculate_gains(self.simulation.system,self.simulation.bs)
-        npt.assert_equal(gains,np.array([[0, 0]]))
+        npt.assert_equal(gains,np.array([[50, 50]]))
+        
+        self.simulation.calculate_external_interference()
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
+                            np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
+                            atol=1e-2)
                               
         
     def test_calculate_bw_weights(self):
