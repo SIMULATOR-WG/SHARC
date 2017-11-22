@@ -28,6 +28,8 @@ class AntennaSA509Test(unittest.TestCase):
         self.assertEqual(self.antenna.efficiency,1)
         self.assertEqual(self.antenna.wavelength,1e-2)
         
+        self.assertAlmostEqual(self.antenna.effective_area,78.539,delta=1e-2)
+        
         self.assertAlmostEqual(self.antenna.g_0,69.943,delta=1e-2)
         self.assertAlmostEqual(self.antenna.phi_0,0.03464,delta=1e-4)
         

@@ -23,6 +23,9 @@ class AntennaSA509(Antenna):
         self.efficiency = param.antenna_efficiency
         self.wavelength = param.SPEED_OF_LIGHT/(param.frequency*1e6)
         
+        # Effective area
+        self.effective_area = self.efficiency*(np.pi*self.diameter**2)/4
+        
         # Diagram parameters
         self.g_0 = 10*np.log10(self.efficiency*\
                                (np.pi*self.diameter/self.wavelength)**2)
