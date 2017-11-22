@@ -143,7 +143,24 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.fss_es.channel_model = "FSPL"
         self.param.fss_es.line_of_sight_prob = 1 
         self.param.fss_es.BOLTZMANN_CONSTANT = 1.38064852e-23
-        self.param.fss_es.EARTH_RADIUS = 6371000        
+        self.param.fss_es.EARTH_RADIUS = 6371000
+
+        self.param.ras.x = -5000
+        self.param.ras.y = 0
+        self.param.ras.height = 10
+        self.param.ras.elevation = 20
+        self.param.ras.azimuth = 0
+        self.param.ras.frequency = 10000
+        self.param.ras.bandwidth = 100
+        self.param.ras.antenna_noise_temperature = 50
+        self.param.ras.receiver_noise_temperature = 50
+        self.param.ras.antenna_gain = 0
+        self.param.ras.antenna_pattern = "OMNI"
+        self.param.ras.channel_model = "FSPL"
+        self.param.ras.line_of_sight_prob = 1 
+        self.param.ras.BOLTZMANN_CONSTANT = 1.38064852e-23
+        self.param.ras.EARTH_RADIUS = 6371000
+        self.param.ras.SPEED_OF_LIGHT = 299792458
 
 
     def test_simulation_2bs_4ue_fss_ss(self):
@@ -343,8 +360,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         # check INR at FSS Earth station
         self.assertAlmostEqual(self.simulation.system.inr, 
                                np.array([ rx_interference - (-98.599) ]),
-                               delta=.01)        
-        
+                               delta=.01)
+                              
         
     def test_calculate_bw_weights(self):
         self.param.general.system = "FSS_ES"
