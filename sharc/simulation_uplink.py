@@ -11,6 +11,7 @@ import math
 from sharc.simulation import Simulation
 from sharc.parameters.parameters import Parameters
 from sharc.station_factory import StationFactory
+from sharc.support.enumerations import StationType
 
 class SimulationUplink(Simulation):
     """
@@ -191,12 +192,18 @@ class SimulationUplink(Simulation):
 
         # calculate INR at the system
         self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
+        
+        # Calculate PFD at the system
+        if self.system.station_type is StationType.RAS:
+            self.system.pfd = 10*np.log10(10**(self.system.rx_interference/10)/self.system.antenna[0].effective_area)
 
 
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         if not self.parameters.imt.interfered_with:
             self.results.system_inr.extend(self.system.inr.tolist())
             self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
+            if self.system.station_type is StationType.RAS:
+                self.results.system_pfd.extend(self.system.pfd)
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
