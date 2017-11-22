@@ -411,7 +411,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param.ras.height])
         
-        # Test gain caltulation
+        # Test gain calculation
         gains = self.simulation.calculate_gains(self.simulation.system,self.simulation.bs)
         npt.assert_equal(gains,np.array([[50, 50]]))
         
@@ -419,6 +419,24 @@ class SimulationDownlinkTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
                             np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
                             atol=1e-2)
+        
+        # Test RAS interference
+        interference = 10 - 10*np.log10(2) - np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2])-\
+                       3 + 10*math.log10(45/100)
+        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
+        self.assertAlmostEqual(self.simulation.system.rx_interference,
+                               rx_interference,
+                               delta=.01)
+        
+        # check RAS station thermal noise
+        thermal_noise = 10*np.log10(1.38064852e-23*100*1e3*100*1e6)
+        self.assertAlmostEqual(self.simulation.system.thermal_noise, 
+                               thermal_noise,
+                               delta=.01)      
+        # check INR at RAS station
+        self.assertAlmostEqual(self.simulation.system.inr, 
+                               np.array([ rx_interference - (-98.599) ]),
+                               delta=.01)
                               
         
     def test_calculate_bw_weights(self):
