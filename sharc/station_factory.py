@@ -306,7 +306,7 @@ class StationFactory(object):
     @staticmethod
     def generate_ras_station(param: ParametersRas):
         ras_station = StationManager(1)
-        ras_station.station_type = StationType.FSS_ES
+        ras_station.station_type = StationType.RAS
 
         ras_station.x = np.array([param.x])
         ras_station.y = np.array([param.y])

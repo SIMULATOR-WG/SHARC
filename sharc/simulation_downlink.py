@@ -11,6 +11,7 @@ import math
 from sharc.simulation import Simulation
 from sharc.parameters.parameters import Parameters
 from sharc.station_factory import StationFactory
+from sharc.support.enumerations import StationType
 
 class SimulationDownlink(Simulation):
     """
@@ -181,6 +182,10 @@ class SimulationDownlink(Simulation):
 
         # calculate INR at the system
         self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
+        
+        # Calculate PFD at the system
+        if self.system.station_type is StationType.RAS:
+            self.system.pfd = 10*np.log10(10**(self.system.rx_interference/10)/self.system.antenna[0].effective_area)
         
         
     def collect_results(self, write_to_file: bool, snapshot_number: int):

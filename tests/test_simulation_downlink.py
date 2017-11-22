@@ -155,6 +155,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.ras.antenna_noise_temperature = 50
         self.param.ras.receiver_noise_temperature = 50
         self.param.ras.antenna_gain = 50
+        self.param.ras.antenna_efficiency = 0.7
+        self.param.ras.diameter = 10
         self.param.ras.antenna_pattern = "OMNI"
         self.param.ras.channel_model = "FSPL"
         self.param.ras.line_of_sight_prob = 1 
@@ -410,6 +412,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.system.x = np.array([-2000])
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param.ras.height])
+        self.simulation.system.antenna[0].effective_area = 54.9779
         
         # Test gain calculation
         gains = self.simulation.calculate_gains(self.simulation.system,self.simulation.bs)
@@ -427,6 +430,12 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
                                delta=.01)
+        
+        # Test RAS PFD
+        pfd = 10*np.log10(10**(rx_interference/10)/54.9779)
+        npt.assert_allclose(self.simulation.system.pfd, 
+                            pfd,
+                            atol=.01)  
         
         # check RAS station thermal noise
         thermal_noise = 10*np.log10(1.38064852e-23*100*1e3*100*1e6)
