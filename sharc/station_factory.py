@@ -352,13 +352,14 @@ class StationFactory(object):
 
         # randomly choose a cell
         if central_cell:
-            cell_x = 0
-            cell_y = 0
+            central_cell_indices = np.where((topology.x == 0) & (topology.y == 0))
+            cell = central_cell_indices[0][np.random.random_integers(0, len(central_cell_indices[0]) - 1, num_stas)]
         else:
             num_bs = topology.num_base_stations
             cell = np.random.random_integers(0, num_bs - 1, num_stas)
-            cell_x = topology.x[cell]
-            cell_y = topology.y[cell]
+
+        cell_x = topology.x[cell]
+        cell_y = topology.y[cell]
 
         x = x + cell_x + hexagon_radius * np.cos(topology.azimuth[cell] * np.pi / 180)
         y = y + cell_y + hexagon_radius * np.sin(topology.azimuth[cell] * np.pi / 180)
