@@ -231,6 +231,7 @@ class Parameters(object):
         self.ras.receiver_noise_temperature = config.getfloat("RAS", "receiver_noise_temperature")
         self.ras.inr_scaling = config.getfloat("RAS", "inr_scaling")
         self.ras.antenna_efficiency = config.getfloat("RAS", "antenna_efficiency")
+        self.ras.antenna_gain = config.getfloat("RAS", "antenna_gain")
         self.ras.antenna_pattern = config.get("RAS", "antenna_pattern")
         self.ras.diameter = config.getfloat("RAS", "diameter")
         self.ras.channel_model = config.get("RAS", "channel_model")
