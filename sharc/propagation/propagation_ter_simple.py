@@ -49,7 +49,6 @@ class PropagationTerSimple(Propagation):
         loss = free_space_loss + building_loss + clutter_loss
         loss = np.repeat(loss, number_of_sectors, 1)
 
-
         return loss
 
 

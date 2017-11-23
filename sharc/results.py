@@ -47,6 +47,7 @@ class Results(object):
 
         self.system_inr = list()
         self.system_pfd = list()
+        self.system_rx_interf = list()
         self.system_inr_scaled = list()
         self.output_directory = "output"
 
@@ -341,9 +342,9 @@ class Results(object):
             y = cumulative / cumulative[-1]
             title = "[SYS] CDF of system PFD"
             x_label = "PFD [dBm/m^2]"
-            y_label = "Probability of INR < $X$"
+            y_label = "Probability of PFD < $X$"
             file_name = title
-            x_limits = (-80, -20)
+#            x_limits = (-80, -20)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
             ###################################################################
@@ -356,7 +357,30 @@ class Results(object):
             file_name = title
             #x_limits = (0, 800)
             #y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))             
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))
+        if len(self.system_rx_interf) > 0:
+            values, base = np.histogram(self.system_rx_interf, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of system received interference"
+            x_label = "Interference [dBm]"
+            y_label = "Probability of Interference < $X$"
+            file_name = title
+#            x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            ###################################################################
+            # now we plot Interference samples
+            x = np.arange(len(self.system_pfd))
+            y = np.array(self.system_pfd)
+            title = "[SYS] Interference samples"
+            x_label = "Number of samples"
+            y_label = "Interference [dBm]"
+            file_name = title
+            #x_limits = (0, 800)
+            #y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))                  
             
     def write_files(self, snapshot_number: int):
         n_bins = 200

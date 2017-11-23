@@ -16,6 +16,7 @@ from sharc.propagation.propagation_ter_simple import PropagationTerSimple
 from sharc.propagation.propagation_uma import PropagationUMa
 from sharc.propagation.propagation_umi import PropagationUMi
 from sharc.propagation.propagation_abg import PropagationABG
+from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
 
 class PropagationFactory(object):
 
@@ -37,6 +38,8 @@ class PropagationFactory(object):
             return PropagationTerSimple()
         elif channel_model == "P619":
             return PropagationP619()
+        elif channel_model == "P452":
+            return PropagationClearAir()
         else:
             sys.stderr.write("ERROR\nInvalid channel_model: " + channel_model)
             sys.exit(1)

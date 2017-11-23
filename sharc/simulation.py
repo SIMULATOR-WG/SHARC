@@ -294,7 +294,6 @@ class Simulation(ABC, Observable):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
 
         gains = np.zeros(phi.shape)
-
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS) or \
@@ -310,10 +309,9 @@ class Simulation(ABC, Observable):
              station_1.station_type is StationType.RAS:
             phi = station_1.get_off_axis_angle(station_2)
             distance = station_1.get_distance_to(station_2)
-            theta = station_1.elevation - np.arctan(np.degrees((station_1.height - station_2.height)/distance))
+            theta = np.degrees(np.arctan((station_1.height - station_2.height)/distance)) + station_1.elevation
             gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec=phi[0,station_2_active],
                                                                             theta_vec=theta[0,station_2_active])
-
         else: # for IMT <-> IMT
             for k in station_1_active:
                 gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
@@ -347,42 +345,42 @@ class Simulation(ABC, Observable):
     def calculate_bw_weights(self, bw_imt: float, bw_sys: float, ue_k: int) -> np.array:
         """
         Calculates the weight that each resource block group of IMT base stations
-        will have when estimating the interference to other systems based on 
-        the bandwidths of both systems. 
-        
+        will have when estimating the interference to other systems based on
+        the bandwidths of both systems.
+
         Parameters
         ----------
             bw_imt : bandwidth of IMT system
             bw_sys : bandwidth of other system
             ue_k : number of UE's allocated to each IMT base station; it also
                 corresponds to the number of resource block groups
-            
+
         Returns
         -------
             K-dimentional array of weights
         """
-        
+
         if bw_imt <= bw_sys:
             weights = np.ones(ue_k)
 
         elif bw_imt > bw_sys:
             weights = np.zeros(ue_k)
-            
+
             bw_per_rbg = bw_imt / ue_k
 
             # number of resource block groups that will have weight equal to 1
             rb_ones = math.floor( bw_sys / bw_per_rbg )
-            
+
             # weight of the rbg that will generate partial interference
             rb_partial = np.mod( bw_sys, bw_per_rbg ) / bw_per_rbg
 
             # assign value to weight array
             weights[:rb_ones] = 1
             weights[rb_ones] = rb_partial
-        
+
         return weights
-        
-        
+
+
     def plot_scenario(self):
         fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
         ax = fig.gca()
