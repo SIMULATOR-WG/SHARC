@@ -194,7 +194,7 @@ class SimulationDownlink(Simulation):
             self.results.system_inr.extend(self.system.inr.tolist())
             self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
             if self.system.station_type is StationType.RAS:
-                self.results.system_rx_interf.extend([self.system.pfd])
+                self.results.system_rx_interf.extend([self.system.rx_interference])
                 self.results.system_pfd.extend([self.system.pfd])
         
         bs_active = np.where(self.bs.active)[0]
