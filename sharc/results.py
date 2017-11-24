@@ -372,8 +372,8 @@ class Results(object):
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
             ###################################################################
             # now we plot Interference samples
-            x = np.arange(len(self.system_pfd))
-            y = np.array(self.system_pfd)
+            x = np.arange(len(self.system_rx_interf))
+            y = np.array(self.system_rx_interf)
             title = "[SYS] Interference samples"
             x_label = "Number of samples"
             y_label = "Interference [dBm]"
