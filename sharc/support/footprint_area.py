@@ -6,24 +6,63 @@ Created on Mon Nov 27 08:52:28 2017
 """
 
 from area import area
-import numpy as np
+from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, isnan
 
 class FootprintArea(object):
     """
-    Defines a satellite footprint region and calculates its area
+    Defines a satellite footprint region and calculates its area.
+    
+    Construction:
+        FootprintArea(bore_lat_deg, bore_subsat_long_deg, beam)
+        
     
     
     """
-    def __init__(self,bore_lat_deg: float, bore_subsat_long_deg: float, beam:float):
+    def __init__(self,bore_lat_deg: float, bore_subsat_long_deg: float, beam_deg:float):
         # Initialize attributes
         self.bore_lat_deg = bore_lat_deg
         self.bore_subsat_long_deg = bore_subsat_long_deg
-        self.beam_width = beam
+        self.beam_width_deg = beam_deg
+        
+        # Convert to radians
+        self.bore_lat_rad = deg2rad(bore_lat_deg)
+        self.bore_subsat_long_rad = deg2rad(bore_subsat_long_deg)
+        self.beam_width_rad = deg2rad(beam_deg)
         
         # Calculate tilt
-        self.beta = np.arccos(np.cos(np.deg2rad(self.bore_lat_deg))*\
-                              np.cos(np.deg2rad(self.bore_subsat_long_deg)))
-        self.bore_tilt = np.arctan(np.sin(self.beta)/(6.6235 - np.cos(self.beta)))
+        self.beta = arccos(cos(deg2rad(self.bore_lat_deg))*\
+                              cos(deg2rad(self.bore_subsat_long_deg)))
+        self.bore_tilt = arctan(sin(self.beta)/(6.6235 - cos(self.beta)))
+        
+    def calc_footprint(self, n: int):
+        # Projection angles
+        phi = linspace(0,2*pi,num = n)
+        
+        cos_gamma_n = cos(self.bore_tilt)*cos(self.beam_width_rad) + \
+                      sin(self.bore_tilt)*sin(self.beam_width_rad)*\
+                      cos(phi)
+        cot_phi_n = (sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
+                     cos(self.bore_tilt)*cos(phi))/sin(phi)
+        
+        gamma_n = arccos(cos_gamma_n)
+        phi_n = self.arccot(cot_phi_n)
+        
+        eps_n = arctan(sin(self.bore_subsat_long_rad)/tan(self.bore_lat_rad)) + \
+                phi_n
+        eps_n[isnan(eps_n)] = arctan(1) + phi_n[isnan(eps_n)]
+                
+        beta_n = arcsin(6.6235*sin(gamma_n)) - gamma_n
+        
+        pt_lat  = arcsin(sin(beta_n)*cos(eps_n))
+        pt_long = arctan(tan(beta_n)*sin(eps_n))
+        
+        return rad2deg(pt_long), rad2deg(pt_lat)
+        
+    def cot(self,angle):
+        return tan(pi/2 - angle)
+    
+    def arccot(self,x):
+        return pi/2 - arctan(x)
         
         
         
