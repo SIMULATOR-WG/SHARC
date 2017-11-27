@@ -6,9 +6,9 @@ Created on Mon Nov 27 08:52:28 2017
 """
 
 from area import area
-from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, isnan
+from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, isnan, vstack
 
-class FootprintArea(object):
+class Footprint(object):
     """
     Defines a satellite footprint region and calculates its area.
     
@@ -57,6 +57,16 @@ class FootprintArea(object):
         pt_long = arctan(tan(beta_n)*sin(eps_n))
         
         return rad2deg(pt_long), rad2deg(pt_lat)
+    
+    def calc_area(self, n:int):
+        long, lat = self.calc_footprint(n)
+        
+        long_lat = vstack((long, lat)).T
+        
+        obj = {'type':'Polygon',
+               'coordinates':[long_lat.tolist()]}
+        
+        return area(obj)*1e-6
         
     def cot(self,angle):
         return tan(pi/2 - angle)

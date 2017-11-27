@@ -9,13 +9,13 @@ import unittest
 import numpy as np
 import numpy.testing as npt
 
-from sharc.support.footprint_area import FootprintArea
+from sharc.support.footprint import Footprint
 
 class FootprintAreaTest(unittest.TestCase):
     
     def setUp(self):
-        self.fa1 = FootprintArea(0,0,0.1)
-        self.fa2 = FootprintArea(0,0,0.65)
+        self.fa1 = Footprint(0,0,0.1)
+        self.fa2 = Footprint(0,0,0.325)
         
     def test_construction(self):
         self.assertEqual(self.fa1.bore_lat_deg,0)
@@ -29,10 +29,12 @@ class FootprintAreaTest(unittest.TestCase):
         
     def test_calc_footprint(self):
         fp_long, fp_lat = self.fa1.calc_footprint(4)
-        self.assertEqual(len(fp_long),4)
-        self.assertEqual(len(fp_lat),4)
         npt.assert_allclose(fp_long,np.array([-0.398, 0.543,  0.146, 0.398]),atol=1e-2)
         npt.assert_allclose(fp_lat,np.array([-0.398, -0.146, -0.543,  0.398]),atol=1e-2)
+        
+    def test_calc_area(self):
+        a = self.fa2.calc_area(10000)
+        self.assertAlmostEqual(a,129464,delta=1000)
         
 if __name__ == '__main__':
     unittest.main()
