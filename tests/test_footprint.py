@@ -33,8 +33,8 @@ class FootprintAreaTest(unittest.TestCase):
         npt.assert_allclose(fp_lat,np.array([-0.398, -0.146, -0.543,  0.398]),atol=1e-2)
         
     def test_calc_area(self):
-        a = self.fa2.calc_area(10000)
-        self.assertAlmostEqual(a,129464,delta=1000)
+        a = self.fa2.calc_area(500)
+        self.assertAlmostEqual(a,129464,delta=150)
         
 if __name__ == '__main__':
     unittest.main()
