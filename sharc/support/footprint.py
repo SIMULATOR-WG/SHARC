@@ -7,6 +7,7 @@ Created on Mon Nov 27 08:52:28 2017
 
 from area import area
 from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, isnan, vstack
+import matplotlib.pyplot as plt
 
 class Footprint(object):
     """
@@ -18,7 +19,7 @@ class Footprint(object):
             bore_subsat_long_deg (float): longitude of boresight with respect
                 to sub-satellite point, taken positive when to the west of the
                 sub-satellite point
-            beam_deg (float): beam width in degrees
+            beam_deg (float): half of beam width in degrees
     """
     def __init__(self,bore_lat_deg: float, bore_subsat_long_deg: float, beam_deg:float):
         # Initialize attributes
@@ -32,8 +33,8 @@ class Footprint(object):
         self.beam_width_rad = deg2rad(beam_deg)
         
         # Calculate tilt
-        self.beta = arccos(cos(deg2rad(self.bore_lat_deg))*\
-                              cos(deg2rad(self.bore_subsat_long_deg)))
+        self.beta = arccos(cos(self.bore_lat_rad)*\
+                           cos(self.bore_subsat_long_rad))
         self.bore_tilt = arctan(sin(self.beta)/(6.6235 - cos(self.beta)))
         
     def calc_footprint(self, n: int):
@@ -94,5 +95,15 @@ class Footprint(object):
     def arccot(self,x):
         return pi/2 - arctan(x)
         
-        
+if __name__ == '__main__':
+    # Earth  [km]
+    R = 6371
+    
+    # Create object
+    fprint = Footprint(0,0,0.325)
+    
+    # Define coordinates
+    long, lat = fprint.calc_footprint(1000)
+    plt.plot(long,lat)
+    plt.show()
         
