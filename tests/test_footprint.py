@@ -16,6 +16,7 @@ class FootprintAreaTest(unittest.TestCase):
     def setUp(self):
         self.fa1 = Footprint(0,0,0.1)
         self.fa2 = Footprint(0,0,0.325)
+        self.fa3 = Footprint(0,61,0.325)
         
     def test_construction(self):
         self.assertEqual(self.fa1.bore_lat_deg,0)
@@ -33,8 +34,10 @@ class FootprintAreaTest(unittest.TestCase):
         npt.assert_allclose(fp_lat,np.array([-0.398, -0.146, -0.543,  0.398]),atol=1e-2)
         
     def test_calc_area(self):
-        a = self.fa2.calc_area(500)
-        self.assertAlmostEqual(a,129464,delta=150)
+        a1 = self.fa2.calc_area(500)
+        self.assertAlmostEqual(a1,129464,delta=150)
+        a2 = self.fa3.calc_area(500)
+        self.assertAlmostEqual(a2,438800,delta=150)
         
 if __name__ == '__main__':
     unittest.main()
