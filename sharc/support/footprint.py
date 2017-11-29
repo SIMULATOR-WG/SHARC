@@ -6,7 +6,7 @@ Created on Mon Nov 27 08:52:28 2017
 """
 
 from area import area
-from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, isnan, vstack
+from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, vstack, arctan2, where
 import matplotlib.pyplot as plt
 
 class Footprint(object):
@@ -35,7 +35,11 @@ class Footprint(object):
         # Calculate tilt
         self.beta = arccos(cos(self.bore_lat_rad)*\
                            cos(self.bore_subsat_long_rad))
-        self.bore_tilt = arctan(sin(self.beta)/(6.6235 - cos(self.beta)))
+        self.bore_tilt = arctan2(sin(self.beta),(6.6235 - cos(self.beta)))
+        
+        # Maximum tilt and latitute coverage
+        self.max_gamma_rad = deg2rad(8.6833)
+        self.max_beta_rad = deg2rad(81.3164)
         
     def calc_footprint(self, n: int):
         """
@@ -54,17 +58,17 @@ class Footprint(object):
         cos_gamma_n = cos(self.bore_tilt)*cos(self.beam_width_rad) + \
                       sin(self.bore_tilt)*sin(self.beam_width_rad)*\
                       cos(phi)
-        cot_phi_n = (sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
-                     cos(self.bore_tilt)*cos(phi))/sin(phi)
+        tan_phi_n = sin(phi)/(sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
+                     cos(self.bore_tilt)*cos(phi))
         
         gamma_n = arccos(cos_gamma_n)
-        phi_n = self.arccot(cot_phi_n)
+        phi_n = arctan(tan_phi_n)  
         
-        eps_n = arctan(sin(self.bore_subsat_long_rad)/tan(self.bore_lat_rad)) + \
+        eps_n = arctan2(sin(self.bore_subsat_long_rad),tan(self.bore_lat_rad)) + \
                 phi_n
-        eps_n[isnan(eps_n)] = arctan(1) + phi_n[isnan(eps_n)]
                 
         beta_n = arcsin(6.6235*sin(gamma_n)) - gamma_n
+        beta_n[where(gamma_n >  self.max_gamma_rad)] = self.max_beta_rad
         
         pt_lat  = arcsin(sin(beta_n)*cos(eps_n))
         pt_long = arctan(tan(beta_n)*sin(eps_n))
@@ -100,10 +104,14 @@ if __name__ == '__main__':
     R = 6371
     
     # Create object
-    fprint = Footprint(0,0,0.325)
+    fprint = Footprint(45,61,0.325)
     
     # Define coordinates
-    long, lat = fprint.calc_footprint(1000)
-    plt.plot(long,lat)
+    long, lat = fprint.calc_footprint(100)
+    col = linspace(-10,10,num=len(long))
+    plt.scatter(long,lat,c=col,cmap="inferno")
+#    plt.plot(long,lat)
+#    plt.xlim([-2, +2])
+#    plt.ylim([-2, +2])
     plt.show()
         
