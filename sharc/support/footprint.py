@@ -5,8 +5,8 @@ Created on Mon Nov 27 08:52:28 2017
 @author: Calil
 """
 
-from area import area
-from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, vstack, arctan2, where
+from area import area as earthArea
+from numpy import cos, sin, tan, arctan, deg2rad, rad2deg, arccos, pi, linspace, arcsin, vstack, arctan2, where, zeros_like
 import matplotlib.pyplot as plt
 
 class Footprint(object):
@@ -163,7 +163,7 @@ class Footprint(object):
         obj = {'type':'Polygon',
                'coordinates':[long_lat.tolist()]}
         
-        return area(obj)*1e-6
+        return earthArea(obj)*1e-6
         
     def cot(self,angle):
         return tan(pi/2 - angle)
@@ -180,21 +180,25 @@ if __name__ == '__main__':
     fprint45 = Footprint(0.325,elevation_deg=45)
     fprint30 = Footprint(0.325,elevation_deg=30)
     fprint20 = Footprint(0.325,elevation_deg=20)
+    fprint05 = Footprint(0.325,elevation_deg=5)
     
     # Plot coordinates
+    n = 100
     plt.figure(figsize=(15,2))
-    long, lat = fprint90.calc_footprint(100)
+    long, lat = fprint90.calc_footprint(n)
     plt.plot(long,lat,'k',label='$90^o$')
-    long, lat = fprint45.calc_footprint(100)
+    long, lat = fprint45.calc_footprint(n)
     plt.plot(long,lat,'b',label='$45^o$')
-    long, lat = fprint30.calc_footprint(100)
+    long, lat = fprint30.calc_footprint(n)
     plt.plot(long,lat,'r',label='$30^o$')
-    long, lat = fprint20.calc_footprint(100)
+    long, lat = fprint20.calc_footprint(n)
     plt.plot(long,lat,'g',label='$20^o$')
+    long, lat = fprint05.calc_footprint(n)
+    plt.plot(long,lat,'y',label='$5^o$')
     plt.legend(loc='upper right')
     plt.xlabel('Longitude [deg]')
     plt.ylabel('Latitude [deg]')
-    plt.xlim([-5, 80])
+    plt.xlim([-5, 90])
     plt.grid()
     plt.show()
     
@@ -204,6 +208,27 @@ if __name__ == '__main__':
     print("Sat elevation 45 deg: area = {}".format(fprint45.calc_area(n)))
     print("Sat elevation 30 deg: area = {}".format(fprint30.calc_area(n)))
     print("Sat elevation 20 deg: area = {}".format(fprint20.calc_area(n)))
+    print("Sat elevation 05 deg: area = {}".format(fprint05.calc_area(n)))
+    
+    # Plot area vs elevation
+    n_el = 100
+    n_poly = 1000
+    elevation = linspace(0,90,num=n_el)
+    area = zeros_like(elevation)
+    
+    fprint = Footprint(0.320,elevation_deg=0)
+    
+    for k in range(len(elevation)):
+        fprint.set_elevation(elevation[k])
+        area[k] = fprint.calc_area(n_poly)
+        
+    plt.plot(elevation,area)
+    plt.xlabel('Elevation [deg]')
+    plt.ylabel('Footprint area [$km^2$]')
+    plt.xlim([0, 90])
+    plt.grid()
+    plt.show()
+        
     
     
         
