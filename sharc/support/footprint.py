@@ -60,11 +60,8 @@ class Footprint(object):
         cos_gamma_n = cos(self.bore_tilt)*cos(self.beam_width_rad) + \
                       sin(self.bore_tilt)*sin(self.beam_width_rad)*\
                       cos(phi)
-#        tan_phi_n = sin(phi)/(sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
-#                     cos(self.bore_tilt)*cos(phi))
         
-        gamma_n = arccos(cos_gamma_n)
-#        phi_n = arctan(tan_phi_n) 
+        gamma_n = arccos(cos_gamma_n) 
         phi_n = arctan2(sin(phi),(sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
                      cos(self.bore_tilt)*cos(phi))) 
         
@@ -108,14 +105,34 @@ if __name__ == '__main__':
     R = 6371
     
     # Create object
-    fprint = Footprint(45,61,0.325)
+    fprint90 = Footprint(0,0,0.325)
+    fprint45 = Footprint(0,38,0.325)
+    fprint30 = Footprint(0,52,0.325)
+    fprint20 = Footprint(0,61,0.325)
     
-    # Define coordinates
-    long, lat = fprint.calc_footprint(100)
-    col = linspace(-10,10,num=len(long))
-#    plt.scatter(long,lat,c=col,cmap="inferno")
-    plt.plot(long,lat)
-#    plt.xlim([-2, +2])
-#    plt.ylim([-2, +2])
+    # Plot coordinates
+    plt.figure(figsize=(15,2))
+    long, lat = fprint90.calc_footprint(100)
+    plt.plot(long,lat,'k',label='$90^o$')
+    long, lat = fprint45.calc_footprint(100)
+    plt.plot(long,lat,'b',label='$45^o$')
+    long, lat = fprint30.calc_footprint(100)
+    plt.plot(long,lat,'r',label='$30^o$')
+    long, lat = fprint20.calc_footprint(100)
+    plt.plot(long,lat,'g',label='$20^o$')
+    plt.legend(loc='upper right')
+    plt.xlabel('Longitude [deg]')
+    plt.ylabel('Latitude [deg]')
+    plt.xlim([-5, 80])
+    plt.grid()
     plt.show()
+    
+    # Print areas
+    n = 1000
+    print("Sat elevation 90 deg: area = {}".format(fprint90.calc_area(n)))
+    print("Sat elevation 45 deg: area = {}".format(fprint45.calc_area(n)))
+    print("Sat elevation 30 deg: area = {}".format(fprint30.calc_area(n)))
+    print("Sat elevation 20 deg: area = {}".format(fprint20.calc_area(n)))
+    
+    
         
