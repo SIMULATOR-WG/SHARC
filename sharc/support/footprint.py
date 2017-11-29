@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 class Footprint(object):
     """
     Defines a satellite footprint region and calculates its area.
+    Method for generating footprints (Siocos,1973) is found in the book 
+    "Satellite Communication Systems" by M. Richharia ISBN 0-07-134208-7
     
     Construction:
         FootprintArea(bore_lat_deg, bore_subsat_long_deg, beam)
@@ -49,8 +51,8 @@ class Footprint(object):
             n (int): number of vertices on polygonal
             
         Outputs:
-            pt_long (np.array): longitude of verices in deg
-            pt_lat (np.array): latiture of verices in deg
+            pt_long (np.array): longitude of vertices in deg
+            pt_lat (np.array): latiture of vertices in deg
         """
         # Projection angles
         phi = linspace(0,2*pi,num = n)
@@ -58,11 +60,13 @@ class Footprint(object):
         cos_gamma_n = cos(self.bore_tilt)*cos(self.beam_width_rad) + \
                       sin(self.bore_tilt)*sin(self.beam_width_rad)*\
                       cos(phi)
-        tan_phi_n = sin(phi)/(sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
-                     cos(self.bore_tilt)*cos(phi))
+#        tan_phi_n = sin(phi)/(sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
+#                     cos(self.bore_tilt)*cos(phi))
         
         gamma_n = arccos(cos_gamma_n)
-        phi_n = arctan(tan_phi_n)  
+#        phi_n = arctan(tan_phi_n) 
+        phi_n = arctan2(sin(phi),(sin(self.bore_tilt)*self.cot(self.beam_width_rad) - \
+                     cos(self.bore_tilt)*cos(phi))) 
         
         eps_n = arctan2(sin(self.bore_subsat_long_rad),tan(self.bore_lat_rad)) + \
                 phi_n
@@ -82,7 +86,7 @@ class Footprint(object):
         Input:
             n (int): number of vertices on polygonal approximation
         Output:
-            a (float): footprint area
+            a (float): footprint area in km^2
         """
         long, lat = self.calc_footprint(n)
         
@@ -109,8 +113,8 @@ if __name__ == '__main__':
     # Define coordinates
     long, lat = fprint.calc_footprint(100)
     col = linspace(-10,10,num=len(long))
-    plt.scatter(long,lat,c=col,cmap="inferno")
-#    plt.plot(long,lat)
+#    plt.scatter(long,lat,c=col,cmap="inferno")
+    plt.plot(long,lat)
 #    plt.xlim([-2, +2])
 #    plt.ylim([-2, +2])
     plt.show()
