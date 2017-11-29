@@ -17,22 +17,39 @@ class Footprint(object):
     
     Construction:
         FootprintArea(bore_lat_deg, bore_subsat_long_deg, beam)
-            bore_lat_deg (float): latitude of boresight point
+            beam_deg (float): half of beam width in degrees
+            elevation_deg (float): optional. Satellite elevation at 
+            boresight bore_lat_deg (float): optional, default = 0. 
+                Latitude of boresight point. If elevation is given this 
+                parameter is not used. Default = 0
             bore_subsat_long_deg (float): longitude of boresight with respect
                 to sub-satellite point, taken positive when to the west of the
-                sub-satellite point
-            beam_deg (float): half of beam width in degrees
+                sub-satellite point. If elevation is given this 
+                parameter is not used. Default = 0
     """
-    def __init__(self,bore_lat_deg: float, bore_subsat_long_deg: float, beam_deg:float):
+    def __init__(self,beam_deg:float,**kwargs):
         # Initialize attributes
-        self.bore_lat_deg = bore_lat_deg
-        self.bore_subsat_long_deg = bore_subsat_long_deg
+        if 'elevation_deg' in kwargs.keys():
+            self.elevation_deg = kwargs['elevation_deg']
+            self.bore_lat_deg = 0.0
+            self.bore_subsat_long_deg = self.calc_beta(self.elevation_deg)
+        else:
+            self.bore_lat_deg = 0.0
+            self.bore_subsat_long_deg = 0.0
+            if 'bore_lat_deg' in kwargs.keys():
+                self.bore_lat_deg = kwargs['bore_lat_deg']
+            if 'bore_subsat_long_deg' in kwargs.keys():
+                self.bore_subsat_long_deg = kwargs['bore_subsat_long_deg']
+            self.elevation_deg = \
+                self.calc_elevation(self.bore_lat_deg,self.bore_subsat_long_deg)
+        
         self.beam_width_deg = beam_deg
         
         # Convert to radians
-        self.bore_lat_rad = deg2rad(bore_lat_deg)
-        self.bore_subsat_long_rad = deg2rad(bore_subsat_long_deg)
-        self.beam_width_rad = deg2rad(beam_deg)
+        self.elevation_rad = deg2rad(self.elevation_deg)
+        self.bore_lat_rad = deg2rad(self.bore_lat_deg)
+        self.bore_subsat_long_rad = deg2rad(self.bore_subsat_long_deg)
+        self.beam_width_rad = deg2rad(self.beam_width_deg)
         
         # Calculate tilt
         self.beta = arccos(cos(self.bore_lat_rad)*\
@@ -42,6 +59,60 @@ class Footprint(object):
         # Maximum tilt and latitute coverage
         self.max_gamma_rad = deg2rad(8.6833)
         self.max_beta_rad = deg2rad(81.3164)
+        
+    def calc_beta(self,elev_deg: float):
+        """
+        Calculates elevation angle based on given elevation. Beta is the 
+        subpoint to earth station great-circle distance
+        
+        Input:
+            elev_deg (float): elevation in degrees
+            
+        Output:
+            beta (float): beta angle in degrees  
+        """
+        elev_rad = deg2rad(elev_deg)
+        beta = 90 - elev_deg - rad2deg(arcsin(cos(elev_rad)/6.6235))
+        return beta
+    
+    def calc_elevation(self,lat_deg: float, long_deg: float):
+        """
+        Calculates elevation for given latitude of boresight point and 
+        longitude of boresight with respect to sub-satellite point.
+        
+        Inputs:
+            lat_deg (float): latitude of boresight point in degrees
+            long_deg (float): longitude of boresight with respect
+                to sub-satellite point, taken positive when to the west of the
+                sub-satellite point, in degrees
+        
+        Output:
+            elev (float): elevation in degrees
+        """
+        lat_rad = deg2rad(lat_deg)
+        long_rad = deg2rad(long_deg)
+        beta = arccos(cos(lat_rad)*cos(long_rad))
+        elev = arctan2((cos(beta) - 0.1510),sin(beta))
+        
+        return rad2deg(elev)
+    
+    def set_elevation(self,elev: float):
+        """
+        Resets elevation angle to given value
+        """
+        self.elevation_deg = elev
+        self.bore_lat_deg = 0.0
+        self.bore_subsat_long_deg = self.calc_beta(self.elevation_deg)
+        
+        # Convert to radians
+        self.elevation_rad = deg2rad(self.elevation_deg)
+        self.bore_lat_rad = deg2rad(self.bore_lat_deg)
+        self.bore_subsat_long_rad = deg2rad(self.bore_subsat_long_deg)
+        
+        # Calculate tilt
+        self.beta = arccos(cos(self.bore_lat_rad)*\
+                           cos(self.bore_subsat_long_rad))
+        self.bore_tilt = arctan2(sin(self.beta),(6.6235 - cos(self.beta)))
         
     def calc_footprint(self, n: int):
         """
@@ -105,10 +176,10 @@ if __name__ == '__main__':
     R = 6371
     
     # Create object
-    fprint90 = Footprint(0,0,0.325)
-    fprint45 = Footprint(0,38,0.325)
-    fprint30 = Footprint(0,52,0.325)
-    fprint20 = Footprint(0,61,0.325)
+    fprint90 = Footprint(0.325,elevation_deg=90)
+    fprint45 = Footprint(0.325,elevation_deg=45)
+    fprint30 = Footprint(0.325,elevation_deg=30)
+    fprint20 = Footprint(0.325,elevation_deg=20)
     
     # Plot coordinates
     plt.figure(figsize=(15,2))
