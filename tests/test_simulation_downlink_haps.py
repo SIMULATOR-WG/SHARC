@@ -15,7 +15,7 @@ from sharc.parameters.parameters import Parameters
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.station_factory import StationFactory
 
-class SimulationDownlinkTest(unittest.TestCase):
+class SimulationDownlinkHapsTest(unittest.TestCase):
 
     def setUp(self):
         self.param = Parameters()
