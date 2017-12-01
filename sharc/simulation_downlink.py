@@ -138,14 +138,16 @@ class SimulationDownlink(Simulation):
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.ue,
                                                                      self.propagation_system)
-
+        # TODO: make it an input parameter
+        polarization_loss = 3
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
         # calculate interference only to active UE's
         ue = np.where(self.ue.active)[0]
         tx_power = self.param_system.tx_power_density + 10*np.log10(self.ue.bandwidth[ue]*1e6) + 30
         self.ue.ext_interference[ue] = tx_power - self.coupling_loss_imt_system[ue] \
-                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss \
+                            - polarization_loss
 
         self.ue.sinr_ext[ue] = self.ue.rx_power[ue] \
             - (10*np.log10(np.power(10, 0.1*self.ue.total_interference[ue]) + np.power(10, 0.1*self.ue.ext_interference[ue])))
@@ -160,7 +162,8 @@ class SimulationDownlink(Simulation):
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.bs,
                                                                      self.propagation_system)
-
+        # TODO: make it an input parameter
+        polarization_loss = 3
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
         # calculate interference only from active UE's
@@ -168,7 +171,8 @@ class SimulationDownlink(Simulation):
         for bs in bs_active:
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
             interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[active_beams] \
-                                + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth)
+                                + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth) \
+                                - polarization_loss
             weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
                                                 self.param_system.bandwidth,
                                                 self.parameters.imt.ue_k)
