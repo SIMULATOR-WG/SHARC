@@ -11,7 +11,7 @@ from sharc.parameters.parameters_fss_es import ParametersFssEs
 
 import numpy as np
 
-class AntennaS509(Antenna):
+class AntennaSA509(Antenna):
     """
     Implements the Earth station antenna pattern in the SRS service
     according to Recommendation ITU-R SA.509-3
@@ -63,20 +63,23 @@ if __name__ == '__main__':
     
     # initialize antenna parameters
     param27 = ParametersFssEs()
+    
+ 
     param27.antenna_pattern = "ITU-R S.509-3"
-    param27.frequency = 26000
+    param27.frequency = 23800
     param27.antenna_gain = 50
     param27.diameter = 9.6
-    antenna27 = AntennaS509(param27)
+    antenna27 = AntennaSA509(param27)
+    
 
     gain27 = antenna27.calculate_gain(phi_vec=phi)
     
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
     
-    plt.semilogx(phi, gain27 - param27.antenna_gain, "-b", label = "$f = 27$ $GHz,$ $D = 9.6$ $m$")
+    plt.semilogx(phi, gain27 - param27.antenna_gain, "-b", label = "$f = 23.8$ $GHz,$ $D = 9.6$ $m$")
 
-    plt.title("ITU-R S.509 antenna radiation pattern")
+    plt.title("ITU-R SA.509 antenna radiation pattern")
     plt.xlabel("Off-axis angle $\phi$ [deg]")
     plt.ylabel("Gain relative to $G_m$ [dB]")
     plt.legend(loc="lower left")

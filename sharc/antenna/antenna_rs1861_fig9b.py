@@ -54,9 +54,9 @@ if __name__ == '__main__':
     phi = np.linspace(0.1, 100, num = 100000)
     
     # initialize antenna parameters
-    param27 = ParametersFssEs()
+    param27 = ParametersFssSs()
     param27.antenna_pattern = "ITU-R RS.1861 Figure 9b"
-    param27.frequency = 26000
+    param27.frequency = 23800
     param27.antenna_gain = 50
     antenna27 = AntennaRS1861FIG9b(param27)
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
     
-    plt.plot(phi, gain27 - param27.antenna_gain, "-b", label = "$f = 26$ $GHz$")
+    plt.plot(phi, gain27 - param27.antenna_gain, "-b", label = "$f = 23.8$ $GHz$")
 
     plt.title("ITU-R RS.1861 Figure 9b antenna radiation pattern")
     plt.xlabel("Off-axis angle $\phi$ [deg]")

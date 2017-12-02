@@ -8,13 +8,13 @@ Created on Wed Nov 15 11:12:59 2017
 
 import unittest
 
-from sharc.antenna.antenna_s509 import AntennaS509
+from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 
 import numpy as np
 import numpy.testing as npt
 
-class AntennaS465Test(unittest.TestCase):
+class AntennaSA509Test(unittest.TestCase):
     
     def setUp(self):
         param = ParametersFssEs()
@@ -23,7 +23,7 @@ class AntennaS465Test(unittest.TestCase):
         param.diameter = 2
         param.frequency = 23800
 
-        self.antenna = AntennaS509(param)
+        self.antenna = AntennaSA509(param)
         
         
         

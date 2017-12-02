@@ -25,7 +25,10 @@ from sharc.antenna.antenna_s580 import AntennaS580
 from sharc.antenna.antenna_s672 import AntennaS672
 from sharc.antenna.antenna_s1528 import AntennaS1528
 from sharc.antenna.antenna_s1855 import AntennaS1855
-from sharc.antenna.antenna_s509 import AntennaS509
+from sharc.antenna.antenna_sa509 import AntennaSA509
+from sharc.antenna.antenna_rs1861_fig9a import AntennaRS1861FIG9a
+from sharc.antenna.antenna_rs1861_fig9b import AntennaRS1861FIG9b
+from sharc.antenna.antenna_rs1861_fig9c import AntennaRS1861FIG9c
 from sharc.antenna.antenna_rrappendix8 import AntennaRRAppendix8
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
@@ -222,6 +225,12 @@ class StationFactory(object):
             fss_space_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
         elif param.antenna_pattern == "ITU-R S.672":
             fss_space_station.antenna = np.array([AntennaS672(param)])
+        elif param.antenna_pattern == "ITU-R RS.1861_fig9a":
+            fss_space_station.antenna = np.array([AntennaRS1861FIG9a(param)])
+        elif param.antenna_pattern == "ITU-R RS.1861_fig9b":
+            fss_space_station.antenna = np.array([AntennaRS1861FIG9b(param)])
+        elif param.antenna_pattern == "ITU-R RS.1861_fig9c":
+            fss_space_station.antenna = np.array([AntennaRS1861FIG9c(param)])
         elif param.antenna_pattern == "ITU-R S.1528":
             fss_space_station.antenna = np.array([AntennaS1528(param)])
         elif param.antenna_pattern == "FSS_SS":
@@ -262,8 +271,8 @@ class StationFactory(object):
             fss_earth_station.antenna = np.array([AntennaS465(param)])
         elif param.antenna_pattern == "ITU-R S.580":
             fss_earth_station.antenna = np.array([AntennaS580(param)])
-        elif param.antenna_pattern == "ITU-R S.509":
-            fss_earth_station.antenna = np.array([AntennaS509(param)])
+        elif param.antenna_pattern == "ITU-R SA.509":
+            fss_earth_station.antenna = np.array([AntennaSA509(param)])
         elif param.antenna_pattern == "RR Appendix 8":
             fss_earth_station.antenna = np.array([AntennaRRAppendix8(param)])       
         else:
