@@ -40,6 +40,8 @@ class Simulation(ABC, Observable):
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
 
+        self.co_channel = bool()
+
         self.topology = TopologyFactory.createTopology(self.parameters)
 
         self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)
@@ -81,7 +83,9 @@ class Simulation(ABC, Observable):
     def initialize(self, *args, **kwargs):
         """
         This method is executed only once to initialize the simulation variables.
-        """
+        """            
+        self.co_channel = (self.parameters.imt.frequency == self.param_system.frequency)
+        
         self.topology.calculate_coordinates()
         num_bs = self.topology.num_base_stations
         num_ue = num_bs*self.parameters.imt.ue_k*self.parameters.imt.ue_k_m

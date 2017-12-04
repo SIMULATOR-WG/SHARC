@@ -367,7 +367,19 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertAlmostEqual(self.simulation.system.inr, 
                                np.array([ rx_interference - (-98.599) ]),
                                delta=.01)
-    '''    
+    '''
+
+    def test_simulation_2bs_4ue_adjacent(self):
+        self.param.imt.frequency = 9000
+        self.param.imt.bs_aclr = 30
+        self.param.general.system = "RAS"
+        
+        self.simulation = SimulationDownlink(self.param)
+        self.simulation.initialize()
+        
+        self.assertFalse(self.simulation.co_channel)
+        
+    
     def test_simulation_2bs_4ue_ras(self):
         self.param.general.system = "RAS"
         
