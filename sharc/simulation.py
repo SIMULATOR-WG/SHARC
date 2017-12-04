@@ -269,14 +269,15 @@ class Simulation(ABC, Observable):
                         station_1: StationManager,
                         station_2: StationManager) -> np.array:
         """
-        Calculates the gains of antennas in station_a in the direction of
-        station_b
+        Calculates the gains of antennas in station_1 in the direction of
+        station_2
         """
         phi, theta = station_1.get_pointing_vector_to(station_2)
 
         station_1_active = np.where(station_1.active)[0]
         station_2_active = np.where(station_2.active)[0]
-
+        
+        # Initialize variables (phi, theta, beams_idx)
         if(station_1.station_type is StationType.IMT_BS):
             if(station_2.station_type is StationType.IMT_UE):
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
@@ -296,7 +297,8 @@ class Simulation(ABC, Observable):
              station_1.station_type is StationType.FS or \
              station_1.station_type is StationType.RAS):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
-
+        
+        # Calculate gains
         gains = np.zeros(phi.shape)
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
@@ -306,7 +308,19 @@ class Simulation(ABC, Observable):
                 for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
-                                                                            beams_l=np.array([beams_idx[b]]))
+                                                                            beams_l=np.array([beams_idx[b]]),
+                                                                            co_channel=self.co_channel)
+        
+        elif (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_SS) or \
+           (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_ES) or \
+           (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FS) or \
+           (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.RAS):
+               for k in station_1_active:
+                   gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
+                                                                            theta_vec=theta[k,station_2_active],
+                                                                            beams_l=beams_idx,
+                                                                            co_channel=self.co_channel)
+        
         elif station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
              station_1.station_type is StationType.FS or \

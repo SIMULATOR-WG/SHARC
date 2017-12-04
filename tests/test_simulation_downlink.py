@@ -367,25 +367,13 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertAlmostEqual(self.simulation.system.inr, 
                                np.array([ rx_interference - (-98.599) ]),
                                delta=.01)
-    '''
-
-    def test_simulation_2bs_4ue_adjacent(self):
-        self.param.imt.frequency = 9000
-        self.param.imt.bs_aclr = 30
-        self.param.general.system = "RAS"
-        
-        self.simulation = SimulationDownlink(self.param)
-        self.simulation.initialize()
-        
-        self.assertFalse(self.simulation.co_channel)
-        
+    '''        
     
     def test_simulation_2bs_4ue_ras(self):
         self.param.general.system = "RAS"
         
         self.simulation = SimulationDownlink(self.param)
-        self.simulation.initialize()
-        
+        self.simulation.initialize()      
         
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
@@ -462,6 +450,59 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.assertAlmostEqual(self.simulation.system.inr, 
                                np.array([ rx_interference - (-98.599) ]),
                                delta=.01)
+        
+    
+    def test_simulation_2bs_4ue_adjacent(self):
+        self.param.imt.frequency = 9000
+        self.param.imt.bs_aclr = 30
+        self.param.general.system = "RAS"
+        
+        self.simulation = SimulationDownlink(self.param)
+        self.simulation.initialize()
+        
+        # Test co-channel variable
+        self.assertFalse(self.simulation.co_channel)
+        
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+                                                                       self.param.antenna_imt,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
+                                                            self.param.antenna_imt,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        
+        self.simulation.connect_ue_to_bs()
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        self.simulation.scheduler()
+        self.simulation.power_control()
+        self.simulation.calculate_sinr()
+        
+        # Create system
+        self.simulation.system = StationFactory.generate_ras_station(self.param.ras)
+        self.simulation.system.x = np.array([-2000])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param.ras.height])
+        self.simulation.system.antenna[0].effective_area = 54.9779
+        
+        # Test gain calculation
+        gains = self.simulation.calculate_gains(self.simulation.system,self.simulation.bs)
+        npt.assert_equal(gains,np.array([[50, 50]]))
+        
+        self.simulation.calculate_external_interference()
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
+                            np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
+                            atol=1e-2)
                               
         
     def test_calculate_bw_weights(self):
