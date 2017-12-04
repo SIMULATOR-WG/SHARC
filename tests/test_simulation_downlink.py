@@ -129,7 +129,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.fss_ss.surf_water_vapour_density = 7.5
         self.param.fss_ss.specific_gaseous_att = 0.1
         self.param.fss_ss.time_ratio = 0.5
-        self.param.fss_ss.antenna_l_s = -20    
+        self.param.fss_ss.antenna_l_s = -20 
+        self.param.fss_ss.acs = 10
         self.param.fss_ss.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param.fss_ss.EARTH_RADIUS = 6371000        
         
@@ -145,7 +146,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.fss_es.antenna_gain = 50
         self.param.fss_es.antenna_pattern = "OMNI"
         self.param.fss_es.channel_model = "FSPL"
-        self.param.fss_es.line_of_sight_prob = 1 
+        self.param.fss_es.line_of_sight_prob = 1
+        self.param.fss_es.acs = 10
         self.param.fss_es.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param.fss_es.EARTH_RADIUS = 6371000
 
@@ -164,6 +166,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.ras.antenna_pattern = "OMNI"
         self.param.ras.channel_model = "FSPL"
         self.param.ras.line_of_sight_prob = 1 
+        self.param.ras.acs = 10
         self.param.ras.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param.ras.EARTH_RADIUS = 6371000
         self.param.ras.SPEED_OF_LIGHT = 299792458
@@ -503,6 +506,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
                             np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
                             atol=1e-2)
+        
+        
                               
         
     def test_calculate_bw_weights(self):

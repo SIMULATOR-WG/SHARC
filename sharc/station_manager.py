@@ -43,6 +43,8 @@ class StationManager(object):
         self.sinr_ext = np.empty(n)
         self.inr = np.empty(n)
         self.pfd = np.empty(n)
+        self.aclr = np.empty(n)
+        self.acs = np.empty(n)
         self.station_type = StationType.NONE
 
     def get_station_list(self, id=None) -> list:
