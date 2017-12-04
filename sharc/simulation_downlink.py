@@ -173,6 +173,7 @@ class SimulationDownlink(Simulation):
             interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[active_beams] \
                                 + 10*np.log10(self.bs.bandwidth[bs]/self.param_system.bandwidth) \
                                 - polarization_loss
+            if not self.co_channel: interference -= (self.bs.aclr[bs] + self.system.acs)
             weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
                                                 self.param_system.bandwidth,
                                                 self.parameters.imt.ue_k)

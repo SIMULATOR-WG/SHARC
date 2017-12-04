@@ -37,7 +37,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.imt.num_resource_blocks = 10
         self.param.imt.bs_conducted_power = 10
         self.param.imt.bs_height = 6
-        self.param.imt.bs_aclr = 40
+        self.param.imt.bs_aclr = 20
         self.param.imt.bs_acs = 30
         self.param.imt.bs_noise_figure = 7
         self.param.imt.bs_noise_temperature = 290
@@ -57,7 +57,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.imt.ue_p_cmax = 20
         self.param.imt.ue_conducted_power = 10
         self.param.imt.ue_height = 1.5
-        self.param.imt.ue_aclr = 35
+        self.param.imt.ue_aclr = 20
         self.param.imt.ue_acs = 25
         self.param.imt.ue_noise_figure = 9
         self.param.imt.ue_feed_loss = 3
@@ -507,6 +507,13 @@ class SimulationDownlinkTest(unittest.TestCase):
                             np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
                             atol=1e-2)
         
+        # Test RAS interference
+        interference = 10 - 10*np.log10(2) - np.array([118.47-50-1+30,  118.47-50-1+30,  119.29-50-2+30,  119.29-50-2+30])-\
+                       3 + 10*math.log10(45/100) - 3
+        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
+        self.assertAlmostEqual(self.simulation.system.rx_interference,
+                               rx_interference,
+                               delta=.01)
         
                               
         
