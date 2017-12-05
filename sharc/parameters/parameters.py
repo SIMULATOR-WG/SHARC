@@ -14,6 +14,7 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
+from sharc.parameters.parameters_haps import ParametersHaps
 
 
 class Parameters(object):
@@ -31,6 +32,7 @@ class Parameters(object):
         self.fs = ParametersFs()
         self.fss_ss = ParametersFssSs()
         self.fss_es = ParametersFssEs()
+        self.haps = ParametersHaps()
 
 
     def set_file_name(self, file_name: str):
@@ -153,7 +155,7 @@ class Parameters(object):
         #######################################################################
         self.fss_ss.frequency               = config.getfloat("FSS_SS", "frequency")
         self.fss_ss.bandwidth               = config.getfloat("FSS_SS", "bandwidth")
-        self.fss_ss.tx_power_density        = config.getfloat("FSS_ES", "tx_power_density")
+        self.fss_ss.tx_power_density        = config.getfloat("FSS_SS", "tx_power_density")
         self.fss_ss.altitude                = config.getfloat("FSS_SS", "altitude")
         self.fss_ss.lat_deg                 = config.getfloat("FSS_SS", "lat_deg")
         self.fss_ss.elevation               = config.getfloat("FSS_SS", "elevation")
@@ -215,3 +217,24 @@ class Parameters(object):
         self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
         self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
 
+        #######################################################################
+        # HAPS (airbone) station
+        #######################################################################
+        self.haps.frequency               = config.getfloat("HAPS", "frequency")
+        self.haps.bandwidth               = config.getfloat("HAPS", "bandwidth")
+        self.haps.antenna_gain            = config.getfloat("HAPS", "antenna_gain")
+        self.haps.tx_power_density        = config.getfloat("HAPS", "eirp_density") - self.haps.antenna_gain - 60
+        self.haps.altitude                = config.getfloat("HAPS", "altitude")
+        self.haps.lat_deg                 = config.getfloat("HAPS", "lat_deg")
+        self.haps.elevation               = config.getfloat("HAPS", "elevation")
+        self.haps.azimuth                 = config.getfloat("HAPS", "azimuth")
+        self.haps.inr_scaling             = config.getfloat("HAPS", "inr_scaling")
+        self.haps.antenna_pattern         = config.get("HAPS", "antenna_pattern")
+        self.haps.imt_altitude            = config.getfloat("HAPS", "imt_altitude")
+        self.haps.imt_lat_deg             = config.getfloat("HAPS", "imt_lat_deg")
+        self.haps.imt_long_diff_deg       = config.getfloat("HAPS", "imt_long_diff_deg")
+        self.haps.season                  = config.get("HAPS", "season")
+        self.haps.channel_model           = config.get("HAPS", "channel_model")
+        self.haps.antenna_l_n             = config.getfloat("HAPS", "antenna_l_n")
+        self.haps.BOLTZMANN_CONSTANT      = config.getfloat("HAPS", "BOLTZMANN_CONSTANT")
+        self.haps.EARTH_RADIUS            = config.getfloat("HAPS", "EARTH_RADIUS")

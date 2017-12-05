@@ -16,10 +16,13 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
+from sharc.parameters.parameters_haps import ParametersHaps
 from sharc.station_manager import StationManager
+from sharc.antenna.antenna import Antenna
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_f699 import AntennaF699
+from sharc.antenna.antenna_f1891 import AntennaF1891
 from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_s580 import AntennaS580
 from sharc.antenna.antenna_s672 import AntennaS672
@@ -177,7 +180,9 @@ class StationFactory(object):
         elif parameters.general.system == "FSS_SS":
             return StationFactory.generate_fss_space_station(parameters.fss_ss)
         elif parameters.general.system == "FS":
-            return StationFactory.generate_fs_station(parameters.fs)            
+            return StationFactory.generate_fs_station(parameters.fs)
+        elif parameters.general.system == "HAPS":
+            return StationFactory.generate_haps(parameters.haps, parameters.imt.intersite_distance)
         else:
             sys.stderr.write("ERROR\nInvalid system: " + parameters.general.system)
             sys.exit(1)
@@ -296,3 +301,47 @@ class StationFactory(object):
         fs_station.bandwidth = np.array([param.bandwidth])
         
         return fs_station
+        
+        
+    @staticmethod
+    def generate_haps(param: ParametersHaps, intersite_distance: int):
+        num_haps = 1
+        haps = StationManager(num_haps)
+        haps.station_type = StationType.HAPS
+
+#        d = intersite_distance
+#        h = (d/3)*math.sqrt(3)/2
+#        haps.x = np.array([0, 7*d/2, -d/2, -4*d, -7*d/2, d/2, 4*d])
+#        haps.y = np.array([0, 9*h, 15*h, 6*h, -9*h, -15*h, -6*h])
+        haps.x = np.array([0])
+        haps.y = np.array([0])
+        
+        haps.height = param.altitude * np.ones(num_haps)
+
+        #haps.azimuth = param.azimuth
+        #haps.elevation = param.elevation
+
+        elev_max = 68.19 # corresponds to 50 km radius and 20 km altitude
+        haps.azimuth = 360 * np.random.random(num_haps)
+        haps.elevation = ((270 + elev_max) - (270 - elev_max)) * np.random.random(num_haps) + (270 - elev_max)
+        
+        haps.active = np.ones(num_haps, dtype = bool)
+
+        haps.antenna = np.empty(num_haps, dtype=Antenna)
+
+        if param.antenna_pattern == "OMNI":
+            for i in range(num_haps):
+                haps.antenna[i] = AntennaOmni(param.antenna_gain)
+        elif param.antenna_pattern == "ITU-R F.1891":
+            for i in range(num_haps):
+                haps.antenna[i] = AntennaF1891(param)
+        else:
+            sys.stderr.write("ERROR\nInvalid HAPS (airbone) antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+
+        haps.bandwidth = np.array([param.bandwidth])
+
+        return haps
+        
+        
+        
