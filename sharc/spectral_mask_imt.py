@@ -26,17 +26,18 @@ class SpectralMaskImt(object):
         if sta_type is StationType.IMT_UE:
             self.mask_dbm = np.array([p_tx, -5, -13, self.spurious_limits])
             
-        elif sta_type is StationType.IMT_BS:
-            if scenario is "OUTDOOR":
+        elif sta_type is StationType.IMT_BS and scenario is "OUTDOOR":
+            # Table 4
+            if p_tx > 32.5 and (freq_ghz > 37 and freq_ghz < 52.6):
+                self.mask_dbm = np.array([p_tx, -5, -13, self.spurious_limits])
                 
-                # Table 4
-                if p_tx > 32.5 and (freq_ghz > 37 and freq_ghz < 52.6):
-                    self.mask_dbm = np.array([p_tx, -5, -13, self.spurious_limits])
-                
-                # Table 5
-                elif p_tx < 32.5 and (freq_ghz > 37 and freq_ghz < 52.6):
-                    self.mask_dbm = np.array([p_tx, -5, np.max((p_tx-45.5,-20)), 
-                                              self.spurious_limits])
+            # Table 5
+            elif p_tx < 32.5 and (freq_ghz > 37 and freq_ghz < 52.6):
+                self.mask_dbm = np.array([p_tx, -5, np.max((p_tx-45.5,-20)), 
+                                          self.spurious_limits])
+    
+            else: # Dummy spectral mask, for testing purposes only
+                self.mask_dbm = np.array([p_tx, -20, -20, -50])
         
         # Spectral mask in dBc
         self.mask_dbc = self.mask_dbm - p_tx

@@ -39,6 +39,8 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.fs
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
+            
+        self.co_channel = (self.parameters.general.compatibility == "CO-CHANNEL")
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 

@@ -22,6 +22,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param = Parameters()
         
         self.param.general.imt_link = "UPLINK"
+        self.param.general.compatibility = "CO-CHANNEL"
         
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19
