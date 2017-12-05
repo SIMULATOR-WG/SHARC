@@ -456,15 +456,13 @@ class SimulationDownlinkTest(unittest.TestCase):
         
     
     def test_simulation_2bs_4ue_adjacent(self):
-        self.param.imt.frequency = 9000
-        self.param.imt.bs_aclr = 30
         self.param.general.system = "RAS"
         
         self.simulation = SimulationDownlink(self.param)
         self.simulation.initialize()
         
         # Test co-channel variable
-        self.assertFalse(self.simulation.co_channel)
+#        self.assertFalse(self.simulation.co_channel)
         
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
@@ -508,7 +506,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)
         
         # Test RAS interference
-        interference = 10 - 10*np.log10(2) - np.array([118.47-50-1+30,  118.47-50-1+30,  119.29-50-2+30,  119.29-50-2+30])-\
+        interference = 10 - 10*np.log10(2) - np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2])-\
                        3 + 10*math.log10(45/100) - 3
         rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,

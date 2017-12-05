@@ -59,8 +59,6 @@ class StationFactory(object):
         imt_base_stations.sinr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.sinr_ext = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.inr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
-        
-        imt_base_stations.aclr = param.ue_aclr*np.ones(num_bs)
 
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
         par = param_ant.get_antenna_parameters("BS", "RX")
@@ -181,8 +179,6 @@ class StationFactory(object):
         imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
-        
-        imt_ue.aclr = param.ue_aclr*np.ones(num_ue)
 
         # TODO: this piece of code works only for uplink
         par = param_ant.get_antenna_parameters("UE","TX")
@@ -255,8 +251,6 @@ class StationFactory(object):
         else:
             sys.stderr.write("ERROR\nInvalid FSS SS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
-            
-        fss_space_station.acs = param.acs
 
         fss_space_station.bandwidth = param.bandwidth
         fss_space_station.noise_temperature = param.noise_temperature
@@ -306,8 +300,6 @@ class StationFactory(object):
         else:
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
-            
-        fss_earth_station.acs = param.acs
 
         fss_earth_station.noise_temperature = param.noise_temperature
         fss_earth_station.bandwidth = np.array([param.bandwidth])
@@ -338,8 +330,6 @@ class StationFactory(object):
         else:
             sys.stderr.write("ERROR\nInvalid FS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
-            
-        fs_station.acs = param.acs
         
         fs_station.noise_temperature = param.noise_temperature
         fs_station.bandwidth = np.array([param.bandwidth])
@@ -372,8 +362,6 @@ class StationFactory(object):
         ras_station.noise_temperature = np.array([param.antenna_noise_temperature + \
                                                   param.receiver_noise_temperature])
         ras_station.bandwidth = np.array([param.bandwidth])
-        
-        ras_station.acs = param.acs
         
         return ras_station
 

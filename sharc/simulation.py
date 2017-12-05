@@ -40,8 +40,6 @@ class Simulation(ABC, Observable):
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
 
-        self.co_channel = bool()
-
         self.topology = TopologyFactory.createTopology(self.parameters)
 
         self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)

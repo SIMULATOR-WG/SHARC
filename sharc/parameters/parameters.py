@@ -176,7 +176,6 @@ class Parameters(object):
         self.fss_ss.channel_model           = config.get("FSS_SS", "channel_model")
         self.fss_ss.antenna_l_s             = config.getfloat("FSS_SS", "antenna_l_s")
         self.fss_ss.antenna_3_dB            = config.getfloat("FSS_SS", "antenna_3_dB")
-        self.fss_ss.acs                     = config.getfloat("FSS_SS", "acs")
         self.fss_ss.BOLTZMANN_CONSTANT      = config.getfloat("FSS_SS", "BOLTZMANN_CONSTANT")
         self.fss_ss.EARTH_RADIUS            = config.getfloat("FSS_SS", "EARTH_RADIUS")
 
@@ -199,7 +198,6 @@ class Parameters(object):
         self.fss_es.diameter = config.getfloat("FSS_ES", "diameter")
         self.fss_es.channel_model = config.get("FSS_ES", "channel_model")
         self.fss_es.line_of_sight_prob = config.getfloat("FSS_ES", "line_of_sight_prob")
-        self.fss_es.acs                     = config.getfloat("FSS_ES", "acs")
         self.fss_es.BOLTZMANN_CONSTANT = config.getfloat("FSS_ES", "BOLTZMANN_CONSTANT")
         self.fss_es.EARTH_RADIUS = config.getfloat("FSS_ES", "EARTH_RADIUS")
 
@@ -255,7 +253,6 @@ class Parameters(object):
         self.fs.diameter                = config.getfloat("FS", "diameter")
         self.fs.channel_model           = config.get("FS", "channel_model")
         self.fs.line_of_sight_prob      = config.getfloat("FS", "line_of_sight_prob")
-        self.fs.acs                     = config.getfloat("FS", "acs")
         self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
         self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
         
@@ -277,7 +274,6 @@ class Parameters(object):
         self.ras.antenna_pattern            = config.get("RAS", "antenna_pattern")
         self.ras.diameter                   = config.getfloat("RAS", "diameter")
         self.ras.channel_model              = config.get("RAS", "channel_model")
-        self.ras.acs                        = config.getfloat("FSS_ES", "acs")
         self.ras.line_of_sight_prob         = config.getfloat("RAS", "line_of_sight_prob")
         self.ras.BOLTZMANN_CONSTANT         = config.getfloat("RAS", "BOLTZMANN_CONSTANT")
         self.ras.EARTH_RADIUS               = config.getfloat("RAS", "EARTH_RADIUS")
