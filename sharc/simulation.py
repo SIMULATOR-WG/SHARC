@@ -131,7 +131,8 @@ class Simulation(ABC, Observable):
     def calculate_coupling_loss(self,
                                 station_a: StationManager,
                                 station_b: StationManager,
-                                propagation: Propagation) -> np.array:
+                                propagation: Propagation,
+                                c_channel = True) -> np.array:
         """
         Calculates the path coupling loss from each station_a to all station_b.
         Result is returned as a numpy array with dimensions num_a x num_b
@@ -197,8 +198,8 @@ class Simulation(ABC, Observable):
                                              shadowing=self.parameters.imt.shadowing,
                                              line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
             # define antenna gains
-            gain_a = self.calculate_gains(station_a, station_b)
-            gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+            gain_a = self.calculate_gains(station_a, station_b,c_channel)
+            gain_b = np.transpose(self.calculate_gains(station_b, station_a, c_channel))
 
             # collect IMT BS and UE antenna gain samples
             self.path_loss_imt = path_loss
