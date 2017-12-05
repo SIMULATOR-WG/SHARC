@@ -42,6 +42,10 @@ class SpectralMaskImt(object):
         # Spectral mask in dBc
         self.mask_dbc = self.mask_dbm - p_tx
         
+    def set_power(self, power: float):
+        # Set new transmit power value
+        self.mask_dbm[0] = power
+        self.mask_dbc = self.mask_dbm - p_tx
         
     def power_calc(self,delta_f: float, band: float):
         

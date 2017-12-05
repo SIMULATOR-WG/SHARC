@@ -93,6 +93,9 @@ class SimulationUplink(Simulation):
                 alpha = self.parameters.imt.ue_alfa
                 cl = self.coupling_loss_imt[bs,ue] + self.ue_power_gain
                 self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*cl)
+                if not self.co_channel:
+                    for k in ue:
+                        self.ue.spectral_mask[k].set_power(self.ue.tx_power[k])
 
 
     def calculate_sinr(self):

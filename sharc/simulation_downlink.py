@@ -12,6 +12,7 @@ from sharc.simulation import Simulation
 from sharc.parameters.parameters import Parameters
 from sharc.station_factory import StationFactory
 from sharc.support.enumerations import StationType
+from sharc.spectral_mask_imt import SpectralMaskImt
 
 class SimulationDownlink(Simulation):
     """
@@ -95,6 +96,10 @@ class SimulationDownlink(Simulation):
         # power from bs_1 to ue_2, etc
         bs_active = np.where(self.bs.active)[0]
         self.bs.tx_power = dict([(bs, tx_power*np.ones(self.parameters.imt.ue_k)) for bs in bs_active])
+        if not self.co_channel:
+            for bs in bs_active:
+                self.bs.spectral_mask[bs].set_power(self.bs.tx_power[bs])
+                
 
 
     def calculate_sinr(self):
