@@ -267,7 +267,8 @@ class Simulation(ABC, Observable):
 
     def calculate_gains(self,
                         station_1: StationManager,
-                        station_2: StationManager) -> np.array:
+                        station_2: StationManager,
+                        c_channel = True) -> np.array:
         """
         Calculates the gains of antennas in station_1 in the direction of
         station_2
@@ -309,7 +310,7 @@ class Simulation(ABC, Observable):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]),
-                                                                            co_channel=self.co_channel)
+                                                                            co_channel=c_channel)
         
         elif (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_ES) or \
@@ -319,7 +320,7 @@ class Simulation(ABC, Observable):
                    gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
                                                                             theta_vec=theta[k,station_2_active],
                                                                             beams_l=beams_idx,
-                                                                            co_channel=self.co_channel)
+                                                                            co_channel=c_channel)
         
         elif station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
