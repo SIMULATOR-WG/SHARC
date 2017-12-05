@@ -30,6 +30,7 @@ from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
+from sharc.spectral_mask_imt import SpectralMaskImt
 
 
 class StationFactory(object):
@@ -67,6 +68,9 @@ class StationFactory(object):
             imt_base_stations.antenna[i] = \
             AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
                                   imt_base_stations.elevation[i])
+            imt_base_stations.spectral_mask[i] = \
+            SpectralMaskImt(StationType.IMT_BS,imt_base_stations.tx_power[i],
+                            param.frequency)
 
         #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
@@ -185,6 +189,9 @@ class StationFactory(object):
         for i in range(num_ue):
             imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i],
                                                            imt_ue.elevation[i])
+            imt_ue.spectral_mask[i] = \
+            SpectralMaskImt(StationType.IMT_UE,imt_ue.tx_power[i],
+                            param.frequency)
 
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
