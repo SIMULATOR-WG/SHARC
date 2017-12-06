@@ -28,19 +28,24 @@ class TopologyIndoor(Topology):
             intersite_distance : Distance between two sites
         """
 
-        cell_radius = param.intersite_distance/2
-        super().__init__(param.intersite_distance, cell_radius)
+        # These are the building's width, deep and height
+        # They do not change
+        self.b_w = 120
+        self.b_d = 50
+        self.b_h = 3
+
+        # This value is hard coded because initially this is the only supported
+        # value
+        intersite_distance = 40
+        
+        cell_radius = intersite_distance/2
+        super().__init__(intersite_distance, cell_radius)
         
         self.n_rows = param.n_rows
         self.n_colums = param.n_colums
         self.street_width = param.street_width
         self.ue_outdoor_percent = param.ue_outdoor_percent
         
-        # These are the building's width, deep and height
-        # They do not change
-        self.b_w = 120
-        self.b_d = 50
-        self.b_h = 3
         
         
     def calculate_coordinates(self):

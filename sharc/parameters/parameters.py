@@ -155,7 +155,6 @@ class Parameters(object):
         #######################################################################
         # INDOOR
         #######################################################################
-        self.indoor.intersite_distance = config.getint("INDOOR", "intersite_distance")
         self.indoor.n_rows = config.getint("INDOOR", "n_rows")
         self.indoor.n_colums = config.getint("INDOOR", "n_colums")
         self.indoor.street_width = config.getint("INDOOR", "street_width")
