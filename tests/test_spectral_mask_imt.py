@@ -20,25 +20,28 @@ class SpectalMaskImtTest(unittest.TestCase):
     
         # Create mask
         self.mask1 = SpectralMaskImt(sta_type,p_tx,freq)
-        
+      
     def test_power_calc(self):
         # Test 1
-        df = -10
-        band = 510
-        power = self.mask1.power_calc(df,band)
-        self.assertAlmostEqual(power,35.1322,delta=1e+2)
+        fc = 43000
+        band = 200
+        pib, poob = self.mask1.power_calc(fc,band)
+        self.assertAlmostEqual(pib,25.1,delta=1e-2)
+        self.assertAlmostEqual(poob,-500,delta=1e-2)
         
         # Test 2
-        df = 410
-        band = 10
-        power = self.mask1.power_calc(df,band)
-        self.assertAlmostEqual(power,-2.9999,delta=1e+2)
+        fc = 43300
+        band = 600
+        pib, poob = self.mask1.power_calc(fc,band)
+        self.assertAlmostEqual(pib,22.1,delta=5e-2)
+        self.assertAlmostEqual(poob,11.8003,delta=1e-2)
         
         # Test 3
-        df = -20
-        band = 10
-        power = self.mask1.power_calc(df,band)
-        self.assertAlmostEqual(power,35.1000,delta=1e+2)
+        fc = 43000
+        band = 1200
+        pib, poob = self.mask1.power_calc(fc,band)
+        self.assertAlmostEqual(pib,25.1,delta=5e-2)
+        self.assertAlmostEqual(poob,14.8106,delta=1e-2)
         
 if __name__ == '__main__':
     unittest.main()

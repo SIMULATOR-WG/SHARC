@@ -70,7 +70,7 @@ class StationFactory(object):
                                   imt_base_stations.elevation[i])
             imt_base_stations.spectral_mask[i] = \
             SpectralMaskImt(StationType.IMT_BS,imt_base_stations.tx_power[i],
-                            param.frequency)
+                            param.frequency, band_mhz=param.bandwidth)
 
         #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
@@ -191,7 +191,7 @@ class StationFactory(object):
                                                            imt_ue.elevation[i])
             imt_ue.spectral_mask[i] = \
             SpectralMaskImt(StationType.IMT_UE,imt_ue.tx_power[i],
-                            param.frequency)
+                            param.frequency, band_mhz=param.bandwidth)
 
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
