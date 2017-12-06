@@ -10,6 +10,7 @@ import configparser
 from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_hotspot import ParametersHotspot
+from sharc.parameters.parameters_indoor import ParametersIndoor
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
@@ -29,6 +30,7 @@ class Parameters(object):
         self.imt = ParametersImt()
         self.antenna_imt = ParametersAntennaImt()
         self.hotspot = ParametersHotspot()
+        self.indoor = ParametersIndoor()
         self.fs = ParametersFs()
         self.fss_ss = ParametersFssSs()
         self.fss_es = ParametersFssEs()
@@ -149,6 +151,15 @@ class Parameters(object):
         self.hotspot.max_dist_hotspot_ue   = config.getfloat("HOTSPOT", "max_dist_hotspot_ue")
         self.hotspot.min_dist_bs_hotspot   = config.getfloat("HOTSPOT", "min_dist_bs_hotspot")
         self.hotspot.min_dist_hotspots     = config.getfloat("HOTSPOT", "min_dist_hotspots")
+
+        #######################################################################
+        # INDOOR
+        #######################################################################
+        self.indoor.intersite_distance = config.getint("INDOOR", "intersite_distance")
+        self.indoor.n_rows = config.getint("INDOOR", "n_rows")
+        self.indoor.n_colums = config.getint("INDOOR", "n_colums")
+        self.indoor.street_width = config.getint("INDOOR", "street_width")
+        self.indoor.ue_outdoor_percent = config.getfloat("INDOOR", "ue_outdoor_percent")
 
         #######################################################################
         # FSS space station

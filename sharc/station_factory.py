@@ -77,7 +77,18 @@ class StationFactory(object):
     @staticmethod
     def generate_imt_ue(param: ParametersImt,
                         param_ant: ParametersAntennaImt,
-                        topology: Topology):
+                        topology: Topology) -> StationManager:
+        
+        if param.topology == "INDOOR":
+            return StationFactory.generate_imt_ue_indoor(param, param_ant, topology)
+        else:
+            return StationFactory.generate_imt_ue_outdoor(param, param_ant, topology)
+
+            
+    @staticmethod
+    def generate_imt_ue_outdoor(param: ParametersImt,
+                                param_ant: ParametersAntennaImt,
+                                topology: Topology) -> StationManager:           
         num_bs = topology.num_base_stations
         num_ue_per_bs = param.ue_k*param.ue_k_m
         num_ue = num_bs*num_ue_per_bs
@@ -172,6 +183,97 @@ class StationFactory(object):
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         return imt_ue
 
+        
+    @staticmethod
+    def generate_imt_ue_indoor(param: ParametersImt,
+                               param_ant: ParametersAntennaImt,
+                               topology: Topology) -> StationManager:           
+        num_bs = topology.num_base_stations
+        num_ue_per_bs = param.ue_k*param.ue_k_m
+        num_ue = num_bs*num_ue_per_bs
+
+        imt_ue = StationManager(num_ue)
+        imt_ue.station_type = StationType.IMT_UE
+        ue_x = list()
+        ue_y = list()
+        
+        # initially set all UE's as indoor
+        imt_ue.indoor = np.ones(num_ue, dtype=bool)
+
+        # Calculate UE pointing
+        azimuth_range = (-60, 60)
+        azimuth = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]
+        # Remove the randomness from azimuth and you will have a perfect pointing
+        #azimuth = np.zeros(num_ue)
+        elevation_range = (-90, 90)
+        elevation = (elevation_range[1] - elevation_range[0])*np.random.random(num_ue) + elevation_range[0]
+        
+        delta_x = (topology.b_w/math.sqrt(1 - topology.ue_outdoor_percent) - topology.b_w)/2
+        delta_y = (topology.b_d/math.sqrt(1 - topology.ue_outdoor_percent) - topology.b_d)/2
+
+        for bs in range(num_bs):
+            idx = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]
+            if bs % 3 == 0:
+                x_min = topology.x[bs] - topology.cell_radius - delta_x
+                x_max = topology.x[bs] + topology.cell_radius
+            if bs % 3 == 1:
+                x_min = topology.x[bs] - topology.cell_radius
+                x_max = topology.x[bs] + topology.cell_radius
+            if bs % 3 == 2:
+                x_min = topology.x[bs] - topology.cell_radius
+                x_max = topology.x[bs] + topology.cell_radius + delta_x
+            y_min = topology.y[bs] - topology.b_d/2 - delta_y
+            y_max = topology.y[bs] + topology.b_d/2 + delta_y
+            x = (x_max - x_min)*np.random.random(num_ue_per_bs) + x_min
+            y = (y_max - y_min)*np.random.random(num_ue_per_bs) + y_min
+            ue_x.extend(x)
+            ue_y.extend(y)
+        
+            # theta is the horizontal angle of the UE wrt the serving BS
+            theta = np.degrees(np.arctan2(y - topology.y[bs], x - topology.x[bs]))
+            # calculate UE azimuth wrt serving BS
+            imt_ue.azimuth[idx] = (azimuth[idx] + theta + 180)%360
+
+            # calculate elevation angle
+            # psi is the vertical angle of the UE wrt the serving BS
+            distance = np.sqrt((topology.x[bs] - x)**2 + (topology.y[bs] - y)**2)
+            psi = np.degrees(np.arctan((param.bs_height - param.ue_height)/distance))
+            imt_ue.elevation[idx] = elevation[idx] + psi
+
+            # check if UE is indoor
+            if bs % 3 == 0:
+                out = (x < topology.x[bs] - topology.cell_radius) | \
+                      (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            if bs % 3 == 1:
+                out = (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            if bs % 3 == 2:
+                out = (x > topology.x[bs] + topology.cell_radius) | \
+                      (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            imt_ue.indoor[idx] = ~ out
+                
+        imt_ue.x = np.array(ue_x)
+        imt_ue.y = np.array(ue_y)
+
+        imt_ue.active = np.zeros(num_ue, dtype=bool)
+        imt_ue.height = param.ue_height*np.ones(num_ue)
+        imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
+        imt_ue.rx_interference = -500*np.ones(num_ue)
+        imt_ue.ext_interference = -500*np.ones(num_ue)
+
+        # TODO: this piece of code works only for uplink
+        par = param_ant.get_antenna_parameters("UE","TX")
+        for i in range(num_ue):
+            imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i],
+                                                         imt_ue.elevation[i])
+
+        #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
+        imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
+        imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
+        return imt_ue
+        
 
     @staticmethod
     def generate_system(parameters: Parameters):
