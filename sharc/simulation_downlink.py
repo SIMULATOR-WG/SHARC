@@ -86,7 +86,7 @@ class SimulationDownlink(Simulation):
         # Currently, the maximum transmit power of the base station is equaly
         # divided among the selected UEs
         tx_power = self.parameters.imt.bs_conducted_power + self.bs_power_gain \
-                    - self.parameters.imt.bs_feed_loss - 10*math.log10(self.parameters.imt.ue_k) 
+                    - 10*math.log10(self.parameters.imt.ue_k) 
         # calculate tansmit powers to have a structure such as
         # {bs_1: [pwr_1, pwr_2,...], ...}, where bs_1 is the base station id,
         # pwr_1 is the transmit power from bs_1 to ue_1, pwr_2 is the transmit
