@@ -480,7 +480,8 @@ class SimulationUplinkTest(unittest.TestCase):
                             atol=1e-2)
         
         # Test RAS interference
-        interference = 20 - np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23])- 7 + 10*math.log10(45/100) - 3
+        interference = 20 - np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23])-\
+                       7 + 10*math.log10(45/100) - 3
         rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
@@ -504,6 +505,10 @@ class SimulationUplinkTest(unittest.TestCase):
         
     def test_simulation_2bs_4ue_ras_adjacent(self):
         self.param.general.system = "RAS"
+        self.param.general.compatibility = "ADJACENT"
+               
+        self.param.ras.frequency = 10000
+        self.param.ras.bandwidth = 1000
 
         self.simulation = SimulationUplink(self.param)
         self.simulation.initialize()
@@ -557,10 +562,17 @@ class SimulationUplinkTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
                             np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]), 
                             atol=1e-2)
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system_adjacent, 
+                            np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]), 
+                            atol=1e-2)
         
         # Test RAS interference
-        interference = 20 - np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23])- 7 + 10*math.log10(45/100) - 3
-        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
+        interference = 20 - np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23])- 7 + \
+                       10*math.log10(45/1000) - 3
+        oob_interference = 17.4625 - np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]) + \
+                           10*math.log10(900/1000) - 3
+        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)) + \
+                                        np.sum(np.power(10, 0.1*oob_interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
                                delta=.01)

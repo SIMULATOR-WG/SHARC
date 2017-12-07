@@ -171,6 +171,13 @@ class SimulationUplink(Simulation):
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.ue,
                                                                      self.propagation_system)
+        
+        if not self.co_channel:
+            self.coupling_loss_imt_system_adjacent = self.calculate_coupling_loss(self.system,
+                                                                     self.ue,
+                                                                     self.propagation_system,
+                                                                     c_channel=False)
+        
         # TODO: make it an input parameter
         polarization_loss = 3
         # applying a bandwidth scaling factor since UE transmits on a portion
@@ -189,6 +196,17 @@ class SimulationUplink(Simulation):
                                                 self.parameters.imt.ue_k)
             self.system.rx_interference = 10*math.log10( \
                     math.pow(10, 0.1*self.system.rx_interference) + np.sum(weights*np.power(10, 0.1*interference_ue)))
+            
+            if not self.co_channel:
+                for u in ue:
+                    oob_power = self.ue.spectral_mask[u].power_calc(self.param_system.frequency,self.system.bandwidth)
+                    oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] \
+                                + 10*np.log10((self.param_system.bandwidth - self.parameters.imt.bandwidth)/
+                                              self.param_system.bandwidth) \
+                                - polarization_loss
+                                
+                    self.system.rx_interference = 10*math.log10( \
+                                math.pow(10, 0.1*self.system.rx_interference) + math.pow(10, 0.1*oob_interference))
 
         # calculate N
         self.system.thermal_noise = \
@@ -197,7 +215,7 @@ class SimulationUplink(Simulation):
                           10*math.log10(self.param_system.bandwidth * 1e6)
 
         # calculate INR at the system
-        self.system.inr = np.array(self.system.rx_interference - self.system.thermal_noise)
+        self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
         
         # Calculate PFD at the system
         if self.system.station_type is StationType.RAS:
