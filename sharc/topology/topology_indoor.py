@@ -45,6 +45,7 @@ class TopologyIndoor(Topology):
         self.n_colums = param.n_colums
         self.street_width = param.street_width
         self.ue_outdoor_percent = param.ue_outdoor_percent
+        self.building_class = param.building_class
         
         
         
@@ -119,6 +120,7 @@ if __name__ == '__main__':
     param.n_colums = 2
     param.street_width = 30
     param.ue_outdoor_percent = 0.05
+    param.building_class = "TRADITIONAL"
     topology = TopologyIndoor(param)
     topology.calculate_coordinates()
     
