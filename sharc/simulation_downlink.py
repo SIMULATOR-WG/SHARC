@@ -88,8 +88,9 @@ class SimulationDownlink(Simulation):
         """
         # Currently, the maximum transmit power of the base station is equaly
         # divided among the selected UEs
-        tx_power = self.parameters.imt.bs_conducted_power + self.bs_power_gain \
-                    - self.parameters.imt.bs_feed_loss - 10*math.log10(self.parameters.imt.ue_k)
+        total_power = self.parameters.imt.bs_conducted_power + self.bs_power_gain \
+                    - self.parameters.imt.bs_feed_loss
+        tx_power = total_power - 10*math.log10(self.parameters.imt.ue_k)
         # calculate tansmit powers to have a structure such as
         # {bs_1: [pwr_1, pwr_2,...], ...}, where bs_1 is the base station id,
         # pwr_1 is the transmit power from bs_1 to ue_1, pwr_2 is the transmit
@@ -98,7 +99,7 @@ class SimulationDownlink(Simulation):
         self.bs.tx_power = dict([(bs, tx_power*np.ones(self.parameters.imt.ue_k)) for bs in bs_active])
         if not self.co_channel:
             for bs in bs_active:
-                self.bs.spectral_mask[bs].set_power(self.bs.tx_power[bs])
+                self.bs.spectral_mask[bs].set_power(total_power)
                 
 
 
@@ -167,6 +168,13 @@ class SimulationDownlink(Simulation):
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.bs,
                                                                      self.propagation_system)
+        
+        if not self.co_channel:
+            self.coupling_loss_imt_system_adjacent = self.calculate_coupling_loss(self.system,
+                                                                     self.bs,
+                                                                     self.propagation_system,
+                                                                     c_channel=False)
+        
         # TODO: make it an input parameter
         polarization_loss = 3
         # applying a bandwidth scaling factor since UE transmits on a portion
@@ -183,6 +191,15 @@ class SimulationDownlink(Simulation):
                                                 self.parameters.imt.ue_k)
             self.system.rx_interference = 10*math.log10( \
                     math.pow(10, 0.1*self.system.rx_interference) + np.sum(weights*np.power(10, 0.1*interference)))
+            
+            if not self.co_channel:
+                oob_power = self.bs.spectral_mask[bs].power_calc(self.param_system.frequency,self.system.bandwidth)
+                oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[active_beams[0]] \
+                                + 10*np.log10((self.param_system.bandwidth - self.parameters.imt.bandwidth)/
+                                              self.param_system.bandwidth) \
+                                - polarization_loss
+                self.system.rx_interference = 10*math.log10( \
+                    math.pow(10, 0.1*self.system.rx_interference) + math.pow(10, 0.1*oob_interference))
 
         # calculate N
         self.system.thermal_noise = \

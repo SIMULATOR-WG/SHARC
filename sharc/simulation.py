@@ -58,6 +58,7 @@ class Simulation(ABC, Observable):
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
+        self.coupling_loss_imt_system_adjacent = np.empty(0)
 
         self.bs_to_ue_phi = np.empty(0)
         self.bs_to_ue_theta = np.empty(0)
@@ -84,7 +85,6 @@ class Simulation(ABC, Observable):
         """
         This method is executed only once to initialize the simulation variables.
         """            
-        self.co_channel = (self.parameters.imt.frequency == self.param_system.frequency)
         
         self.topology.calculate_coordinates()
         num_bs = self.topology.num_base_stations

@@ -51,7 +51,7 @@ class SpectralMaskImt(object):
                                           self.spurious_limits])
     
             else: # Dummy spectral mask, for testing purposes only
-                mask_dbm = np.array([-20, -20, -50])
+                mask_dbm = np.array([-10, -20, -50])
                  
         self.mask_dbm = np.concatenate((np.flip(mask_dbm,0),np.array([self.p_tx]),
                                         mask_dbm))
