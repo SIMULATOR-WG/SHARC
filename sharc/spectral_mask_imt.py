@@ -63,7 +63,6 @@ class SpectralMaskImt(object):
         df_max = center_f + band/2
         
         # Power in mW
-        power_ib = np.power(10,-500/10)  # In-band power
         power_oob = np.power(10,-500/10) # Out-of-band power
         
         # Included delta f values
@@ -74,39 +73,32 @@ class SpectralMaskImt(object):
             msk = self.mask_dbm[np.where(self.freq_lim >= df_max)]
             if len(msk) == 0: msk = np.array([self.mask_dbm[-1]])
             pwr_lvl = msk[0]
-            power = band*np.power(10,(pwr_lvl/10))
             
-            if pwr_lvl != self.p_tx: power_oob += power
-            else:                    power_ib  += power
+            if pwr_lvl != self.p_tx: power_oob += band*np.power(10,(pwr_lvl/10))
             
         else:
             
             pwr_lvl_1 = self.mask_dbm[inc_df[0]]
             pwr_lvl_2 = self.mask_dbm[inc_df[-1] + 1]
-            
-            power_1 = (self.freq_lim[inc_df[0]] - df_min)*\
+                    
+            if pwr_lvl_1 != self.p_tx: 
+                power_oob += (self.freq_lim[inc_df[0]] - df_min)*\
                     np.power(10,(pwr_lvl_1/10))
                     
-            if pwr_lvl_1 != self.p_tx: power_oob += power_1
-            else:                      power_ib  += power_1
-            
-            power_2 = (df_max - self.freq_lim[inc_df[-1]])*\
+            if pwr_lvl_2 != self.p_tx: 
+                power_oob += (df_max - self.freq_lim[inc_df[-1]])*\
                     np.power(10,(pwr_lvl_2/10))
-                    
-            if pwr_lvl_2 != self.p_tx: power_oob += power_2
-            else:                      power_ib  += power_2
                 
             for df in inc_df[0:-1]:
                 
                 pwr_lvl = self.mask_dbm[df + 1]
-                power = (self.freq_lim[df + 1] - self.freq_lim[df])*\
-                          np.power(10,(pwr_lvl/10))
                 
-                if pwr_lvl != self.p_tx: power_oob += power
-                else:                    power_ib  += power
+                if pwr_lvl != self.p_tx: 
+                    power_oob += (self.freq_lim[df + 1] - self.freq_lim[df])*\
+                          np.power(10,(pwr_lvl/10))
                     
                     
-        return 10*np.log10(power_ib), 10*np.log10(power_oob)
+        return 10*np.log10(power_oob)
         
             
         

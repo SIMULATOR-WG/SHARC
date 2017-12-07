@@ -25,22 +25,19 @@ class SpectalMaskImtTest(unittest.TestCase):
         # Test 1
         fc = 43000
         band = 200
-        pib, poob = self.mask1.power_calc(fc,band)
-        self.assertAlmostEqual(pib,25.1,delta=1e-2)
+        poob = self.mask1.power_calc(fc,band)
         self.assertAlmostEqual(poob,-500,delta=1e-2)
         
         # Test 2
         fc = 43300
         band = 600
-        pib, poob = self.mask1.power_calc(fc,band)
-        self.assertAlmostEqual(pib,22.1,delta=5e-2)
+        poob = self.mask1.power_calc(fc,band)
         self.assertAlmostEqual(poob,11.8003,delta=1e-2)
         
         # Test 3
         fc = 43000
         band = 1200
-        pib, poob = self.mask1.power_calc(fc,band)
-        self.assertAlmostEqual(pib,25.1,delta=5e-2)
+        poob = self.mask1.power_calc(fc,band)
         self.assertAlmostEqual(poob,14.8106,delta=1e-2)
         
 if __name__ == '__main__':
