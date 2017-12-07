@@ -108,7 +108,7 @@ class SimulationUplink(Simulation):
             ue = self.link[bs]
             self.bs.rx_power[bs] = self.ue.tx_power[ue]  \
                                         - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
-                                        - self.coupling_loss_imt[bs,ue] - self.parameters.imt.bs_feed_loss
+                                        - self.coupling_loss_imt[bs,ue]
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]
 
@@ -117,7 +117,7 @@ class SimulationUplink(Simulation):
                 ui = self.link[bi]
                 interference = self.ue.tx_power[ui] \
                                 - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
-                                - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_feed_loss
+                                - self.coupling_loss_imt[bs,ui]
                 self.bs.rx_interference[bs] = 10*np.log10( \
                     np.power(10, 0.1*self.bs.rx_interference[bs])
                     + np.power(10, 0.1*interference))
@@ -187,7 +187,7 @@ class SimulationUplink(Simulation):
         for bs in bs_active:
             ue = self.link[bs]
             interference_ue = self.ue.tx_power[ue] \
-                                - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
+                                - self.parameters.imt.ue_body_loss \
                                 - self.coupling_loss_imt_system[ue] \
                                 + 10*np.log10(self.ue.bandwidth[ue]/self.param_system.bandwidth) \
                                 - polarization_loss
