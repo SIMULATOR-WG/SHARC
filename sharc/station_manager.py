@@ -94,6 +94,28 @@ class StationManager(object):
                             np.power(self.height[i] - station.height, 2))
         return distance
 
+    def get_elevation_angles(self, station) -> np.array:
+        """
+        Calculates the elevation angle between stations. Can be used for
+        IMT stations.
+        
+        TODO: this implementation is essentialy the same as the one from 
+              get_elevation_angle (free-space elevation angle), despite the
+              different matrix dimentions. So, the methods should be merged 
+              in order to reuse the source code
+        """
+
+        elevation = np.empty([self.num_stations, station.num_stations])
+
+        for i in range(self.num_stations):
+            distance = np.sqrt(np.power(self.x[i] - station.x, 2) +
+                           np.power(self.y[i] - station.y, 2))
+            rel_z = station.height - self.height[i]
+            elevation[i] = np.degrees(np.arctan2(rel_z, distance))
+            
+        return elevation
+        
+        
     def get_elevation_angle(self, station, sat_params) -> dict:
         free_space_angle = np.empty(self.num_stations)
         angle = np.empty(self.num_stations)

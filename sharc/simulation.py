@@ -141,6 +141,10 @@ class Simulation(ABC, Observable):
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.HAPS:
             elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
+        elif station_a.station_type is StationType.IMT_BS and \
+             station_b.station_type is StationType.IMT_UE and \
+             self.parameters.imt.topology == "INDOOR":
+            elevation_angles = station_b.get_elevation_angles(station_a)
         else:
             elevation_angles = None
 
