@@ -68,7 +68,7 @@ class PropagationUMi(Propagation):
             loss[i_los] = loss_los[i_los]
 
         if len(i_nlos[0]):
-            loss_nlos = self.get_loss_los(d_2D, d_3D, f, h_bs, h_ue, h_e, shadowing_nlos)
+            loss_nlos = self.get_loss_nlos(d_2D, d_3D, f, h_bs, h_ue, h_e, shadowing_nlos)
             loss[i_nlos] = loss_nlos[i_nlos]
         
         return loss
