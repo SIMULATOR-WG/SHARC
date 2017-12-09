@@ -41,7 +41,7 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.imt.bs_acs = 30
         self.param.imt.bs_noise_figure = 7
         self.param.imt.bs_noise_temperature = 290
-        self.param.imt.bs_feed_loss = 3
+        self.param.imt.bs_ohmic_loss = 3
         self.param.imt.ul_attenuation_factor = 0.4
         self.param.imt.ul_sinr_min = -10
         self.param.imt.ul_sinr_max = 22
@@ -59,7 +59,7 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.imt.ue_aclr = 35
         self.param.imt.ue_acs = 25
         self.param.imt.ue_noise_figure = 9
-        self.param.imt.ue_feed_loss = 3
+        self.param.imt.ue_ohmic_loss = 3
         self.param.imt.ue_body_loss = 4
         self.param.imt.dl_attenuation_factor = 0.6
         self.param.imt.dl_sinr_min = -10
@@ -168,37 +168,53 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         bandwidth_per_ue = math.trunc((1 - 0.1)*100/2) 
         thermal_noise = 10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9
         
-        p_tx = 10 - 10*math.log10(2)
-        npt.assert_allclose(self.simulation.bs.tx_power[0], np.array([p_tx, p_tx]), atol=1e-2)
-        npt.assert_allclose(self.simulation.bs.tx_power[1], np.array([p_tx, p_tx]), atol=1e-2)
+        tx_power = 10 - 10*math.log10(2)
+        npt.assert_allclose(self.simulation.bs.tx_power[0], np.array([tx_power, tx_power]), atol=1e-2)
+        npt.assert_allclose(self.simulation.bs.tx_power[1], np.array([tx_power, tx_power]), atol=1e-2)
         
         # check UE received power
-        npt.assert_allclose(self.simulation.ue.rx_power, 
-                            np.array([p_tx-(78.47-1-10)-4-3, p_tx-(89.35-1-11)-4-3, p_tx-(91.53-2-22)-4-3, p_tx-(81.99-2-23)-4-3]),
-                            atol=1e-2)
+        rx_power = np.array([tx_power-3-(78.47-1-10)-4-3, tx_power-3-(89.35-1-11)-4-3, tx_power-3-(91.53-2-22)-4-3, tx_power-3-(81.99-2-23)-4-3])
+        npt.assert_allclose(self.simulation.ue.rx_power, rx_power, atol=1e-2)
+        
+        # check UE received interference
+        rx_interference = np.array([tx_power-3-(97.55-2-10)-4-3,  tx_power-3-(94.72-2-11)-4-3, tx_power-3-(93.27-1-22)-4-3, tx_power-3-(97.05-1-23)-4-3])
+        npt.assert_allclose(self.simulation.ue.rx_interference, rx_interference, atol=1e-2)
+        
+        # check UE thermal noise
+        thermal_noise = 10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9
+        npt.assert_allclose(self.simulation.ue.thermal_noise, thermal_noise, atol=1e-2)
+
+        # check UE thermal noise + interference
+        total_interference = 10*np.log10(np.power(10, 0.1*rx_interference) + np.power(10, 0.1*thermal_noise))
+        npt.assert_allclose(self.simulation.ue.total_interference, total_interference, atol=1e-2)
 
         self.simulation.system = StationFactory.generate_haps(self.param.haps, 0)
         
         # now we evaluate interference from HAPS to IMT UE
         self.simulation.calculate_sinr_ext()
+        
+        # check coupling loss between FSS_ES and IMT_UE
+        coupling_loss_imt_system = np.array([138.47-28-10,  138.47-28-11,  138.47-28-22,  138.47-28-23])
         npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
-                            np.array([138.47-28-10,  138.47-28-11,  138.47-28-22,  138.47-28-23]), 
-                            atol=1e-2)
+                            coupling_loss_imt_system, 
+                            atol=1e-2)        
 
         system_tx_power = (4.4 - 28 - 60) + 10*math.log10(bandwidth_per_ue*1e6) + 30
+
+        ext_interference = system_tx_power - coupling_loss_imt_system - 3 - 4
         npt.assert_allclose(self.simulation.ue.ext_interference, 
-                            np.array([system_tx_power - (138.47-28-10) - 7,  system_tx_power - (138.47-28-11) - 7,  system_tx_power - (138.47-28-22) - 7,  system_tx_power - (138.47-28-23) - 7]), 
+                            ext_interference, 
                             atol=1e-2)
-        
-        interference = 10*np.log10(np.power(10, 0.1*np.array([ -83.76, -80.89, -70.22, -72.94 ])) \
-                                 + np.power(10, 0.1*np.array([ -84.53, -83.53, -72.53, -71.53 ])))
+
+        ext_interference_total = 10*np.log10(np.power(10, 0.1*total_interference) \
+                                           + np.power(10, 0.1*ext_interference))
         
         npt.assert_allclose(self.simulation.ue.sinr_ext, 
-                            np.array([-67.48, -77.36, -67.54, -57.00]) - interference, 
+                            rx_power - ext_interference_total, 
                             atol=1e-2)       
         
         npt.assert_allclose(self.simulation.ue.inr, 
-                            np.array([-84.53, -83.53, -72.53, -71.53]) - thermal_noise, 
+                            ext_interference - thermal_noise, 
                             atol=1e-2)
     
         

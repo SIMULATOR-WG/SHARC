@@ -64,15 +64,7 @@ class PropagationABG(Propagation):
         if "gamma" in kwargs:
             self.gamma = kwargs["gamma"]
             
-        if "shadowing" in kwargs:
-            std = kwargs["shadowing"] 
-        else:
-            std = False
-    
-        if std:
-            shadowing = np.random.normal(0, self.shadowing_sigma_dB, d.shape)
-        else:
-            shadowing = 0
+        shadowing = 0
             
         building_loss = self.building_loss*indoor_stations
         
