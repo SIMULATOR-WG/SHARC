@@ -71,7 +71,7 @@ class Parameters(object):
         self.imt.bs_acs                  = config.getfloat("IMT", "bs_acs")
         self.imt.bs_noise_figure         = config.getfloat("IMT", "bs_noise_figure")
         self.imt.bs_noise_temperature    = config.getfloat("IMT", "bs_noise_temperature")
-        self.imt.bs_feed_loss            = config.getfloat("IMT", "bs_feed_loss")
+        self.imt.bs_ohmic_loss           = config.getfloat("IMT", "bs_ohmic_loss")
         self.imt.ul_attenuation_factor   = config.getfloat("IMT", "ul_attenuation_factor")
         self.imt.ul_sinr_min             = config.getfloat("IMT", "ul_sinr_min")
         self.imt.ul_sinr_max             = config.getfloat("IMT", "ul_sinr_max")

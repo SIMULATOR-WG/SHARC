@@ -100,24 +100,24 @@ class SimulationUplink(Simulation):
 
     def calculate_sinr(self):
         """
-        Calculates the uplink SINR for each UE.
+        Calculates the uplink SINR for each BS.
         """
         # calculate uplink received power for each active BS
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
             self.bs.rx_power[bs] = self.ue.tx_power[ue]  \
-                                        - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
-                                        - self.coupling_loss_imt[bs,ue]
+                                        - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_ohmic_loss \
+                                        - self.coupling_loss_imt[bs,ue] - self.parameters.imt.bs_ohmic_loss
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]
 
             # calculate intra system interference
             for bi in bs_interf:
                 ui = self.link[bi]
-                interference = self.ue.tx_power[ui] \
+                interference = self.ue.tx_power[ui] - self.parameters.imt.ue_ohmic_loss  \
                                 - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
-                                - self.coupling_loss_imt[bs,ui]
+                                - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_ohmic_loss
                 self.bs.rx_interference[bs] = 10*np.log10( \
                     np.power(10, 0.1*self.bs.rx_interference[bs])
                     + np.power(10, 0.1*interference))
@@ -156,7 +156,7 @@ class SimulationUplink(Simulation):
         for bs in bs_active:
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
             self.bs.ext_interference[bs] = tx_power[bs] - self.coupling_loss_imt_system[active_beams] \
-                                            - self.parameters.imt.bs_feed_loss - polarization_loss
+                                            - self.parameters.imt.bs_ohmic_loss - polarization_loss
 
             self.bs.sinr_ext[bs] = self.bs.rx_power[bs] \
                 - (10*np.log10(np.power(10, 0.1*self.bs.total_interference[bs]) + np.power(10, 0.1*self.bs.ext_interference[bs])))
@@ -186,11 +186,9 @@ class SimulationUplink(Simulation):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
-            interference_ue = self.ue.tx_power[ue] \
+            interference_ue = self.ue.tx_power[ue] - self.parameters.imt.ue_ohmic_loss \
                                 - self.parameters.imt.ue_body_loss \
-                                - self.coupling_loss_imt_system[ue] \
-                                + 10*np.log10(self.ue.bandwidth[ue]/self.param_system.bandwidth) \
-                                - polarization_loss
+                                - self.coupling_loss_imt_system[ue]
             weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
                                                 self.param_system.bandwidth,
                                                 self.parameters.imt.ue_k)
@@ -200,10 +198,9 @@ class SimulationUplink(Simulation):
             if not self.co_channel:
                 for u in ue:
                     oob_power = self.ue.spectral_mask[u].power_calc(self.param_system.frequency,self.system.bandwidth)
-                    oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] \
-                                + 10*np.log10((self.param_system.bandwidth - self.parameters.imt.bandwidth)/
-                                              self.param_system.bandwidth) \
-                                - polarization_loss
+                    oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] -\
+                                       self.parameters.imt.ue_ohmic_loss - \
+                                       self.parameters.imt.ue_body_loss
                                 
                     self.system.rx_interference = 10*math.log10( \
                                 math.pow(10, 0.1*self.system.rx_interference) + math.pow(10, 0.1*oob_interference))
