@@ -198,9 +198,11 @@ class SimulationUplink(Simulation):
             if not self.co_channel:
                 for u in ue:
                     oob_power = self.ue.spectral_mask[u].power_calc(self.param_system.frequency,self.system.bandwidth)
-                    oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] -\
-                                       self.parameters.imt.ue_ohmic_loss - \
-                                       self.parameters.imt.ue_body_loss
+                    oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] \
+                                        + 10*np.log10((self.param_system.bandwidth - self.parameters.imt.bandwidth)/
+                                              self.param_system.bandwidth) \
+                                        - self.parameters.imt.ue_ohmic_loss \
+                                        - self.parameters.imt.ue_body_loss
                                 
                     self.system.rx_interference = 10*math.log10( \
                                 math.pow(10, 0.1*self.system.rx_interference) + math.pow(10, 0.1*oob_interference))

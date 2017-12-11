@@ -197,6 +197,8 @@ class SimulationDownlink(Simulation):
             if not self.co_channel:
                 oob_power = self.bs.spectral_mask[bs].power_calc(self.param_system.frequency,self.system.bandwidth)
                 oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[active_beams[0]] \
+                                + 10*np.log10((self.param_system.bandwidth - self.parameters.imt.bandwidth)/
+                                              self.param_system.bandwidth) \
                                 - self.parameters.imt.bs_ohmic_loss
                 self.system.rx_interference = 10*math.log10( \
                     math.pow(10, 0.1*self.system.rx_interference) + math.pow(10, 0.1*oob_interference))
