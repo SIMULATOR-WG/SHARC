@@ -70,7 +70,7 @@ class PropagationUMa(Propagation):
             loss[i_los] = loss_los[i_los]
 
         if len(i_nlos[0]):
-            loss_nlos = self.get_loss_los(d_2D, d_3D, f, h_bs, h_ue, h_e, shadowing_nlos)
+            loss_nlos = self.get_loss_nlos(d_2D, d_3D, f, h_bs, h_ue, h_e, shadowing_nlos)
             loss[i_nlos] = loss_nlos[i_nlos]
         
         return loss
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     
     loss_los = uma.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     loss_nlos = uma.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
-    loss_fs = PropagationFreeSpace().get_loss(distance=distance_2D, frequency=freq)
+    loss_fs = PropagationFreeSpace().get_loss(distance_2D=distance_2D, frequency=freq)
     
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()
