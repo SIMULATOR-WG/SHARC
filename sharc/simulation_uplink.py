@@ -107,7 +107,7 @@ class SimulationUplink(Simulation):
         for bs in bs_active:
             ue = self.link[bs]
             self.bs.rx_power[bs] = self.ue.tx_power[ue]  \
-                                        - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_ohmic_loss \
+                                        - self.parameters.imt.ue_ohmic_loss \
                                         - self.coupling_loss_imt[bs,ue] - self.parameters.imt.bs_ohmic_loss
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]

@@ -334,7 +334,7 @@ class Results(object):
             file_name = title
             #x_limits = (0, 800)
             #y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))
+#            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))
         if len(self.system_pfd) > 0:
             values, base = np.histogram(self.system_pfd, bins=n_bins)
             cumulative = np.cumsum(values)
