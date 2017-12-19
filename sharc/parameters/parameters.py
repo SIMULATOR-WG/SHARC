@@ -155,10 +155,11 @@ class Parameters(object):
         #######################################################################
         # INDOOR
         #######################################################################
+        self.indoor.basic_path_loss = config.get("INDOOR", "basic_path_loss")
         self.indoor.n_rows = config.getint("INDOOR", "n_rows")
         self.indoor.n_colums = config.getint("INDOOR", "n_colums")
         self.indoor.street_width = config.getint("INDOOR", "street_width")
-        self.indoor.ue_outdoor_percent = config.getfloat("INDOOR", "ue_outdoor_percent")
+        self.indoor.ue_indoor_percent = config.getfloat("INDOOR", "ue_indoor_percent")
         self.indoor.building_class = config.get("INDOOR", "building_class")
 
         #######################################################################
