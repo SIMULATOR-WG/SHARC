@@ -19,8 +19,8 @@ class PropagationBuildingEntryLoss(Propagation):
     def __init__(self):
         super().__init__()
 
-    def get_loss(self, frequency_MHz, elevation, prob="random",
-                 building_class="traditional", test = False) -> np.array:
+    def get_loss(self, frequency_MHz, elevation, prob="RANDOM",
+                 building_class="TRADITIONAL", test = False) -> np.array:
         """
         Calculates building loss
 
@@ -29,8 +29,8 @@ class PropagationBuildingEntryLoss(Propagation):
             frequency_MHz (np.array) : carrier frequencies (MHz)
             elevation (np.array) : apparent elevation angles
             prob (np.array / string) : the probability with which the loss is not exceeded;
-                                    if "random", then different values are chosen for each user
-            building_class (string) : type of construction material, "traditional" or "thermally-efficient"
+                                    if "RANDOM", then different values are chosen for each user
+            building_class (string) : type of construction material, "TRADITIONAL" or "THERMALLY_EFFICIENT"
             test (bool): True if only mu_1 is returned, for testing purposes (default False)
 
         Returns
@@ -40,10 +40,10 @@ class PropagationBuildingEntryLoss(Propagation):
 
         f_GHz = frequency_MHz / 1000
 
-        if isinstance(prob, str) and prob.lower() == "random":
+        if isinstance(prob, str) and prob.upper() == "RANDOM":
             prob = np.random.random(elevation.shape)
 
-        if building_class == "traditional":
+        if building_class == "TRADITIONAL":
             r = 12.64
             s = 3.72
             t = .96
@@ -53,7 +53,7 @@ class PropagationBuildingEntryLoss(Propagation):
             x = -3.
             y = 4.5
             z = -2.
-        elif building_class == "thermally-efficient":
+        elif building_class == "THERMALLY_EFFICIENT":
             r = 28.19
             s = -3.
             t = 8.48
@@ -100,11 +100,11 @@ if __name__ == '__main__':
     # Plot median BLE mu_1, for comparison with ITU-R P2109-0
     plt.figure()
     median_loss_traditional = entry_loss.get_loss( freq_MHz, 0, prob=.5,
-                                                   building_class="traditional", test=True)
+                                                   building_class="TRADITIONAL", test=True)
     median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 0, prob=.5,
-                                                building_class="thermally-efficient", test=True)
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="traditional, 0deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="thermally-efficient, 0deg")
+                                                building_class="THERMALLY_EFFICIENT", test=True)
+    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 0deg")
+    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 0deg")
 
     plt.legend(title="Building Type, elevation")
     plt.grid()
@@ -118,30 +118,30 @@ if __name__ == '__main__':
     # 0 degrees
     plt.figure()
     median_loss_traditional = entry_loss.get_loss( freq_MHz, 0, prob=.5,
-                                                   building_class="traditional")
+                                                   building_class="TRADITIONAL")
     median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 0, prob=.5,
-                                                building_class="thermally-efficient")
+                                                building_class="THERMALLY_EFFICIENT")
 
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="traditional, 0deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="thermally-efficient, 0deg")
+    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 0deg")
+    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 0deg")
 
     # 45 degrees
     median_loss_traditional = entry_loss.get_loss( freq_MHz, 45, prob=.5,
-                                                   building_class="traditional")
+                                                   building_class="TRADITIONAL")
     median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 45, prob=.5,
-                                                building_class="thermally-efficient")
+                                                building_class="THERMALLY_EFFICIENT")
 
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="traditional, 45deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="thermally-efficient, 45deg")
+    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 45deg")
+    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 45deg")
 
     # 90 deg
     median_loss_traditional = entry_loss.get_loss( freq_MHz, 90, prob=.5,
-                                                   building_class="traditional")
+                                                   building_class="TRADITIONAL")
     median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 90, prob=.5,
-                                                building_class="thermally-efficient")
+                                                building_class="THERMALLY_EFFICIENT")
 
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="traditional, 90deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="thermally-efficient, 90deg")
+    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 90deg")
+    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 90deg")
 
     plt.legend(title="Building Type, elevation")
     plt.grid()
