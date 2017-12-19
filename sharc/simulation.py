@@ -42,8 +42,8 @@ class Simulation(ABC, Observable):
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 
-        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)
-        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
+        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model, self.parameters)
+        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model, self.parameters)
 
         self.bs_power_gain = 0
         self.ue_power_gain = 0
@@ -144,7 +144,7 @@ class Simulation(ABC, Observable):
         elif station_a.station_type is StationType.IMT_BS and \
              station_b.station_type is StationType.IMT_UE and \
              self.parameters.imt.topology == "INDOOR":
-            elevation_angles = station_b.get_elevation_angles(station_a)
+            elevation_angles = np.transpose(station_b.get_elevation(station_a))
         else:
             elevation_angles = None
 
@@ -196,6 +196,7 @@ class Simulation(ABC, Observable):
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              bs_height=station_a.height,
                                              ue_height=station_b.height,
+                                             elevation=elevation_angles,
                                              shadowing=self.parameters.imt.shadowing,
                                              line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
             # define antenna gains
