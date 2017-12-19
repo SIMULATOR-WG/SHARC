@@ -208,8 +208,8 @@ class StationFactory(object):
         elevation_range = (-90, 90)
         elevation = (elevation_range[1] - elevation_range[0])*np.random.random(num_ue) + elevation_range[0]
         
-        delta_x = (topology.b_w/math.sqrt(1 - topology.ue_outdoor_percent) - topology.b_w)/2
-        delta_y = (topology.b_d/math.sqrt(1 - topology.ue_outdoor_percent) - topology.b_d)/2
+        delta_x = (topology.b_w/math.sqrt(topology.ue_indoor_percent) - topology.b_w)/2
+        delta_y = (topology.b_d/math.sqrt(topology.ue_indoor_percent) - topology.b_d)/2
 
         for bs in range(num_bs):
             idx = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]

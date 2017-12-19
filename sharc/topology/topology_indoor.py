@@ -25,7 +25,7 @@ class TopologyIndoor(Topology):
         
         Parameters
         ----------
-            intersite_distance : Distance between two sites
+            param : parameters of the indoor topology
         """
 
         # These are the building's width, deep and height
@@ -44,7 +44,7 @@ class TopologyIndoor(Topology):
         self.n_rows = param.n_rows
         self.n_colums = param.n_colums
         self.street_width = param.street_width
-        self.ue_outdoor_percent = param.ue_outdoor_percent
+        self.ue_indoor_percent = param.ue_indoor_percent
         self.building_class = param.building_class
         
         
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     param.n_rows = 4
     param.n_colums = 2
     param.street_width = 30
-    param.ue_outdoor_percent = 0.05
+    param.ue_indoor_percent = 0.95
     param.building_class = "TRADITIONAL"
     topology = TopologyIndoor(param)
     topology.calculate_coordinates()
