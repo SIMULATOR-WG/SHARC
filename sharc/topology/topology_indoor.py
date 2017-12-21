@@ -72,6 +72,7 @@ class TopologyIndoor(Topology):
 
             self.azimuth = np.zeros(self.num_base_stations)
             self.elevation = -90*np.ones(self.num_base_stations)
+            self.indoor = np.ones(self.num_base_stations, dtype = bool)
                 
             
     def plot(self, ax: matplotlib.axes.Axes):

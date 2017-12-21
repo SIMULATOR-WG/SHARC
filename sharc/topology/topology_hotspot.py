@@ -106,6 +106,7 @@ class TopologyHotspot(Topology):
         self.elevation = self.ELEVATION*np.ones(len(self.x))
         # In the end, we have to update the number of base stations
         self.num_base_stations = len(self.x)
+        self.indoor = np.zeros(self.num_base_stations, dtype = bool)
 
 
     def overlapping_hotspots(self,
