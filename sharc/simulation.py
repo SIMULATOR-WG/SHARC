@@ -39,11 +39,13 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.fs
         elif self.parameters.general.system == "HAPS":
             self.param_system = self.parameters.haps
+        elif self.parameters.general.system == "RNS":
+            self.param_system = self.parameters.rns            
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 
-        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)
-        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
+        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model, self.parameters)
+        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model, self.parameters)
 
         self.bs_power_gain = 0
         self.ue_power_gain = 0
@@ -139,19 +141,21 @@ class Simulation(ABC, Observable):
         d_3D = station_a.get_3d_distance_to(station_b)
 
         if station_a.station_type is StationType.FSS_SS or \
-           station_a.station_type is StationType.HAPS:
+           station_a.station_type is StationType.HAPS or \
+           station_a.station_type is StationType.RNS:
             elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
         elif station_a.station_type is StationType.IMT_BS and \
              station_b.station_type is StationType.IMT_UE and \
              self.parameters.imt.topology == "INDOOR":
-            elevation_angles = station_b.get_elevation_angles(station_a)
+            elevation_angles = np.transpose(station_b.get_elevation(station_a))
         else:
             elevation_angles = None
 
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.FSS_ES or \
            station_a.station_type is StationType.HAPS or \
-           station_a.station_type is StationType.FS:
+           station_a.station_type is StationType.FS or \
+           station_a.station_type is StationType.RNS:
 
             if station_b.station_type is StationType.IMT_UE:
                 # define antenna gains
@@ -173,7 +177,8 @@ class Simulation(ABC, Observable):
                 single_entry = False
 
             if station_a.station_type is StationType.FSS_SS or \
-               station_a.station_type is StationType.HAPS:
+               station_a.station_type is StationType.HAPS or \
+               station_a.station_type is StationType.RNS:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                              frequency=self.param_system.frequency*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
@@ -196,6 +201,7 @@ class Simulation(ABC, Observable):
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              bs_height=station_a.height,
                                              ue_height=station_b.height,
+                                             elevation=elevation_angles,
                                              shadowing=self.parameters.imt.shadowing,
                                              line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
             # define antenna gains
@@ -285,7 +291,8 @@ class Simulation(ABC, Observable):
             elif(station_2.station_type is StationType.FSS_SS or \
                  station_2.station_type is StationType.FSS_ES or \
                  station_2.station_type is StationType.HAPS or \
-                 station_2.station_type is StationType.FS):
+                 station_2.station_type is StationType.FS or \
+                 station_2.station_type is StationType.RNS):
                 phi = np.repeat(phi,self.parameters.imt.ue_k,0)
                 theta = np.repeat(theta,self.parameters.imt.ue_k,0)
                 beams_idx = np.tile(np.arange(self.parameters.imt.ue_k),self.bs.num_stations)
@@ -296,7 +303,8 @@ class Simulation(ABC, Observable):
         elif(station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
              station_1.station_type is StationType.HAPS or \
-             station_1.station_type is StationType.FS):
+             station_1.station_type is StationType.FS or \
+             station_1.station_type is StationType.RNS):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
 
         gains = np.zeros(phi.shape)
@@ -304,12 +312,17 @@ class Simulation(ABC, Observable):
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.HAPS) or \
-           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS):
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.RNS):
             for k in station_1_active:
                 for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
                     gains[b,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[b,station_2_active],
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]))
+        elif station_1.station_type is StationType.RNS:
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec = phi[0,station_2_active],
+                                                                            theta_vec = theta[0,station_2_active])            
+                    
         elif station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
              station_1.station_type is StationType.HAPS or \

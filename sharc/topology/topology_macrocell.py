@@ -80,7 +80,8 @@ class TopologyMacrocell(Topology):
             self.elevation = np.tile(self.ELEVATION, 3*19*self.num_clusters)
             
             # In the end, we have to update the number of base stations
-            self.num_base_stations = len(self.x)        
+            self.num_base_stations = len(self.x)
+            self.indoor = np.zeros(self.num_base_stations, dtype = bool)
                 
             
     def plot(self, ax: matplotlib.axes.Axes):

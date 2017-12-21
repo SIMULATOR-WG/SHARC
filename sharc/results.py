@@ -319,7 +319,7 @@ class Results(object):
             x_label = "INR [dB]"
             y_label = "Probability of INR < $X$"
             file_name = title
-            x_limits = (-80, -20)
+            x_limits = (-80, 30)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
             ###################################################################

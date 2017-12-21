@@ -94,7 +94,7 @@ class StationManager(object):
                             np.power(self.height[i] - station.height, 2))
         return distance
 
-    def get_elevation_angles(self, station) -> np.array:
+    def get_elevation(self, station) -> np.array:
         """
         Calculates the elevation angle between stations. Can be used for
         IMT stations.
