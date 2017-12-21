@@ -16,6 +16,7 @@ from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.parameters.parameters_haps import ParametersHaps
+from sharc.parameters.parameters_rns import ParametersRns
 
 
 class Parameters(object):
@@ -35,6 +36,7 @@ class Parameters(object):
         self.fss_ss = ParametersFssSs()
         self.fss_es = ParametersFssEs()
         self.haps = ParametersHaps()
+        self.rns = ParametersRns()
 
 
     def set_file_name(self, file_name: str):
@@ -250,3 +252,24 @@ class Parameters(object):
         self.haps.antenna_l_n             = config.getfloat("HAPS", "antenna_l_n")
         self.haps.BOLTZMANN_CONSTANT      = config.getfloat("HAPS", "BOLTZMANN_CONSTANT")
         self.haps.EARTH_RADIUS            = config.getfloat("HAPS", "EARTH_RADIUS")
+        
+        #######################################################################
+        # RNS
+        #######################################################################
+        self.rns.x                  = config.getfloat("RNS", "x")
+        self.rns.y                  = config.getfloat("RNS", "y")
+        self.rns.altitude           = config.getfloat("RNS", "altitude")
+        self.rns.frequency          = config.getfloat("RNS", "frequency")
+        self.rns.bandwidth          = config.getfloat("RNS", "bandwidth")
+        self.rns.noise_temperature  = config.getfloat("RNS", "noise_temperature")
+        self.rns.inr_scaling        = config.getfloat("RNS", "inr_scaling")
+        self.rns.tx_power_density   = config.getfloat("RNS", "tx_power_density")
+        self.rns.antenna_gain       = config.getfloat("RNS", "antenna_gain")
+        self.rns.antenna_pattern    = config.get("RNS", "antenna_pattern")
+        self.rns.season             = config.get("RNS", "season")
+        self.rns.imt_altitude       = config.getfloat("RNS", "imt_altitude")
+        self.rns.imt_lat_deg        = config.getfloat("RNS", "imt_lat_deg")
+        self.rns.channel_model      = config.get("RNS", "channel_model")
+        self.rns.BOLTZMANN_CONSTANT = config.getfloat("RNS", "BOLTZMANN_CONSTANT")
+        self.rns.EARTH_RADIUS       = config.getfloat("RNS", "EARTH_RADIUS")        
+        

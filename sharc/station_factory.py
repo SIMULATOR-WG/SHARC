@@ -17,12 +17,14 @@ from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.parameters.parameters_haps import ParametersHaps
+from sharc.parameters.parameters_rns import ParametersRns
 from sharc.station_manager import StationManager
 from sharc.antenna.antenna import Antenna
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_f699 import AntennaF699
 from sharc.antenna.antenna_f1891 import AntennaF1891
+from sharc.antenna.antenna_m1466 import AntennaM1466
 from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_s580 import AntennaS580
 from sharc.antenna.antenna_s672 import AntennaS672
@@ -46,7 +48,7 @@ class StationFactory(object):
         imt_base_stations.azimuth = topology.azimuth
         imt_base_stations.elevation = topology.elevation
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
-        imt_base_stations.indoor = np.zeros(num_bs, dtype=bool)
+        imt_base_stations.indoor = topology.indoor
         imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
         imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
@@ -285,6 +287,8 @@ class StationFactory(object):
             return StationFactory.generate_fs_station(parameters.fs)
         elif parameters.general.system == "HAPS":
             return StationFactory.generate_haps(parameters.haps, parameters.imt.intersite_distance)
+        elif parameters.general.system == "RNS":
+            return StationFactory.generate_rns(parameters.rns)
         else:
             sys.stderr.write("ERROR\nInvalid system: " + parameters.general.system)
             sys.exit(1)
@@ -445,5 +449,40 @@ class StationFactory(object):
 
         return haps
         
+        
+    @staticmethod
+    def generate_rns(param: ParametersRns):
+        num_rns = 1
+        rns = StationManager(num_rns)
+        rns.station_type = StationType.RNS
+
+        rns.x = np.array([param.x])
+        rns.y = np.array([param.y])
+        rns.height = np.array([param.altitude])
+        
+        # minimum and maximum values for azimuth and elevation
+        azimuth = np.array([-30, 30])
+        elevation = np.array([-30, 5])
+
+        rns.azimuth = 90 + (azimuth[1] - azimuth[0]) * np.random.random(num_rns) + azimuth[0]
+        rns.elevation = (elevation[1] - elevation[0]) * np.random.random(num_rns) + elevation[0]
+        
+        rns.active = np.ones(num_rns, dtype = bool)
+
+        if param.antenna_pattern == "OMNI":
+            rns.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        elif param.antenna_pattern == "ITU-R M.1466":
+            rns.antenna = np.array([AntennaM1466(param.antenna_gain, rns.azimuth, rns.elevation)])
+        else:
+            sys.stderr.write("ERROR\nInvalid RNS antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+
+        rns.bandwidth = np.array([param.bandwidth])
+        rns.noise_temperature = param.noise_temperature
+        rns.thermal_noise = -500
+        rns.total_interference = -500
+        rns.rx_interference = -500
+
+        return rns
         
         

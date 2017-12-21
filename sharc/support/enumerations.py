@@ -36,3 +36,5 @@ class StationType(Enum):
     FSS_ES = 4  # FSS Earth Station
     FS     = 5  # Fixed Service
     HAPS   = 6  # HAPS (airbone) station
+    RNS    = 7  # Radionavigation service
+    
