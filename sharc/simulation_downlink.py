@@ -193,7 +193,8 @@ class SimulationDownlink(Simulation):
             self.results.system_inr.extend(self.system.inr.tolist())
             self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
             if self.system.station_type is StationType.RAS:
-                self.results.system_pfd.extend(self.system.pfd)
+                self.results.system_pfd.extend([self.system.pfd])
+                self.results.system_dl_interf_power.extend([self.system.rx_interference])
         
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
@@ -203,7 +204,6 @@ class SimulationDownlink(Simulation):
             
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
-            
             
             tput = self.calculate_imt_tput(self.ue.sinr[ue],
                                            self.parameters.imt.dl_sinr_min,

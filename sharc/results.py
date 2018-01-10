@@ -345,18 +345,31 @@ class Results(object):
             file_name = title
             x_limits = (-80, -20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
-            ###################################################################
-            # now we plot PFD samples
-            x = np.arange(len(self.system_pfd))
-            y = np.array(self.system_pfd)
-            title = "[SYS] PFD samples"
-            x_label = "Number of samples"
-            y_label = "PFD [dBm/m^2]"
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))                        
+        if len(self.system_ul_interf_power) > 0:
+            values, base = np.histogram(self.system_ul_interf_power, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of system interference power from IMT UL"
+            x_label = "Interference Power [dBm]"
+            y_label = "Probability of Power < $X$"
             file_name = title
-            #x_limits = (0, 800)
-            #y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))             
+            #x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.system_dl_interf_power) > 0:
+            values, base = np.histogram(self.system_dl_interf_power, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of system interference power from IMT DL"
+            x_label = "Interference Power [dBm]"
+            y_label = "Probability of Power < $X$"
+            file_name = title
+            #x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))                        
             
     def write_files(self, snapshot_number: int):
         n_bins = 200
@@ -365,6 +378,7 @@ class Results(object):
         self.generate_plot_list(n_bins)
             
         for plot in self.plot_list:
+            print(plot.title)
             np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension), 
                        np.transpose([plot.x, plot.y]), 
                        fmt="%.5f", delimiter="\t", header=header_text, 

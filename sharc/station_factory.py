@@ -180,7 +180,7 @@ class StationFactory(object):
             return StationFactory.generate_fss_space_station(parameters.fss_ss)
         elif parameters.general.system == "FS":
             return StationFactory.generate_fs_station(parameters.fs)
-        elif parameters.general.sysstem == "RAS":
+        elif parameters.general.system == "RAS":
             return StationFactory.generate_ras_station(parameters.ras)            
         else:
             sys.stderr.write("ERROR\nInvalid system: " + parameters.general.system)
