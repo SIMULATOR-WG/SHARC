@@ -340,7 +340,7 @@ class Results(object):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[SYS] CDF of system PFD"
-            x_label = "PFD [dBm/m^2]"
+            x_label = "PFD [dBm/$m^2$]"
             y_label = "Probability of INR < $X$"
             file_name = title
             x_limits = (-80, -20)
@@ -378,7 +378,6 @@ class Results(object):
         self.generate_plot_list(n_bins)
             
         for plot in self.plot_list:
-            print(plot.title)
             np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension), 
                        np.transpose([plot.x, plot.y]), 
                        fmt="%.5f", delimiter="\t", header=header_text, 
