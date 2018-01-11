@@ -417,6 +417,34 @@ class StationManagerTest(unittest.TestCase):
         npt.assert_allclose(phi_ref, sm6.get_off_axis_angle(sm7), atol=1e-2)          
         
         
+    def test_elevation(self):
+        sm1 = StationManager(1)
+        sm1.x = np.array([0])
+        sm1.y = np.array([0])
+        sm1.height = np.array([10])
+        
+        sm2 = StationManager(6)
+        sm2.x =      np.array([10, 10, 0,  0, 30, 20])
+        sm2.y =      np.array([ 0,  0, 5, 10, 30, 20])
+        sm2.height = np.array([10, 20, 5,  0, 20, 20])
+        
+        elevation_ref = np.array([[0, 45, -45, -45, 13.26, 19.47]])
+        npt.assert_allclose(elevation_ref, sm1.get_elevation(sm2), atol=1e-2)    
+        
+        #######################################################################
+        sm3 = StationManager(2)
+        sm3.x = np.array([0, 30])
+        sm3.y = np.array([0, 0])
+        sm3.height = np.array([10, 10])
+        
+        sm4 = StationManager(2)
+        sm4.x =      np.array([10, 10])
+        sm4.y =      np.array([ 0,  0])
+        sm4.height = np.array([10, 20])
+        
+        elevation_ref = np.array([[0, 45], [0, 26.56]])
+        npt.assert_allclose(elevation_ref, sm3.get_elevation(sm4), atol=1e-2)          
+        
 if __name__ == '__main__':
     unittest.main()
                 

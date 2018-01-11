@@ -57,7 +57,8 @@ class TopologySingleBaseStation(Topology):
                 self.y = np.array([0, 0])
                 self.azimuth = np.array(TopologySingleBaseStation.AZIMUTH)
                 self.elevation = TopologySingleBaseStation.ELEVATION*np.ones(2)
-                self.num_base_stations = 2       
+                self.num_base_stations = 2
+            self.indoor = np.zeros(self.num_base_stations, dtype = bool)
                 
                 
     def plot(self, ax: matplotlib.axes.Axes):
