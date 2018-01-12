@@ -26,7 +26,7 @@ class SpectralMaskImt(object):
         self.band_mhz = band_mhz
         self.freq_mhz = freq_mhz
         
-        self.freq_lim = np.concatenate(((freq_mhz - band_mhz/2)-np.flip(self.delta_f_lim,0),
+        self.freq_lim = np.concatenate(((freq_mhz - band_mhz/2)-self.delta_f_lim[::-1],
                                         (freq_mhz + band_mhz/2)+self.delta_f_lim))
         
         self.set_power(p_tx)
@@ -38,22 +38,44 @@ class SpectralMaskImt(object):
         
         # Set new transmit power value       
         if self.sta_type is StationType.IMT_UE:
+            # Table 8
+            mask_dbm = np.array([-5, -13, self.spurious_limits])
+            
+        elif self.sta_type is StationType.IMT_BS and self.scenario is "INDOOR":             
+            # Table 1
             mask_dbm = np.array([-5, -13, self.spurious_limits])
             
         elif self.sta_type is StationType.IMT_BS and self.scenario is "OUTDOOR":
-            # Table 4
-            if self.p_tx > 32.5 and (self.freq_mhz > 37000 and self.freq_mhz < 52600):
-                mask_dbm = np.array([-5, -13, self.spurious_limits])
-                
-            # Table 5
-            elif self.p_tx < 32.5 and (self.freq_mhz > 37000 and self.freq_mhz < 52600):
-                mask_dbm = np.array([-5, np.max((p_tx-45.5,-20)), 
+            
+            if (self.freq_mhz > 24250 and self.freq_mhz < 33400):
+                if self.p_tx >= 34.5:
+                    # Table 2
+                    mask_dbm = np.array([-5, -13, self.spurious_limits])
+                else:
+                    # Table 3
+                    mask_dbm = np.array([-5, np.max((p_tx-47.5,-20)), 
                                           self.spurious_limits])
-    
-            else: # Dummy spectral mask, for testing purposes only
+            elif (self.freq_mhz > 37000 and self.freq_mhz < 52600):
+                if self.p_tx >= 32.5:
+                    # Table 4
+                    mask_dbm = np.array([-5, -13, self.spurious_limits])
+                else:
+                    # Table 5
+                    mask_dbm = np.array([-5, np.max((p_tx-45.5,-20)), 
+                                          self.spurious_limits])
+            elif (self.freq_mhz > 66000 and self.freq_mhz < 86000):
+                if self.p_tx >= 30.5:
+                    # Table 6
+                    mask_dbm = np.array([-5, -13, self.spurious_limits])
+                else:
+                    # Table 7
+                    mask_dbm = np.array([-5, np.max((p_tx-43.5,-20)), 
+                                          self.spurious_limits])
+            else:
+                # Dummy spectral mask, for testing purposes only
                 mask_dbm = np.array([-10, -20, -50])
                  
-        self.mask_dbm = np.concatenate((np.flip(mask_dbm,0),np.array([self.p_tx]),
+        self.mask_dbm = np.concatenate((mask_dbm[::-1],np.array([self.p_tx]),
                                         mask_dbm))
         
     def power_calc(self,center_f: float, band: float):
