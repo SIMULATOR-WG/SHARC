@@ -152,6 +152,8 @@ class SimulationDownlinkTest(unittest.TestCase):
 
         self.simulation = SimulationDownlink(self.param)
         self.simulation.initialize()
+            
+        self.assertTrue(self.simulation.co_channel)
 
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0

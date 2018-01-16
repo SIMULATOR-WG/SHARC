@@ -157,6 +157,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
         
+        self.assertTrue(self.simulation.co_channel)
+        
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology)
