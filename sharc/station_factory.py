@@ -22,6 +22,7 @@ from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_f699 import AntennaF699
 from sharc.antenna.antenna_s465 import AntennaS465
+from sharc.antenna.antenna_modified_s465 import AntennaModifiedS465
 from sharc.antenna.antenna_s580 import AntennaS580
 from sharc.antenna.antenna_s672 import AntennaS672
 from sharc.antenna.antenna_s1528 import AntennaS1528
@@ -31,6 +32,7 @@ from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
 from sharc.spectral_mask_imt import SpectralMaskImt
+from sharc.spectral_mask_3gpp import SpectralMask3Gpp
 
 
 class StationFactory(object):
@@ -69,7 +71,7 @@ class StationFactory(object):
             AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
                                   imt_base_stations.elevation[i])
             imt_base_stations.spectral_mask[i] = \
-            SpectralMaskImt(StationType.IMT_BS,imt_base_stations.tx_power[i],
+            SpectralMask3Gpp(StationType.IMT_BS,imt_base_stations.tx_power[i],
                             param.frequency, band_mhz=param.bandwidth)
 
         #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
@@ -106,7 +108,8 @@ class StationFactory(object):
                 sys.stderr.write("ERROR\nUniform UE distribution is currently supported only with Macrocell topology")
                 sys.exit(1)
 
-            [ue_x, ue_y, theta, distance] = StationFactory.get_random_position(num_ue, topology)
+            [ue_x, ue_y, theta, distance] = StationFactory.get_random_position(num_ue, topology,
+                                                                               param.minimum_separation_distance_bs_ue)
             psi = np.degrees(np.arctan((param.bs_height - param.ue_height) / distance))
 
             imt_ue.azimuth = (azimuth + theta + np.pi/2)
@@ -190,7 +193,7 @@ class StationFactory(object):
             imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i],
                                                            imt_ue.elevation[i])
             imt_ue.spectral_mask[i] = \
-            SpectralMaskImt(StationType.IMT_UE,imt_ue.tx_power[i],
+            SpectralMask3Gpp(StationType.IMT_UE,imt_ue.tx_power[i],
                             param.frequency, band_mhz=param.bandwidth)
 
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
@@ -208,7 +211,7 @@ class StationFactory(object):
         elif parameters.general.system == "FS":
             return StationFactory.generate_fs_station(parameters.fs)
         elif parameters.general.system == "RAS":
-            return StationFactory.generate_ras_station(parameters.ras)            
+            return StationFactory.generate_ras_station(parameters.ras)
         else:
             sys.stderr.write("ERROR\nInvalid system: " + parameters.general.system)
             sys.exit(1)
@@ -276,33 +279,45 @@ class StationFactory(object):
             fss_earth_station.x = np.array([param.x])
             fss_earth_station.y = np.array([param.y])
         elif param.location.upper() == "CELL":
-            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, True )
+            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, param.min_dist_to_bs, True )
             fss_earth_station.x = np.array(x)
             fss_earth_station.y = np.array(y)
         elif param.location.upper() == "NETWORK":
-            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, False)
+            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, param.min_dist_to_bs, False)
             fss_earth_station.x = np.array(x)
             fss_earth_station.y = np.array(y)
+        elif param.location.upper() == "UNIFORM_DIST":
+            dist = np.random.uniform( param.min_dist_to_bs, param.max_dist_to_bs)
+            angle = np.random.uniform(-np.pi, np.pi)
+            fss_earth_station.x[0] = np.array(dist * np.cos(angle))
+            fss_earth_station.y[0] = np.array(dist * np.sin(angle))
         else:
             sys.stderr.write("ERROR\nFSS-ES location type {} not supported".format(param.location))
             sys.exit(1)
 
         fss_earth_station.height = np.array([param.height])
 
-        fss_earth_station.azimuth = np.array([param.azimuth])
-        fss_earth_station.elevation = np.array([param.elevation])
+        if param.azimuth.upper() == "RANDOM":
+            fss_earth_station.azimuth = np.random.uniform(-180., 180.)
+        else:
+            fss_earth_station.azimuth = float(param.azimuth)
+
+        elevation =  np.random.uniform(param.elevation_min, param.elevation_max)
+        fss_earth_station.elevation = np.array([elevation])
 
         fss_earth_station.active = np.array([True])
         fss_earth_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
         fss_earth_station.rx_interference = -500
 
-        if param.antenna_pattern == "OMNI":
+        if param.antenna_pattern.upper() == "OMNI":
             fss_earth_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
-        elif param.antenna_pattern == "ITU-R S.1855":
+        elif param.antenna_pattern.upper() == "ITU-R S.1855":
             fss_earth_station.antenna = np.array([AntennaS1855(param)])
-        elif param.antenna_pattern == "ITU-R S.465":
+        elif param.antenna_pattern.upper() == "ITU-R S.465":
             fss_earth_station.antenna = np.array([AntennaS465(param)])
-        elif param.antenna_pattern == "ITU-R S.580":
+        elif param.antenna_pattern.upper() == "MODIFIED ITU-R S.465":
+            fss_earth_station.antenna = np.array([AntennaModifiedS465(param)])
+        elif param.antenna_pattern.upper() == "ITU-R S.580":
             fss_earth_station.antenna = np.array([AntennaS580(param)])
         else:
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
@@ -337,12 +352,12 @@ class StationFactory(object):
         else:
             sys.stderr.write("ERROR\nInvalid FS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
-        
+
         fs_station.noise_temperature = param.noise_temperature
         fs_station.bandwidth = np.array([param.bandwidth])
-        
+
         return fs_station
-    
+
     @staticmethod
     def generate_ras_station(param: ParametersRas):
         ras_station = StationManager(1)
@@ -361,7 +376,7 @@ class StationFactory(object):
         if param.antenna_pattern == "OMNI":
             ras_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
         elif param.antenna_pattern == "ITU-R SA.509":
-            ras_station.antenna = np.array([AntennaSA509(param)]) 
+            ras_station.antenna = np.array([AntennaSA509(param)])
         else:
             sys.stderr.write("ERROR\nInvalid RAS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
@@ -369,20 +384,28 @@ class StationFactory(object):
         ras_station.noise_temperature = np.array([param.antenna_noise_temperature + \
                                                   param.receiver_noise_temperature])
         ras_station.bandwidth = np.array([param.bandwidth])
-        
+
         return ras_station
 
     @staticmethod
-    def get_random_position( num_stas: int, topology: Topology, central_cell = False ):
+    def get_random_position( num_stas: int, topology: Topology, min_dist_to_bs = 0, central_cell = False ):
         hexagon_radius = topology.intersite_distance / 3
 
-        # generate UE uniformily in a triangle
-        x = np.random.uniform(0, hexagon_radius * np.cos(np.pi / 6), num_stas)
-        y = np.random.uniform(0, hexagon_radius / 2, num_stas)
+        min_dist_ok = False
 
-        invert_index = np.arctan(y / x) > np.pi / 6
-        y[invert_index] = -(hexagon_radius / 2 - y[invert_index])
-        x[invert_index] = (hexagon_radius * np.cos(np.pi / 6) - x[invert_index])
+        while not min_dist_ok:
+            # generate UE uniformly in a triangle
+            x = np.random.uniform(0, hexagon_radius * np.cos(np.pi / 6), num_stas)
+            y = np.random.uniform(0, hexagon_radius / 2, num_stas)
+
+            invert_index = np.arctan(y / x) > np.pi / 6
+            y[invert_index] = -(hexagon_radius / 2 - y[invert_index])
+            x[invert_index] = (hexagon_radius * np.cos(np.pi / 6) - x[invert_index])
+
+            if any (np.sqrt(x**2 + y**2) <  min_dist_to_bs):
+                min_dist_ok = False
+            else:
+                min_dist_ok = True
 
         # randomly choose an hextant
         hextant = np.random.random_integers(0, 5, num_stas)

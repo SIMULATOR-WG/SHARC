@@ -11,7 +11,7 @@ import numpy as np
 import os
 
 class Results(object):
-    
+
     def __init__(self):
         self.imt_ul_tx_power_density = list()
         self.imt_ul_tx_power = list()
@@ -26,7 +26,7 @@ class Results(object):
         self.imt_coupling_loss = list()
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
-        
+
         self.system_imt_antenna_gain = list()
         self.imt_system_antenna_gain = list()
 
@@ -38,7 +38,7 @@ class Results(object):
         self.imt_dl_inr = list()
         self.imt_dl_tput_ext = list()
         self.imt_dl_tput = list()
-        
+
         self.system_ul_coupling_loss = list()
         self.system_ul_interf_power = list()
 
@@ -51,7 +51,7 @@ class Results(object):
         self.system_inr_scaled = list()
         self.output_directory = "output"
 
-        
+
     def generate_plot_list(self, n_bins):
         self.plot_list = list()
         if len(self.system_imt_antenna_gain) > 0:
@@ -65,7 +65,7 @@ class Results(object):
             file_name = title
             #x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_system_antenna_gain) > 0:
             values, base = np.histogram(self.imt_system_antenna_gain, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -77,7 +77,7 @@ class Results(object):
             file_name = title
             #x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_bs_antenna_gain) > 0:
             values, base = np.histogram(self.imt_bs_antenna_gain, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -89,7 +89,7 @@ class Results(object):
             file_name = title
             x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ue_antenna_gain) > 0:
             values, base = np.histogram(self.imt_ue_antenna_gain, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -101,7 +101,7 @@ class Results(object):
             file_name = title
             x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ul_tx_power_density) > 0:
             values, base = np.histogram(self.imt_ul_tx_power_density, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -183,7 +183,7 @@ class Results(object):
             y_label = "Probability of UL throughput < $X$"
             file_name = title
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_ul_tput) > 0:
             values, base = np.histogram(self.imt_ul_tput, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -311,7 +311,7 @@ class Results(object):
             file_name = title
             x_limits = (-80, -20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.system_inr) > 0:
             values, base = np.histogram(self.system_inr, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -323,7 +323,7 @@ class Results(object):
             file_name = title
             x_limits = (-80, -20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
             ###################################################################
             # now we plot INR samples
             x = np.arange(len(self.system_inr))
@@ -332,9 +332,9 @@ class Results(object):
             x_label = "Number of samples"
             y_label = "INR [dB]"
             file_name = title
-            #x_limits = (0, 800)
-            #y_limits = (0, 1)
-#            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))
+            x_limits = (0, 800)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))
         if len(self.system_pfd) > 0:
             values, base = np.histogram(self.system_pfd, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -346,7 +346,7 @@ class Results(object):
             file_name = title
 #            x_limits = (-80, -20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
             ###################################################################
             # now we plot PFD samples
             x = np.arange(len(self.system_pfd))
@@ -369,7 +369,7 @@ class Results(object):
             file_name = title
 #            x_limits = (-80, -20)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
             ###################################################################
             # now we plot Interference samples
             x = np.arange(len(self.system_rx_interf))
@@ -380,18 +380,17 @@ class Results(object):
             file_name = title
             #x_limits = (0, 800)
             #y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))                  
-            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))
+
     def write_files(self, snapshot_number: int):
         n_bins = 200
         file_extension = ".txt"
         header_text = "Results collected after " + str(snapshot_number) + " snapshots."
         self.generate_plot_list(n_bins)
-            
+
         for plot in self.plot_list:
-            np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension), 
-                       np.transpose([plot.x, plot.y]), 
-                       fmt="%.5f", delimiter="\t", header=header_text, 
+            np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension),
+                       np.transpose([plot.x, plot.y]),
+                       fmt="%.5f", delimiter="\t", header=header_text,
                        newline=os.linesep)
 
-      

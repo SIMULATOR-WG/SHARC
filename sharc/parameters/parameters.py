@@ -49,7 +49,8 @@ class Parameters(object):
         self.general.num_snapshots   = config.getint("GENERAL", "num_snapshots")
         self.general.imt_link        = config.get("GENERAL", "imt_link")
         self.general.system          = config.get("GENERAL", "system")
-        self.general.compatibility   = config.get("GENERAL", "compatibility")
+        self.general.enable_cochannel = config.getboolean("GENERAL", "enable_cochannel")
+        self.general.enable_adjacent_channel = config.getboolean("GENERAL", "enable_adjacent_channel")
 
         #######################################################################
         # IMT
@@ -67,8 +68,6 @@ class Parameters(object):
         self.imt.bs_load_probability     = config.getfloat("IMT", "bs_load_probability")
         self.imt.bs_conducted_power      = config.getfloat("IMT", "bs_conducted_power")
         self.imt.bs_height               = config.getfloat("IMT", "bs_height")
-        self.imt.bs_aclr                 = config.getfloat("IMT", "bs_aclr")
-        self.imt.bs_acs                  = config.getfloat("IMT", "bs_acs")
         self.imt.bs_noise_figure         = config.getfloat("IMT", "bs_noise_figure")
         self.imt.bs_noise_temperature    = config.getfloat("IMT", "bs_noise_temperature")
         self.imt.bs_ohmic_loss           = config.getfloat("IMT", "bs_ohmic_loss")
@@ -87,10 +86,8 @@ class Parameters(object):
         self.imt.ue_p_cmax               = config.getfloat("IMT", "ue_p_cmax")
         self.imt.ue_conducted_power      = config.getfloat("IMT", "ue_conducted_power")
         self.imt.ue_height               = config.getfloat("IMT", "ue_height")
-        self.imt.ue_aclr                 = config.getfloat("IMT", "ue_aclr")
-        self.imt.ue_acs                  = config.getfloat("IMT", "ue_acs")
         self.imt.ue_noise_figure         = config.getfloat("IMT", "ue_noise_figure")
-        self.imt.ue_feed_loss            = config.getfloat("IMT", "ue_feed_loss")
+        self.imt.ue_ohmic_loss            = config.getfloat("IMT", "ue_ohmic_loss")
         self.imt.ue_body_loss            = config.getfloat("IMT", "ue_body_loss")
         self.imt.dl_attenuation_factor   = config.getfloat("IMT", "dl_attenuation_factor")
         self.imt.dl_sinr_min             = config.getfloat("IMT", "dl_sinr_min")
@@ -186,16 +183,21 @@ class Parameters(object):
         self.fss_es.location = config.get("FSS_ES", "location")
         self.fss_es.x = config.getfloat("FSS_ES", "x")
         self.fss_es.y = config.getfloat("FSS_ES", "y")
+        self.fss_es.min_dist_to_bs = config.getfloat("FSS_ES", "min_dist_to_bs")
+        self.fss_es.max_dist_to_bs = config.getfloat("FSS_ES", "max_dist_to_bs")
         self.fss_es.height = config.getfloat("FSS_ES", "height")
-        self.fss_es.elevation = config.getfloat("FSS_ES", "elevation")
-        self.fss_es.azimuth = config.getfloat("FSS_ES", "azimuth")
+        self.fss_es.elevation_min = config.getfloat("FSS_ES", "elevation_min")
+        self.fss_es.elevation_max = config.getfloat("FSS_ES", "elevation_max")
+        self.fss_es.azimuth = config.get("FSS_ES", "azimuth")
         self.fss_es.frequency = config.getfloat("FSS_ES", "frequency")
         self.fss_es.bandwidth = config.getfloat("FSS_ES", "bandwidth")
+        self.fss_es.acs = config.getfloat("FSS_ES", "acs")
         self.fss_es.tx_power_density = config.getfloat("FSS_ES", "tx_power_density")
         self.fss_es.noise_temperature = config.getfloat("FSS_ES", "noise_temperature")
         self.fss_es.inr_scaling = config.getfloat("FSS_ES", "inr_scaling")
         self.fss_es.antenna_gain = config.getfloat("FSS_ES", "antenna_gain")
         self.fss_es.antenna_pattern = config.get("FSS_ES", "antenna_pattern")
+        self.fss_es.antenna_envelope_gain = config.getfloat("FSS_ES", "antenna_envelope_gain")
         self.fss_es.diameter = config.getfloat("FSS_ES", "diameter")
         self.fss_es.channel_model = config.get("FSS_ES", "channel_model")
         self.fss_es.line_of_sight_prob = config.getfloat("FSS_ES", "line_of_sight_prob")
@@ -256,7 +258,7 @@ class Parameters(object):
         self.fs.line_of_sight_prob      = config.getfloat("FS", "line_of_sight_prob")
         self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
         self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
-        
+
         #######################################################################
         # RAS station
         #######################################################################
@@ -279,7 +281,7 @@ class Parameters(object):
         self.ras.BOLTZMANN_CONSTANT         = config.getfloat("RAS", "BOLTZMANN_CONSTANT")
         self.ras.EARTH_RADIUS               = config.getfloat("RAS", "EARTH_RADIUS")
         self.ras.SPEED_OF_LIGHT             = config.getfloat("RAS", "SPEED_OF_LIGHT")
-        
+
         # P452 parameters
         self.ras.atmospheric_pressure = config.getfloat("RAS", "atmospheric_pressure")
         self.ras.air_temperature = config.getfloat("RAS", "air_temperature")

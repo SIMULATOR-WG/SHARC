@@ -39,8 +39,9 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.fs
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
-            
-        self.co_channel = (self.parameters.general.compatibility == "CO-CHANNEL")
+
+        self.co_channel = self.parameters.general.enable_cochannel
+        self.adjacent_channel = self.parameters.general.enable_adjacent_channel
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 
@@ -75,6 +76,25 @@ class Simulation(ABC, Observable):
 
         self.results = None
 
+        imt_min_freq = self.parameters.imt.frequency - self.parameters.imt.bandwidth / 2
+        imt_max_freq = self.parameters.imt.frequency + self.parameters.imt.bandwidth / 2
+        system_min_freq = self.param_system.frequency - self.param_system.bandwidth / 2
+        system_max_freq = self.param_system.frequency + self.param_system.bandwidth / 2
+
+        max_min_freq = np.maximum(imt_min_freq, system_min_freq)
+        min_max_freq = np.minimum(imt_max_freq, system_max_freq)
+
+        self.overlapping_bandwidth = min_max_freq - max_min_freq
+        if self.overlapping_bandwidth < 0:
+            self.overlapping_bandwidth = 0
+
+        if (self.overlapping_bandwidth == self.param_system.bandwidth and
+            not self.parameters.imt.interfered_with) or \
+           (self.overlapping_bandwidth == self.parameters.imt.bandwidth and
+            self.parameters.imt.interfered_with):
+
+            self.adjacent_channel = False
+
 
     def add_observer_list(self, observers: list):
         for o in observers:
@@ -84,14 +104,16 @@ class Simulation(ABC, Observable):
     def initialize(self, *args, **kwargs):
         """
         This method is executed only once to initialize the simulation variables.
-        """            
-        
+        """
+
         self.topology.calculate_coordinates()
         num_bs = self.topology.num_base_stations
         num_ue = num_bs*self.parameters.imt.ue_k*self.parameters.imt.ue_k_m
 
-        self.bs_power_gain = 10*math.log10(self.parameters.antenna_imt.bs_tx_n_rows*self.parameters.antenna_imt.bs_tx_n_columns)
-        self.ue_power_gain = 10*math.log10(self.parameters.antenna_imt.ue_tx_n_rows*self.parameters.antenna_imt.ue_tx_n_columns)
+        self.bs_power_gain = 10*math.log10(self.parameters.antenna_imt.bs_tx_n_rows*
+                                           self.parameters.antenna_imt.bs_tx_n_columns)
+        self.ue_power_gain = 10*math.log10(self.parameters.antenna_imt.ue_tx_n_rows*
+                                           self.parameters.antenna_imt.ue_tx_n_columns)
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
         self.path_loss_imt = np.empty([num_bs, num_ue])
@@ -278,7 +300,7 @@ class Simulation(ABC, Observable):
 
         station_1_active = np.where(station_1.active)[0]
         station_2_active = np.where(station_2.active)[0]
-        
+
         # Initialize variables (phi, theta, beams_idx)
         if(station_1.station_type is StationType.IMT_BS):
             if(station_2.station_type is StationType.IMT_UE):
@@ -299,7 +321,7 @@ class Simulation(ABC, Observable):
              station_1.station_type is StationType.FS or \
              station_1.station_type is StationType.RAS):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
-        
+
         # Calculate gains
         gains = np.zeros(phi.shape)
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
@@ -312,7 +334,7 @@ class Simulation(ABC, Observable):
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]),
                                                                             co_channel=c_channel)
-        
+
         elif (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_ES) or \
            (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FS) or \
@@ -322,7 +344,7 @@ class Simulation(ABC, Observable):
                                                                             theta_vec=theta[k,station_2_active],
                                                                             beams_l=beams_idx,
                                                                             co_channel=c_channel)
-        
+
         elif station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
              station_1.station_type is StationType.FS or \

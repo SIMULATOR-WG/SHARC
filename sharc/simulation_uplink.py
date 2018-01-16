@@ -93,7 +93,7 @@ class SimulationUplink(Simulation):
                 alpha = self.parameters.imt.ue_alfa
                 cl = self.coupling_loss_imt[bs,ue] + self.ue_power_gain
                 self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*cl)
-                if not self.co_channel:
+                if self.adjacent_channel:
                     for k in ue:
                         self.ue.spectral_mask[k].set_power(self.ue.tx_power[k])
 
@@ -116,7 +116,7 @@ class SimulationUplink(Simulation):
             for bi in bs_interf:
                 ui = self.link[bi]
                 interference = self.ue.tx_power[ui] - self.parameters.imt.ue_ohmic_loss  \
-                                - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
+                                - self.parameters.imt.ue_ohmic_loss - self.parameters.imt.ue_body_loss \
                                 - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_ohmic_loss
                 self.bs.rx_interference[bs] = 10*np.log10( \
                     np.power(10, 0.1*self.bs.rx_interference[bs])
@@ -171,13 +171,13 @@ class SimulationUplink(Simulation):
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.ue,
                                                                      self.propagation_system)
-        
-        if not self.co_channel:
+
+        if self.adjacent_channel:
             self.coupling_loss_imt_system_adjacent = self.calculate_coupling_loss(self.system,
                                                                      self.ue,
                                                                      self.propagation_system,
                                                                      c_channel=False)
-        
+
         # TODO: make it an input parameter
         polarization_loss = 3
         # applying a bandwidth scaling factor since UE transmits on a portion
@@ -192,10 +192,12 @@ class SimulationUplink(Simulation):
             weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
                                                 self.param_system.bandwidth,
                                                 self.parameters.imt.ue_k)
-            self.system.rx_interference = 10*math.log10( \
-                    math.pow(10, 0.1*self.system.rx_interference) + np.sum(weights*np.power(10, 0.1*interference_ue)))
-            
-            if not self.co_channel:
+
+            if self.co_channel:
+                cochannel_interference = math.pow(10, 0.1*self.system.rx_interference) + \
+                                         np.sum(weights*np.power(10, 0.1*interference_ue))
+
+            if self.adjacent_channel:
                 for u in ue:
                     oob_power = self.ue.spectral_mask[u].power_calc(self.param_system.frequency,self.system.bandwidth)
                     oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] \
@@ -203,9 +205,8 @@ class SimulationUplink(Simulation):
                                               self.param_system.bandwidth) \
                                         - self.parameters.imt.ue_ohmic_loss \
                                         - self.parameters.imt.ue_body_loss
-                                
-                    self.system.rx_interference = 10*math.log10( \
-                                math.pow(10, 0.1*self.system.rx_interference) + math.pow(10, 0.1*oob_interference))
+
+            self.system.rx_interference = 10*math.log10( cochannel_interference + math.pow(10, 0.1*oob_interference))
 
         # calculate N
         self.system.thermal_noise = \
@@ -215,7 +216,7 @@ class SimulationUplink(Simulation):
 
         # calculate INR at the system
         self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
-        
+
         # Calculate PFD at the system
         if self.system.station_type is StationType.RAS:
             self.system.pfd = 10*np.log10(10**(self.system.rx_interference/10)/self.system.antenna[0].effective_area)
@@ -228,7 +229,7 @@ class SimulationUplink(Simulation):
             if self.system.station_type is StationType.RAS:
                 self.results.system_rx_interf.extend([self.system.rx_interference])
                 self.results.system_pfd.extend([self.system.pfd])
-        
+
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
