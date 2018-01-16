@@ -142,6 +142,11 @@ class Simulation(ABC, Observable):
         # num_bs x num_ue array
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
+        
+        if self.parameters.imt.interfered_with:
+            freq = self.param_system.frequency
+        else:
+            freq = self.parameters.imt.frequency
 
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.HAPS or \
@@ -183,14 +188,14 @@ class Simulation(ABC, Observable):
                station_a.station_type is StationType.HAPS or \
                station_a.station_type is StationType.RNS:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
-                                             frequency=self.param_system.frequency*np.ones(d_3D.shape),
+                                             frequency=freq*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, sat_params = self.param_system,
                                              earth_to_space = earth_to_space, earth_station_antenna_gain=gain_b,
                                              single_entry=single_entry, number_of_sectors=sectors_in_node)
             else:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
-                                             frequency=self.param_system.frequency*np.ones(d_3D.shape),
+                                             frequency=freq*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, es_params=self.param_system,
                                              tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node)

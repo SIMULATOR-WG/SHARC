@@ -109,7 +109,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.param.antenna_imt.ue_rx_element_horiz_spacing = 1
         self.param.antenna_imt.ue_rx_element_vert_spacing = 1
         
-        self.param.fss_ss.frequency = 7000
+        self.param.fss_ss.frequency = 10000
         self.param.fss_ss.bandwidth = 100
         self.param.fss_ss.altitude = 35786000
         self.param.fss_ss.lat_deg = 0
@@ -185,7 +185,21 @@ class SimulationAdjacentTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.bs.tx_power[1], np.array([tx_power, tx_power]), atol=1e-2)
         
         npt.assert_equal(self.simulation.bs.spectral_mask.mask_dbm,np.array([-50, -20, -10, -10, -10, -20, -50]))
-       
+             
+        # create system
+        self.simulation.system = StationFactory.generate_fss_space_station(self.param.fss_ss)
+        self.simulation.system.x = np.array([0.01]) # avoids zero-division
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param.fss_ss.altitude])
+        
+        # test the method that calculates interference from IMT UE to FSS space station
+        self.simulation.calculate_external_interference()
+        
+        # check coupling loss
+        coupling_loss_imt_system = np.array([203.52-51-1, 203.52-51-1, 203.52-51-2, 203.52-51-2])
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
+                            coupling_loss_imt_system,
+                            atol=1e-2)
         
         
     def test_simulation_2bs_4ue_uplink(self):
