@@ -29,9 +29,9 @@ class SpectralMaskImt(object):
                                         (freq_mhz + band_mhz/2)+self.delta_f_lim))
        
         
-    def set_power(self, p_tx: float):
+    def set_mask(self, power = 0):
         
-        self.p_tx = p_tx - 10*np.log10(self.band_mhz)
+        self.p_tx = power - 10*np.log10(self.band_mhz)
         
         # Set new transmit power value       
         if self.sta_type is StationType.IMT_UE:
@@ -50,7 +50,7 @@ class SpectralMaskImt(object):
                     mask_dbm = np.array([-5, -13, self.spurious_limits])
                 else:
                     # Table 3
-                    mask_dbm = np.array([-5, np.max((p_tx-47.5,-20)), 
+                    mask_dbm = np.array([-5, np.max((power-47.5,-20)), 
                                           self.spurious_limits])
             elif (self.freq_mhz > 37000 and self.freq_mhz < 52600):
                 if self.p_tx >= 32.5:
@@ -58,7 +58,7 @@ class SpectralMaskImt(object):
                     mask_dbm = np.array([-5, -13, self.spurious_limits])
                 else:
                     # Table 5
-                    mask_dbm = np.array([-5, np.max((p_tx-45.5,-20)), 
+                    mask_dbm = np.array([-5, np.max((power-45.5,-20)), 
                                           self.spurious_limits])
             elif (self.freq_mhz > 66000 and self.freq_mhz < 86000):
                 if self.p_tx >= 30.5:
@@ -66,7 +66,7 @@ class SpectralMaskImt(object):
                     mask_dbm = np.array([-5, -13, self.spurious_limits])
                 else:
                     # Table 7
-                    mask_dbm = np.array([-5, np.max((p_tx-43.5,-20)), 
+                    mask_dbm = np.array([-5, np.max((power-43.5,-20)), 
                                           self.spurious_limits])
             else:
                 # Dummy spectral mask, for testing purposes only
@@ -82,7 +82,7 @@ class SpectralMaskImt(object):
         df_max = center_f + band/2
         
         # Power in mW
-        power_oob = np.power(10,-500/10) # Out-of-band power
+        power_oob = 0 # Out-of-band power
         
         # Included delta f values
         inc_df = np.where(np.logical_and(self.freq_lim > df_min,

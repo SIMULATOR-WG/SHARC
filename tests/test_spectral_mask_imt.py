@@ -6,6 +6,7 @@ Created on Tue Dec  5 11:56:10 2017
 """
 
 import unittest
+import numpy as np
 
 from sharc.spectral_mask_imt import SpectralMaskImt
 from sharc.support.enumerations import StationType
@@ -21,14 +22,14 @@ class SpectalMaskImtTest(unittest.TestCase):
     
         # Create mask
         self.mask1 = SpectralMaskImt(sta_type,freq,band)
-        self.mask1.set_power(p_tx)
+        self.mask1.set_mask(power = p_tx)
       
     def test_power_calc(self):
         # Test 1
         fc = 43000
         band = 200
         poob = self.mask1.power_calc(fc,band)
-        self.assertAlmostEqual(poob,-500,delta=1e-2)
+        self.assertAlmostEqual(poob,-np.inf,delta=1e-2)
         
         # Test 2
         fc = 43300

@@ -21,6 +21,7 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param = Parameters()
         
         self.param.general.imt_link = "DOWNLINK"
+        self.param.general.simulation_type = "CO-CHANNEL"
         
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19

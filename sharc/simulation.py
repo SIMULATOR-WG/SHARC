@@ -71,6 +71,8 @@ class Simulation(ABC, Observable):
 
         self.num_rb_per_bs = 0
         self.num_rb_per_ue = 0
+        
+        self.co_channel = (self.parameters.general.simulation_type == "CO-CHANNEL")
 
         self.results = None
 
