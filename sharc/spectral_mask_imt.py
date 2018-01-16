@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 class SpectralMaskImt(object):
     
-    def __init__(self,sta_type: StationType, p_tx: float, freq_mhz: float, band_mhz = 200, scenario = "OUTDOOR"):
+    def __init__(self,sta_type: StationType, freq_mhz: float, band_mhz: float, scenario = "OUTDOOR"):
         
         # Spurious domain limits [dDm/MHz]
         self.spurious_limits = -13
@@ -20,7 +20,6 @@ class SpectralMaskImt(object):
         self.delta_f_lim = np.array([0, 20, 400])
         
         # Attributes
-        self.tx_power = p_tx
         self.sta_type = sta_type
         self.scenario = scenario
         self.band_mhz = band_mhz
@@ -28,8 +27,6 @@ class SpectralMaskImt(object):
         
         self.freq_lim = np.concatenate(((freq_mhz - band_mhz/2)-self.delta_f_lim[::-1],
                                         (freq_mhz + band_mhz/2)+self.delta_f_lim))
-        
-        self.set_power(p_tx)
        
         
     def set_power(self, p_tx: float):
@@ -45,7 +42,7 @@ class SpectralMaskImt(object):
             # Table 1
             mask_dbm = np.array([-5, -13, self.spurious_limits])
             
-        elif self.sta_type is StationType.IMT_BS and self.scenario is "OUTDOOR":
+        else:
             
             if (self.freq_mhz > 24250 and self.freq_mhz < 33400):
                 if self.p_tx >= 34.5:
@@ -129,9 +126,11 @@ if __name__ == '__main__':
     sta_type = StationType.IMT_BS
     p_tx = 25.1
     freq = 43000
+    band = 200
     
     # Create mask
-    msk = SpectralMaskImt(sta_type,p_tx,freq)
+    msk = SpectralMaskImt(sta_type,freq,band)
+    msk.set_power(p_tx)
     
     # Frequencies
     freqs = np.linspace(-600,600,num=1000)+freq

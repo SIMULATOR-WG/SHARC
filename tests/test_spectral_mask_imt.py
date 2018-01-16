@@ -17,9 +17,11 @@ class SpectalMaskImtTest(unittest.TestCase):
         sta_type = StationType.IMT_BS
         p_tx = 25.1
         freq = 43000
+        band = 200
     
         # Create mask
-        self.mask1 = SpectralMaskImt(sta_type,p_tx,freq)
+        self.mask1 = SpectralMaskImt(sta_type,freq,band)
+        self.mask1.set_power(p_tx)
       
     def test_power_calc(self):
         # Test 1

@@ -19,6 +19,7 @@ from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.parameters.parameters_haps import ParametersHaps
 from sharc.parameters.parameters_rns import ParametersRns
 from sharc.station_manager import StationManager
+from sharc.spectral_mask_imt import SpectralMaskImt
 from sharc.antenna.antenna import Antenna
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
@@ -71,8 +72,13 @@ class StationFactory(object):
 
         #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
+        imt_base_stations.center_freq = param.frequency*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
+        
+        imt_base_stations.spectral_mask = SpectralMaskImt(StationType.IMT_BS,param.frequency,\
+                                                          param.bandwidth,scenario = param.topology)
+        
         return imt_base_stations
 
 
@@ -182,7 +188,12 @@ class StationFactory(object):
 
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
+        imt_ue.center_freq = param.frequency*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
+        
+        imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
+                                               param.bandwidth,scenario = "OUTDOOR")
+        
         return imt_ue
 
         
@@ -273,7 +284,12 @@ class StationFactory(object):
 
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
+        imt_ue.center_freq = param.frequency*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
+        
+        imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
+                                               param.bandwidth,scenario = "INDOOR")
+        
         return imt_ue
         
 
