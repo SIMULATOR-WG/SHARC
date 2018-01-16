@@ -172,14 +172,25 @@ class SimulationDownlink(Simulation):
         # calculate interference only from active UE's
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
-            active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
-            interference = self.bs.tx_power[bs] - self.parameters.imt.bs_ohmic_loss \
+            
+            if self.co_channel:
+                active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
+                interference = self.bs.tx_power[bs] - self.parameters.imt.bs_ohmic_loss \
                             - self.coupling_loss_imt_system[active_beams] 
-            weights = self.calculate_bw_weights(self.parameters.imt.bandwidth, 
+                weights = self.calculate_bw_weights(self.parameters.imt.bandwidth, 
                                                 self.param_system.bandwidth,
                                                 self.parameters.imt.ue_k)
+                interf_power = np.sum(weights*np.power(10, 0.1*interference))
+                
+            else:
+                interf_power = self.bs.spectral_mask.power_calc(self.param_system.frequency,\
+                                                                self.param_system.bandwidth)\
+                               - self.param_system.acs
+                interf_power = math.pow(10,0.1*interf_power)
+                                    
+                
             self.system.rx_interference = 10*math.log10( \
-                    math.pow(10, 0.1*self.system.rx_interference) + np.sum(weights*np.power(10, 0.1*interference)))
+                    math.pow(10, 0.1*self.system.rx_interference) + interf_power)
 
         # calculate N
         self.system.thermal_noise = \

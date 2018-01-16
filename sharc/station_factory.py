@@ -193,6 +193,7 @@ class StationFactory(object):
         
         imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
                                                param.bandwidth,scenario = "OUTDOOR")
+        imt_ue.spectral_mask.set_mask()
         
         return imt_ue
 
