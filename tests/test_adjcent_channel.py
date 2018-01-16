@@ -255,5 +255,20 @@ class SimulationAdjacentTest(unittest.TestCase):
         tx_power = 20
         npt.assert_allclose(self.simulation.ue.tx_power, tx_power*np.ones(4))
         
+        # create system
+        self.simulation.system = StationFactory.generate_fss_space_station(self.param.fss_ss)
+        self.simulation.system.x = np.array([0])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param.fss_ss.altitude])
+        
+        # test the method that calculates interference from IMT UE to FSS space station
+        self.simulation.calculate_external_interference()
+        
+        # check coupling loss
+        coupling_loss_imt_system = np.array([203.52-51-10, 203.52-51-11, 203.52-51-22, 203.52-51-23])
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system,
+                            coupling_loss_imt_system,
+                            atol=1e-2)
+        
 if __name__ == '__main__':
     unittest.main()
