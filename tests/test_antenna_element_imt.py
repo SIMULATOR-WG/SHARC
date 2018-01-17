@@ -8,7 +8,7 @@ Created on Fri Apr 14 14:19:38 2017
 import numpy as np
 import unittest
 
-from sharc.antenna.antenna_element_imt_m2101 import AntennaElementImt
+from sharc.antenna.antenna_element_imt_m2101 import AntennaElementImtM2101
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 
 class AntennaImtTest(unittest.TestCase):
@@ -17,9 +17,13 @@ class AntennaImtTest(unittest.TestCase):
         #Element parameters
         self.param = ParametersAntennaImt()
 
+        self.param.bs_element_pattern = "M2101"
+        self.param.ue_element_pattern = "M2101"
+        self.param.bs_downtilt_deg = 0
+
         self.param.bs_tx_element_max_g    = 5
-        self.param.bs_tx_element_phi_3db  = 80
-        self.param.bs_tx_element_theta_3db = 60
+        self.param.bs_tx_element_phi_deg_3db  = 80
+        self.param.bs_tx_element_theta_deg_3db = 60
         self.param.bs_tx_element_am       = 30
         self.param.bs_tx_element_sla_v    = 30
         self.param.bs_tx_n_rows           = 8
@@ -28,8 +32,8 @@ class AntennaImtTest(unittest.TestCase):
         self.param.bs_tx_element_vert_spacing = 0.5
 
         self.param.bs_rx_element_max_g    = 5
-        self.param.bs_rx_element_phi_3db  = 80
-        self.param.bs_rx_element_theta_3db = 60
+        self.param.bs_rx_element_phi_deg_3db  = 80
+        self.param.bs_rx_element_theta_deg_3db = 60
         self.param.bs_rx_element_am       = 30
         self.param.bs_rx_element_sla_v    = 30
         self.param.bs_rx_n_rows           = 8
@@ -38,8 +42,8 @@ class AntennaImtTest(unittest.TestCase):
         self.param.bs_rx_element_vert_spacing = 0.5
 
         self.param.ue_tx_element_max_g    = 10
-        self.param.ue_tx_element_phi_3db  = 75
-        self.param.ue_tx_element_theta_3db = 65
+        self.param.ue_tx_element_phi_deg_3db  = 75
+        self.param.ue_tx_element_theta_deg_3db = 65
         self.param.ue_tx_element_am       = 25
         self.param.ue_tx_element_sla_v    = 35
         self.param.ue_tx_n_rows           = 4
@@ -48,8 +52,8 @@ class AntennaImtTest(unittest.TestCase):
         self.param.ue_tx_element_vert_spacing = 0.5
 
         self.param.ue_rx_element_max_g    = 10
-        self.param.ue_rx_element_phi_3db  = 75
-        self.param.ue_rx_element_theta_3db = 65
+        self.param.ue_rx_element_phi_deg_3db  = 75
+        self.param.ue_rx_element_theta_deg_3db = 65
         self.param.ue_rx_element_am       = 25
         self.param.ue_rx_element_sla_v    = 35
         self.param.ue_rx_n_rows           = 4
@@ -59,21 +63,21 @@ class AntennaImtTest(unittest.TestCase):
 
         # Create antenna IMT objects
         par = self.param.get_antenna_parameters("BS","TX")
-        self.antenna1 = AntennaElementImt(par)
+        self.antenna1 = AntennaElementImtM2101(par)
         par = self.param.get_antenna_parameters("UE","RX")
-        self.antenna2 = AntennaElementImt(par)
+        self.antenna2 = AntennaElementImtM2101(par)
 
     def test_g_max(self):
         self.assertEqual(self.antenna1.g_max,5)
         self.assertEqual(self.antenna2.g_max,10)
 
     def test_phi_3db(self):
-        self.assertEqual(self.antenna1.phi_3db,80)
-        self.assertEqual(self.antenna2.phi_3db,75)
+        self.assertEqual(self.antenna1.phi_deg_3db,80)
+        self.assertEqual(self.antenna2.phi_deg_3db,75)
 
     def test_theta_3db(self):
-        self.assertEqual(self.antenna1.theta_3db,60)
-        self.assertEqual(self.antenna2.theta_3db,65)
+        self.assertEqual(self.antenna1.theta_deg_3db,60)
+        self.assertEqual(self.antenna2.theta_deg_3db,65)
 
     def test_am(self):
         self.assertEqual(self.antenna1.am,30)
