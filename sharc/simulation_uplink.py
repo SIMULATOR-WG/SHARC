@@ -201,8 +201,8 @@ class SimulationUplink(Simulation):
                 for u in ue:
                     oob_power = self.ue.spectral_mask[u].power_calc(self.param_system.frequency,self.system.bandwidth)
                     oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] \
-                                        + 10*np.log10((self.param_system.bandwidth - self.parameters.imt.bandwidth)/
-                                              self.param_system.bandwidth) \
+                                        + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
+                                                 self.param_system.bandwidth) \
                                         - self.parameters.imt.ue_ohmic_loss \
                                         - self.parameters.imt.ue_body_loss
 
