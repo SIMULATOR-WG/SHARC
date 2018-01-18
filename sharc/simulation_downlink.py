@@ -165,7 +165,8 @@ class SimulationDownlink(Simulation):
 
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system, 
                                                                      self.bs,
-                                                                     self.propagation_system)
+                                                                     self.propagation_system,
+                                                                     c_channel = self.co_channel)
 
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
@@ -173,8 +174,9 @@ class SimulationDownlink(Simulation):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             
+            active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
+            
             if self.co_channel:
-                active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
                 interference = self.bs.tx_power[bs] - self.parameters.imt.bs_ohmic_loss \
                             - self.coupling_loss_imt_system[active_beams] 
                 weights = self.calculate_bw_weights(self.parameters.imt.bandwidth, 
@@ -185,7 +187,9 @@ class SimulationDownlink(Simulation):
             else:
                 interf_power = self.bs.spectral_mask.power_calc(self.param_system.frequency,\
                                                                 self.param_system.bandwidth)\
-                               - self.param_system.acs
+                               - self.param_system.acs \
+                               - self.coupling_loss_imt_system[active_beams[0]] \
+                               - self.parameters.imt.bs_ohmic_loss
                 interf_power = math.pow(10,0.1*interf_power)
                                     
                 

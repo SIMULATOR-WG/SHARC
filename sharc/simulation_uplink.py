@@ -183,10 +183,13 @@ class SimulationUplink(Simulation):
                 interf_power = weights*np.power(10, 0.1*interference_ue)
                 
             else:
-                ue_interf = self.ue.spectral_mask.power_calc(self.param_system.frequency,\
+                interf_power = self.ue.spectral_mask.power_calc(self.param_system.frequency,\
                                                                 self.param_system.bandwidth)\
-                               - self.param_system.acs
-                interf_power = math.pow(10,0.1*ue_interf)*np.ones_like(ue)
+                               - self.param_system.acs \
+                               - self.coupling_loss_imt_system[ue] \
+                               - self.parameters.imt.ue_ohmic_loss \
+                               - self.parameters.imt.ue_body_loss
+                interf_power = np.power(10,0.1*interf_power)
                                
             self.system.rx_interference = 10*math.log10( \
                     math.pow(10, 0.1*self.system.rx_interference) + np.sum(interf_power))
