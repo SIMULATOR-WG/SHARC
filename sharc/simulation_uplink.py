@@ -205,6 +205,8 @@ class SimulationUplink(Simulation):
                                                  self.param_system.bandwidth) \
                                         - self.parameters.imt.ue_ohmic_loss \
                                         - self.parameters.imt.ue_body_loss
+            else:
+                oob_interference = 0
 
             self.system.rx_interference = 10*math.log10( cochannel_interference + math.pow(10, 0.1*oob_interference))
 

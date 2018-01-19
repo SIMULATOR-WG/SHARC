@@ -22,7 +22,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param = Parameters()
 
         self.param.general.imt_link = "UPLINK"
-        self.param.general.compatibility = "CO-CHANNEL"
+        self.param.general.enable_cochannel = True
+        self.param.general.enable_adjacent_channel = False
 
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19
@@ -42,7 +43,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.bs_acs = 30
         self.param.imt.bs_noise_figure = 7
         self.param.imt.bs_noise_temperature = 290
-        self.param.imt.bs_feed_loss = 3
+        self.param.imt.bs_ohmic_loss = 3
         self.param.imt.ul_attenuation_factor = 0.4
         self.param.imt.ul_sinr_min = -10
         self.param.imt.ul_sinr_max = 22
@@ -61,7 +62,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.ue_aclr = 20
         self.param.imt.ue_acs = 25
         self.param.imt.ue_noise_figure = 9
-        self.param.imt.ue_feed_loss = 3
+        self.param.imt.ue_ohmic_loss = 3
         self.param.imt.ue_body_loss = 4
         self.param.imt.dl_attenuation_factor = 0.6
         self.param.imt.dl_sinr_min = -10

@@ -57,7 +57,6 @@ class PropagationClearAir(Propagation):
 
         self.dsw = 20
         self.k = 0.5
-        self.eta = 2.5
 
         ###########################################################################
         # The distance of the i-th profile point
@@ -74,8 +73,8 @@ class PropagationClearAir(Propagation):
 
         d_km = np.asarray(kwargs["distance_3D"])*(1e-3)   #Km
         f = np.asarray(kwargs["frequency"])*(1e-3)  #GHz
-        number_of_sectors = kwargs["number_of_sectors"]
-        indoor_stations = kwargs["indoor_stations"]
+        number_of_sectors = kwargs.pop("number_of_sectors",1)
+        indoor_stations = kwargs.pop("indoor_stations",1)
 
         f = np.unique(f)
         if len(f) > 1:
@@ -108,6 +107,7 @@ class PropagationClearAir(Propagation):
         dlm = np.asarray(es_params.dlm)
         epsilon = np.asarray(es_params.epsilon)
         hm = np.asarray(es_params.hm)
+
         Gt = np.asarray(kwargs["tx_gain"])
         Gr = np.asarray(kwargs["rx_gain"])
 
@@ -119,9 +119,9 @@ class PropagationClearAir(Propagation):
         ep = np.asarray(es_params.par_ep)
         dsw = np.asarray(self.dsw)
         k = np.asarray(self.k)
-        di = self.dist_di
-        hi = self.height_hi
-        n = np.asarray(self.eta)
+        di = kwargs.pop("di",self.dist_di)
+        hi = kwargs.pop("hi",self.height_hi)
+        n = np.asarray(es_params.eta)
 
         Stim = -np.inf * np.ones(d_km.size)
 
@@ -146,7 +146,13 @@ class PropagationClearAir(Propagation):
 
         val_hi =len(hi)
 
-        for k in range(len(d_km)):
+        # for i in range(0, val_hi,1):
+        #     Stim_old = (hi[i] + 500*Ce*di[i]*(d_km - di[i]) - Hts)/di[i]
+        #
+        #     if Stim_old>Stim:
+        #        Stim = Stim_old
+
+        for k in range(d_km.size):
             for i in range(0, val_hi,1):
                 Stim_old = (hi[i] + 500*Ce*di[i]*(d_km[0,k] - di[i]) - Hts)/di[i]
 

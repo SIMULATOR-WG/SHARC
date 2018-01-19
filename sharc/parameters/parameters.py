@@ -237,6 +237,7 @@ class Parameters(object):
         self.fss_es.par_ep = config.getfloat("FSS_ES", "par_ep")
         self.fss_es.Beta_0 = config.getfloat("FSS_ES", "Beta_0")
         self.fss_es.clutter_loss = config.getboolean("FSS_ES", "clutter_loss")
+        self.fss_es.eta = config.getfloat("FSS_ES", "eta")
 
         #######################################################################
         # Fixed wireless service
