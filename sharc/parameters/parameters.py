@@ -53,7 +53,8 @@ class Parameters(object):
         self.general.num_snapshots   = config.getint("GENERAL", "num_snapshots")
         self.general.imt_link        = config.get("GENERAL", "imt_link")
         self.general.system          = config.get("GENERAL", "system")
-        self.general.simulation_type = config.get("GENERAL", "simulation_type")
+        self.general.enable_cochannel = config.getboolean("GENERAL", "enable_cochannel")
+        self.general.enable_adjacent_channel = config.getboolean("GENERAL", "enable_adjacent_channel")
 
         #######################################################################
         # IMT
@@ -71,7 +72,6 @@ class Parameters(object):
         self.imt.bs_load_probability     = config.getfloat("IMT", "bs_load_probability")
         self.imt.bs_conducted_power      = config.getfloat("IMT", "bs_conducted_power")
         self.imt.bs_height               = config.getfloat("IMT", "bs_height")
-        self.imt.bs_aclr                 = config.getfloat("IMT", "bs_aclr")
         self.imt.bs_acs                  = config.getfloat("IMT", "bs_acs")
         self.imt.bs_noise_figure         = config.getfloat("IMT", "bs_noise_figure")
         self.imt.bs_noise_temperature    = config.getfloat("IMT", "bs_noise_temperature")
@@ -90,7 +90,6 @@ class Parameters(object):
         self.imt.ue_p_cmax               = config.getfloat("IMT", "ue_p_cmax")
         self.imt.ue_conducted_power      = config.getfloat("IMT", "ue_conducted_power")
         self.imt.ue_height               = config.getfloat("IMT", "ue_height")
-        self.imt.ue_aclr                 = config.getfloat("IMT", "ue_aclr")
         self.imt.ue_acs                  = config.getfloat("IMT", "ue_acs")
         self.imt.ue_noise_figure         = config.getfloat("IMT", "ue_noise_figure")
         self.imt.ue_ohmic_loss            = config.getfloat("IMT", "ue_ohmic_loss")

@@ -22,7 +22,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param = Parameters()
         
         self.param.general.imt_link = "UPLINK"
-        self.param.general.simulation_type = "CO-CHANNEL"
+        self.param.general.enable_cochannel = True
+        self.param.general.enable_adjacent_channel = False
         
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19
@@ -39,7 +40,6 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.num_resource_blocks = 10
         self.param.imt.bs_conducted_power = 10
         self.param.imt.bs_height = 6
-        self.param.imt.bs_aclr = 40
         self.param.imt.bs_acs = 30
         self.param.imt.bs_noise_figure = 7
         self.param.imt.bs_noise_temperature = 290
@@ -58,7 +58,6 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.ue_p_cmax = 20
         self.param.imt.ue_conducted_power = 10
         self.param.imt.ue_height = 1.5
-        self.param.imt.ue_aclr = 35
         self.param.imt.ue_acs = 25
         self.param.imt.ue_noise_figure = 9
         self.param.imt.ue_ohmic_loss = 3
@@ -111,6 +110,7 @@ class SimulationUplinkTest(unittest.TestCase):
         
         self.param.fss_ss.frequency = 10000
         self.param.fss_ss.bandwidth = 100
+        self.param.fss_ss.acs = 0
         self.param.fss_ss.altitude = 35786000
         self.param.fss_ss.lat_deg = 0
         self.param.fss_ss.azimuth = 0
@@ -138,6 +138,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.fss_es.azimuth = 0
         self.param.fss_es.frequency = 10000
         self.param.fss_es.bandwidth = 100
+        self.param.fss_es.acs = 0
         self.param.fss_es.noise_temperature = 100
         self.param.fss_es.tx_power_density = -60
         self.param.fss_es.antenna_gain = 50

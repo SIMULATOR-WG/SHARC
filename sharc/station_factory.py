@@ -394,6 +394,9 @@ class StationFactory(object):
             sys.exit(1)
 
         fss_earth_station.bandwidth = np.array([param.bandwidth])
+        fss_earth_station.noise_temperature = param.noise_temperature
+        fss_earth_station.thermal_noise = -500
+        fss_earth_station.total_interference = -500
         
         return fss_earth_station
         

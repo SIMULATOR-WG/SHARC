@@ -21,7 +21,8 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param = Parameters()
         
         self.param.general.imt_link = "DOWNLINK"
-        self.param.general.simulation_type = "CO-CHANNEL"
+        self.param.general.enable_cochannel = True
+        self.param.general.enable_adjacent_channel = False
         
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19
@@ -38,7 +39,6 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.imt.num_resource_blocks = 10
         self.param.imt.bs_conducted_power = 10
         self.param.imt.bs_height = 6
-        self.param.imt.bs_aclr = 40
         self.param.imt.bs_acs = 30
         self.param.imt.bs_noise_figure = 7
         self.param.imt.bs_noise_temperature = 290
@@ -57,7 +57,6 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.imt.ue_p_cmax = 20
         self.param.imt.ue_conducted_power = 10
         self.param.imt.ue_height = 1.5
-        self.param.imt.ue_aclr = 35
         self.param.imt.ue_acs = 25
         self.param.imt.ue_noise_figure = 9
         self.param.imt.ue_ohmic_loss = 3

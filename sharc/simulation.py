@@ -40,7 +40,10 @@ class Simulation(ABC, Observable):
         elif self.parameters.general.system == "HAPS":
             self.param_system = self.parameters.haps
         elif self.parameters.general.system == "RNS":
-            self.param_system = self.parameters.rns            
+            self.param_system = self.parameters.rns
+            
+        self.co_channel = self.parameters.general.enable_cochannel
+        self.adjacent_channel = self.parameters.general.enable_adjacent_channel
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 
@@ -58,6 +61,7 @@ class Simulation(ABC, Observable):
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
+        self.coupling_loss_imt_system_adjacent = np.empty(0)
 
         self.bs_to_ue_phi = np.empty(0)
         self.bs_to_ue_theta = np.empty(0)
@@ -71,10 +75,25 @@ class Simulation(ABC, Observable):
 
         self.num_rb_per_bs = 0
         self.num_rb_per_ue = 0
-        
-        self.co_channel = (self.parameters.general.simulation_type == "CO-CHANNEL")
 
         self.results = None
+        
+        imt_min_freq = self.parameters.imt.frequency - self.parameters.imt.bandwidth / 2
+        imt_max_freq = self.parameters.imt.frequency + self.parameters.imt.bandwidth / 2
+        system_min_freq = self.param_system.frequency - self.param_system.bandwidth / 2
+        system_max_freq = self.param_system.frequency + self.param_system.bandwidth / 2
+        
+        max_min_freq = np.maximum(imt_min_freq, system_min_freq)
+        min_max_freq = np.minimum(imt_max_freq, system_max_freq)
+
+        self.overlapping_bandwidth = min_max_freq - max_min_freq
+        if self.overlapping_bandwidth < 0:
+            self.overlapping_bandwidth = 0
+
+        if (self.overlapping_bandwidth == self.param_system.bandwidth and not self.parameters.imt.interfered_with) or \
+        (self.overlapping_bandwidth == self.parameters.imt.bandwidth and self.parameters.imt.interfered_with):
+                self.adjacent_channel = False
+
 
 
     def add_observer_list(self, observers: list):
