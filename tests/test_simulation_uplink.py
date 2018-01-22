@@ -294,7 +294,6 @@ class SimulationUplinkTest(unittest.TestCase):
                                np.array([ -120.18 - (-88.82) ]),
                                delta=.01)
 
-    '''
     def test_simulation_2bs_4ue_es(self):
         self.param.general.system = "FSS_ES"
 
@@ -408,7 +407,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.assertAlmostEqual(self.simulation.system.inr,
                                np.array([ rx_interference - (-98.599) ]),
                                delta=.01)
-    '''
+
     def test_simulation_2bs_4ue_ras(self):
         self.param.general.system = "RAS"
 

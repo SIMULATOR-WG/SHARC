@@ -25,7 +25,7 @@ class PropagationGasesAttenuationTest(unittest.TestCase):
         T = 288
         ro = 7.5
         np.allclose(1.099,
-                         self.__gasAtt.get_loss_Ag(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro),atol=1e-3)
+                         self.__gasAtt.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro),atol=1e-3)
 
         f = 27   #GHz
         d = [10,20]
@@ -33,7 +33,7 @@ class PropagationGasesAttenuationTest(unittest.TestCase):
         T = 288
         ro = 7.5
         np.allclose([0.140, 3.297],
-                         self.__gasAtt.get_loss_Ag(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro),atol=1e-3)
+                         self.__gasAtt.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro),atol=1e-3)
 
 
         f = 40   #GHz
@@ -42,7 +42,7 @@ class PropagationGasesAttenuationTest(unittest.TestCase):
         T = 288
         ro = 7.5
         np.allclose([1.295, 3.885],
-                         self.__gasAtt.get_loss_Ag(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro),atol=1e-3)
+                         self.__gasAtt.get_loss(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro),atol=1e-3)
 
 
 if __name__ == '__main__':

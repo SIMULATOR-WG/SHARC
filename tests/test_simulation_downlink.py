@@ -458,7 +458,8 @@ class SimulationDownlinkTest(unittest.TestCase):
 
     def test_simulation_2bs_4ue_adjacent(self):
         self.param.general.system = "RAS"
-        self.param.general.compatibility = "ADJACENT"
+        self.param.general.enable_cochannel = False
+        self.param.general.enable_adjacent_channel = True
 
         self.param.ras.frequency = 10000
         self.param.ras.bandwidth = 1000
