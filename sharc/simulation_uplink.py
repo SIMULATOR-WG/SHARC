@@ -91,7 +91,7 @@ class SimulationUplink(Simulation):
                 m_pusch = self.num_rb_per_ue
                 p_o_pusch = self.parameters.imt.ue_p_o_pusch
                 alpha = self.parameters.imt.ue_alfa
-                cl = self.coupling_loss_imt[bs,ue] + self.ue_power_gain
+                cl = self.coupling_loss_imt[bs,ue] + self.ue_power_gain 
                 self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*cl)
                 if self.adjacent_channel:
                     for k in ue:
@@ -106,8 +106,10 @@ class SimulationUplink(Simulation):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
+
             self.bs.rx_power[bs] = self.ue.tx_power[ue]  \
                                         - self.parameters.imt.ue_ohmic_loss \
+                                        - self.parameters.imt.ue_body_loss \
                                         - self.coupling_loss_imt[bs,ue] - self.parameters.imt.bs_ohmic_loss
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]
@@ -116,7 +118,7 @@ class SimulationUplink(Simulation):
             for bi in bs_interf:
                 ui = self.link[bi]
                 interference = self.ue.tx_power[ui] - self.parameters.imt.ue_ohmic_loss  \
-                                - self.parameters.imt.ue_ohmic_loss - self.parameters.imt.ue_body_loss \
+                                - self.parameters.imt.ue_body_loss \
                                 - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_ohmic_loss
                 self.bs.rx_interference[bs] = 10*np.log10( \
                     np.power(10, 0.1*self.bs.rx_interference[bs])
@@ -145,18 +147,14 @@ class SimulationUplink(Simulation):
         """
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.bs,
-                                                                     self.propagation_system)
-        # TODO: make it an input parameter
-        polarization_loss = 3
-        # applying a bandwidth scaling factor since UE transmits on a portion
-        # of the satellite's bandwidth
-        # calculate interference only to active UE's
+                                                                     self.propagation_system)       
+        
         bs_active = np.where(self.bs.active)[0]
         tx_power = self.param_system.tx_power_density + 10*np.log10(self.bs.bandwidth*1e6) + 30
         for bs in bs_active:
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
             self.bs.ext_interference[bs] = tx_power[bs] - self.coupling_loss_imt_system[active_beams] \
-                                            - self.parameters.imt.bs_ohmic_loss - polarization_loss
+                                            - self.parameters.imt.bs_ohmic_loss
 
             self.bs.sinr_ext[bs] = self.bs.rx_power[bs] \
                 - (10*np.log10(np.power(10, 0.1*self.bs.total_interference[bs]) + np.power(10, 0.1*self.bs.ext_interference[bs])))
@@ -167,49 +165,45 @@ class SimulationUplink(Simulation):
         """
         Calculates interference that IMT system generates on other system
         """
-
-        self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
-                                                                     self.ue,
-                                                                     self.propagation_system)
-
+        if self.co_channel:
+            self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system, 
+                                                                         self.ue,
+                                                                         self.propagation_system)
+        
         if self.adjacent_channel:
-            self.coupling_loss_imt_system_adjacent = self.calculate_coupling_loss(self.system,
-                                                                     self.ue,
-                                                                     self.propagation_system,
-                                                                     c_channel=False)
-
-        # TODO: make it an input parameter
-        polarization_loss = 3
+              self.coupling_loss_imt_system_adjacent = self.calculate_coupling_loss(self.system,
+                                                                       self.ue,
+                                                                       self.propagation_system,
+                                                                       c_channel=False)
+              
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the satellite's bandwidth
         # calculate interference only from active UE's
+        rx_interference = 0
+        
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
-            interference_ue = self.ue.tx_power[ue] - self.parameters.imt.ue_ohmic_loss \
-                                - self.parameters.imt.ue_body_loss \
-                                - self.coupling_loss_imt_system[ue]
-            weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
-                                                self.param_system.bandwidth,
-                                                self.parameters.imt.ue_k)
 
             if self.co_channel:
-                cochannel_interference = math.pow(10, 0.1*self.system.rx_interference) + \
-                                         np.sum(weights*np.power(10, 0.1*interference_ue))
+                interference_ue = self.ue.tx_power[ue] - self.parameters.imt.ue_ohmic_loss \
+                                - self.parameters.imt.ue_body_loss \
+                                - self.coupling_loss_imt_system[ue]
+                weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
+                                                    self.param_system.bandwidth,
+                                                    self.parameters.imt.ue_k)
+                rx_interference += np.sum(weights*np.power(10, 0.1*interference_ue)) / 10**(self.param_system.acs/10.)
 
             if self.adjacent_channel:
-                for u in ue:
-                    oob_power = self.ue.spectral_mask[u].power_calc(self.param_system.frequency,self.system.bandwidth)
-                    oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[u] \
-                                        + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
+                oob_power = self.ue.spectral_mask.power_calc(self.param_system.frequency,self.system.bandwidth)
+                oob_interference_array = oob_power - self.coupling_loss_imt_system_adjacent[ue] \
+                                            + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
                                                  self.param_system.bandwidth) \
-                                        - self.parameters.imt.ue_ohmic_loss \
-                                        - self.parameters.imt.ue_body_loss
-            else:
-                oob_interference = 0
+                                            - self.parameters.imt.ue_ohmic_loss \
+                                            - self.parameters.imt.ue_body_loss
+                rx_interference += np.sum(np.power(10,0.1*oob_interference_array))
 
-            self.system.rx_interference = 10*math.log10( cochannel_interference + math.pow(10, 0.1*oob_interference))
-
+        self.system.rx_interference = 10*np.log10(rx_interference)
         # calculate N
         self.system.thermal_noise = \
             10*np.log10(self.param_system.BOLTZMANN_CONSTANT* \

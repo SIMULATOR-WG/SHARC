@@ -7,6 +7,7 @@ Created on Thu Jul  6 16:03:24 2017
 
 import sys
 
+from sharc.parameters.parameters import Parameters
 from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_close_in import PropagationCloseIn
@@ -18,12 +19,12 @@ from sharc.propagation.propagation_umi import PropagationUMi
 from sharc.propagation.propagation_abg import PropagationABG
 from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
 from sharc.propagation.propagation_tvro import PropagationTvro
-
+from sharc.propagation.propagation_indoor import PropagationIndoor
 
 class PropagationFactory(object):
 
     @staticmethod
-    def createPropagation(channel_model: str) -> Propagation:
+    def createPropagation(channel_model: str, param: Parameters) -> Propagation:
         if channel_model == "FSPL":
             return PropagationFreeSpace()
         elif channel_model == "ABG":
@@ -44,6 +45,8 @@ class PropagationFactory(object):
             return PropagationClearAir()
         elif channel_model == "TVRO":
             return PropagationTvro()
+        elif channel_model == "INDOOR":
+            return PropagationIndoor(param.indoor)
         else:
             sys.stderr.write("ERROR\nInvalid channel_model: " + channel_model)
             sys.exit(1)

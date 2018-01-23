@@ -37,16 +37,20 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.fss_es
         elif self.parameters.general.system == "FS":
             self.param_system = self.parameters.fs
+        elif self.parameters.general.system == "HAPS":
+            self.param_system = self.parameters.haps
+        elif self.parameters.general.system == "RNS":
+            self.param_system = self.parameters.rns
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
-
+            
         self.co_channel = self.parameters.general.enable_cochannel
         self.adjacent_channel = self.parameters.general.enable_adjacent_channel
 
         self.topology = TopologyFactory.createTopology(self.parameters)
 
-        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)
-        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
+        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model, self.parameters)
+        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model, self.parameters)
 
         self.bs_power_gain = 0
         self.ue_power_gain = 0
@@ -75,6 +79,23 @@ class Simulation(ABC, Observable):
         self.num_rb_per_ue = 0
 
         self.results = None
+        
+        imt_min_freq = self.parameters.imt.frequency - self.parameters.imt.bandwidth / 2
+        imt_max_freq = self.parameters.imt.frequency + self.parameters.imt.bandwidth / 2
+        system_min_freq = self.param_system.frequency - self.param_system.bandwidth / 2
+        system_max_freq = self.param_system.frequency + self.param_system.bandwidth / 2
+        
+        max_min_freq = np.maximum(imt_min_freq, system_min_freq)
+        min_max_freq = np.minimum(imt_max_freq, system_max_freq)
+
+        self.overlapping_bandwidth = min_max_freq - max_min_freq
+        if self.overlapping_bandwidth < 0:
+            self.overlapping_bandwidth = 0
+
+        if (self.overlapping_bandwidth == self.param_system.bandwidth and not self.parameters.imt.interfered_with) or \
+        (self.overlapping_bandwidth == self.parameters.imt.bandwidth and self.parameters.imt.interfered_with):
+                self.adjacent_channel = False
+
 
         imt_min_freq = self.parameters.imt.frequency - self.parameters.imt.bandwidth / 2
         imt_max_freq = self.parameters.imt.frequency + self.parameters.imt.bandwidth / 2
@@ -164,15 +185,29 @@ class Simulation(ABC, Observable):
         # num_bs x num_ue array
         d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
+        
+        if self.parameters.imt.interfered_with:
+            freq = self.param_system.frequency
+        else:
+            freq = self.parameters.imt.frequency
 
-        if station_a.station_type is StationType.FSS_SS :
+        if station_a.station_type is StationType.FSS_SS or \
+           station_a.station_type is StationType.HAPS or \
+           station_a.station_type is StationType.RNS:
             elevation_angles = station_b.get_elevation_angle(station_a, self.param_system)
+        elif station_a.station_type is StationType.IMT_BS and \
+             station_b.station_type is StationType.IMT_UE and \
+             self.parameters.imt.topology == "INDOOR":
+            elevation_angles = np.transpose(station_b.get_elevation(station_a))
         else:
             elevation_angles = None
 
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.FSS_ES or \
            station_a.station_type is StationType.FS or \
+           station_a.station_type is StationType.HAPS or \
+           station_a.station_type is StationType.FS or \
+           station_a.station_type is StationType.RNS or \
            station_a.station_type is StationType.RAS:
 
             if station_b.station_type is StationType.IMT_UE:
@@ -194,16 +229,18 @@ class Simulation(ABC, Observable):
                 earth_to_space = True
                 single_entry = False
 
-            if station_a.station_type is StationType.FSS_SS:
+            if station_a.station_type is StationType.FSS_SS or \
+               station_a.station_type is StationType.HAPS or \
+               station_a.station_type is StationType.RNS:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
-                                             frequency=self.param_system.frequency*np.ones(d_3D.shape),
+                                             frequency=freq*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, sat_params = self.param_system,
                                              earth_to_space = earth_to_space, earth_station_antenna_gain=gain_b,
                                              single_entry=single_entry, number_of_sectors=sectors_in_node)
             else:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
-                                             frequency=self.param_system.frequency*np.ones(d_3D.shape),
+                                             frequency=freq*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, es_params=self.param_system,
                                              tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node)
@@ -217,10 +254,11 @@ class Simulation(ABC, Observable):
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              bs_height=station_a.height,
                                              ue_height=station_b.height,
+                                             elevation=elevation_angles,
                                              shadowing=self.parameters.imt.shadowing,
                                              line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
             # define antenna gains
-            gain_a = self.calculate_gains(station_a, station_b,c_channel)
+            gain_a = self.calculate_gains(station_a, station_b, c_channel)
             gain_b = np.transpose(self.calculate_gains(station_b, station_a, c_channel))
 
             # collect IMT BS and UE antenna gain samples
@@ -307,7 +345,9 @@ class Simulation(ABC, Observable):
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
             elif(station_2.station_type is StationType.FSS_SS or \
                  station_2.station_type is StationType.FSS_ES or \
+                 station_2.station_type is StationType.HAPS or \
                  station_2.station_type is StationType.FS or \
+                 station_2.station_type is StationType.RNS or \
                  station_2.station_type is StationType.RAS):
                 phi = np.repeat(phi,self.parameters.imt.ue_k,0)
                 theta = np.repeat(theta,self.parameters.imt.ue_k,0)
@@ -318,7 +358,9 @@ class Simulation(ABC, Observable):
 
         elif(station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
+             station_1.station_type is StationType.HAPS or \
              station_1.station_type is StationType.FS or \
+             station_1.station_type is StationType.RNS or \
              station_1.station_type is StationType.RAS):
             beams_idx = np.zeros(len(station_2_active),dtype=int)
 
@@ -326,7 +368,9 @@ class Simulation(ABC, Observable):
         gains = np.zeros(phi.shape)
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.HAPS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS) or \
+           (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.RNS) or \
            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.RAS):
             for k in station_1_active:
                 for b in range(k*self.parameters.imt.ue_k,(k+1)*self.parameters.imt.ue_k):
@@ -334,19 +378,26 @@ class Simulation(ABC, Observable):
                                                                             theta_vec=theta[b,station_2_active],
                                                                             beams_l=np.array([beams_idx[b]]),
                                                                             co_channel=c_channel)
-
+                    
         elif (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_SS) or \
-           (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_ES) or \
-           (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FS) or \
-           (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.RAS):
+             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_ES) or \
+             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.HAPS) or \
+             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FS) or \
+             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.RNS) or \
+             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.RAS):
                for k in station_1_active:
                    gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k,station_2_active],
                                                                             theta_vec=theta[k,station_2_active],
                                                                             beams_l=beams_idx,
                                                                             co_channel=c_channel)
-
+        
+        elif station_1.station_type is StationType.RNS:
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(phi_vec = phi[0,station_2_active],
+                                                                            theta_vec = theta[0,station_2_active])            
+                    
         elif station_1.station_type is StationType.FSS_SS or \
              station_1.station_type is StationType.FSS_ES or \
+             station_1.station_type is StationType.HAPS or \
              station_1.station_type is StationType.FS or \
              station_1.station_type is StationType.RAS:
             phi = station_1.get_off_axis_angle(station_2)

@@ -16,11 +16,17 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
+from sharc.parameters.parameters_haps import ParametersHaps
+from sharc.parameters.parameters_rns import ParametersRns
 from sharc.parameters.parameters_ras import ParametersRas
 from sharc.station_manager import StationManager
+from sharc.spectral_mask_imt import SpectralMaskImt
+from sharc.antenna.antenna import Antenna
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_f699 import AntennaF699
+from sharc.antenna.antenna_f1891 import AntennaF1891
+from sharc.antenna.antenna_m1466 import AntennaM1466
 from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_modified_s465 import AntennaModifiedS465
 from sharc.antenna.antenna_s580 import AntennaS580
@@ -31,7 +37,6 @@ from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
-from sharc.spectral_mask_imt import SpectralMaskImt
 from sharc.spectral_mask_3gpp import SpectralMask3Gpp
 
 
@@ -50,7 +55,7 @@ class StationFactory(object):
         imt_base_stations.azimuth = topology.azimuth
         imt_base_stations.elevation = topology.elevation
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
-        imt_base_stations.indoor = np.zeros(num_bs, dtype=bool)
+        imt_base_stations.indoor = topology.indoor
         imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
         imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
@@ -70,20 +75,33 @@ class StationFactory(object):
             imt_base_stations.antenna[i] = \
             AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
                                   imt_base_stations.elevation[i])
-            imt_base_stations.spectral_mask[i] = \
-            SpectralMask3Gpp(StationType.IMT_BS,imt_base_stations.tx_power[i],
-                            param.frequency, band_mhz=param.bandwidth)
 
         #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
+        imt_base_stations.center_freq = param.frequency*np.ones(num_bs)
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
+        
+        imt_base_stations.spectral_mask = SpectralMaskImt(StationType.IMT_BS,param.frequency,\
+                                                          param.bandwidth,scenario = param.topology)
+        
         return imt_base_stations
 
     @staticmethod
     def generate_imt_ue(param: ParametersImt,
                         param_ant: ParametersAntennaImt,
-                        topology: Topology):
+                        topology: Topology) -> StationManager:
+        
+        if param.topology == "INDOOR":
+            return StationFactory.generate_imt_ue_indoor(param, param_ant, topology)
+        else:
+            return StationFactory.generate_imt_ue_outdoor(param, param_ant, topology)
+
+            
+    @staticmethod
+    def generate_imt_ue_outdoor(param: ParametersImt,
+                                param_ant: ParametersAntennaImt,
+                                topology: Topology) -> StationManager:           
         num_bs = topology.num_base_stations
         num_ue_per_bs = param.ue_k*param.ue_k_m
 
@@ -192,15 +210,115 @@ class StationFactory(object):
         for i in range(num_ue):
             imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i],
                                                            imt_ue.elevation[i])
-            imt_ue.spectral_mask[i] = \
-            SpectralMask3Gpp(StationType.IMT_UE,imt_ue.tx_power[i],
-                            param.frequency, band_mhz=param.bandwidth)
 
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
+        imt_ue.center_freq = param.frequency*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
+        
+        imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
+                                               param.bandwidth,scenario = "OUTDOOR")
+        imt_ue.spectral_mask.set_mask()
+        
         return imt_ue
 
+        
+    @staticmethod
+    def generate_imt_ue_indoor(param: ParametersImt,
+                               param_ant: ParametersAntennaImt,
+                               topology: Topology) -> StationManager:           
+        num_bs = topology.num_base_stations
+        num_ue_per_bs = param.ue_k*param.ue_k_m
+        num_ue = num_bs*num_ue_per_bs
+
+        imt_ue = StationManager(num_ue)
+        imt_ue.station_type = StationType.IMT_UE
+        ue_x = list()
+        ue_y = list()
+        
+        # initially set all UE's as indoor
+        imt_ue.indoor = np.ones(num_ue, dtype=bool)
+
+        # Calculate UE pointing
+        azimuth_range = (-60, 60)
+        azimuth = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]
+        # Remove the randomness from azimuth and you will have a perfect pointing
+        #azimuth = np.zeros(num_ue)
+        elevation_range = (-90, 90)
+        elevation = (elevation_range[1] - elevation_range[0])*np.random.random(num_ue) + elevation_range[0]
+        
+        delta_x = (topology.b_w/math.sqrt(topology.ue_indoor_percent) - topology.b_w)/2
+        delta_y = (topology.b_d/math.sqrt(topology.ue_indoor_percent) - topology.b_d)/2
+
+        for bs in range(num_bs):
+            idx = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]
+            if bs % 3 == 0:
+                x_min = topology.x[bs] - topology.cell_radius - delta_x
+                x_max = topology.x[bs] + topology.cell_radius
+            if bs % 3 == 1:
+                x_min = topology.x[bs] - topology.cell_radius
+                x_max = topology.x[bs] + topology.cell_radius
+            if bs % 3 == 2:
+                x_min = topology.x[bs] - topology.cell_radius
+                x_max = topology.x[bs] + topology.cell_radius + delta_x
+            y_min = topology.y[bs] - topology.b_d/2 - delta_y
+            y_max = topology.y[bs] + topology.b_d/2 + delta_y
+            x = (x_max - x_min)*np.random.random(num_ue_per_bs) + x_min
+            y = (y_max - y_min)*np.random.random(num_ue_per_bs) + y_min
+            ue_x.extend(x)
+            ue_y.extend(y)
+        
+            # theta is the horizontal angle of the UE wrt the serving BS
+            theta = np.degrees(np.arctan2(y - topology.y[bs], x - topology.x[bs]))
+            # calculate UE azimuth wrt serving BS
+            imt_ue.azimuth[idx] = (azimuth[idx] + theta + 180)%360
+
+            # calculate elevation angle
+            # psi is the vertical angle of the UE wrt the serving BS
+            distance = np.sqrt((topology.x[bs] - x)**2 + (topology.y[bs] - y)**2)
+            psi = np.degrees(np.arctan((param.bs_height - param.ue_height)/distance))
+            imt_ue.elevation[idx] = elevation[idx] + psi
+
+            # check if UE is indoor
+            if bs % 3 == 0:
+                out = (x < topology.x[bs] - topology.cell_radius) | \
+                      (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            if bs % 3 == 1:
+                out = (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            if bs % 3 == 2:
+                out = (x > topology.x[bs] + topology.cell_radius) | \
+                      (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            imt_ue.indoor[idx] = ~ out
+                
+        imt_ue.x = np.array(ue_x)
+        imt_ue.y = np.array(ue_y)
+
+        imt_ue.active = np.zeros(num_ue, dtype=bool)
+        imt_ue.height = param.ue_height*np.ones(num_ue)
+        imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
+        imt_ue.rx_interference = -500*np.ones(num_ue)
+        imt_ue.ext_interference = -500*np.ones(num_ue)
+
+        # TODO: this piece of code works only for uplink
+        par = param_ant.get_antenna_parameters("UE","TX")
+        for i in range(num_ue):
+            imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i],
+                                                         imt_ue.elevation[i])
+
+        #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
+        imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
+        imt_ue.center_freq = param.frequency*np.ones(num_ue)
+        imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
+        
+        imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
+                                               param.bandwidth,scenario = "INDOOR")
+        imt_ue.spectral_mask.set_mask()
+        
+        return imt_ue
+        
 
     @staticmethod
     def generate_system(parameters: Parameters, topology: Topology):
@@ -210,6 +328,10 @@ class StationFactory(object):
             return StationFactory.generate_fss_space_station(parameters.fss_ss)
         elif parameters.general.system == "FS":
             return StationFactory.generate_fs_station(parameters.fs)
+        elif parameters.general.system == "HAPS":
+            return StationFactory.generate_haps(parameters.haps, parameters.imt.intersite_distance)
+        elif parameters.general.system == "RNS":
+            return StationFactory.generate_rns(parameters.rns)
         elif parameters.general.system == "RAS":
             return StationFactory.generate_ras_station(parameters.ras)
         else:
@@ -271,7 +393,16 @@ class StationFactory(object):
 
 
     @staticmethod
-    def generate_fss_earth_station(param: ParametersFssEs, topology: Topology):
+    def generate_fss_earth_station(param: ParametersFssEs, *args):
+        """
+        Generates FSS Earth Station.
+        
+        Arguments:
+            param: ParametersFssEs
+            topology (optional): Topology
+        """
+        if len(args): topology = args[0]
+        
         fss_earth_station = StationManager(1)
         fss_earth_station.station_type = StationType.FSS_ES
 
@@ -325,7 +456,10 @@ class StationFactory(object):
 
         fss_earth_station.noise_temperature = param.noise_temperature
         fss_earth_station.bandwidth = np.array([param.bandwidth])
-
+        fss_earth_station.noise_temperature = param.noise_temperature
+        fss_earth_station.thermal_noise = -500
+        fss_earth_station.total_interference = -500
+        
         return fss_earth_station
 
 
@@ -357,7 +491,83 @@ class StationFactory(object):
         fs_station.bandwidth = np.array([param.bandwidth])
 
         return fs_station
+    
+    @staticmethod
+    def generate_haps(param: ParametersHaps, intersite_distance: int):
+        num_haps = 1
+        haps = StationManager(num_haps)
+        haps.station_type = StationType.HAPS
 
+#        d = intersite_distance
+#        h = (d/3)*math.sqrt(3)/2
+#        haps.x = np.array([0, 7*d/2, -d/2, -4*d, -7*d/2, d/2, 4*d])
+#        haps.y = np.array([0, 9*h, 15*h, 6*h, -9*h, -15*h, -6*h])
+        haps.x = np.array([0])
+        haps.y = np.array([0])
+        
+        haps.height = param.altitude * np.ones(num_haps)
+
+        #haps.azimuth = param.azimuth
+        #haps.elevation = param.elevation
+
+        elev_max = 68.19 # corresponds to 50 km radius and 20 km altitude
+        haps.azimuth = 360 * np.random.random(num_haps)
+        haps.elevation = ((270 + elev_max) - (270 - elev_max)) * np.random.random(num_haps) + (270 - elev_max)
+        
+        haps.active = np.ones(num_haps, dtype = bool)
+
+        haps.antenna = np.empty(num_haps, dtype=Antenna)
+
+        if param.antenna_pattern == "OMNI":
+            for i in range(num_haps):
+                haps.antenna[i] = AntennaOmni(param.antenna_gain)
+        elif param.antenna_pattern == "ITU-R F.1891":
+            for i in range(num_haps):
+                haps.antenna[i] = AntennaF1891(param)
+        else:
+            sys.stderr.write("ERROR\nInvalid HAPS (airbone) antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+
+        haps.bandwidth = np.array([param.bandwidth])
+
+        return haps
+        
+        
+    @staticmethod
+    def generate_rns(param: ParametersRns):
+        num_rns = 1
+        rns = StationManager(num_rns)
+        rns.station_type = StationType.RNS
+
+        rns.x = np.array([param.x])
+        rns.y = np.array([param.y])
+        rns.height = np.array([param.altitude])
+        
+        # minimum and maximum values for azimuth and elevation
+        azimuth = np.array([-30, 30])
+        elevation = np.array([-30, 5])
+
+        rns.azimuth = 90 + (azimuth[1] - azimuth[0]) * np.random.random(num_rns) + azimuth[0]
+        rns.elevation = (elevation[1] - elevation[0]) * np.random.random(num_rns) + elevation[0]
+        
+        rns.active = np.ones(num_rns, dtype = bool)
+
+        if param.antenna_pattern == "OMNI":
+            rns.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        elif param.antenna_pattern == "ITU-R M.1466":
+            rns.antenna = np.array([AntennaM1466(param.antenna_gain, rns.azimuth, rns.elevation)])
+        else:
+            sys.stderr.write("ERROR\nInvalid RNS antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+
+        rns.bandwidth = np.array([param.bandwidth])
+        rns.noise_temperature = param.noise_temperature
+        rns.thermal_noise = -500
+        rns.total_interference = -500
+        rns.rx_interference = -500
+
+        return rns
+    
     @staticmethod
     def generate_ras_station(param: ParametersRas):
         ras_station = StationManager(1)
