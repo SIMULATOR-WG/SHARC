@@ -153,6 +153,26 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.fss_es.acs = 0
         self.param.fss_es.BOLTZMANN_CONSTANT = 1.38064852e-23
         self.param.fss_es.EARTH_RADIUS = 6371000  
+        
+        self.param.ras.x = -5000
+        self.param.ras.y = 0
+        self.param.ras.height = 10
+        self.param.ras.elevation = 20
+        self.param.ras.azimuth = 0
+        self.param.ras.frequency = 10000
+        self.param.ras.bandwidth = 100
+        self.param.ras.antenna_noise_temperature = 50
+        self.param.ras.receiver_noise_temperature = 50
+        self.param.ras.antenna_gain = 50
+        self.param.ras.antenna_efficiency = 0.7
+        self.param.ras.diameter = 10
+        self.param.ras.acs = 0
+        self.param.ras.antenna_pattern = "OMNI"
+        self.param.ras.channel_model = "FSPL"
+        self.param.ras.line_of_sight_prob = 1 
+        self.param.ras.BOLTZMANN_CONSTANT = 1.38064852e-23
+        self.param.ras.EARTH_RADIUS = 6371000
+        self.param.ras.SPEED_OF_LIGHT = 299792458
 
 
     def test_simulation_2bs_4ue_fss_ss(self):
@@ -376,7 +396,91 @@ class SimulationDownlinkTest(unittest.TestCase):
         # check INR at FSS Earth station
         self.assertAlmostEqual(self.simulation.system.inr, 
                                np.array([ rx_interference - thermal_noise ]),
-                               delta=.01)        
+                               delta=.01)
+        
+        
+    def test_simulation_2bs_4ue_ras(self):
+        self.param.general.system = "RAS"
+        
+        self.simulation = SimulationDownlink(self.param)
+        self.simulation.initialize()
+        
+        
+        self.simulation.bs_power_gain = 0
+        self.simulation.ue_power_gain = 0
+        
+        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+                                                                       self.param.antenna_imt,
+                                                                       self.simulation.topology)
+        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
+        self.simulation.bs.active = np.ones(2, dtype=bool)
+        
+        self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
+                                                            self.param.antenna_imt,
+                                                            self.simulation.topology)
+        self.simulation.ue.x = np.array([20, 70, 110, 170])
+        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
+        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
+        self.simulation.ue.active = np.ones(4, dtype=bool)
+        
+        self.simulation.connect_ue_to_bs()
+        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs, 
+                                                                                    self.simulation.ue,
+                                                                                    self.simulation.propagation_imt)
+        self.simulation.scheduler()
+        self.simulation.power_control()
+        self.simulation.calculate_sinr()
+        
+        # check UE thermal noise
+        bandwidth_per_ue = math.trunc((1 - 0.1)*100/2) 
+        thermal_noise = 10*np.log10(1.38064852e-23*290*bandwidth_per_ue*1e3*1e6) + 9
+        npt.assert_allclose(self.simulation.ue.thermal_noise, 
+                            thermal_noise,
+                            atol=1e-2)
+        
+        # check SINR
+        npt.assert_allclose(self.simulation.ue.sinr, 
+                            np.array([-70.48 - (-85.49), -80.36 - (-83.19), -70.54 - (-73.15), -60.00 - (-75.82)]),
+                            atol=1e-2)        
+
+        self.simulation.system = StationFactory.generate_ras_station(self.param.ras)
+        self.simulation.system.x = np.array([-2000])
+        self.simulation.system.y = np.array([0])
+        self.simulation.system.height = np.array([self.param.ras.height])
+        self.simulation.system.antenna[0].effective_area = 54.9779
+        
+        # Test gain calculation
+        gains = self.simulation.calculate_gains(self.simulation.system,self.simulation.bs)
+        npt.assert_equal(gains,np.array([[50, 50]]))
+        
+        self.simulation.calculate_external_interference()
+        npt.assert_allclose(self.simulation.coupling_loss_imt_system, 
+                            np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]), 
+                            atol=1e-2)
+        
+        # Test RAS interference
+        interference = 10 - 10*np.log10(2) - np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2])-\
+                       3
+        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
+        self.assertAlmostEqual(self.simulation.system.rx_interference,
+                               rx_interference,
+                               delta=.01)
+        
+        # Test RAS PFD
+        pfd = 10*np.log10(10**(rx_interference/10)/54.9779)
+        self.assertAlmostEqual(self.simulation.system.pfd, 
+                            pfd,
+                            delta=.01)  
+        
+        # check RAS station thermal noise
+        thermal_noise = 10*np.log10(1.38064852e-23*100*1e3*100*1e6)
+        self.assertAlmostEqual(self.simulation.system.thermal_noise, 
+                               thermal_noise,
+                               delta=.01)      
+        # check INR at RAS station
+        self.assertAlmostEqual(self.simulation.system.inr, 
+                               np.array([ rx_interference - (-98.599) ]),
+                               delta=.01)
         
     def test_calculate_bw_weights(self):
         self.param.general.system = "FSS_ES"

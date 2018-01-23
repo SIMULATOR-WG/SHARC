@@ -204,7 +204,6 @@ class Simulation(ABC, Observable):
 
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.FSS_ES or \
-           station_a.station_type is StationType.FS or \
            station_a.station_type is StationType.HAPS or \
            station_a.station_type is StationType.FS or \
            station_a.station_type is StationType.RNS or \

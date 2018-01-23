@@ -492,6 +492,7 @@ class StationFactory(object):
 
         return fs_station
     
+    
     @staticmethod
     def generate_haps(param: ParametersHaps, intersite_distance: int):
         num_haps = 1
@@ -567,6 +568,7 @@ class StationFactory(object):
         rns.rx_interference = -500
 
         return rns
+    
     
     @staticmethod
     def generate_ras_station(param: ParametersRas):
