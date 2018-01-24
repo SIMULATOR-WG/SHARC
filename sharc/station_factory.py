@@ -82,8 +82,12 @@ class StationFactory(object):
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
         
-        imt_base_stations.spectral_mask = SpectralMaskImt(StationType.IMT_BS,param.frequency,\
-                                                          param.bandwidth,scenario = param.topology)
+        if param.spectral_mask == "ITU 265-E":
+            imt_base_stations.spectral_mask = SpectralMaskImt(StationType.IMT_BS,param.frequency,\
+                                                              param.bandwidth,scenario = param.topology)
+        elif param.spectral_mask == "3GPP 36.104":
+            imt_base_stations.spectral_mask = SpectralMask3Gpp(StationType.IMT_BS,param.frequency,\
+                                                               param.bandwidth)
         
         return imt_base_stations
 
@@ -216,8 +220,14 @@ class StationFactory(object):
         imt_ue.center_freq = param.frequency*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         
-        imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
-                                               param.bandwidth,scenario = "OUTDOOR")
+        if param.spectral_mask == "ITU 265-E":
+            imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
+                                                   param.bandwidth,scenario = "OUTDOOR")
+            
+        elif param.spectral_mask == "3GPP 36.104":
+            imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,param.frequency,\
+                                                   param.bandwidth)
+        
         imt_ue.spectral_mask.set_mask()
         
         return imt_ue
@@ -313,8 +323,14 @@ class StationFactory(object):
         imt_ue.center_freq = param.frequency*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
         
-        imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
-                                               param.bandwidth,scenario = "INDOOR")
+        if param.spectral_mask == "ITU 265-E":
+            imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
+                                                   param.bandwidth,scenario = "INDOOR")
+            
+        elif param.spectral_mask == "3GPP 36.104":
+            imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,param.frequency,\
+                                                   param.bandwidth)
+            
         imt_ue.spectral_mask.set_mask()
         
         return imt_ue

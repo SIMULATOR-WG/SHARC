@@ -33,6 +33,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.param.imt.interfered_with = False
         self.param.imt.frequency = 10000
         self.param.imt.bandwidth = 100
+        self.param.imt.spectral_mask = "ITU 265-E"
         self.param.imt.rb_bandwidth = 0.180
         self.param.imt.guard_band_ratio = 0.1
         self.param.imt.ho_margin = 3

@@ -70,6 +70,7 @@ class Parameters(object):
         self.imt.frequency               = config.getfloat("IMT", "frequency")
         self.imt.bandwidth               = config.getfloat("IMT", "bandwidth")
         self.imt.rb_bandwidth            = config.getfloat("IMT", "rb_bandwidth")
+        self.imt.spectral_mask           = config.get("IMT", "spectral_mask")
         self.imt.guard_band_ratio        = config.getfloat("IMT", "guard_band_ratio")
         self.imt.bs_load_probability     = config.getfloat("IMT", "bs_load_probability")
         self.imt.bs_conducted_power      = config.getfloat("IMT", "bs_conducted_power")

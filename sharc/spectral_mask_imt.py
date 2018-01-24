@@ -14,6 +14,9 @@ import matplotlib.pyplot as plt
 class SpectralMaskImt(SpectralMask):
     
     def __init__(self,sta_type: StationType, freq_mhz: float, band_mhz: float, scenario = "OUTDOOR"):
+        """
+        Implements spectral mask from document ITU 265-E
+        """
         
         # Spurious domain limits [dDm/MHz]
         self.spurious_limits = -13
