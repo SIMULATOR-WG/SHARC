@@ -24,6 +24,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.general.imt_link = "UPLINK"
         self.param.general.enable_cochannel = True
         self.param.general.enable_adjacent_channel = False
+        self.param.general.overwrite_output = True
 
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19
@@ -180,7 +181,7 @@ class SimulationUplinkTest(unittest.TestCase):
     def test_simulation_2bs_4ue_ss(self):
         self.param.general.system = "FSS_SS"
 
-        self.simulation = SimulationUplink(self.param)
+        self.simulation = SimulationUplink(self.param, "")
         self.simulation.initialize()
 
         random_number_gen = np.random.RandomState()
@@ -213,10 +214,10 @@ class SimulationUplinkTest(unittest.TestCase):
         # We do not test the selection method here because in this specific
         # scenario we do not want to change the order of the UE's
 
-        self.simulation.propagation_imt = PropagationFactory.createPropagation(self.param.imt.channel_model,
-                                                                               random_number_gen)
-        self.simulation.propagation_system = PropagationFactory.createPropagation(self.param.fss_ss.channel_model,
-                                                                                  random_number_gen)
+        self.simulation.propagation_imt = PropagationFactory.create_propagation(self.param.imt.channel_model,
+                                                                                self.param, random_number_gen)
+        self.simulation.propagation_system = PropagationFactory.create_propagation(self.param.fss_ss.channel_model,
+                                                                                   self.param, random_number_gen)
 
         # test coupling loss method
         self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
@@ -329,7 +330,7 @@ class SimulationUplinkTest(unittest.TestCase):
     def test_simulation_2bs_4ue_es(self):
         self.param.general.system = "FSS_ES"
 
-        self.simulation = SimulationUplink(self.param)
+        self.simulation = SimulationUplink(self.param, "")
         self.simulation.initialize()
 
         self.simulation.bs_power_gain = 0
@@ -357,10 +358,10 @@ class SimulationUplinkTest(unittest.TestCase):
 
         # We do not test the selection method here because in this specific
         # scenario we do not want to change the order of the UE's
-        self.simulation.propagation_imt = PropagationFactory.createPropagation(self.param.imt.channel_model,
-                                                                               random_number_gen)
-        self.simulation.propagation_system = PropagationFactory.createPropagation(self.param.fss_ss.channel_model,
-                                                                                  random_number_gen)
+        self.simulation.propagation_imt = PropagationFactory.create_propagation(self.param.imt.channel_model,
+                                                                                self.param, random_number_gen)
+        self.simulation.propagation_system = PropagationFactory.create_propagation(self.param.fss_ss.channel_model,
+                                                                                   self.param, random_number_gen)
 
         # test coupling loss method
         self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
@@ -435,7 +436,7 @@ class SimulationUplinkTest(unittest.TestCase):
                             rx_power[1] - total_interference[1],
                             atol=1e-2)
 
-        self.simulation.system = StationFactory.generate_fss_earth_station(self.param.fss_es)
+        self.simulation.system = StationFactory.generate_fss_earth_station(self.param.fss_es, random_number_gen)
         self.simulation.system.x = np.array([-2000])
         self.simulation.system.y = np.array([0])
         self.simulation.system.height = np.array([self.param.fss_es.height])
@@ -511,7 +512,7 @@ class SimulationUplinkTest(unittest.TestCase):
     def test_simulation_2bs_4ue_ras(self):
         self.param.general.system = "RAS"
 
-        self.simulation = SimulationUplink(self.param)
+        self.simulation = SimulationUplink(self.param, "")
         self.simulation.initialize()
 
         self.simulation.bs_power_gain = 0
@@ -541,10 +542,10 @@ class SimulationUplinkTest(unittest.TestCase):
         # scenario we do not want to change the order of the UE's
         #self.simulation.select_ue()
 
-        self.simulation.propagation_imt = PropagationFactory.createPropagation(self.param.imt.channel_model,
-                                                                               random_number_gen)
-        self.simulation.propagation_system = PropagationFactory.createPropagation(self.param.fss_ss.channel_model,
-                                                                                  random_number_gen)
+        self.simulation.propagation_imt = PropagationFactory.create_propagation(self.param.imt.channel_model,
+                                                                                self.param, random_number_gen)
+        self.simulation.propagation_system = PropagationFactory.create_propagation(self.param.fss_ss.channel_model,
+                                                                                   self.param, random_number_gen)
 
         # test coupling loss method
         self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
@@ -613,7 +614,7 @@ class SimulationUplinkTest(unittest.TestCase):
     def test_beamforming_gains(self):
         self.param.general.system = "FSS_SS"
 
-        self.simulation = SimulationUplink(self.param)
+        self.simulation = SimulationUplink(self.param, "")
         self.simulation.initialize()
 
         eps = 1e-2
@@ -715,7 +716,7 @@ class SimulationUplinkTest(unittest.TestCase):
     def test_calculate_imt_ul_tput(self):
         self.param.general.system = "FSS_SS"
 
-        self.simulation = SimulationUplink(self.param)
+        self.simulation = SimulationUplink(self.param, "")
         self.simulation.initialize()
 
         eps = 1e-2

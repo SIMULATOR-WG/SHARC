@@ -210,7 +210,6 @@ class StationFactory(object):
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
         imt_ue.indoor = random_number_gen.random_sample(num_ue) <= (param.ue_indoor_percent/100)
-        imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
 
@@ -314,7 +313,6 @@ class StationFactory(object):
 
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
-        imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
 
@@ -698,7 +696,6 @@ if __name__ == '__main__':
             self.ue_indoor_percent = 0
             self.ue_k = 3
             self.ue_k_m = 20
-            self.ue_conducted_power = np.random.rand()
             self.bandwidth  = np.random.rand()
             self.ue_noise_figure = np.random.rand()
 

@@ -29,7 +29,7 @@ class AntennaS465(Antenna):
             self.phi_min = np.maximum(2, 114 * math.pow(D_lmbda, -1.09))
 
     def calculate_gain(self, *args, **kwargs) -> np.array:
-        phi = np.absolute(kwargs["phi_vec"])
+        phi = np.absolute(kwargs["off_axis_angle_vec"])
 
         gain = np.zeros(phi.shape)
 

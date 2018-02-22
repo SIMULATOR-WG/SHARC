@@ -94,7 +94,6 @@ class Parameters(object):
         self.imt.ue_p_o_pusch            = config.getfloat("IMT", "ue_p_o_pusch")
         self.imt.ue_alpha                 = config.getfloat("IMT", "ue_alpha")
         self.imt.ue_p_cmax               = config.getfloat("IMT", "ue_p_cmax")
-        self.imt.ue_conducted_power      = config.getfloat("IMT", "ue_conducted_power")
         self.imt.ue_height               = config.getfloat("IMT", "ue_height")
         self.imt.ue_noise_figure         = config.getfloat("IMT", "ue_noise_figure")
         self.imt.ue_ohmic_loss            = config.getfloat("IMT", "ue_ohmic_loss")

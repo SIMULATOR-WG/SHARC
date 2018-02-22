@@ -12,24 +12,28 @@ class AntennaOmni(Antenna):
     """
     This is an omnidirectional antenna
     """
-    
+
     def __init__(self, gain: float = 0):
         super().__init__()
         self.gain = gain
-    
 
-    def calculate_gain(self, *args, **kwargs) -> np.array:        
+    def calculate_gain(self, *args, **kwargs) -> np.array:
         """
         Calculates the gain, which is the same for all the directions
-        
+
         Parameters
         ----------
         phi_vec (np.array): azimuth angles [degrees]
 
         Returns
         -------
-        gains (np.array): numpy array of gains        
+        gains (np.array): numpy array of gains
         """
-        phi_vec = np.asarray(kwargs["phi_vec"])
+
+        if "phi_vec" in kwargs:
+            phi_vec = np.asarray(kwargs["phi_vec"])
+        else:
+            phi_vec = np.asarray(kwargs["off_axis_angle_vec"])
+
         return self.gain*np.ones(len(phi_vec))
-    
+

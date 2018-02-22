@@ -14,6 +14,7 @@ from sharc.simulation_downlink import SimulationDownlink
 from sharc.parameters.parameters import Parameters
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.station_factory import StationFactory
+from sharc.propagation.propagation_factory import PropagationFactory
 
 class SimulationDownlinkHapsTest(unittest.TestCase):
 
@@ -23,6 +24,7 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.general.imt_link = "DOWNLINK"
         self.param.general.enable_cochannel = True
         self.param.general.enable_adjacent_channel = False
+        self.param.general.overwrite_output = True
 
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.num_macrocell_sites = 19
@@ -142,27 +144,34 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         """
         self.param.general.system = "HAPS"
 
-        self.simulation = SimulationDownlink(self.param)
+        self.simulation = SimulationDownlink(self.param, "")
         self.simulation.initialize()
-
 
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
 
+        random_number_gen = np.random.RandomState()
+
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
-                                                                       self.simulation.topology)
+                                                                       self.simulation.topology,
+                                                                       random_number_gen)
         self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
         self.simulation.bs.active = np.ones(2, dtype=bool)
 
         self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
                                                             self.param.antenna_imt,
-                                                            self.simulation.topology)
+                                                            self.simulation.topology,
+                                                            random_number_gen)
         self.simulation.ue.x = np.array([20, 70, 110, 170])
         self.simulation.ue.y = np.array([ 0,  0,   0,   0])
         self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
         self.simulation.ue.active = np.ones(4, dtype=bool)
 
+        self.simulation.propagation_imt = PropagationFactory.create_propagation(self.param.imt.channel_model,
+                                                                                self.param, random_number_gen)
+        self.simulation.propagation_system = PropagationFactory.create_propagation(self.param.haps.channel_model,
+                                                                                   self.param, random_number_gen)
         self.simulation.connect_ue_to_bs()
         self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
                                                                                     self.simulation.ue,
@@ -194,7 +203,7 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         total_interference = 10*np.log10(np.power(10, 0.1*rx_interference) + np.power(10, 0.1*thermal_noise))
         npt.assert_allclose(self.simulation.ue.total_interference, total_interference, atol=1e-2)
 
-        self.simulation.system = StationFactory.generate_haps(self.param.haps, 0)
+        self.simulation.system = StationFactory.generate_haps(self.param.haps, 0, random_number_gen)
 
         # now we evaluate interference from HAPS to IMT UE
         self.simulation.calculate_sinr_ext()
