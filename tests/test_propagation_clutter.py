@@ -7,7 +7,7 @@ Created on Tue Mai 02 15:02:31 2017
 """
 
 import unittest
-import numpy.testing as npt
+import numpy as np
 
 
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
@@ -15,7 +15,7 @@ from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
 class PropagationClutterLossTest(unittest.TestCase):
 
     def setUp(self):
-        self.__ClutterAtt = PropagationClutterLoss()
+        self.__ClutterAtt = PropagationClutterLoss(np.random.RandomState())
 
     def test_loss(self):
 

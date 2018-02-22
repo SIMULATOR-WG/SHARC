@@ -16,6 +16,7 @@ from sharc.propagation.atmosphere import ReferenceAtmosphere
 from sharc.support.enumerations import StationType
 from sharc.propagation.scintillation import Scintillation
 
+
 class PropagationP619(Propagation):
     """
     Implements the earth-to-space channel model from ITU-R P.619
@@ -24,12 +25,13 @@ class PropagationP619(Propagation):
         get_loss: Calculates path loss for earth-space link
     """
 
-    def __init__(self):
-        super().__init__()
-        self.clutter = PropagationClutterLoss()
-        self.free_space = PropagationFreeSpace()
-        self.building_entry = PropagationBuildingEntryLoss()
-        self.scintillation = Scintillation()
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
+
+        self.clutter = PropagationClutterLoss(self.random_number_gen)
+        self.free_space = PropagationFreeSpace(self.random_number_gen)
+        self.building_entry = PropagationBuildingEntryLoss(self.random_number_gen)
+        self.scintillation = Scintillation(self.random_number_gen)
         self.atmosphere = ReferenceAtmosphere()
 
         self.depolarization_loss = 1.5
@@ -39,6 +41,7 @@ class PropagationP619(Propagation):
         self.surf_water_dens_has_atmospheric_loss = []
         self.atmospheric_loss = []
         self.elevation_delta = .01
+
 
     def _get_atmospheric_gasses_loss(self, *args, **kwargs) -> float:
         """

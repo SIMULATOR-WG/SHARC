@@ -15,7 +15,7 @@ from sharc.propagation.propagation_gases_attenuation import PropagationGasesAtte
 class PropagationGasesAttenuationTest(unittest.TestCase):
 
     def setUp(self):
-        self.__gasAtt = PropagationGasesAttenuation()
+        self.__gasAtt = PropagationGasesAttenuation(np.random.RandomState())
 
     def test_loss(self):
 

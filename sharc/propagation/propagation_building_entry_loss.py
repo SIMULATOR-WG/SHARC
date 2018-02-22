@@ -16,9 +16,6 @@ class PropagationBuildingEntryLoss(Propagation):
     Implements the building entry loss according to ITU-R P.2109-0 (Prediction of Building Entry Loss)
     """
 
-    def __init__(self):
-        super().__init__()
-
     def get_loss(self, frequency_MHz, elevation, prob="random",
                  building_class="traditional", test = False) -> np.array:
         """
@@ -41,7 +38,7 @@ class PropagationBuildingEntryLoss(Propagation):
         f_GHz = frequency_MHz / 1000
 
         if isinstance(prob, str) and prob.lower() == "random":
-            prob = np.random.random(elevation.shape)
+            prob = self.random_number_gen.random_sample(elevation.shape)
 
         if building_class == "traditional":
             r = 12.64

@@ -16,8 +16,6 @@ from scipy import special
 
 class PropagationClutterLoss(Propagation):
 
-    def __init__(self):
-        super().__init__()
 
     def get_loss(self, *args, **kwargs) -> np.array:
         """
@@ -50,7 +48,7 @@ class PropagationClutterLoss(Propagation):
             f = f * np.ones(d.shape)
 
         if isinstance(loc_per, str) and loc_per.upper() == "RANDOM":
-            p = np.random.random(d.shape)
+            p = self.random_number_gen.random_sample(d.shape)
         else:
             p = loc_per*np.ones(d.shape)
 

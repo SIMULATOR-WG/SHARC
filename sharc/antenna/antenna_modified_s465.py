@@ -25,6 +25,7 @@ class AntennaModifiedS465(Antenna):
         self.envelope_angle = 10**((32 - self.envelope_gain) / 25.)
 
     def calculate_gain(self, *args, **kwargs) -> np.array:
+
         phi = np.absolute(kwargs["phi_vec"])
 
         gain = np.zeros(phi.shape)
@@ -39,7 +40,6 @@ class AntennaModifiedS465(Antenna):
         gain[idx_2] = self.envelope_gain
 
         return gain
-
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

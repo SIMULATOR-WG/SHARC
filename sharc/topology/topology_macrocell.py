@@ -42,8 +42,7 @@ class TopologyMacrocell(Topology):
         super().__init__(intersite_distance, cell_radius)
         self.num_clusters = num_clusters
 
-
-    def calculate_coordinates(self):
+    def calculate_coordinates(self, random_number_gen=np.random.RandomState()):
         """
         Calculates the coordinates of the stations according to the inter-site
         distance parameter. This method is invoked in all snapshots but it can

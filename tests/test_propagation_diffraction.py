@@ -8,11 +8,14 @@ import matplotlib.pyplot as plt
 import numpy.testing as npt
 
 from sharc.propagation.propagation_diffraction import PropagationDiffraction
+from sharc.propagation.propagation_gases_attenuation import PropagationGasesAttenuation
 
 class PropagationDiffractionTest(unittest.TestCase):
 
     def setUp(self):
-        self.__Diffraction = PropagationDiffraction()
+        random_number_gen = np.random.RandomState()
+        self.__Diffraction = PropagationDiffraction(random_number_gen,
+                                                    PropagationGasesAttenuation(random_number_gen))
 
     def test_loss(self):
         d = 10000

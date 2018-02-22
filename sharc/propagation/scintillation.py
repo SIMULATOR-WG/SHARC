@@ -16,8 +16,9 @@ class Scintillation():
     (currently only tropospheric scintillation is implemented, ionospheric scintillation not available)
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, random_number_gen: np.random.RandomState):
+        self.random_number_gen = random_number_gen
+
         self.atmosphere = ReferenceAtmosphere()
 
 
@@ -84,7 +85,7 @@ class Scintillation():
                                    / np.sin(elevation_rad) ** 1.2)
 
         if isinstance(time_ratio, str) and time_ratio.lower() == "random":
-            time_ratio = np.random.rand(len(elevation_rad))
+            time_ratio = self.random_number_gen.rand(len(elevation_rad))
 
         # tropospheric scintillation attenuation not exceeded for time_percentage percent time
         time_percentage = time_ratio * 100.

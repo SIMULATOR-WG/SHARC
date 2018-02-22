@@ -18,11 +18,6 @@ class PropagationUMa(Propagation):
     TODO: calculate the effective environment height for the generic case
     """
 
-
-    def __init__(self):
-        super().__init__()
-
-
     def get_loss(self, *args, **kwargs) -> np.array:
         """
         Calculates path loss for LOS and NLOS cases with respective shadowing
@@ -112,7 +107,7 @@ class PropagationUMa(Propagation):
                 + fitting_term[idg]
 
         if shadowing_std:
-            shadowing = np.random.normal(0, shadowing_std, distance_2D.shape)
+            shadowing = self.random_number_gen.normal(0, shadowing_std, distance_2D.shape)
         else:
             shadowing = 0
 
@@ -145,7 +140,7 @@ class PropagationUMa(Propagation):
             loss_nlos[idl] = np.maximum(loss_los[idl], loss_nlos[idl])
 
         if shadowing_std:
-            shadowing = np.random.normal(0, shadowing_std, distance_3D.shape)
+            shadowing = self.random_number_gen.normal(0, shadowing_std, distance_3D.shape)
         else:
             shadowing = 0
 
@@ -190,7 +185,7 @@ class PropagationUMa(Propagation):
             An array with True or False if user equipments are in LOS of NLOS
             condition, respectively.
         """
-        los_condition = np.random.random(p_los.shape) < p_los
+        los_condition = self.random_number_gen.random_sample(p_los.shape) < p_los
         return los_condition
 
 

@@ -6,6 +6,7 @@ Created on Thu Jul  6 16:03:24 2017
 """
 
 import sys
+import numpy.random as rnd
 
 from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
@@ -23,27 +24,27 @@ from sharc.propagation.propagation_tvro import PropagationTvro
 class PropagationFactory(object):
 
     @staticmethod
-    def createPropagation(channel_model: str) -> Propagation:
+    def createPropagation(channel_model: str, random_number_gen: rnd.RandomState) -> Propagation:
         if channel_model == "FSPL":
-            return PropagationFreeSpace()
+            return PropagationFreeSpace(random_number_gen)
         elif channel_model == "ABG":
-            return PropagationABG()
+            return PropagationABG(random_number_gen)
         elif channel_model == "UMa":
-            return PropagationUMa()
+            return PropagationUMa(random_number_gen)
         elif channel_model == "UMi":
-            return PropagationUMi()
+            return PropagationUMi(random_number_gen)
         elif channel_model == "CI":
-            return PropagationCloseIn()
+            return PropagationCloseIn(random_number_gen)
         elif channel_model == "SatelliteSimple":
-            return PropagationSatSimple()
+            return PropagationSatSimple(random_number_gen)
         elif channel_model == "TerrestrialSimple":
-            return PropagationTerSimple()
+            return PropagationTerSimple(random_number_gen)
         elif channel_model == "P619":
-            return PropagationP619()
+            return PropagationP619(random_number_gen)
         elif channel_model == "P452":
-            return PropagationClearAir()
+            return PropagationClearAir(random_number_gen)
         elif channel_model == "TVRO":
-            return PropagationTvro()
+            return PropagationTvro(random_number_gen)
         else:
             sys.stderr.write("ERROR\nInvalid channel_model: " + channel_model)
             sys.exit(1)

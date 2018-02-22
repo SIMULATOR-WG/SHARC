@@ -13,7 +13,7 @@ from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
 class PropagationClearAirTest(unittest.TestCase):
 
     def setUp(self):
-        self.__ClearAir = PropagationClearAir()
+        self.__ClearAir = PropagationClearAir(np.random.RandomState())
 
     def test_loss(self):
 

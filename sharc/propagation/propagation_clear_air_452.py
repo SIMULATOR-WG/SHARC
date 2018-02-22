@@ -21,15 +21,14 @@ class PropagationClearAir(Propagation):
     """
     Basic transmission loss due to free-space propagation and attenuation by atmospheric gases
     """
-    def __init__(self):
-        super(PropagationClearAir, self).__init__()
-        np.random.seed(0)
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
 
-        self.propagationAg = PropagationGasesAttenuation()
-        self.propagationDucting = PropagationDuctingReflection()
-        self.propagationTropoScatter = PropagationTropScatter()
-        self.propagationDiffraction = PropagationDiffraction()
-        self.clutter = PropagationClutterLoss()
+        self.propagationAg = PropagationGasesAttenuation(random_number_gen)
+        self.propagationDucting = PropagationDuctingReflection(random_number_gen, self.propagationAg)
+        self.propagationTropoScatter = PropagationTropScatter(random_number_gen, self.propagationAg)
+        self.propagationDiffraction = PropagationDiffraction(random_number_gen, self.propagationAg)
+        self.clutter = PropagationClutterLoss(random_number_gen)
 
         self.building_loss = 20
 

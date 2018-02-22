@@ -10,26 +10,26 @@ from sharc.support.observable import Observable
 
 import numpy as np
 import math
-import random
 import sys
 import matplotlib.pyplot as plt
 
 
 from sharc.support.enumerations import StationType
 from sharc.topology.topology_factory import TopologyFactory
-from sharc.propagation.propagation_factory import PropagationFactory
 from sharc.parameters.parameters import Parameters
 from sharc.propagation.propagation import Propagation
 from sharc.station_manager import StationManager
 from sharc.results import Results
 
+
 class Simulation(ABC, Observable):
 
-    def __init__(self, parameters: Parameters):
+    def __init__(self, parameters: Parameters, parameter_file: str):
         ABC.__init__(self)
         Observable.__init__(self)
 
         self.parameters = parameters
+        self.parameters_filename = parameter_file
 
         if self.parameters.general.system == "FSS_SS":
             self.param_system = self.parameters.fss_ss
@@ -44,9 +44,6 @@ class Simulation(ABC, Observable):
         self.adjacent_channel = self.parameters.general.enable_adjacent_channel
 
         self.topology = TopologyFactory.createTopology(self.parameters)
-
-        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model)
-        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model)
 
         self.bs_power_gain = 0
         self.ue_power_gain = 0
@@ -95,11 +92,12 @@ class Simulation(ABC, Observable):
 
             self.adjacent_channel = False
 
+        self.propagation_imt = None
+        self.propagation_system = None
 
     def add_observer_list(self, observers: list):
         for o in observers:
             self.add_observer(o)
-
 
     def initialize(self, *args, **kwargs):
         """
@@ -139,8 +137,7 @@ class Simulation(ABC, Observable):
         # calculates the number of RB per UE on a given BS
         self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.parameters.imt.ue_k)
 
-        self.results = Results()
-
+        self.results = Results(self.parameters_filename)
 
     def finalize(self, *args, **kwargs):
         """
@@ -148,7 +145,6 @@ class Simulation(ABC, Observable):
         """
         snapshot_number = kwargs["snapshot_number"]
         self.results.write_files(snapshot_number)
-
 
     def calculate_coupling_loss(self,
                                 station_a: StationManager,
@@ -233,7 +229,6 @@ class Simulation(ABC, Observable):
 
         return coupling_loss
 
-
     def connect_ue_to_bs(self):
         """
         Link the UE's to the serving BS. It is assumed that each group of K*M
@@ -246,8 +241,7 @@ class Simulation(ABC, Observable):
             ue_list = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]
             self.link[bs] = ue_list
 
-
-    def select_ue(self):
+    def select_ue(self, random_number_gen: np.random.RandomState):
         """
         Select K UEs randomly from all the UEs linked to one BS as “chosen”
         UEs. These K “chosen” UEs will be scheduled during this snapshot.
@@ -258,7 +252,7 @@ class Simulation(ABC, Observable):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             # select K UE's among the ones that are connected to BS
-            random.shuffle(self.link[bs])
+            random_number_gen.shuffle(self.link[bs])
             K = self.parameters.imt.ue_k
             del self.link[bs][K:]
             # Activate the selected UE's and create beams
@@ -285,8 +279,6 @@ class Simulation(ABC, Observable):
             ue = self.link[bs]
             self.bs.bandwidth[bs] = self.num_rb_per_ue*self.parameters.imt.rb_bandwidth
             self.ue.bandwidth[ue] = self.num_rb_per_ue*self.parameters.imt.rb_bandwidth
-
-
 
     def calculate_gains(self,
                         station_1: StationManager,
@@ -362,7 +354,6 @@ class Simulation(ABC, Observable):
 
         return gains
 
-
     def calculate_imt_tput(self,
                            sinr: np.array,
                            sinr_min: float,
@@ -382,7 +373,6 @@ class Simulation(ABC, Observable):
             tput[id_max] = tput_max
 
         return tput
-
 
     def calculate_bw_weights(self, bw_imt: float, bw_sys: float, ue_k: int) -> np.array:
         """
@@ -422,7 +412,6 @@ class Simulation(ABC, Observable):
 
         return weights
 
-
     def plot_scenario(self):
         fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
         ax = fig.gca()
@@ -450,14 +439,12 @@ class Simulation(ABC, Observable):
 
         sys.exit(0)
 
-
     @abstractmethod
     def snapshot(self, *args, **kwargs):
         """
         Performs a single snapshot.
         """
         pass
-
 
     @abstractmethod
     def power_control(self):

@@ -13,15 +13,10 @@ class PropagationDuctingReflection(Propagation):
     Basic transmission loss due to free-space propagation and attenuation by atmospheric gases
     """
 
+    def __init__(self, random_number_gen: np.random.RandomState, propagation_ag: PropagationGasesAttenuation):
+        super().__init__(random_number_gen)
 
-
-    def __init__(self):
-        super(PropagationDuctingReflection, self).__init__()
-        np.random.seed(0)
-
-        #self.param = param
-        #self.paramProp = paramProp
-        self.propagation = PropagationGasesAttenuation()
+        self.propagation = propagation_ag
 
     def get_loss(self, *args, **kwargs) -> np.array:
 

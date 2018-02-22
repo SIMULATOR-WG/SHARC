@@ -31,7 +31,6 @@ from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
-from sharc.spectral_mask_imt import SpectralMaskImt
 from sharc.spectral_mask_3gpp import SpectralMask3Gpp
 
 
@@ -40,7 +39,8 @@ class StationFactory(object):
     @staticmethod
     def generate_imt_base_stations(param: ParametersImt,
                                    param_ant: ParametersAntennaImt,
-                                   topology: Topology):
+                                   topology: Topology,
+                                   random_number_gen: np.random.RandomState):
         num_bs = topology.num_base_stations
         imt_base_stations = StationManager(num_bs)
         imt_base_stations.station_type = StationType.IMT_BS
@@ -51,7 +51,7 @@ class StationFactory(object):
         imt_base_stations.elevation = topology.elevation
         imt_base_stations.height = param.bs_height*np.ones(num_bs)
         imt_base_stations.indoor = np.zeros(num_bs, dtype=bool)
-        imt_base_stations.active = np.random.rand(num_bs) < param.bs_load_probability
+        imt_base_stations.active = random_number_gen.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
         imt_base_stations.rx_power = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.rx_interference = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
@@ -83,7 +83,8 @@ class StationFactory(object):
     @staticmethod
     def generate_imt_ue(param: ParametersImt,
                         param_ant: ParametersAntennaImt,
-                        topology: Topology):
+                        topology: Topology,
+                        random_number_gen: np.random.RandomState):
         num_bs = topology.num_base_stations
         num_ue_per_bs = param.ue_k*param.ue_k_m
 
@@ -97,10 +98,11 @@ class StationFactory(object):
 
         # Calculate UE pointing
         azimuth_range = (-60, 60)
-        azimuth = (azimuth_range[1] - azimuth_range[0])*np.random.random(num_ue) + azimuth_range[0]
+        azimuth = (azimuth_range[1] - azimuth_range[0])*random_number_gen.random_sample(num_ue) + azimuth_range[0]
         # Remove the randomness from azimuth and you will have a perfect pointing
         elevation_range = (-90, 90)
-        elevation = (elevation_range[1] - elevation_range[0])*np.random.random(num_ue) + elevation_range[0]
+        elevation = (elevation_range[1] - elevation_range[0])*random_number_gen.random_sample(num_ue) + \
+                    elevation_range[0]
 
         if param.ue_distribution_type.upper() == "UNIFORM":
 
@@ -108,8 +110,8 @@ class StationFactory(object):
                 sys.stderr.write("ERROR\nUniform UE distribution is currently supported only with Macrocell topology")
                 sys.exit(1)
 
-            [ue_x, ue_y, theta, distance] = StationFactory.get_random_position(num_ue, topology,
-                                                                               param.minimum_separation_distance_bs_ue)
+            [ue_x, ue_y, theta, distance] = StationFactory.get_random_position(num_ue, topology, random_number_gen,
+                                                                               param.minimum_separation_distance_bs_ue )
             psi = np.degrees(np.arctan((param.bs_height - param.ue_height) / distance))
 
             imt_ue.azimuth = (azimuth + theta + np.pi/2)
@@ -128,9 +130,9 @@ class StationFactory(object):
                 # sigma = distance/3.0345. So we always distibute UE's in order to meet
                 # the requirement Prob(d<d_edge) = 99% for a given cell radius.
                 radius_scale = topology.cell_radius / 3.0345
-                radius = np.random.rayleigh(radius_scale, num_ue)
+                radius = random_number_gen.rayleigh(radius_scale, num_ue)
             elif param.ue_distribution_distance.upper() == "UNIFORM":
-                radius = topology.cell_radius * np.random.random(num_ue)
+                radius = topology.cell_radius * random_number_gen.random_sample(num_ue)
             else:
                 sys.stderr.write("ERROR\nInvalid UE distance distribution: " + param.ue_distribution_distance)
                 sys.exit(1)
@@ -143,14 +145,15 @@ class StationFactory(object):
                 N = 1.4
                 angle_scale = 30
                 angle_mean = 0
-                angle_n = np.random.normal(angle_mean, angle_scale, int(N * num_ue))
+                angle_n = random_number_gen.normal(angle_mean, angle_scale, int(N * num_ue))
 
                 angle_cutoff = 60
                 idx = np.where((angle_n < angle_cutoff) & (angle_n > -angle_cutoff))[0][:num_ue]
                 angle = angle_n[idx]
             elif param.ue_distribution_azimuth.upper() == "UNIFORM":
                 azimuth_range = (-60, 60)
-                angle = (azimuth_range[1] - azimuth_range[0]) * np.random.random(num_ue) + azimuth_range[0]
+                angle = (azimuth_range[1] - azimuth_range[0]) * random_number_gen.random_sample(num_ue) \
+                        + azimuth_range[0]
             else:
                 sys.stderr.write("ERROR\nInvalid UE azimuth distribution: " + param.ue_distribution_distance)
                 sys.exit(1)
@@ -182,7 +185,7 @@ class StationFactory(object):
 
         imt_ue.active = np.zeros(num_ue, dtype=bool)
         imt_ue.height = param.ue_height*np.ones(num_ue)
-        imt_ue.indoor = np.random.random(num_ue) <= (param.ue_indoor_percent/100)
+        imt_ue.indoor = random_number_gen.random_sample(num_ue) <= (param.ue_indoor_percent/100)
         imt_ue.tx_power = param.ue_conducted_power*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
@@ -203,9 +206,9 @@ class StationFactory(object):
 
 
     @staticmethod
-    def generate_system(parameters: Parameters, topology: Topology):
+    def generate_system(parameters: Parameters, topology: Topology, random_number_gen: np.random.RandomState ):
         if parameters.general.system == "FSS_ES":
-            return StationFactory.generate_fss_earth_station(parameters.fss_es, topology)
+            return StationFactory.generate_fss_earth_station(parameters.fss_es, topology, random_number_gen)
         elif parameters.general.system == "FSS_SS":
             return StationFactory.generate_fss_space_station(parameters.fss_ss)
         elif parameters.general.system == "FS":
@@ -271,7 +274,8 @@ class StationFactory(object):
 
 
     @staticmethod
-    def generate_fss_earth_station(param: ParametersFssEs, topology: Topology):
+    def generate_fss_earth_station(param: ParametersFssEs, topology: Topology,
+                                   random_number_gen: np.random.RandomState):
         fss_earth_station = StationManager(1)
         fss_earth_station.station_type = StationType.FSS_ES
 
@@ -279,16 +283,18 @@ class StationFactory(object):
             fss_earth_station.x = np.array([param.x])
             fss_earth_station.y = np.array([param.y])
         elif param.location.upper() == "CELL":
-            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, param.min_dist_to_bs, True )
+            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, random_number_gen,
+                                                                      param.min_dist_to_bs, True)
             fss_earth_station.x = np.array(x)
             fss_earth_station.y = np.array(y)
         elif param.location.upper() == "NETWORK":
-            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, param.min_dist_to_bs, False)
+            x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, random_number_gen,
+                                                                      param.min_dist_to_bs, False)
             fss_earth_station.x = np.array(x)
             fss_earth_station.y = np.array(y)
         elif param.location.upper() == "UNIFORM_DIST":
-            dist = np.random.uniform( param.min_dist_to_bs, param.max_dist_to_bs)
-            angle = np.random.uniform(-np.pi, np.pi)
+            dist = random_number_gen.uniform( param.min_dist_to_bs, param.max_dist_to_bs)
+            angle = random_number_gen.uniform(-np.pi, np.pi)
             fss_earth_station.x[0] = np.array(dist * np.cos(angle))
             fss_earth_station.y[0] = np.array(dist * np.sin(angle))
         else:
@@ -298,11 +304,11 @@ class StationFactory(object):
         fss_earth_station.height = np.array([param.height])
 
         if param.azimuth.upper() == "RANDOM":
-            fss_earth_station.azimuth = np.random.uniform(-180., 180.)
+            fss_earth_station.azimuth = random_number_gen.uniform(-180., 180.)
         else:
             fss_earth_station.azimuth = float(param.azimuth)
 
-        elevation =  np.random.uniform(param.elevation_min, param.elevation_max)
+        elevation =  random_number_gen.uniform(param.elevation_min, param.elevation_max)
         fss_earth_station.elevation = np.array([elevation])
 
         fss_earth_station.active = np.array([True])
@@ -388,15 +394,17 @@ class StationFactory(object):
         return ras_station
 
     @staticmethod
-    def get_random_position( num_stas: int, topology: Topology, min_dist_to_bs = 0, central_cell = False ):
+    def get_random_position( num_stas: int, topology: Topology,
+                             random_number_gen: np.random.RandomState,
+                             min_dist_to_bs = 0, central_cell = False ):
         hexagon_radius = topology.intersite_distance / 3
 
         min_dist_ok = False
 
         while not min_dist_ok:
             # generate UE uniformly in a triangle
-            x = np.random.uniform(0, hexagon_radius * np.cos(np.pi / 6), num_stas)
-            y = np.random.uniform(0, hexagon_radius / 2, num_stas)
+            x = random_number_gen.uniform(0, hexagon_radius * np.cos(np.pi / 6), num_stas)
+            y = random_number_gen.uniform(0, hexagon_radius / 2, num_stas)
 
             invert_index = np.arctan(y / x) > np.pi / 6
             y[invert_index] = -(hexagon_radius / 2 - y[invert_index])
@@ -408,7 +416,7 @@ class StationFactory(object):
                 min_dist_ok = True
 
         # randomly choose an hextant
-        hextant = np.random.random_integers(0, 5, num_stas)
+        hextant = random_number_gen.random_integers(0, 5, num_stas)
         hextant_angle = np.pi / 6 + np.pi / 3 * hextant
 
         old_x = x
@@ -418,10 +426,11 @@ class StationFactory(object):
         # randomly choose a cell
         if central_cell:
             central_cell_indices = np.where((topology.x == 0) & (topology.y == 0))
-            cell = central_cell_indices[0][np.random.random_integers(0, len(central_cell_indices[0]) - 1, num_stas)]
+            cell = central_cell_indices[0][random_number_gen.random_integers(0, len(central_cell_indices[0]) - 1,
+                                                                             num_stas)]
         else:
             num_bs = topology.num_base_stations
-            cell = np.random.random_integers(0, num_bs - 1, num_stas)
+            cell = random_number_gen.random_integers(0, num_bs - 1, num_stas)
 
         cell_x = topology.x[cell]
         cell_y = topology.y[cell]

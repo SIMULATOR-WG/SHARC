@@ -15,6 +15,7 @@ from sharc.parameters.parameters import Parameters
 from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.station_factory import StationFactory
+from sharc.propagation.propagation_factory import PropagationFactory
 
 class SimulationUplinkTest(unittest.TestCase):
 
@@ -180,18 +181,22 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation = SimulationUplink(self.param)
         self.simulation.initialize()
 
+        random_number_gen = np.random.RandomState()
+
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
 
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
-                                                                       self.simulation.topology)
+                                                                       self.simulation.topology,
+                                                                       random_number_gen)
         self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
         self.simulation.bs.active = np.ones(2, dtype=bool)
 
         self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
                                                             self.param.antenna_imt,
-                                                            self.simulation.topology)
+                                                            self.simulation.topology,
+                                                            random_number_gen)
         self.simulation.ue.x = np.array([20, 70, 110, 170])
         self.simulation.ue.y = np.array([ 0,  0,   0,   0])
         self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
@@ -203,7 +208,11 @@ class SimulationUplinkTest(unittest.TestCase):
 
         # We do not test the selection method here because in this specific
         # scenario we do not want to change the order of the UE's
-        #self.simulation.select_ue()
+
+        self.simulation.propagation_imt = PropagationFactory.createPropagation(self.param.imt.channel_model,
+                                                                               random_number_gen)
+        self.simulation.propagation_system = PropagationFactory.createPropagation(self.param.fss_ss.channel_model,
+                                                                                  random_number_gen)
 
         # test coupling loss method
         self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
@@ -303,15 +312,19 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
 
+        random_number_gen = np.random.RandomState()
+
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
-                                                                       self.simulation.topology)
+                                                                       self.simulation.topology,
+                                                                       random_number_gen)
         self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
         self.simulation.bs.active = np.ones(2, dtype=bool)
 
         self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
                                                             self.param.antenna_imt,
-                                                            self.simulation.topology)
+                                                            self.simulation.topology,
+                                                            random_number_gen)
         self.simulation.ue.x = np.array([20, 70, 110, 170])
         self.simulation.ue.y = np.array([ 0,  0,   0,   0])
         self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
@@ -321,7 +334,10 @@ class SimulationUplinkTest(unittest.TestCase):
 
         # We do not test the selection method here because in this specific
         # scenario we do not want to change the order of the UE's
-        #self.simulation.select_ue()
+        self.simulation.propagation_imt = PropagationFactory.createPropagation(self.param.imt.channel_model,
+                                                                               random_number_gen)
+        self.simulation.propagation_system = PropagationFactory.createPropagation(self.param.fss_ss.channel_model,
+                                                                                  random_number_gen)
 
         # test coupling loss method
         self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
@@ -417,15 +433,19 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.bs_power_gain = 0
         self.simulation.ue_power_gain = 0
 
+        random_number_gen = np.random.RandomState()
+
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
-                                                                       self.simulation.topology)
+                                                                       self.simulation.topology,
+                                                                       random_number_gen)
         self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
         self.simulation.bs.active = np.ones(2, dtype=bool)
 
         self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
                                                             self.param.antenna_imt,
-                                                            self.simulation.topology)
+                                                            self.simulation.topology,
+                                                            random_number_gen)
         self.simulation.ue.x = np.array([20, 70, 110, 170])
         self.simulation.ue.y = np.array([ 0,  0,   0,   0])
         self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
@@ -436,6 +456,11 @@ class SimulationUplinkTest(unittest.TestCase):
         # We do not test the selection method here because in this specific
         # scenario we do not want to change the order of the UE's
         #self.simulation.select_ue()
+
+        self.simulation.propagation_imt = PropagationFactory.createPropagation(self.param.imt.channel_model,
+                                                                               random_number_gen)
+        self.simulation.propagation_system = PropagationFactory.createPropagation(self.param.fss_ss.channel_model,
+                                                                                  random_number_gen)
 
         # test coupling loss method
         self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
@@ -502,80 +527,6 @@ class SimulationUplinkTest(unittest.TestCase):
                                np.array([ rx_interference - (-98.599) ]),
                                delta=.01)
 
-    def test_simulation_2bs_4ue_ras_adjacent(self):
-        self.param.general.system = "RAS"
-        self.param.general.compatibility = "ADJACENT"
-
-        self.param.ras.frequency = 10000
-        self.param.ras.bandwidth = 1000
-
-        self.simulation = SimulationUplink(self.param)
-        self.simulation.initialize()
-
-        self.simulation.bs_power_gain = 0
-        self.simulation.ue_power_gain = 0
-
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
-                                                                       self.param.antenna_imt,
-                                                                       self.simulation.topology)
-        self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
-        self.simulation.bs.active = np.ones(2, dtype=bool)
-
-        self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
-                                                            self.param.antenna_imt,
-                                                            self.simulation.topology)
-        self.simulation.ue.x = np.array([20, 70, 110, 170])
-        self.simulation.ue.y = np.array([ 0,  0,   0,   0])
-        self.simulation.ue.antenna = np.array([AntennaOmni(10), AntennaOmni(11), AntennaOmni(22), AntennaOmni(23)])
-        self.simulation.ue.active = np.ones(4, dtype=bool)
-
-        self.simulation.connect_ue_to_bs()
-
-        # We do not test the selection method here because in this specific
-        # scenario we do not want to change the order of the UE's
-        #self.simulation.select_ue()
-
-        # test coupling loss method
-        self.simulation.coupling_loss_imt = self.simulation.calculate_coupling_loss(self.simulation.bs,
-                                                                                    self.simulation.ue,
-                                                                                    self.simulation.propagation_imt)
-
-        self.simulation.scheduler()
-        self.simulation.power_control()
-
-        self.simulation.calculate_sinr()
-
-        # Create system
-        self.simulation.system = StationFactory.generate_ras_station(self.param.ras)
-        self.simulation.system.x = np.array([-2000])
-        self.simulation.system.y = np.array([0])
-        self.simulation.system.height = np.array([self.param.ras.height])
-        self.simulation.system.antenna[0].effective_area = 54.9779
-
-        # Test gain calculation
-        gains = self.simulation.calculate_gains(self.simulation.system,self.simulation.ue)
-        npt.assert_equal(gains,np.array([[50, 50, 50, 50]]))
-
-        # Test external interference
-        self.simulation.calculate_external_interference()
-        npt.assert_allclose(self.simulation.coupling_loss_imt_system,
-                            np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]),
-                            atol=1e-2)
-        npt.assert_allclose(self.simulation.coupling_loss_imt_system_adjacent,
-                            np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]),
-                            atol=1e-2)
-
-        # Test RAS interference
-        interference = 20 - np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23])- 7 + \
-                       10*math.log10(45/1000) - 3
-        oob_interference = 17.4625 - np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23]) + \
-                           10*math.log10(900/1000) - 3
-        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)) + \
-                                        np.sum(np.power(10, 0.1*oob_interference)))
-        self.assertAlmostEqual(self.simulation.system.rx_interference,
-                               rx_interference,
-                               delta=.01)
-
     def test_beamforming_gains(self):
         self.param.general.system = "FSS_SS"
 
@@ -584,14 +535,18 @@ class SimulationUplinkTest(unittest.TestCase):
 
         eps = 1e-2
 
+        random_number_gen = np.random.RandomState()
+
         # Set scenario
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
-                                                                       self.simulation.topology)
+                                                                       self.simulation.topology,
+                                                                       random_number_gen)
 
         self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
                                                             self.param.antenna_imt,
-                                                            self.simulation.topology)
+                                                            self.simulation.topology,
+                                                            random_number_gen)
         self.simulation.ue.x = np.array([50.000, 43.301, 150.000, 175.000])
         self.simulation.ue.y = np.array([ 0.000, 25.000,   0.000, 43.301])
 

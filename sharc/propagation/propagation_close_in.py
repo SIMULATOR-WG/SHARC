@@ -14,8 +14,8 @@ class PropagationCloseIn(Propagation):
     Implements the close-in free-space reference distance propagation model.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
         # model parameters for LOS
         self.path_loss_exponent_los = 2.0
         self.shadowing_sigma_dB_los = 4.1
@@ -31,7 +31,7 @@ class PropagationCloseIn(Propagation):
         p_los = kwargs["line_of_sight_prob"]
         std = kwargs["shadowing"]
 
-        line_of_sight = np.random.sample(d.shape) <= p_los
+        line_of_sight = self.random_number_gen.random_sample(d.shape) <= p_los
 
         path_loss_exponent = np.ones(d.shape) * self.path_loss_exponent_nlos
         path_loss_exponent[line_of_sight] = self.path_loss_exponent_los
@@ -40,7 +40,7 @@ class PropagationCloseIn(Propagation):
         shadowing_sigma_dB[line_of_sight] = self.shadowing_sigma_dB_los
 
         if std:
-            shadowing = np.random.normal(0, shadowing_sigma_dB, d.shape)
+            shadowing = self.random_number_gen.normal(0, shadowing_sigma_dB, d.shape)
         else:
             shadowing = 0
 

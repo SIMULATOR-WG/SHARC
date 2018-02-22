@@ -18,12 +18,10 @@ class PropagationDiffraction(Propagation):
     Implements the Diffraction loss model
     """
 
-    def __init__(self):
-        super(PropagationDiffraction, self).__init__()
-        np.random.seed(0)
+    def __init__(self, random_number_gen, propagation_ag: PropagationGasesAttenuation):
+        super().__init__(random_number_gen)
 
-        self.propagation = self
-        self.propagationAg = PropagationGasesAttenuation()
+        self.propagationAg = propagation_ag
 
     def func_Gt(self, K,Bdft,Yt):
 
@@ -56,9 +54,7 @@ class PropagationDiffraction(Propagation):
 
         return res_G
 
-
     def Jfunction(self,v):
-
         if (v<-0.78):
            v_result=0;
 
@@ -156,7 +152,7 @@ class PropagationDiffraction(Propagation):
                    if vmax_i>vmax:
                        vmax = vmax_i
 
-               Luc = self.propagation.Jfunction(vmax)
+               Luc = self.Jfunction(vmax)
 
             if(Stim_max>=Str):
                for i in range(0, val_hi,1):
@@ -171,7 +167,7 @@ class PropagationDiffraction(Propagation):
 
                    if vb>vb_max:
                       vb_max = vb
-               Luc = self.propagation.Jfunction(vb_max)
+               Luc = self.Jfunction(vb_max)
 
             Lbull = Luc + (1 - np.exp(- Luc/6))*(10 + 0.02*d)
 
@@ -237,9 +233,9 @@ class PropagationDiffraction(Propagation):
                Fx = -20*np.log10(X) - 5.6488*(X**1.425)
 
             if i == 0:
-               Ldftland = -Fx - self.propagation.func_Gt(K,Bdft,Yt) - self.propagation.func_Gr(K,Bdft,Yr)
+               Ldftland = -Fx - self.func_Gt(K,Bdft,Yt) - self.func_Gr(K,Bdft,Yr)
             if i == 1:
-               Ldftsea = -Fx - self.propagation.func_Gt(K,Bdft,Yt) - self.propagation.func_Gr(K,Bdft,Yr)
+               Ldftsea = -Fx - self.func_Gt(K,Bdft,Yt) - self.func_Gr(K,Bdft,Yr)
 
 
         Ldft  = omega*Ldftsea + (1- omega)*Ldftland
@@ -312,10 +308,10 @@ class PropagationDiffraction(Propagation):
          Lb0p = Lbfgs + Esp
 
          a = 'p'
-         Ld50 = self.propagation.Ld_difraction(d,f,a,deltaN,hrs,hts,hte,hre,hsr,hst,h0,hn,di,hi,omega)    # Ld50
+         Ld50 = self.Ld_difraction(d,f,a,deltaN,hrs,hts,hte,hre,hsr,hst,h0,hn,di,hi,omega)    # Ld50
 
          a = 'b'
-         Ldbeta = self.propagation.Ld_difraction(d,f,a,deltaN,hrs,hts,hte,hre,hsr,hst,h0,hn,di,hi,omega)  #Ldbeta
+         Ldbeta = self.Ld_difraction(d,f,a,deltaN,hrs,hts,hte,hre,hsr,hst,h0,hn,di,hi,omega)  #Ldbeta
 
          Ldp = Ld50 + Fi*(Ldbeta - Ld50)
          Ldb = Lb0p + Ldp

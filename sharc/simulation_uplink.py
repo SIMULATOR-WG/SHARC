@@ -13,41 +13,51 @@ from sharc.parameters.parameters import Parameters
 from sharc.station_factory import StationFactory
 from sharc.support.enumerations import StationType
 
+from sharc.propagation.propagation_factory import PropagationFactory
+
+
 class SimulationUplink(Simulation):
     """
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, parameters: Parameters):
-        super().__init__(parameters)
-
+    def __init__(self, parameters: Parameters, parameter_file: str):
+        super().__init__(parameters, parameter_file)
 
     def snapshot(self, *args, **kwargs):
         write_to_file = kwargs["write_to_file"]
         snapshot_number = kwargs["snapshot_number"]
+        seed = kwargs["seed"]
+
+        random_number_gen = np.random.RandomState(seed)
+
+        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model,
+                                                                    random_number_gen)
+        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model,
+                                                                       random_number_gen)
 
         # In case of hotspots, base stations coordinates have to be calculated
         # on every snapshot. Anyway, let topology decide whether to calculate
         # or not
-        self.topology.calculate_coordinates()
+        self.topology.calculate_coordinates(random_number_gen)
 
         # Create the base stations (remember that it takes into account the
         # network load factor)
         self.bs = StationFactory.generate_imt_base_stations(self.parameters.imt,
                                                             self.parameters.antenna_imt,
-                                                            self.topology)
+                                                            self.topology, random_number_gen)
 
         # Create the other system (FSS, HAPS, etc...)
-        self.system = StationFactory.generate_system(self.parameters, self.topology)
+        self.system = StationFactory.generate_system(self.parameters, self.topology, random_number_gen)
 
         # Create IMT user equipments
         self.ue = StationFactory.generate_imt_ue(self.parameters.imt,
                                                  self.parameters.antenna_imt,
-                                                 self.topology)
+                                                 self.topology, random_number_gen)
         #self.plot_scenario()
 
         self.connect_ue_to_bs()
-        self.select_ue()
+        self.select_ue(random_number_gen)
 
         # Calculate coupling loss after beams are created
         self.coupling_loss_imt = self.calculate_coupling_loss(self.bs,
@@ -194,8 +204,13 @@ class SimulationUplink(Simulation):
                                                 self.parameters.imt.ue_k)
 
             if self.co_channel:
+                if self.overlapping_bandwidth:
+                    acs = 0
+                else:
+                    acs = self.param_system.adjacent_ch_selectivity
+
                 cochannel_interference = math.pow(10, 0.1*self.system.rx_interference) + \
-                                         np.sum(weights*np.power(10, 0.1*interference_ue))
+                                         np.sum(weights*np.power(10, 0.1*interference_ue)) / 10**(acs/10.)
 
             if self.adjacent_channel:
                 for u in ue:

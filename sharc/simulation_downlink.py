@@ -13,42 +13,51 @@ from sharc.parameters.parameters import Parameters
 from sharc.station_factory import StationFactory
 from sharc.support.enumerations import StationType
 
+from sharc.propagation.propagation_factory import PropagationFactory
+
+
 class SimulationDownlink(Simulation):
     """
     Implements the flowchart of simulation downlink method
     """
 
-    def __init__(self, parameters: Parameters):
-        super().__init__(parameters)
-
-
+    def __init__(self, parameters: Parameters, parameter_file: str):
+        super().__init__(parameters, parameter_file)
 
     def snapshot(self, *args, **kwargs):
         write_to_file = kwargs["write_to_file"]
         snapshot_number = kwargs["snapshot_number"]
+        seed = kwargs["seed"]
+
+        random_number_gen = np.random.RandomState(seed)
+
+        self.propagation_imt = PropagationFactory.createPropagation(self.parameters.imt.channel_model,
+                                                                    random_number_gen)
+        self.propagation_system = PropagationFactory.createPropagation(self.param_system.channel_model,
+                                                                       random_number_gen)
 
         # In case of hotspots, base stations coordinates have to be calculated
         # on every snapshot. Anyway, let topology decide whether to calculate
         # or not
-        self.topology.calculate_coordinates()
+        self.topology.calculate_coordinates(random_number_gen)
 
         # Create the base stations (remember that it takes into account the
         # network load factor)
         self.bs = StationFactory.generate_imt_base_stations(self.parameters.imt,
                                                             self.parameters.antenna_imt,
-                                                            self.topology)
+                                                            self.topology, random_number_gen)
 
         # Create the other system (FSS, HAPS, etc...)
-        self.system = StationFactory.generate_system(self.parameters,self.topology)
+        self.system = StationFactory.generate_system(self.parameters,self.topology, random_number_gen)
 
         # Create IMT user equipments
         self.ue = StationFactory.generate_imt_ue(self.parameters.imt,
                                                  self.parameters.antenna_imt,
-                                                 self.topology)
+                                                 self.topology, random_number_gen)
         #self.plot_scenario()
 
         self.connect_ue_to_bs()
-        self.select_ue()
+        self.select_ue(random_number_gen)
 
         # Calculate coupling loss after beams are created
         self.coupling_loss_imt = self.calculate_coupling_loss(self.bs,
@@ -70,16 +79,12 @@ class SimulationDownlink(Simulation):
             # the other system
             self.calculate_sinr()
             self.calculate_external_interference()
-            #self.calculate_external_degradation()
             pass
 
         self.collect_results(write_to_file, snapshot_number)
 
-
-
     def finalize(self, *args, **kwargs):
         self.notify_observers(source=__name__, results=self.results)
-
 
     def power_control(self):
         """
@@ -99,8 +104,6 @@ class SimulationDownlink(Simulation):
         if self.adjacent_channel:
             for bs in bs_active:
                 self.bs.spectral_mask[bs].set_power(total_power)
-
-
 
     def calculate_sinr(self):
         """
@@ -137,7 +140,6 @@ class SimulationDownlink(Simulation):
         self.ue.sinr = self.ue.rx_power - self.ue.total_interference
         self.ue.snr = self.ue.rx_power - self.ue.thermal_noise
 
-
     def calculate_sinr_ext(self):
         """
         Calculates the downlink SINR and INR for each UE taking into account the
@@ -161,21 +163,22 @@ class SimulationDownlink(Simulation):
             - (10*np.log10(np.power(10, 0.1*self.ue.total_interference[ue]) + np.power(10, 0.1*self.ue.ext_interference[ue])))
         self.ue.inr[ue] = self.ue.ext_interference[ue] - self.ue.thermal_noise[ue]
 
-
     def calculate_external_interference(self):
         """
         Calculates interference that IMT system generates on other system
         """
 
+        polarization_loss = 3
+
         self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.bs,
-                                                                     self.propagation_system)
+                                                                     self.propagation_system) + polarization_loss
 
         if self.adjacent_channel:
             self.coupling_loss_imt_system_adjacent = self.calculate_coupling_loss(self.system,
                                                                      self.bs,
                                                                      self.propagation_system,
-                                                                     c_channel=False)
+                                                                     c_channel=False) + polarization_loss
 
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the interfered systems bandwidth
@@ -192,7 +195,12 @@ class SimulationDownlink(Simulation):
                                                 self.parameters.imt.ue_k)
 
             if self.co_channel:
-                rx_interference += np.sum(weights*np.power(10, 0.1*interference)) / 10**(self.param_system.acs/10.)
+                if self.overlapping_bandwidth:
+                    acs = 0
+                else:
+                    acs = self.param_system.adjacent_ch_selectivity
+
+                rx_interference += np.sum(weights*np.power(10, 0.1*interference)) / 10**(acs/10.)
 
             if self.adjacent_channel:
 
@@ -218,7 +226,6 @@ class SimulationDownlink(Simulation):
         if self.system.station_type is StationType.RAS:
             self.system.pfd = 10*np.log10(10**(self.system.rx_interference/10)/self.system.antenna[0].effective_area)
 
-
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         if not self.parameters.imt.interfered_with:
             self.results.system_inr.extend(self.system.inr.tolist())
@@ -235,7 +242,6 @@ class SimulationDownlink(Simulation):
 
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
-
 
             tput = self.calculate_imt_tput(self.ue.sinr[ue],
                                            self.parameters.imt.dl_sinr_min,
@@ -260,8 +266,7 @@ class SimulationDownlink(Simulation):
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
 
             self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
-            #imt_dl_tx_power_density = 10*np.log10(np.power(10, 0.1*self.bs.tx_power[bs])/(self.num_rb_per_ue*self.parameters.imt.rb_bandwidth*1e6))
-            #self.results.imt_dl_tx_power_density.extend(imt_dl_tx_power_density.tolist())
+
             self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
             self.results.imt_dl_snr.extend(self.ue.snr[ue].tolist())
 

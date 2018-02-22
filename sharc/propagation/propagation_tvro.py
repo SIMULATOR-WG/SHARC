@@ -20,14 +20,14 @@ class PropagationTvro(Propagation):
     TODO: calculate the effective environment height for the generic case
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
 
         self.d_k = 0.2 #km
         self.std = 6.
         self.h_a = 20
 
-        self.free_space_path_loss = PropagationFreeSpace()
+        self.free_space_path_loss = PropagationFreeSpace(random_number_gen)
 
     def get_loss(self, *args, **kwargs) -> np.array:
         """
@@ -51,7 +51,7 @@ class PropagationTvro(Propagation):
         number_of_sectors = kwargs.pop("number_of_sectors",1)
 
         free_space_path_loss = self.free_space_path_loss.get_loss(distance_3D=d_3D, frequency=f_MHz)
-        shadowing = np.random.randn(d_3D.size)
+        shadowing = self.random_number_gen.randn(d_3D.size)
 
         f_fc = .25 + .375*(1 + np.tanh(7.5*(f_GHz-.5)))
         clutter_loss = 10.25 * f_fc * np.exp(-self.d_k) * \

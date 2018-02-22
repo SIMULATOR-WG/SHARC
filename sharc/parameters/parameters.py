@@ -51,6 +51,7 @@ class Parameters(object):
         self.general.system          = config.get("GENERAL", "system")
         self.general.enable_cochannel = config.getboolean("GENERAL", "enable_cochannel")
         self.general.enable_adjacent_channel = config.getboolean("GENERAL", "enable_adjacent_channel")
+        self.general.seed            = config.get("GENERAL", "seed")
 
         #######################################################################
         # IMT
@@ -164,6 +165,7 @@ class Parameters(object):
         self.fss_ss.elevation               = config.getfloat("FSS_SS", "elevation")
         self.fss_ss.azimuth                 = config.getfloat("FSS_SS", "azimuth")
         self.fss_ss.noise_temperature       = config.getfloat("FSS_SS", "noise_temperature")
+        self.fss_ss.adjacent_ch_selectivity = config.getfloat("FSS_SS", "adjacent_ch_selectivity")
         self.fss_ss.inr_scaling             = config.getfloat("FSS_SS", "inr_scaling")
         self.fss_ss.antenna_gain            = config.getfloat("FSS_SS", "antenna_gain")
         self.fss_ss.antenna_pattern         = config.get("FSS_SS", "antenna_pattern")
@@ -191,7 +193,7 @@ class Parameters(object):
         self.fss_es.azimuth = config.get("FSS_ES", "azimuth")
         self.fss_es.frequency = config.getfloat("FSS_ES", "frequency")
         self.fss_es.bandwidth = config.getfloat("FSS_ES", "bandwidth")
-        self.fss_es.acs = config.getfloat("FSS_ES", "acs")
+        self.fss_es.adjacent_ch_selectivity = config.getfloat("FSS_ES", "adjacent_ch_selectivity")
         self.fss_es.tx_power_density = config.getfloat("FSS_ES", "tx_power_density")
         self.fss_es.noise_temperature = config.getfloat("FSS_ES", "noise_temperature")
         self.fss_es.inr_scaling = config.getfloat("FSS_ES", "inr_scaling")
@@ -250,6 +252,7 @@ class Parameters(object):
         self.fs.frequency               = config.getfloat("FS", "frequency")
         self.fs.bandwidth               = config.getfloat("FS", "bandwidth")
         self.fs.noise_temperature       = config.getfloat("FS", "noise_temperature")
+        self.fs.adjacent_ch_selectivity = config.getfloat("FS", "adjacent_ch_selectivity")
         self.fs.tx_power_density        = config.getfloat("FS", "tx_power_density")
         self.fs.inr_scaling             = config.getfloat("FS", "inr_scaling")
         self.fs.antenna_gain            = config.getfloat("FS", "antenna_gain")
@@ -272,6 +275,7 @@ class Parameters(object):
         self.ras.bandwidth                  = config.getfloat("RAS", "bandwidth")
         self.ras.antenna_noise_temperature  = config.getfloat("RAS", "antenna_noise_temperature")
         self.ras.receiver_noise_temperature = config.getfloat("RAS", "receiver_noise_temperature")
+        self.ras.adjacent_ch_selectivity    = config.getfloat("FSS_ES", "adjacent_ch_selectivity")
         self.ras.inr_scaling                = config.getfloat("RAS", "inr_scaling")
         self.ras.antenna_efficiency         = config.getfloat("RAS", "antenna_efficiency")
         self.ras.antenna_gain               = config.getfloat("RAS", "antenna_gain")

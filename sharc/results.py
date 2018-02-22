@@ -9,10 +9,13 @@ from sharc.plot import Plot
 
 import numpy as np
 import os
+import datetime
+
+from shutil import copy
 
 class Results(object):
 
-    def __init__(self):
+    def __init__(self, parameters_filename: str):
         self.imt_ul_tx_power_density = list()
         self.imt_ul_tx_power = list()
         self.imt_ul_sinr_ext = list()
@@ -49,7 +52,20 @@ class Results(object):
         self.system_pfd = list()
         self.system_rx_interf = list()
         self.system_inr_scaled = list()
-        self.output_directory = "output"
+
+        today = datetime.date.today()
+
+        results_number = 1
+        results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}".format(results_number)
+        while os.path.exists(results_dir_head):
+            results_number += 1
+            results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}".format(results_number)
+
+        os.makedirs(results_dir_head)
+
+        self.output_directory = results_dir_head
+
+        copy(parameters_filename, self.output_directory)
 
 
     def generate_plot_list(self, n_bins):
