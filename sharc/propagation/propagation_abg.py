@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
 """
 Created on Tue Jul  4 11:57:41 2017
 
@@ -77,11 +75,9 @@ class PropagationABG(Propagation):
         building_loss = self.building_loss*indoor_stations
 
         loss = 10*self.alpha*np.log10(d) + self.beta + 10*self.gamma*np.log10(f*1e-3) + \
-                shadowing + building_loss
+               shadowing + building_loss
 
         return loss
-
-
 
 if __name__ == '__main__':
 
@@ -92,7 +88,6 @@ if __name__ == '__main__':
     from sharc.propagation.propagation_umi import PropagationUMi
 
     import matplotlib.pyplot as plt
-    #from cycler import cycler
 
     shadowing_std = 0
     distance_2D = np.linspace(1, 1000, num=1000)[:,np.newaxis]

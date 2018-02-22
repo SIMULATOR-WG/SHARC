@@ -57,7 +57,6 @@ class TopologyHotspot(Topology):
         """
         Calculates coordinates of hotspots
         """
-        random_number_gen = kwargs["random_number_gen"]
 
         i = 0
         x = np.empty(0)
@@ -107,6 +106,7 @@ class TopologyHotspot(Topology):
         self.elevation = self.ELEVATION*np.ones(len(self.x))
         # In the end, we have to update the number of base stations
         self.num_base_stations = len(self.x)
+        self.indoor = np.zeros(self.num_base_stations, dtype = bool)
 
 
     def overlapping_hotspots(self,

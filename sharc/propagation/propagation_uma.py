@@ -264,7 +264,7 @@ if __name__ == '__main__':
     loss_los = uma.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     loss_nlos = uma.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     loss_fs = PropagationFreeSpace().get_loss(distance_2D=distance_2D, frequency=freq)
-
+    
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )

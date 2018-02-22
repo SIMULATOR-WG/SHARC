@@ -25,6 +25,7 @@ class Topology(object):
         self.y = np.empty(0)
         self.azimuth = np.empty(0)
         self.elevation = np.empty(0)
+        self.indoor = np.empty(0)
         self.num_base_stations = -1
         self.static_base_stations = False
 

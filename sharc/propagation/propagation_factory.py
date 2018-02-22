@@ -8,6 +8,7 @@ Created on Thu Jul  6 16:03:24 2017
 import sys
 import numpy.random as rnd
 
+from sharc.parameters.parameters import Parameters
 from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 from sharc.propagation.propagation_close_in import PropagationCloseIn
@@ -19,12 +20,12 @@ from sharc.propagation.propagation_umi import PropagationUMi
 from sharc.propagation.propagation_abg import PropagationABG
 from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
 from sharc.propagation.propagation_tvro import PropagationTvro
-
+from sharc.propagation.propagation_indoor import PropagationIndoor
 
 class PropagationFactory(object):
 
     @staticmethod
-    def createPropagation(channel_model: str, random_number_gen: rnd.RandomState) -> Propagation:
+    def create_propagation(channel_model: str, param: Parameters, random_number_gen: rnd.RandomState) -> Propagation:
         if channel_model == "FSPL":
             return PropagationFreeSpace(random_number_gen)
         elif channel_model == "ABG":
@@ -45,6 +46,8 @@ class PropagationFactory(object):
             return PropagationClearAir(random_number_gen)
         elif channel_model == "TVRO":
             return PropagationTvro(random_number_gen)
+        elif channel_model == "INDOOR":
+            return PropagationIndoor(random_number_gen, param.indoor)
         else:
             sys.stderr.write("ERROR\nInvalid channel_model: " + channel_model)
             sys.exit(1)

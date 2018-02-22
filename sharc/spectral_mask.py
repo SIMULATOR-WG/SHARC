@@ -11,7 +11,7 @@ import numpy as np
 class SpectralMask(ABC):
 
     @abstractmethod
-    def set_power(self, p_tx: float):
+    def set_mask(self, p_tx = 0):
         pass
 
     def power_calc(self,center_f: float, band: float):
@@ -55,7 +55,5 @@ class SpectralMask(ABC):
                     power_oob += (self.freq_lim[df + 1] - self.freq_lim[df])*\
                           np.power(10,(pwr_lvl/10))
 
-
         return 10*np.log10(power_oob)
-
 

@@ -80,8 +80,9 @@ class TopologyMacrocell(Topology):
 
             # In the end, we have to update the number of base stations
             self.num_base_stations = len(self.x)
-
-
+            
+            self.indoor = np.zeros(self.num_base_stations, dtype = bool)
+                
     def plot(self, ax: matplotlib.axes.Axes):
         # create the hexagons
         r = self.intersite_distance/3

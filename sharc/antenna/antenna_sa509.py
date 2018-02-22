@@ -70,11 +70,11 @@ if __name__ == '__main__':
     par.frequency = 43000
     par.SPEED_OF_LIGHT = 3e8
         
-    antenna1 = AntenaSA509(par)
+    antenna1 = AntennaSA509(par)
     par.diameter = 7
-    antenna7 = AntenaSA509(par)
+    antenna7 = AntennaSA509(par)
     par.diameter = 10
-    antenna10 = AntenaSA509(par)
+    antenna10 = AntennaSA509(par)
 
     phi = np.linspace(0.1, 180, num = 100000)
     gain1  = antenna1.calculate_gain(phi_vec = phi)
