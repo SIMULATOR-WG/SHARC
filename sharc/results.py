@@ -63,6 +63,11 @@ class Results(object):
         self.system_dl_coupling_loss = list()
         self.system_dl_interf_power = list()
         self.system_dl_inr_scaled = list()
+        
+        self.imt_dl_rx_power = list()
+        self.imt_ul_rx_power = list()
+        self.imt_dl_ue_interf = list()
+        self.imt_ul_bs_interf = list()
 
         self.system_inr = list()
         self.system_inr_scaled = list()
@@ -214,6 +219,18 @@ class Results(object):
             x_limits = (-40, 30)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_ul_rx_power) > 0:
+            values, base = np.histogram(self.imt_ul_rx_power, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Receive power [dBm]"
+            y_label = "Probability of receive power < $X$"
+            title = "[IMT] CDF of UE receive power"
+            file_name = title
+            x_limits = (-40, 30)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ul_sinr_ext) > 0:
             values, base = np.histogram(self.imt_ul_sinr_ext, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -236,6 +253,18 @@ class Results(object):
             title = "[IMT] CDF of UL SINR"
             file_name = title
             x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_ul_bs_interf) > 0:
+            values, base = np.histogram(self.imt_ul_bs_interf, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "UL Interference [dB]"
+            y_label = "Probability of Interference < $X$"
+            title = "[IMT] CDF of UL Interference"
+            file_name = title
+#            x_limits = (-15, 20)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ul_snr) > 0:
@@ -414,6 +443,17 @@ class Results(object):
             file_name = title
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_dl_rx_power) > 0:
+            values, base = np.histogram(self.imt_dl_rx_power, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Receive power [dBm]"
+            y_label = "Probability of receive power < $X$"
+            title = "[IMT] CDF of BS receive power"
+            file_name = title
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_dl_sinr_ext) > 0:
             values, base = np.histogram(self.imt_dl_sinr_ext, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -434,6 +474,18 @@ class Results(object):
             x_label = "SINR [dB]"
             y_label = "Probability of SINR < $X$"
             title = "[IMT] CDF of DL SINR"
+            file_name = title
+            x_limits = (-20, 80)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.imt_dl_ue_interf) > 0:
+            values, base = np.histogram(self.imt_dl_ue_interf, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Interference [dB]"
+            y_label = "Probability of Interference < $X$"
+            title = "[IMT] CDF of DL Interference"
             file_name = title
             x_limits = (-20, 80)
             y_limits = (0, 1)

@@ -152,7 +152,7 @@ class SimulationFullDuplex(Simulation):
                 ue_interf = self.link[bi]
                 # Interference from UEs
                 interference_ue = self.ue.tx_power[ue_interf] - self.coupling_loss_imt_ue_ue[ue_interf,ue] \
-                                 - 2*self.parameters.imt.ue_body_loss - 2*self.parameters.imt.ue_feed_loss
+                                 - 2*self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
            
                 self.ue.rx_interference[ue] = 10*np.log10( \
                     np.power(10, 0.1*self.ue.rx_interference[ue]) + \
@@ -191,7 +191,7 @@ class SimulationFullDuplex(Simulation):
                                 - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
                                 - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_feed_loss
                                 
-                interference_bs = self.bs.tx_power[bi] - 2*self.parameters.imt.bs_feed_loss \
+                interference_bs = self.bs.tx_power[bi] - self.parameters.imt.bs_feed_loss \
                                 - self.coupling_loss_imt_bs_bs[bs,np.arange(bi*self.parameters.imt.ue_k,(bi+1)*self.parameters.imt.ue_k)]
                                 
                 self.bs.rx_interference[bs] = 10*np.log10( \
@@ -326,6 +326,7 @@ class SimulationFullDuplex(Simulation):
             ue = self.link[bs]
             self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
             self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
+            self.results.imt_coupling_loss_all.extend(self.coupling_loss_imt[bs,:])
             
             bs_bs_pl = self.path_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
             self.results.imt_bs_bs_path_loss.extend(bs_bs_pl)
@@ -401,12 +402,16 @@ class SimulationFullDuplex(Simulation):
             self.results.system_dl_coupling_loss.extend([self.coupling_loss_imt_bs_system[bs]])
 
             self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
+            self.results.imt_dl_rx_power.extend(self.ue.rx_power[ue].tolist())
             self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
             self.results.imt_dl_snr.extend(self.ue.snr[ue].tolist())
+            self.results.imt_dl_ue_interf.extend(self.ue.total_interference[ue].tolist())
             
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
+            self.results.imt_ul_rx_power.extend(self.bs.rx_power[bs].tolist())
             self.results.imt_ul_sinr.extend(self.bs.sinr[bs].tolist())
             self.results.imt_ul_snr.extend(self.bs.snr[bs].tolist())
+            self.results.imt_ul_bs_interf.extend(self.bs.total_interference[bs].tolist())
             
         if write_to_file:
             self.results.write_files(snapshot_number)
