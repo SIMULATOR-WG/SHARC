@@ -16,10 +16,12 @@ class AntennaOmniF1336(Antenna):
     (average sidelobe patterns for omnidirectional antennas)
     """
     
-    def __init__(self, max_gain: float, down_tilt: float):
+    def __init__(self, max_gain: float, down_tilt: float, elevation: float):
+        super().__init__()
         # Set attributes
         self.max_gain = max_gain
-        self.down_tilt = down_tilt
+        self.down_tilt = -1*down_tilt
+        self.elevation = elevation
         
         # Fixed parameters
         self.theta_3db = 107.6*(10**(-0.1*max_gain))
@@ -56,9 +58,27 @@ class AntennaOmniF1336(Antenna):
         
         return gain
     
+    def add_beam(self, phi_etilt: float, theta_etilt: float):
+        """
+        Add new beam to antenna.
+        Does not receive angles in local coordinate system.
+        Theta taken with z axis as reference.
+        
+        Parameters
+        ----------
+            phi_etilt (float): azimuth electrical tilt angle [degrees]
+            theta_etilt (float): elevation electrical tilt angle [degrees]
+        """
+        self.beams_list.append(theta_etilt)
+    
     def to_local_coord(self,theta):
-        # Switch reference to x axis
-        lo_theta = 90 - np.ravel(np.mod(np.array([theta]),360))
+        """
+        Receives theta with reference to z axis, converts it to reference in
+        x axis and converts to local coordinate system
+        """
+        lo_theta = np.ravel(np.array([theta + self.elevation]))
+        
+        lo_theta = 90 - np.ravel(np.mod(np.array([lo_theta]),360))
         
         ofb_theta = np.where(lo_theta < -90)
         lo_theta[ofb_theta] = -1*(180 + lo_theta[ofb_theta])
@@ -74,8 +94,9 @@ if __name__ == '__main__':
     
     # Create variables
     max_g = 5
-    down_tilt = 10
-    ant = AntennaOmniF1336(max_g,down_tilt)
+    down_tilt = -10
+    elevation = 20
+    ant = AntennaOmniF1336(max_g,down_tilt,elevation)
     
     # Gains
     phi_1 = np.linspace(-180, 180, num = 360)
