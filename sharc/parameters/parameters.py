@@ -100,6 +100,9 @@ class Parameters(object):
         #######################################################################
         # IMT ANTENNA
         #######################################################################
+        self.antenna_imt.bs_antenna_type        = config.get("IMT_ANTENNA", "bs_antenna_type")
+        self.antenna_imt.bs_omni_gain          = config.getfloat("IMT_ANTENNA", "bs_omni_gain")
+        
         self.antenna_imt.bs_tx_element_max_g    = config.getfloat("IMT_ANTENNA", "bs_tx_element_max_g")
         self.antenna_imt.bs_tx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "bs_tx_element_phi_3db")
         self.antenna_imt.bs_tx_element_theta_3db = config.getfloat("IMT_ANTENNA", "bs_tx_element_theta_3db")
@@ -119,6 +122,9 @@ class Parameters(object):
         self.antenna_imt.bs_rx_n_columns        = config.getfloat("IMT_ANTENNA", "bs_rx_n_columns")
         self.antenna_imt.bs_rx_element_horiz_spacing = config.getfloat("IMT_ANTENNA", "bs_rx_element_horiz_spacing")
         self.antenna_imt.bs_rx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "bs_rx_element_vert_spacing")
+
+        self.antenna_imt.ue_antenna_type        = config.get("IMT_ANTENNA", "ue_antenna_type")
+        self.antenna_imt.ue_omni_gain          = config.getfloat("IMT_ANTENNA", "ue_omni_gain")
 
         self.antenna_imt.ue_tx_element_max_g    = config.getfloat("IMT_ANTENNA", "ue_tx_element_max_g")
         self.antenna_imt.ue_tx_element_phi_3db  = config.getfloat("IMT_ANTENNA", "ue_tx_element_phi_3db")

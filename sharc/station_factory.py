@@ -16,8 +16,10 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.station_manager import StationManager
+from sharc.antenna.antenna import Antenna
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
+from sharc.antenna.antenna_omni_f1336 import AntennaOmniF1336
 from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_s672 import AntennaS672
 from sharc.antenna.antenna_s1528 import AntennaS1528
@@ -53,14 +55,22 @@ class StationFactory(object):
         imt_base_stations.sinr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.sinr_ext = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.inr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        
+        if param_ant.bs_antenna_type == "BEAMFORMING":
+            par = param_ant.get_antenna_parameters("BS", "RX")
 
-        imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
-        par = param_ant.get_antenna_parameters("BS", "RX")
-
-        for i in range(num_bs):
-            imt_base_stations.antenna[i] = \
-            AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
+            for i in range(num_bs):
+                imt_base_stations.antenna[i] = \
+                AntennaBeamformingImt(par, imt_base_stations.azimuth[i],\
                                   imt_base_stations.elevation[i])
+        elif param_ant.bs_antenna_type == "ITU-R F.1336":
+            # BS elevation is an electrical downtilt for this antenna pattern
+            imt_base_stations.antenna = [AntennaOmniF1336(param_ant.bs_omni_gain,
+                              imt_base_stations.elevation[i], 0.0) for i in range(num_bs)]
+        else:
+            sys.stderr.write("ERROR\nInvalid BS antenna type: " 
+                             + param_ant.bs_antenna_type)
+            sys.exit(1)
 
         #imt_base_stations.antenna = [AntennaOmni(0) for bs in range(num_bs)]
         imt_base_stations.bandwidth = param.bandwidth*np.ones(num_bs)
@@ -157,12 +167,22 @@ class StationFactory(object):
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.self_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
+            
+        if param_ant.ue_antenna_type == "BEAMFORMING":
+            # TODO: this piece of code works only for uplink
+            par = param_ant.get_antenna_parameters("UE","TX")
 
-        # TODO: this piece of code works only for uplink
-        par = param_ant.get_antenna_parameters("UE","TX")
-        for i in range(num_ue):
-            imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i],
-                                                         imt_ue.elevation[i])
+            for i in range(num_ue):
+                imt_ue.antenna[i] = AntennaBeamformingImt(par, imt_ue.azimuth[i],
+                              imt_ue.elevation[i])
+        elif param_ant.ue_antenna_type == "ITU-R F.1336":
+            imt_ue.antenna = [AntennaOmniF1336(param_ant.ue_omni_gain,0.0,
+                                               imt_ue.elevation[i])
+                                               for i in range(num_ue)]
+        else:
+            sys.stderr.write("ERROR\nInvalid UE antenna type: " 
+                             + param_ant.ue_antenna_type)
+            sys.exit(1)
 
         #imt_ue.antenna = [AntennaOmni(0) for bs in range(num_ue)]
         imt_ue.bandwidth = param.bandwidth*np.ones(num_ue)
