@@ -394,7 +394,7 @@ class Simulation(ABC, Observable):
             off_axis_angle = station_1.get_off_axis_angle(station_2)
             distance = station_1.get_distance_to(station_2)
             theta = np.degrees(np.arctan((station_1.height - station_2.height)/distance)) + station_1.elevation
-            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(off_axis_angle_vec=phi[0,station_2_active],
+            gains[0,station_2_active] = station_1.antenna[0].calculate_gain(off_axis_angle_vec=off_axis_angle[0,station_2_active],
                                                                             theta_vec=theta[0,station_2_active])
         else: # for IMT <-> IMT
             for k in station_1_active:
