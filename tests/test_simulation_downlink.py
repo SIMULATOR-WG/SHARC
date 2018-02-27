@@ -500,7 +500,8 @@ class SimulationDownlinkTest(unittest.TestCase):
                             atol=1e-2)
 
         # Test RAS interference
-        interference = 10 - 10*np.log10(2) - np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2])-3
+        interference = self.param.imt.bs_conducted_power - 10*np.log10(self.param.imt.ue_k) - self.param.imt.bs_ohmic_loss \
+                       - np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]) - polarization_loss
         rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
