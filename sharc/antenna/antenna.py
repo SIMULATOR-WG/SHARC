@@ -41,4 +41,4 @@ class Antenna(ABC):
             phi_etilt (float): azimuth electrical tilt angle [degrees]
             theta_etilt (float): elevation electrical tilt angle [degrees]
         """
-        pass
+        self.beams_list.append((phi_etilt,theta_etilt))
