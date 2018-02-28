@@ -78,11 +78,10 @@ class AntennaSectorF1336(Antenna):
             a_h (np.array): horizontal radiation pattern gain value
         """
         x_h = abs(phi)/self.phi_deg_3db
-        if x_h < 0.5:
-            gain = -12 * x_h ** 2
-        else:
-            gain = -12 * x_h ** (2 - self.k_h) - self.lambda_k_h
-        gain = max(gain, self.g_hr_180)
+        gain = np.zeros_like(phi)
+        gain[np.where(x_h < 0.5)] = -12 * x_h[np.where(x_h < 0.5)] ** 2
+        gain[np.where(x_h >= 0.5)] = -12 * x_h[np.where(x_h >= 0.5)] ** (2 - self.k_h) - self.lambda_k_h
+        gain = np.maximum(gain, self.g_hr_180)
 
         return gain
 
@@ -99,15 +98,17 @@ class AntennaSectorF1336(Antenna):
             a_v (np.array): vertical radiation pattern gain value
         """
         x_v = abs(theta)/self.theta_deg_3db
-
-        if x_v < self.x_k:
-            gain = -12 * x_v ** 2
-        elif x_v < 4:
-            gain = -12 + 10*np.log10(x_v**-1.5 + self.k_v)
-        elif x_v < 90 / self.theta_deg_3db:
-            gain = - self.lambda_k_v - self.incline_factor * np.log10(x_v)
-        else:
-            gain = self.g_hr_180
+        gain = np.zeros_like(theta)
+        
+        sec_1 = np.where(x_v < self.x_k)
+        sec_2 = np.where(np.logical_and(x_v >= self.x_k,x_v < 4))
+        sec_3 = np.where(np.logical_and(x_v >= 4,x_v < (90/self.theta_deg_3db)))
+        sec_4 = np.where(x_v >= (90/self.theta_deg_3db))
+        
+        gain[sec_1] = -12*x_v[sec_1]**2
+        gain[sec_2] = -12 + 10*np.log10(x_v[sec_2]**-1.5 + self.k_v)
+        gain[sec_3] = - self.lambda_k_v - self.incline_factor * np.log10(x_v[sec_3])
+        gain[sec_4] = self.g_hr_180
 
         return gain
 
@@ -138,10 +139,8 @@ class AntennaSectorF1336(Antenna):
                 np.cos(theta_rad) * np.cos(phi_rad) * np.cos(self.downtilt_rad))/np.cos(new_theta_rad)
 
         # to avoid numerical errors, as sometimes cosines are slightly out of bounds
-        if cos > 1:
-            cos = 1
-        elif cos < -1:
-            cos = -1
+        cos[np.where(cos > 1)] = 1
+        cos[np.where(cos < -1)] = -1
 
         phi_rad = np.arccos(cos)
         theta = new_theta_rad / np.pi * 180
@@ -207,11 +206,10 @@ if __name__ == '__main__':
     pattern_ver_90deg = np.zeros(theta_v.shape)
     pattern_ver_120deg = np.zeros(theta_v.shape)
 
-    for phi, index in zip(phi_v, range(len(phi_v))):
-        pattern_hor_0deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=0)
-        pattern_hor_10deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=10)
-        pattern_hor_30deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=30)
-        pattern_hor_60deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=60)
+    pattern_hor_0deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=0)
+    pattern_hor_10deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=10)
+    pattern_hor_30deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=30)
+    pattern_hor_60deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=60)
 
     plt.figure(1)
     plt.plot(phi_v, pattern_hor_0deg, label = 'elevation = 0 degrees')
@@ -225,12 +223,11 @@ if __name__ == '__main__':
 
     plt.legend()
 
-    for theta, index in zip(theta_v, range(len(theta_v))):
-        pattern_ver_0deg[index] = antenna.calculate_gain(phi_vec=0,theta_vec=theta)
-        pattern_ver_30deg[index] = antenna.calculate_gain(phi_vec=30,theta_vec=theta)
-        pattern_ver_60deg[index] = antenna.calculate_gain(phi_vec=60,theta_vec=theta)
-        pattern_ver_90deg[index] = antenna.calculate_gain(phi_vec=90,theta_vec=theta)
-        pattern_ver_120deg[index] = antenna.calculate_gain(phi_vec=120,theta_vec=theta)
+    pattern_ver_0deg = antenna.calculate_gain(phi_vec=0,theta_vec=theta_v)
+    pattern_ver_30deg = antenna.calculate_gain(phi_vec=30,theta_vec=theta_v)
+    pattern_ver_60deg = antenna.calculate_gain(phi_vec=60,theta_vec=theta_v)
+    pattern_ver_90deg = antenna.calculate_gain(phi_vec=90,theta_vec=theta_v)
+    pattern_ver_120deg = antenna.calculate_gain(phi_vec=120,theta_vec=theta_v)
 
     plt.figure(2)
     plt.plot(theta_v, pattern_ver_0deg, label='azimuth = 0 degrees')
@@ -249,11 +246,10 @@ if __name__ == '__main__':
     downtilt_deg = -10
     antenna = AntennaSectorF1336(param,downtilt_deg,elevation,azimuth)
 
-    for phi, index in zip(phi_v, range(len(phi_v))):
-        pattern_hor_0deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=0)
-        pattern_hor_10deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=10)
-        pattern_hor_30deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=30)
-        pattern_hor_60deg[index] = antenna.calculate_gain(phi_vec=phi,theta_vec=60)
+    pattern_hor_0deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=0)
+    pattern_hor_10deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=10)
+    pattern_hor_30deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=30)
+    pattern_hor_60deg = antenna.calculate_gain(phi_vec=phi_v,theta_vec=60)
 
     plt.figure(3)
     plt.plot(phi_v, pattern_hor_0deg, label='0 degrees')
@@ -266,12 +262,11 @@ if __name__ == '__main__':
     plt.ylabel ('gain (dBi)')
     plt.legend()
 
-    for theta, index in zip(theta_v, range(len(theta_v))):
-        pattern_ver_0deg[index] = antenna.calculate_gain(phi_vec=0,theta_vec=theta)
-        pattern_ver_30deg[index] = antenna.calculate_gain(phi_vec=30,theta_vec=theta)
-        pattern_ver_60deg[index] = antenna.calculate_gain(phi_vec=60,theta_vec=theta)
-        pattern_ver_90deg[index] = antenna.calculate_gain(phi_vec=90,theta_vec=theta)
-        pattern_ver_120deg[index] = antenna.calculate_gain(phi_vec=120,theta_vec=theta)
+    pattern_ver_0deg = antenna.calculate_gain(phi_vec=0,theta_vec=theta_v)
+    pattern_ver_30deg = antenna.calculate_gain(phi_vec=30,theta_vec=theta_v)
+    pattern_ver_60deg = antenna.calculate_gain(phi_vec=60,theta_vec=theta_v)
+    pattern_ver_90deg = antenna.calculate_gain(phi_vec=90,theta_vec=theta_v)
+    pattern_ver_120deg = antenna.calculate_gain(phi_vec=120,theta_vec=theta_v)
 
     plt.figure(4)
     plt.plot(theta_v, pattern_ver_0deg, label='azimuth = 0 degrees')
