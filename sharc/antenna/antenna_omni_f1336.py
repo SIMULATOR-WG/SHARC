@@ -58,19 +58,6 @@ class AntennaOmniF1336(Antenna):
         
         return gain
     
-    def add_beam(self, phi_etilt: float, theta_etilt: float):
-        """
-        Add new beam to antenna.
-        Does not receive angles in local coordinate system.
-        Theta taken with z axis as reference.
-        
-        Parameters
-        ----------
-            phi_etilt (float): azimuth electrical tilt angle [degrees]
-            theta_etilt (float): elevation electrical tilt angle [degrees]
-        """
-        self.beams_list.append(theta_etilt)
-    
     def to_local_coord(self,theta):
         """
         Receives theta with reference to z axis, converts it to reference in
@@ -80,10 +67,8 @@ class AntennaOmniF1336(Antenna):
         
         lo_theta = 90 - np.ravel(np.mod(np.array([lo_theta]),360))
         
-        ofb_theta = np.where(lo_theta < -90)
-        lo_theta[ofb_theta] = -1*(180 + lo_theta[ofb_theta])
-        ofb_theta = np.where(lo_theta > 90)
-        lo_theta[ofb_theta] = 180 - lo_theta[ofb_theta]
+        ofb_theta = np.where(np.logical_or(lo_theta < -90,lo_theta > 90))
+        lo_theta[ofb_theta] = np.sign(lo_theta[ofb_theta])*180 - lo_theta[ofb_theta]
         
         return lo_theta
         
