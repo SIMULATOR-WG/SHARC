@@ -6,6 +6,7 @@ Created on Thu Jul  6 16:03:24 2017
 """
 
 import sys
+import numpy.random as rnd
 
 from sharc.parameters.parameters import Parameters
 from sharc.propagation.propagation import Propagation
@@ -17,30 +18,36 @@ from sharc.propagation.propagation_ter_simple import PropagationTerSimple
 from sharc.propagation.propagation_uma import PropagationUMa
 from sharc.propagation.propagation_umi import PropagationUMi
 from sharc.propagation.propagation_abg import PropagationABG
+from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
+from sharc.propagation.propagation_tvro import PropagationTvro
 from sharc.propagation.propagation_indoor import PropagationIndoor
 
 class PropagationFactory(object):
 
     @staticmethod
-    def createPropagation(channel_model: str, param: Parameters) -> Propagation:
+    def create_propagation(channel_model: str, param: Parameters, random_number_gen: rnd.RandomState) -> Propagation:
         if channel_model == "FSPL":
-            return PropagationFreeSpace()
+            return PropagationFreeSpace(random_number_gen)
         elif channel_model == "ABG":
-            return PropagationABG()
+            return PropagationABG(random_number_gen)
         elif channel_model == "UMa":
-            return PropagationUMa()
+            return PropagationUMa(random_number_gen)
         elif channel_model == "UMi":
-            return PropagationUMi()
+            return PropagationUMi(random_number_gen)
         elif channel_model == "CI":
-            return PropagationCloseIn()
+            return PropagationCloseIn(random_number_gen)
         elif channel_model == "SatelliteSimple":
-            return PropagationSatSimple()
+            return PropagationSatSimple(random_number_gen)
         elif channel_model == "TerrestrialSimple":
-            return PropagationTerSimple()
+            return PropagationTerSimple(random_number_gen)
         elif channel_model == "P619":
-            return PropagationP619()
+            return PropagationP619(random_number_gen)
+        elif channel_model == "P452":
+            return PropagationClearAir(random_number_gen)
+        elif channel_model == "TVRO":
+            return PropagationTvro(random_number_gen)
         elif channel_model == "INDOOR":
-            return PropagationIndoor(param.indoor)
+            return PropagationIndoor(random_number_gen, param.indoor)
         else:
             sys.stderr.write("ERROR\nInvalid channel_model: " + channel_model)
             sys.exit(1)

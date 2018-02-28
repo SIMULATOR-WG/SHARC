@@ -53,11 +53,11 @@ class TopologyHotspot(Topology):
         cell_radius = self.param.max_dist_hotspot_ue
         super().__init__(intersite_distance, cell_radius)
 
-
-    def calculate_coordinates(self):
+    def calculate_coordinates(self, random_number_gen=np.random.RandomState()):
         """
         Calculates coordinates of hotspots
         """
+
         i = 0
         x = np.empty(0)
         y = np.empty(0)
@@ -76,11 +76,11 @@ class TopologyHotspot(Topology):
                 # The backoff factor (1.0) controls the overlapping rate between hotspots
                 # coverage areas (overlapping of hotspots in different macro cells)
                 r = np.maximum(0, (self.macrocell.intersite_distance/3)*np.sqrt(3)/2 - self.param.max_dist_hotspot_ue/1.0)
-                hotspot_radius = r*np.random.random(self.param.num_hotspots_per_cell)
-                hotspot_angle = 2*np.pi*np.random.random(self.param.num_hotspots_per_cell)
+                hotspot_radius = r*random_number_gen.random_sample(self.param.num_hotspots_per_cell)
+                hotspot_angle = 2*np.pi*random_number_gen.random_sample(self.param.num_hotspots_per_cell)
                 hotspot_x = hotspot_radius*np.cos(hotspot_angle) + macro_cell_x
                 hotspot_y = hotspot_radius*np.sin(hotspot_angle) + macro_cell_y
-                hotspot_azimuth = np.random.choice(self.AZIMUTH, self.param.num_hotspots_per_cell)
+                hotspot_azimuth = random_number_gen.choice(self.AZIMUTH, self.param.num_hotspots_per_cell)
                 # Hotspots within a cell are validated if they do not overlap
                 # and if they have the minimum separation distance from macro BS
                 hotspots_validated = (not self.overlapping_hotspots(hotspot_x,

@@ -11,12 +11,11 @@ import numpy as np
 
 from sharc.propagation.propagation_sat_simple import PropagationSatSimple
 
+
 class PropagationSatSimpleTest(unittest.TestCase):
 
-
     def setUp(self):
-        self.propagation = PropagationSatSimple()
-
+        self.propagation = PropagationSatSimple(np.random.RandomState())
 
     def test_loss(self):
         d = np.array(10)

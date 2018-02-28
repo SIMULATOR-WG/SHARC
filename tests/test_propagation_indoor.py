@@ -14,10 +14,10 @@ from sharc.parameters.parameters_indoor import ParametersIndoor
 
 
 class PropagationIndoorTest(unittest.TestCase):
-    
+
     def setUp(self):
         pass
-        
+
     def test_loss(self):
         params = ParametersIndoor()
         params.basic_path_loss = "INH_OFFICE"
@@ -26,10 +26,10 @@ class PropagationIndoorTest(unittest.TestCase):
     #    params.street_width = 30
         params.ue_indoor_percent = .95
         params.building_class = "TRADITIONAL"
-        
+
         bs_per_building = 3
         ue_per_bs = 3
-        
+
         num_bs = bs_per_building*params.n_rows*params.n_colums
         num_ue = num_bs*ue_per_bs
         distance_2D = 150*np.random.random((num_bs, num_ue))
@@ -40,17 +40,8 @@ class PropagationIndoorTest(unittest.TestCase):
         distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
         height_diff = np.tile(h_bs, (num_bs, 3)) - np.tile(h_ue, (num_bs, 1))
         elevation = np.degrees(np.arctan(height_diff/distance_2D))
-        
-        propagation_indoor = PropagationIndoor(params)
-#        loss_indoor = propagation_indoor.get_loss(distance_3D = distance_3D,
-#                                                  distance_2D = distance_2D,
-#                                                  elevation = elevation,
-#                                                  frequency = frequency,
-#                                                  indoor = indoor,
-#                                                  shadowing = False)
 
-        
-        
+        propagation_indoor = PropagationIndoor(np.random.RandomState(), params)
+
 if __name__ == '__main__':
     unittest.main()
-        

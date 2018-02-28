@@ -11,6 +11,8 @@ import math
 from sharc.support.enumerations import StationType
 from sharc.station import Station
 from sharc.antenna.antenna import Antenna
+from sharc.spectral_mask_imt import SpectralMaskImt
+from sharc.spectral_mask_3gpp import SpectralMask3Gpp
 
 class StationManager(object):
     """
@@ -42,6 +44,10 @@ class StationManager(object):
         self.sinr = np.empty(n)
         self.sinr_ext = np.empty(n)
         self.inr = np.empty(n)
+        self.pfd = np.empty(n)
+        self.spectral_mask = np.empty(n, dtype=SpectralMask3Gpp)
+        self.center_freq = np.empty(n)
+        self.spectral_mask = None
         self.station_type = StationType.NONE
 
     def get_station_list(self, id=None) -> list:
@@ -167,10 +173,9 @@ class StationManager(object):
 
         a = 90 - self.elevation
         C = Az0 - Az
-        
+
         phi = np.arccos(np.cos(np.radians(a))*np.cos(np.radians(b)) \
                         + np.sin(np.radians(a))*np.sin(np.radians(b))*np.cos(np.radians(C)))
         phi_deg = np.degrees(phi)
 
         return phi_deg
-        

@@ -17,10 +17,10 @@ class PropagationSatSimple(Propagation):
     Implements the simplified satellite propagation model
     """
 
-    def __init__(self):
-        super().__init__()
-        self.clutter = PropagationClutterLoss()
-        self.free_space = PropagationFreeSpace()
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
+        self.clutter = PropagationClutterLoss(random_number_gen)
+        self.free_space = PropagationFreeSpace(random_number_gen)
         self.atmospheric_loss = 1
         self.polarization_loss = 3
         self.building_loss = 20

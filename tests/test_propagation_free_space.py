@@ -11,11 +11,12 @@ import numpy.testing as npt
 
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
 
+
 class PropagationFreeSpaceTest(unittest.TestCase):
-    
+
     def setUp(self):
-        self.freeSpace = PropagationFreeSpace()
-        
+        self.freeSpace = PropagationFreeSpace(np.random.RandomState())
+
     def test_loss(self):
         d = np.array([10])
         f = np.array([10])
@@ -41,8 +42,7 @@ class PropagationFreeSpaceTest(unittest.TestCase):
         ref_loss = np.array([[ 32.45,  38.47,  41.99],
                              [ 44.49,  46.42,  48.01]])
         npt.assert_allclose(ref_loss, loss, atol=1e-2)
-        
-        
+
+
 if __name__ == '__main__':
     unittest.main()
-        

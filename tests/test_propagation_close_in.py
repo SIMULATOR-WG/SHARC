@@ -14,7 +14,7 @@ from sharc.propagation.propagation_close_in import PropagationCloseIn
 class PropagationCloseInTest(unittest.TestCase):
 
     def setUp(self):
-        self.propagation = PropagationCloseIn()
+        self.propagation = PropagationCloseIn(np.random.RandomState())
 
     def test_loss_los(self):
         d = np.array([10, 100])
@@ -22,7 +22,7 @@ class PropagationCloseInTest(unittest.TestCase):
         los_prob = 1
         s_std = 0
         result = np.array([-27.55 + 20 + 20, -27.55 + 40 + 40])
-        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d, 
+        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d,
                                                               frequency=f,
                                                               line_of_sight_prob=los_prob,
                                                               shadowing=s_std))
@@ -32,11 +32,11 @@ class PropagationCloseInTest(unittest.TestCase):
         los_prob = 1
         s_std = 0
         result = np.array([[ -27.55 + 0 + 40,  -27.55 + 20 + 40 ], [ -27.55 + 40 + 40, -27.55 + 60 + 40]])
-        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d, 
+        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d,
                                                               frequency=f,
                                                               line_of_sight_prob=los_prob,
                                                               shadowing=s_std))
-        
+
 
     def test_loss_nlos(self):
         d = np.array([10, 100])
@@ -44,7 +44,7 @@ class PropagationCloseInTest(unittest.TestCase):
         los_prob = 0
         s_std = 0
         result = np.array([-27.55 + 30 + 20, -27.55 + 60 + 40])
-        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d, 
+        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d,
                                                               frequency=f,
                                                               line_of_sight_prob=los_prob,
                                                               shadowing=s_std))
@@ -54,18 +54,18 @@ class PropagationCloseInTest(unittest.TestCase):
         los_prob = 0
         s_std = 0
         result = np.array([[-27.55 + 0 + 40, -27.55 + 30 + 40], [-27.55 + 60 + 40, -27.55 + 90 + 40]])
-        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d, 
+        npt.assert_allclose(result, self.propagation.get_loss(distance_2D=d,
                                                               frequency=f,
                                                               line_of_sight_prob=los_prob,
                                                               shadowing=s_std))
-        
-        
-    def test_shadowing(self):        
+
+
+    def test_shadowing(self):
         d = np.ones(100000)
         f = np.ones(100000)
         los_prob = 1
         s_std = 4.1
-        loss = self.propagation.get_loss(distance_2D=d, 
+        loss = self.propagation.get_loss(distance_2D=d,
                                          frequency=f,
                                          line_of_sight_prob=los_prob,
                                          shadowing=s_std)

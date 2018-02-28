@@ -16,9 +16,6 @@ class PropagationBuildingEntryLoss(Propagation):
     Implements the building entry loss according to ITU-R P.2109-0 (Prediction of Building Entry Loss)
     """
 
-    def __init__(self):
-        super().__init__()
-
     def get_loss(self, frequency_MHz, elevation, prob="RANDOM",
                  building_class="TRADITIONAL", test = False) -> np.array:
         """
@@ -41,9 +38,9 @@ class PropagationBuildingEntryLoss(Propagation):
         f_GHz = frequency_MHz / 1000
 
         if isinstance(prob, str) and prob.upper() == "RANDOM":
-            prob = np.random.random(elevation.shape)
+            prob = self.random_number_gen.random_sample(elevation.shape)
 
-        if building_class == "TRADITIONAL":
+        if building_class.upper() == "TRADITIONAL":
             r = 12.64
             s = 3.72
             t = .96
@@ -112,8 +109,6 @@ if __name__ == '__main__':
     plt.ylabel("median loss (dB)")
     plt.title("Median Building Entry Loss (mu_1) - horizontal entry")
 
-
-
     # Plot median loss at different angles,
     # 0 degrees
     plt.figure()
@@ -148,7 +143,6 @@ if __name__ == '__main__':
     plt.xlabel("frequency(GHz)")
     plt.ylabel("median loss (dB)")
     plt.title("Median Building Entry Loss - horizontal entry")
-
 
     plt.show()
 
