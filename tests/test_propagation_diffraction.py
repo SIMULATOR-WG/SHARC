@@ -132,3 +132,5 @@ class PropagationDiffractionTest(unittest.TestCase):
 #        fig.savefig('dif_att.png', dpi=350, format='png')
 
 
+if __name__ == '__main__':
+    unittest.main()

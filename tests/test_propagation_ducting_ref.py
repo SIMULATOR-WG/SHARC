@@ -124,3 +124,6 @@ class PropagationDuctingReflectionTest(unittest.TestCase):
 #        ax.set_ylim([200,380])
 #        ax.grid(True)
 #        fig.savefig('ducting_ref_att.png', dpi=350, format='png')
+
+if __name__ == '__main__':
+    unittest.main()
