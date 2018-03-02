@@ -82,7 +82,7 @@ class SimulationDownlink(Simulation):
         # Currently, the maximum transmit power of the base station is equaly
         # divided among the selected UEs
         tx_power = self.parameters.imt.bs_conducted_power + self.bs_power_gain \
-                    - self.parameters.imt.bs_feed_loss - 10*math.log10(self.parameters.imt.ue_k) 
+                    - self.parameters.imt.bs_ohmic_loss - 10*math.log10(self.parameters.imt.ue_k) 
         # calculate tansmit powers to have a structure such as
         # {bs_1: [pwr_1, pwr_2,...], ...}, where bs_1 is the base station id,
         # pwr_1 is the transmit power from bs_1 to ue_1, pwr_2 is the transmit
@@ -99,7 +99,7 @@ class SimulationDownlink(Simulation):
         for bs in bs_active:
             ue = self.link[bs]
             self.ue.rx_power[ue] = self.bs.tx_power[bs] - self.coupling_loss_imt[bs,ue] \
-                                     - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                                     - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss
 
             # create a list with base stations that generate interference in ue_list
             bs_interf = [b for b in bs_active if b not in [bs]]
@@ -107,8 +107,8 @@ class SimulationDownlink(Simulation):
             # calculate intra system interference
             for bi in bs_interf:
                 interference = self.bs.tx_power[bi] - self.coupling_loss_imt[bi,ue] \
-                                 - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss \
-                                 - self.parameters.imt.bs_feed_loss
+                                 - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss \
+                                 - self.parameters.imt.bs_ohmic_loss
                 self.ue.rx_interference[ue] = 10*np.log10( \
                     np.power(10, 0.1*self.ue.rx_interference[ue]) + np.power(10, 0.1*interference))
 
@@ -140,7 +140,7 @@ class SimulationDownlink(Simulation):
         ue = np.where(self.ue.active)[0]
         tx_power = self.param_system.tx_power_density + 10*np.log10(self.ue.bandwidth[ue]*1e6) + 30
         self.ue.ext_interference[ue] = tx_power - self.coupling_loss_imt_system[ue] \
-                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss
 
         self.ue.sinr_ext[ue] = self.ue.rx_power[ue] \
             - (10*np.log10(np.power(10, 0.1*self.ue.total_interference[ue]) + np.power(10, 0.1*self.ue.ext_interference[ue])))
