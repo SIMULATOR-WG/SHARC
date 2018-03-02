@@ -72,68 +72,68 @@ class PropagationClearAirTest(unittest.TestCase):
 #        npt.assert_allclose(158.491,Ldb,atol=1e-3)
 
         #Grafico da perda de difraçao em funçao da distancia e da frequencia
-        data1 = []
-        data2 = []
-        data3 = []
-        data4 = []
-        data5 = []
-        eixo_x = []
-
-        for n in range (1,6,1):
-
-            params.eta = n
-
-            if params.eta==1:
-                f = 10000
-
-                for d in range(1000, 100100,1000):
-
-                    d = np.array(d, ndmin=2)
-                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f, es_params=params,
-                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
-
-                    data1.append(Loss)
-
-                    eixo_x.append(d/1000)
-
-            if params.eta==2:
-                f = 20000
-
-                for d in range(1000, 100100,1000):
-                    d = np.array(d, ndmin=2)
-
-                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
-                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
-                    data2.append(Loss)
-
-            if params.eta==3:
-                f = 30000
-
-                for d in range(1000, 100100,1000):
-
-                    d = np.array(d, ndmin=2)
-                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
-                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
-                    data3.append(Loss)
-
-            if params.eta==4:
-                f = 40000
-
-                for d in range(1000, 100100,1000):
-                    d = np.array(d, ndmin=2)
-                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
-                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
-                    data4.append(Loss)
-
-
-            if params.eta==5:
-                f = 50000
-
-                for d in range(1000, 100100,1000):
-                    d = np.array(d, ndmin=2)
-                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
-                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
-                    data5.append(Loss)
+#        data1 = []
+#        data2 = []
+#        data3 = []
+#        data4 = []
+#        data5 = []
+#        eixo_x = []
+#
+#        for n in range (1,6,1):
+#
+#            params.eta = n
+#
+#            if params.eta==1:
+#                f = 10000
+#
+#                for d in range(1000, 100100,1000):
+#
+#                    d = np.array(d, ndmin=2)
+#                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f, es_params=params,
+#                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
+#
+#                    data1.append(Loss)
+#
+#                    eixo_x.append(d/1000)
+#
+#            if params.eta==2:
+#                f = 20000
+#
+#                for d in range(1000, 100100,1000):
+#                    d = np.array(d, ndmin=2)
+#
+#                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
+#                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
+#                    data2.append(Loss)
+#
+#            if params.eta==3:
+#                f = 30000
+#
+#                for d in range(1000, 100100,1000):
+#
+#                    d = np.array(d, ndmin=2)
+#                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
+#                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
+#                    data3.append(Loss)
+#
+#            if params.eta==4:
+#                f = 40000
+#
+#                for d in range(1000, 100100,1000):
+#                    d = np.array(d, ndmin=2)
+#                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
+#                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
+#                    data4.append(Loss)
+#
+#
+#            if params.eta==5:
+#                f = 50000
+#
+#                for d in range(1000, 100100,1000):
+#                    d = np.array(d, ndmin=2)
+#                    Loss = self.__ClearAir.get_loss(distance_3D=d, frequency=f,es_params=params,
+#                                                    tx_gain=Gt, rx_gain=Gr, di=di, hi=hi)
+#                    data5.append(Loss)
 
     #     fig = plt.figure(2)
     #     f = ['10 GHz','20 GHz','30 GHz','40 GHz','50 GHz','60 GHz']
