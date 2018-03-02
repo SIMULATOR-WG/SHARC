@@ -104,7 +104,7 @@ class SimulationFullDuplex(Simulation):
         # Currently, the maximum transmit power of the base station is equaly
         # divided among the selected UEs
         tx_power = self.parameters.imt.bs_conducted_power + self.bs_power_gain \
-                    - self.parameters.imt.bs_feed_loss - 10*math.log10(self.parameters.imt.ue_k) 
+                    - self.parameters.imt.bs_ohmic_loss - 10*math.log10(self.parameters.imt.ue_k) 
         # calculate tansmit powers to have a structure such as
         # {bs_1: [pwr_1, pwr_2,...], ...}, where bs_1 is the base station id,
         # pwr_1 is the transmit power from bs_1 to ue_1, pwr_2 is the transmit
@@ -138,7 +138,7 @@ class SimulationFullDuplex(Simulation):
         for bs in bs_active:
             ue = self.link[bs]
             self.ue.rx_power[ue] = self.bs.tx_power[bs] - self.coupling_loss_imt[bs,ue] \
-                                     - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                                     - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss
 
             # create a list with base stations that generate interference in ue_list
             bs_interf = [b for b in bs_active if b not in [bs]]
@@ -147,12 +147,12 @@ class SimulationFullDuplex(Simulation):
             for bi in bs_interf:
                 #  Interference from BSs
                 interference_bs = self.bs.tx_power[bi] - self.coupling_loss_imt[bi,ue] \
-                                 - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                                 - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss
                             
                 ue_interf = self.link[bi]
                 # Interference from UEs
                 interference_ue = self.ue.tx_power[ue_interf] - self.coupling_loss_imt_ue_ue[ue_interf,ue] \
-                                 - 2*self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                                 - 2*self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss
            
                 self.ue.rx_interference[ue] = 10*np.log10( \
                     np.power(10, 0.1*self.ue.rx_interference[ue]) + \
@@ -179,8 +179,8 @@ class SimulationFullDuplex(Simulation):
         for bs in bs_active:
             ue = self.link[bs]
             self.bs.rx_power[bs] = self.ue.tx_power[ue]  \
-                                        - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
-                                        - self.coupling_loss_imt[bs,ue] - self.parameters.imt.bs_feed_loss
+                                        - self.parameters.imt.ue_ohmic_loss - self.parameters.imt.ue_body_loss \
+                                        - self.coupling_loss_imt[bs,ue] - self.parameters.imt.bs_ohmic_loss
             # create a list of BSs that serve the interfering UEs
             bs_interf = [b for b in bs_active if b not in [bs]]
 
@@ -188,10 +188,10 @@ class SimulationFullDuplex(Simulation):
             for bi in bs_interf:
                 ui = self.link[bi]
                 interference_ue = self.ue.tx_power[ui] \
-                                - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
-                                - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_feed_loss
+                                - self.parameters.imt.ue_ohmic_loss - self.parameters.imt.ue_body_loss \
+                                - self.coupling_loss_imt[bs,ui] - self.parameters.imt.bs_ohmic_loss
                                 
-                interference_bs = self.bs.tx_power[bi] - self.parameters.imt.bs_feed_loss \
+                interference_bs = self.bs.tx_power[bi] - self.parameters.imt.bs_ohmic_loss \
                                 - self.coupling_loss_imt_bs_bs[bs,np.arange(bi*self.parameters.imt.ue_k,(bi+1)*self.parameters.imt.ue_k)]
                                 
                 self.bs.rx_interference[bs] = 10*np.log10( \
@@ -236,7 +236,7 @@ class SimulationFullDuplex(Simulation):
         ue = np.where(self.ue.active)[0]
         tx_power = self.param_system.tx_power_density + 10*np.log10(self.ue.bandwidth[ue]*1e6) + 30
         self.ue.ext_interference[ue] = tx_power - self.coupling_loss_imt_ue_system[ue] \
-                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_feed_loss
+                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss
 
         self.ue.sinr_ext[ue] = self.ue.rx_power[ue] \
             - (10*np.log10(np.power(10, 0.1*self.ue.total_interference[ue]) + np.power(10, 0.1*self.ue.ext_interference[ue])))
@@ -255,7 +255,7 @@ class SimulationFullDuplex(Simulation):
         for bs in bs_active:
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
             self.bs.ext_interference[bs] = tx_power[bs] - self.coupling_loss_imt_bs_system[active_beams] \
-                                            - self.parameters.imt.bs_feed_loss
+                                            - self.parameters.imt.bs_ohmic_loss
 
             self.bs.sinr_ext[bs] = self.bs.rx_power[bs] \
                 - (10*np.log10(np.power(10, 0.1*self.bs.total_interference[bs]) + np.power(10, 0.1*self.bs.ext_interference[bs])))
@@ -300,7 +300,7 @@ class SimulationFullDuplex(Simulation):
         # UE interference
         ue_active = np.where(self.ue.active)[0]
         interference_ue = self.ue.tx_power[ue_active] \
-                            - self.parameters.imt.ue_feed_loss - self.parameters.imt.ue_body_loss \
+                            - self.parameters.imt.ue_ohmic_loss - self.parameters.imt.ue_body_loss \
                             - self.coupling_loss_imt_ue_system[ue_active] \
                             + 10*np.log10(self.ue.bandwidth[ue_active]/self.param_system.bandwidth)
                             
