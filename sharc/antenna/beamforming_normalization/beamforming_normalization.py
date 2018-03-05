@@ -6,6 +6,8 @@ Created on Fri Mar  2 14:28:25 2018
 """
 
 import numpy as np
+from itertools import product
+from scipy.integrate import dblquad
 
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.support.named_tuples import AntennaPar
@@ -21,17 +23,11 @@ class BeamformingNormalization(object):
         """
         # Initialize attributes
         self.res = res
-        self.phi_scan_vals = np.arange(-180,180,res)
-        self.theta_tilt_vals = np.arange(0,180,res)
+        self.phi_vals = np.arange(-180,180,res)
+        self.theta_vals = np.arange(0,180,res)
         self.antenna = None  
                
-    def calculcate_correction_factor(self):
-        """
-        
-        """
-        pass
-    
-    def calculate_gain_matrix(self, par: AntennaPar, beams_list: np.array, c_chan: bool):
+    def generate_correction_matrix(self, par: AntennaPar, c_chan: bool):
         """
         
         """
@@ -40,17 +36,26 @@ class BeamformingNormalization(object):
         ele = 0 # Antenna elevation: 0 degrees as well
         self.antenna = AntennaBeamformingImt(par,azi,ele)
         
-        gains = np.zeros((len(self.phi_scan_vals),len(self.theta_tilt_vals)))
+        # Loop throug all the possible beams
+        for phi, theta in product(self.phi_vals,self.theta_vals):
+            pass
+            
+    def calculate_correction_factor(self, phi_e: float, theta_t: float, c_chan: bool):
+        """
         
-        for k,theta_tilt in enumerate(self.theta_tilt_vals):
-            theta_v = theta_tilt*np.ones_like(self.phi_scan_vals)
-            gains[k,:] = self.antenna.calcualte_gain(phi_vec = self.phi_scan_vals,
-                                                     theta_vec=theta_v,
-                                                     beams_l = beams_list,
-                                                     co_channel = c_chan)   
-        return gains
+        """
+        if c_chan:
+            self.antenna.add_beam(phi_e,theta_t)
+            beam = np.array([len(self.antenna.beams_list) - 1])
+            int_f = lambda t,p: self.antenna._beam_gain(p,t,beam)*np.sin(t)
+        else:
+            int_f = lambda t,p: self.element.element_pattern(p,t)*np.sin(t)
+        
+        int_val = dblquad(int_f,-180,180,lambda t: 0, lambda t: 180)
+        
+        return int_val/(4*np.pi)
     
-    def save_files(self):
+    def _save_files(self):
         pass
     
 if __name__ == '__main__':
