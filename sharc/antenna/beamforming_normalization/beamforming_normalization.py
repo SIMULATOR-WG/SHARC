@@ -30,7 +30,7 @@ class BeamformingNormalization(object):
         self.theta_vals = np.arange(0,180,res)
         self.antenna = None  
                
-    def generate_correction_matrix(self, par: AntennaPar, c_chan: bool):
+    def generate_correction_matrix(self, par: AntennaPar, c_chan: bool, file_name: str):
         """
         
         """
@@ -54,7 +54,7 @@ class BeamformingNormalization(object):
           
         # Convert to dB and save
         cf = 10*np.log10(cf)
-        self._save_files(cf,par)
+        self._save_files(cf,par,file_name)
             
     def calculate_correction_factor(self, phi_e: float, theta_t: float, c_chan: bool):
         """
@@ -72,8 +72,13 @@ class BeamformingNormalization(object):
         
         return int_val/(4*np.pi)
     
-    def _save_files(self, correction, par:AntennaPar):
-        pass
+    def _save_files(self, correction, par:AntennaPar, file_name: str):
+        """
+        
+        """
+        np.savez(file_name,
+                 correction_factor = correction,
+                 parameters = np.array(par))
     
 if __name__ == '__main__':
     pass
