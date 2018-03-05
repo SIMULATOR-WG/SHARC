@@ -364,6 +364,4 @@ if __name__ == '__main__':
     plot.plot_element_pattern(ue_array,"UE","TX","ELEMENT")
     plot.plot_element_pattern(ue_array,"UE","TX","ARRAY")
 
-
-
     print('END')
