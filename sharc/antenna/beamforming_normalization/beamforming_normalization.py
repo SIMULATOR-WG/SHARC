@@ -16,7 +16,7 @@ class BeamformingNormalization(object):
     """
     
     """
-    def _init_(self, res: float):
+    def __init__(self, res: float):
         """
         
         """
