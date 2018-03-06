@@ -77,7 +77,7 @@ class AntennaElementImtM2101(object):
 
         Returns
         -------
-            gain (np.array): element radiation pattern gain value
+            gain (np.array): element radiation pattern gain value [dBi]
         """
         att = -1.0*(self.horizontal_pattern(phi) + \
                     self.vertical_pattern(theta))
