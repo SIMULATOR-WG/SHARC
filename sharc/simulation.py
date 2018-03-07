@@ -207,13 +207,13 @@ class Simulation(ABC, Observable):
             if station_b.station_type is StationType.IMT_UE:
                 # define antenna gains
                 gain_a = self.calculate_gains(station_a, station_b)
-                gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+                gain_b = np.transpose(self.calculate_gains(station_b, station_a, c_channel))
                 sectors_in_node=1
 
             else:
                 # define antenna gains
                 gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.parameters.imt.ue_k, 1)
-                gain_b = np.transpose(self.calculate_gains(station_b, station_a))
+                gain_b = np.transpose(self.calculate_gains(station_b, station_a, c_channel))
                 sectors_in_node = self.parameters.imt.ue_k
 
             if self.parameters.imt.interfered_with:
@@ -252,8 +252,8 @@ class Simulation(ABC, Observable):
                                              shadowing=self.parameters.imt.shadowing,
                                              line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
             # define antenna gains
-            gain_a = self.calculate_gains(station_a, station_b, c_channel)
-            gain_b = np.transpose(self.calculate_gains(station_b, station_a, c_channel))
+            gain_a = self.calculate_gains(station_a, station_b)
+            gain_b = np.transpose(self.calculate_gains(station_b, station_a))
 
             # collect IMT BS and UE antenna gain samples
             self.path_loss_imt = path_loss
