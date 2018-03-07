@@ -41,6 +41,32 @@ class BeamformingNormalizationTest(unittest.TestCase):
                                 horiz_spacing,
                                 vert_spacing,
                                 down_tilt)
+        
+        # Test 2
+        resolution = 5
+        self.norm_2 = BeamformingNormalization(resolution)
+        element_pattern = "M2101"
+        element_max_g = 5
+        element_phi_deg_3db = 65
+        element_theta_deg_3db = 65
+        element_am = 30
+        element_sla_v = 30
+        n_rows = 8
+        n_columns = 8
+        horiz_spacing = 0.5
+        vert_spacing = 0.5
+        down_tilt = 0
+        self.par_2 = AntennaPar(element_pattern,
+                                element_max_g,
+                                element_phi_deg_3db,
+                                element_theta_deg_3db,
+                                element_am,
+                                element_sla_v,
+                                n_rows,
+                                n_columns,
+                                horiz_spacing,
+                                vert_spacing,
+                                down_tilt)
     
     def test_construction(self):
         # Test 1
@@ -66,6 +92,18 @@ class BeamformingNormalizationTest(unittest.TestCase):
         c_fac, err = self.norm_1.calculate_correction_factor(0,0,c_chan)
         self.assertAlmostEqual(c_fac,0.0,delta = 1e-2)
         self.assertLess(np.max(np.abs(err)),1e-3)
+        
+        # Test 2
+        azi = 0
+        ele = 0
+        self.norm_2.antenna = AntennaBeamformingImt(self.par_2,azi,ele)
+        # Test adjacent channel case: single antenna element
+        c_chan = False
+        c_fac, err = self.norm_2.calculate_correction_factor(0,0,c_chan)
+#        self.assertAlmostEqual(c_fac,0.0,delta = 1e-2)
+#        self.assertLess(np.max(np.abs(err)),1e-3)
+        print(c_fac)
+        print(err)
         
     def test_generate_correction_matrix(self):
         pass
