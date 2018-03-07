@@ -89,22 +89,6 @@ class Simulation(ABC, Observable):
         if self.overlapping_bandwidth < 0:
             self.overlapping_bandwidth = 0
 
-        if (self.overlapping_bandwidth == self.param_system.bandwidth and not self.parameters.imt.interfered_with) or \
-        (self.overlapping_bandwidth == self.parameters.imt.bandwidth and self.parameters.imt.interfered_with):
-                self.adjacent_channel = False
-
-        imt_min_freq = self.parameters.imt.frequency - self.parameters.imt.bandwidth / 2
-        imt_max_freq = self.parameters.imt.frequency + self.parameters.imt.bandwidth / 2
-        system_min_freq = self.param_system.frequency - self.param_system.bandwidth / 2
-        system_max_freq = self.param_system.frequency + self.param_system.bandwidth / 2
-
-        max_min_freq = np.maximum(imt_min_freq, system_min_freq)
-        min_max_freq = np.minimum(imt_max_freq, system_max_freq)
-
-        self.overlapping_bandwidth = min_max_freq - max_min_freq
-        if self.overlapping_bandwidth < 0:
-            self.overlapping_bandwidth = 0
-
         if (self.overlapping_bandwidth == self.param_system.bandwidth and
             not self.parameters.imt.interfered_with) or \
            (self.overlapping_bandwidth == self.parameters.imt.bandwidth and
