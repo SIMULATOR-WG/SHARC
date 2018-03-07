@@ -138,16 +138,16 @@ if __name__ == '__main__':
     antenna = AntennaS1855(params_fss_ss)
 
     # Plot radiation pattern for theta = 90 degrees
-    phi_vec = np.linspace(0.01, 180, num = 10000)
-    theta_90 = 90*np.ones(phi_vec.shape)
-    theta = 0*np.ones(phi_vec.shape)
+    off_axis_angle_vec = np.linspace(0.01, 180, num = 10000)
+    theta_90 = 90*np.ones(off_axis_angle_vec.shape)
+    theta = 0*np.ones(off_axis_angle_vec.shape)
 
-    gain_90 = antenna.calculate_gain(phi_vec = phi_vec, theta_vec = theta_90)
-    gain = antenna.calculate_gain(phi_vec = phi_vec, theta_vec = theta)
+    gain_90 = antenna.calculate_gain(off_axis_angle_vec = off_axis_angle_vec, theta_vec = theta_90)
+    gain = antenna.calculate_gain(off_axis_angle_vec = off_axis_angle_vec, theta_vec = theta)
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')
-    plt.semilogx(phi_vec, gain_90, "-b", label = "$\\theta = 90$ deg")
-    plt.semilogx(phi_vec, gain, "-r", label = "$\\theta = 0$ deg")
+    plt.semilogx(off_axis_angle_vec, gain_90, "-b", label = "$\\theta = 90$ deg")
+    plt.semilogx(off_axis_angle_vec, gain, "-r", label = "$\\theta = 0$ deg")
 
     plt.xlabel("Off-axis angle, $\\varphi$ [deg]")
     plt.ylabel("Gain [dBi]")

@@ -12,14 +12,42 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class SpectralMaskImt(SpectralMask):
+    """
+    Implements spectral masks from document ITU 265-E. The masks are in the
+    document's tables 1 to 8.
     
+    Attributes:
+        spurious_emissions (float): level of power emissions at spurious
+            domain (dBm/MHz). Hardcoded as -13 dBm/MHz,  as specified in
+            document ITU 265-E
+        delta_f_lin (np.array): mask delta f breaking limits in MHz. Delta f 
+            values for which the spectral mask changes value. Hard coded as
+            [0, 20, 400]. In this context, delta f is the frequency distance to
+            the transmission's edge frequencies
+        freq_lim (no.array): frequency values for which the spectral mask
+            changes emission value
+        sta_type (StationType): type of station to which consider the spectral
+            mask. Possible values are StationType.IMT_BS and StationType.IMT_UE
+        freq_mhz (float): center frequency of station in MHz
+        band_mhs (float): transmitting bandwidth of station in MHz
+        scenario (str): INDOOR or OUTDOOR scenario
+        p_tx (float): station's transmit power in dBm/MHz
+        mask_dbm (np.array): spectral mask emission values in dBm
+    """
     def __init__(self,sta_type: StationType, freq_mhz: float, band_mhz: float, scenario = "OUTDOOR"):
         """
-        Implements spectral mask from document ITU 265-E
-        """
+        Class constructor.
         
+        Parameters:
+            sta_type (StationType): type of station to which consider the spectral
+                mask. Possible values are StationType.IMT_BS and StationType.
+                IMT_UE
+            freq_mhz (float): center frequency of station in MHz
+            band_mhs (float): transmitting bandwidth of station in MHz
+            scenario (str): INDOOR or OUTDOOR scenario
+        """
         # Spurious domain limits [dDm/MHz]
-        self.spurious_limits = -13
+        self.spurious_emissions = -13
         # Mask delta f breaking limits [MHz]
         self.delta_f_lim = np.array([0, 20, 400])
         
@@ -34,44 +62,50 @@ class SpectralMaskImt(SpectralMask):
        
         
     def set_mask(self, power = 0):
+        """
+        Sets the spectral mask (mask_dbm attribute) based on station type, 
+        operating frequency and transmit power.
         
+        Parameters:
+            power (float): station transmit power. Default = 0
+        """
         self.p_tx = power - 10*np.log10(self.band_mhz)
         
         # Set new transmit power value       
         if self.sta_type is StationType.IMT_UE:
             # Table 8
-            mask_dbm = np.array([-5, -13, self.spurious_limits])
+            mask_dbm = np.array([-5, -13, self.spurious_emissions])
             
         elif self.sta_type is StationType.IMT_BS and self.scenario is "INDOOR":             
             # Table 1
-            mask_dbm = np.array([-5, -13, self.spurious_limits])
+            mask_dbm = np.array([-5, -13, self.spurious_emissions])
             
         else:
             
             if (self.freq_mhz > 24250 and self.freq_mhz < 33400):
-                if self.p_tx >= 34.5:
+                if power >= 34.5:
                     # Table 2
-                    mask_dbm = np.array([-5, -13, self.spurious_limits])
+                    mask_dbm = np.array([-5, -13, self.spurious_emissions])
                 else:
                     # Table 3
                     mask_dbm = np.array([-5, np.max((power-47.5,-20)), 
-                                          self.spurious_limits])
+                                          self.spurious_emissions])
             elif (self.freq_mhz > 37000 and self.freq_mhz < 52600):
-                if self.p_tx >= 32.5:
+                if power >= 32.5:
                     # Table 4
-                    mask_dbm = np.array([-5, -13, self.spurious_limits])
+                    mask_dbm = np.array([-5, -13, self.spurious_emissions])
                 else:
                     # Table 5
                     mask_dbm = np.array([-5, np.max((power-45.5,-20)), 
-                                          self.spurious_limits])
+                                          self.spurious_emissions])
             elif (self.freq_mhz > 66000 and self.freq_mhz < 86000):
-                if self.p_tx >= 30.5:
+                if power >= 30.5:
                     # Table 6
-                    mask_dbm = np.array([-5, -13, self.spurious_limits])
+                    mask_dbm = np.array([-5, -13, self.spurious_emissions])
                 else:
                     # Table 7
                     mask_dbm = np.array([-5, np.max((power-43.5,-20)), 
-                                          self.spurious_limits])
+                                          self.spurious_emissions])
             else:
                 # Dummy spectral mask, for testing purposes only
                 mask_dbm = np.array([-10, -20, -50])
