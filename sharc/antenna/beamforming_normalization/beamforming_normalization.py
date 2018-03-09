@@ -78,7 +78,9 @@ class BeamformingNormalization(object):
             np.power(10,self.antenna.element.element_pattern(np.rad2deg(p),np.rad2deg(t))/10)*np.sin(t)
         
         int_val, err = dblquad(int_f,self.phi_min_rad,self.phi_max_rad,
-                          lambda p: self.theta_min_rad, lambda p: self.theta_max_rad)
+                          lambda p: self.theta_min_rad, 
+                          lambda p: self.theta_max_rad,
+                          epsabs=0.0)
         
         cf = 10*np.log10(int_val/(4*np.pi))
         
