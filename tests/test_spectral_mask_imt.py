@@ -44,5 +44,11 @@ class SpectalMaskImtTest(unittest.TestCase):
         poob = self.mask1.power_calc(fc,band)
         self.assertAlmostEqual(poob,14.8106,delta=1e-2)
         
+        # Test 4
+        fc = 45000
+        band = 1000
+        poob = self.mask1.power_calc(fc, band)
+        self.assertAlmostEqual(poob, 17, delta=1e-2)        
+        
 if __name__ == '__main__':
     unittest.main()
