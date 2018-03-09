@@ -83,10 +83,10 @@ class BeamformingNormalization(object):
                           epsabs=1e-2,
                           epsrel=0.0)
         
-        cf = 10*np.log10(int_val/(4*np.pi))
+        cf = -10*np.log10(int_val/(4*np.pi))
         
-        low_bound = 10*np.log10((int_val - err)/(4*np.pi))
-        hig_bound = 10*np.log10((int_val + err)/(4*np.pi))
+        low_bound = -10*np.log10((int_val - err)/(4*np.pi))
+        hig_bound = -10*np.log10((int_val + err)/(4*np.pi))
         
         return cf, (low_bound,hig_bound)
     

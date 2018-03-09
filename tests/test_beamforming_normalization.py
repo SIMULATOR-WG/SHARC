@@ -152,9 +152,9 @@ class BeamformingNormalizationTest(unittest.TestCase):
         # Test adjacent channel case: single antenna element
         c_chan = False
         c_fac, err = self.norm_2.calculate_correction_factor(0,0,c_chan)
-        self.assertAlmostEqual(c_fac,-2.4,delta = 1e-1)
-        self.assertGreater(err[0],-2.45)
-        self.assertLess(err[1],-2.35)
+        self.assertAlmostEqual(c_fac,2.4,delta = 1e-1)
+        self.assertGreater(err[0],2.35)
+        self.assertLess(err[1],2.45)
         
         # Test 3: BS element pattern
         azi = 0
@@ -163,9 +163,9 @@ class BeamformingNormalizationTest(unittest.TestCase):
         # Test adjacent channel case: single antenna element
         c_chan = False
         c_fac, err = self.norm_3.calculate_correction_factor(0,0,c_chan)
-        self.assertAlmostEqual(c_fac,-4.8,delta = 1e-1)
-        self.assertGreater(err[0],-4.85)
-        self.assertLess(err[1],-4.75)
+        self.assertAlmostEqual(c_fac,4.8,delta = 1e-1)
+        self.assertGreater(err[0],4.75)
+        self.assertLess(err[1],4.85)
         
     def test_generate_correction_matrix(self):
         pass
