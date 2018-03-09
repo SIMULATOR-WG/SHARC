@@ -23,8 +23,8 @@ class BeamformingNormalization(object):
         # Initialize attributes
         self.res_deg = res_deg
         
-        self.phi_min_deg = 0
-        self.phi_max_deg = 360
+        self.phi_min_deg = -180
+        self.phi_max_deg = 180
         self.theta_min_deg = 0
         self.theta_max_deg = 180
         
@@ -80,7 +80,8 @@ class BeamformingNormalization(object):
         int_val, err = dblquad(int_f,self.phi_min_rad,self.phi_max_rad,
                           lambda p: self.theta_min_rad, 
                           lambda p: self.theta_max_rad,
-                          epsabs=0.0)
+                          epsabs=1e-2,
+                          epsrel=0.0)
         
         cf = 10*np.log10(int_val/(4*np.pi))
         
