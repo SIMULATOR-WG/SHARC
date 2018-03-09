@@ -16,12 +16,13 @@ class BeamformingNormalization(object):
     """
     
     """
-    def __init__(self, res_deg: float):
+    def __init__(self, res_deg: float, tol: float):
         """
         
         """
         # Initialize attributes
         self.res_deg = res_deg
+        self.tol = tol
         
         self.phi_min_deg = -180
         self.phi_max_deg = 180
@@ -55,14 +56,15 @@ class BeamformingNormalization(object):
             # Loop throug all the possible beams
             for phi_idx, phi in enumerate(self.phi_vals_deg):
                 for theta_idx, theta in enumerate(self.theta_vals_deg):
-                    cf[phi_idx,theta_idx] = self.calculate_correction_factor(phi,theta,c_chan)
+                    cf[phi_idx,theta_idx], err = self.calculate_correction_factor(phi,theta,c_chan)
                 
         else:
             # Correction factor float
             cf, err = self.calculate_correction_factor(0,0,c_chan)
           
-        # Convert to dB and save
+        # Save in file
         self._save_files(cf,par,file_name)
+        return cf
             
     def calculate_correction_factor(self, phi_e: float, theta_t: float, c_chan: bool):
         """
@@ -70,7 +72,7 @@ class BeamformingNormalization(object):
         """
         if c_chan:
             self.antenna.add_beam(phi_e,theta_t)
-            beam = np.array([len(self.antenna.beams_list) - 1])
+            beam = int(len(self.antenna.beams_list) - 1)
             int_f = lambda t,p: \
             np.power(10,self.antenna._beam_gain(np.rad2deg(p),np.rad2deg(t),beam)/10)*np.sin(t)
         else:
@@ -80,13 +82,13 @@ class BeamformingNormalization(object):
         int_val, err = dblquad(int_f,self.phi_min_rad,self.phi_max_rad,
                           lambda p: self.theta_min_rad, 
                           lambda p: self.theta_max_rad,
-                          epsabs=1e-2,
+                          epsabs=self.tol,
                           epsrel=0.0)
         
         cf = -10*np.log10(int_val/(4*np.pi))
         
-        low_bound = -10*np.log10((int_val - err)/(4*np.pi))
-        hig_bound = -10*np.log10((int_val + err)/(4*np.pi))
+        hig_bound = -10*np.log10((int_val - err)/(4*np.pi))
+        low_bound = -10*np.log10((int_val + err)/(4*np.pi))
         
         return cf, (low_bound,hig_bound)
     
@@ -96,7 +98,7 @@ class BeamformingNormalization(object):
         """
         np.savez(file_name,
                  correction_factor = correction,
-                 parameters = np.array(par))
+                 parameters = par)
     
 if __name__ == '__main__':
     pass

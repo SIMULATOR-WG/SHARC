@@ -8,6 +8,7 @@ Created on Mon Mar  5 10:30:15 2018
 import unittest
 import numpy as np
 import numpy.testing as npt
+import os
 
 from sharc.antenna.beamforming_normalization.beamforming_normalization import BeamformingNormalization
 from sharc.support.named_tuples import AntennaPar
@@ -18,7 +19,8 @@ class BeamformingNormalizationTest(unittest.TestCase):
     def setUp(self):
         # Test 1
         resolution = 30
-        self.norm_1 = BeamformingNormalization(resolution)
+        tolerance = 1e-2
+        self.norm_1 = BeamformingNormalization(resolution,tolerance)
         element_pattern = "FIXED"
         element_max_g = 0
         element_phi_deg_3db = 65
@@ -42,35 +44,10 @@ class BeamformingNormalizationTest(unittest.TestCase):
                                 vert_spacing,
                                 down_tilt)
         
-        # Test 2
-        resolution = 5
-        self.norm_2 = BeamformingNormalization(resolution)
-        element_pattern = "M2101"
-        element_max_g = 5
-        element_phi_deg_3db = 65
-        element_theta_deg_3db = 65
-        element_am = 30
-        element_sla_v = 30
-        n_rows = 8
-        n_columns = 8
-        horiz_spacing = 0.5
-        vert_spacing = 0.5
-        down_tilt = 0
-        self.par_2 = AntennaPar(element_pattern,
-                                element_max_g,
-                                element_phi_deg_3db,
-                                element_theta_deg_3db,
-                                element_am,
-                                element_sla_v,
-                                n_rows,
-                                n_columns,
-                                horiz_spacing,
-                                vert_spacing,
-                                down_tilt)
-        
         # Test 2: UE configuration
         resolution = 5
-        self.norm_2 = BeamformingNormalization(resolution)
+        tolerance = 1e-2
+        self.norm_2 = BeamformingNormalization(resolution,tolerance)
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 90
@@ -95,8 +72,9 @@ class BeamformingNormalizationTest(unittest.TestCase):
                                 down_tilt)
         
         # Test 3: BS configuration
-        resolution = 5
-        self.norm_3 = BeamformingNormalization(resolution)
+        resolution = 1
+        tolerance = 5e-2
+        self.norm_3 = BeamformingNormalization(resolution,tolerance)
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 65
@@ -156,7 +134,7 @@ class BeamformingNormalizationTest(unittest.TestCase):
         self.assertGreater(err[0],2.35)
         self.assertLess(err[1],2.45)
         
-        # Test 3: BS element pattern
+        # Test 3.1: BS element pattern
         azi = 0
         ele = 0
         self.norm_3.antenna = AntennaBeamformingImt(self.par_3,azi,ele)
@@ -167,11 +145,32 @@ class BeamformingNormalizationTest(unittest.TestCase):
         self.assertGreater(err[0],4.75)
         self.assertLess(err[1],4.85)
         
+        # Test 3.2: BS array
+        azi = 0
+        ele = 0
+        self.norm_3.antenna = AntennaBeamformingImt(self.par_3,azi,ele)
+        # Test adjacent channel case: single antenna element
+        c_chan = True
+        c_fac, err = self.norm_3.calculate_correction_factor(0,0,c_chan)
+        self.assertAlmostEqual(c_fac,8.0,delta = 1e-1)
+        self.assertGreater(err[0],7.5)
+        self.assertLess(err[1],8.5)
+        
     def test_generate_correction_matrix(self):
-        pass
-    
-    def test_save_files(self):
-        pass
+        # Test 2: UE element pattern
+        # Test adjacent channel case: single antenna element
+        c_chan = False
+        file_name = "test_2.npz"
+        c_fac = self.norm_2.generate_correction_matrix(self.par_2,
+                                                       c_chan,
+                                                       file_name)
+        self.assertAlmostEqual(c_fac,2.4,delta = 1e-1)
+        # Test saved file
+        data = np.load(file_name)
+        self.assertEqual(data['correction_factor'],c_fac)
+        npt.assert_equal(data['parameters'],np.array(self.par_2))
+        data.close()
+        os.remove(file_name)
     
 if __name__ == '__main__':
     unittest.main()
