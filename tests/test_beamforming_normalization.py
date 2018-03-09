@@ -72,7 +72,7 @@ class BeamformingNormalizationTest(unittest.TestCase):
                                 down_tilt)
         
         # Test 3: BS configuration
-        resolution = 1
+        resolution = 180
         tolerance = 5e-2
         self.norm_3 = BeamformingNormalization(resolution,tolerance)
         element_pattern = "M2101"
@@ -158,7 +158,6 @@ class BeamformingNormalizationTest(unittest.TestCase):
         
     def test_generate_correction_matrix(self):
         # Test 2: UE element pattern
-        # Test adjacent channel case: single antenna element
         c_chan = False
         file_name = "test_2.npz"
         c_fac = self.norm_2.generate_correction_matrix(self.par_2,
@@ -169,6 +168,20 @@ class BeamformingNormalizationTest(unittest.TestCase):
         data = np.load(file_name)
         self.assertEqual(data['correction_factor'],c_fac)
         npt.assert_equal(data['parameters'],np.array(self.par_2))
+        data.close()
+        os.remove(file_name)
+        
+        # Test 3: BS array
+        c_chan = True
+        file_name = "test_3.npz"
+        c_fac = self.norm_3.generate_correction_matrix(self.par_3,
+                                                       c_chan,
+                                                       file_name)
+        npt.assert_allclose(c_fac,np.array([[8.0],[8.0]]),atol = 1e-1)
+        # Test saved file
+        data = np.load(file_name)
+        npt.assert_equal(data['correction_factor'],c_fac)
+        npt.assert_equal(data['parameters'],np.array(self.par_3))
         data.close()
         os.remove(file_name)
     
