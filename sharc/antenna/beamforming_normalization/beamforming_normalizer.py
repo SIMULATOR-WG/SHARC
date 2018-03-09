@@ -12,7 +12,7 @@ from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.support.named_tuples import AntennaPar
 
  
-class BeamformingNormalization(object):
+class BeamformingNormalizer(object):
     """
     
     """
@@ -101,4 +101,57 @@ class BeamformingNormalization(object):
                  parameters = par)
     
 if __name__ == '__main__':
-    pass
+    """
+    
+    """
+    import matplotlib.pyplot as plt
+    
+    # Create normalizer object
+    resolution = 5
+    tolerance = 5e-1
+    norm = BeamformingNormalizer(resolution,tolerance)
+    
+    # Antenna parameters
+    element_pattern = "M2101"
+    element_max_g = 5
+    element_phi_deg_3db = 65
+    element_theta_deg_3db = 65
+    element_am = 30
+    element_sla_v = 30
+    n_rows = 8
+    n_columns = 8
+    horiz_spacing = 0.5
+    vert_spacing = 0.5
+    down_tilt = 0
+    par = AntennaPar(element_pattern,
+                     element_max_g,
+                     element_phi_deg_3db,
+                     element_theta_deg_3db,
+                     element_am,
+                     element_sla_v,
+                     n_rows,
+                     n_columns,
+                     horiz_spacing,
+                     vert_spacing,
+                     down_tilt)
+    
+    # Set range of values & calculate correction factor
+    norm.theta_vals_deg = np.array([90])
+    c_chan = True
+    file_name = 'main_test.npz'
+    cf = norm.generate_correction_matrix(par,c_chan,file_name)
+    
+    plt.plot(norm.phi_vals_deg,cf)
+    plt.show()
+    
+    # Set range of values & calculate correction factor
+    norm = BeamformingNormalizer(resolution,tolerance)
+    norm.phi_vals_deg = np.array([0])
+    c_chan = True
+    file_name = 'main_test.npz'
+    cf = norm.generate_correction_matrix(par,c_chan,file_name)
+    
+    plt.plot(norm.theta_vals_deg,np.transpose(cf))
+    plt.show()
+    
+    

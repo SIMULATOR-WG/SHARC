@@ -10,7 +10,7 @@ import numpy as np
 import numpy.testing as npt
 import os
 
-from sharc.antenna.beamforming_normalization.beamforming_normalization import BeamformingNormalization
+from sharc.antenna.beamforming_normalization.beamforming_normalization import BeamformingNormalizer
 from sharc.support.named_tuples import AntennaPar
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 
@@ -20,7 +20,7 @@ class BeamformingNormalizationTest(unittest.TestCase):
         # Test 1
         resolution = 30
         tolerance = 1e-2
-        self.norm_1 = BeamformingNormalization(resolution,tolerance)
+        self.norm_1 = BeamformingNormalizer(resolution,tolerance)
         element_pattern = "FIXED"
         element_max_g = 0
         element_phi_deg_3db = 65
@@ -47,7 +47,7 @@ class BeamformingNormalizationTest(unittest.TestCase):
         # Test 2: UE configuration
         resolution = 5
         tolerance = 1e-2
-        self.norm_2 = BeamformingNormalization(resolution,tolerance)
+        self.norm_2 = BeamformingNormalizer(resolution,tolerance)
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 90
@@ -74,7 +74,7 @@ class BeamformingNormalizationTest(unittest.TestCase):
         # Test 3: BS configuration
         resolution = 180
         tolerance = 5e-2
-        self.norm_3 = BeamformingNormalization(resolution,tolerance)
+        self.norm_3 = BeamformingNormalizer(resolution,tolerance)
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 65
