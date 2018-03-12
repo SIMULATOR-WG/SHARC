@@ -14,11 +14,37 @@ from sharc.support.named_tuples import AntennaPar
  
 class BeamformingNormalizer(object):
     """
+    Calculates the total integrated gain of given antenna array or element and
+    returns its correction factor.
     
+    Attributes:
+        res_deg (float): correction factor matrix resolution [degreees]
+        tol (float): integral absolute tolerance
+        pni_min_deg (float): minimum phi escan value for correction factor
+            matrix [degrees]. Hardcoded as -180 degrees
+        phi_max_deg (float): maximum phi escan value for correction factor
+            matrix [degrees]. Hardcoded as +180 degrees
+        theta_min_deg (float): minimum theta tilt value for correction factor
+            matrix [degrees]. Hardcoded as 0 degrees
+        theta_max_deg (float): maximum theta tilt value for correction factor
+            matrix [degrees]. Hardcoded as +180 degrees
+        phi_min_rad (float): same as pni_min_deg, but in radians
+        phi_max_rad (float): same as pni_max_deg, but in radians
+        theta_min_rad (float): same as theta_min_deg, but in radians
+        theta_max_rad (float): same as theta_max_deg, but in radians
+        self.phi_vals_deg (np.array): all phi escan values for given resolution
+        self.phi_vals_deg (np.array): all theta tilt values for given 
+            resolution
+        antenna (AntennaBeamformingImt): antenna to which calculate 
+            normalization
     """
     def __init__(self, res_deg: float, tol: float):
         """
+        Class constructor
         
+        Parameters:
+            res_deg (float): correction factor matrix resolution in degrees
+            tol (float): absolute tolerance for integration
         """
         # Initialize attributes
         self.res_deg = res_deg
@@ -42,7 +68,17 @@ class BeamformingNormalizer(object):
                
     def generate_correction_matrix(self, par: AntennaPar, c_chan: bool, file_name: str):
         """
+        Generates the correction factor matrix and saves it in a file
         
+        Parameters:
+            par (AntennaPar): set of parameters antenna parameters to be used
+            c_chan (bool): if True, whole antenna array will be used. If false,
+                just a single element is used
+            file_name (str): name of file to which save the correction matrix
+            
+        Returns:
+            cf (np.array): corraction factor matrix
+            err (np.array): error matrix
         """
         # Create antenna object
         azi = 0 # Antenna azimuth: 0 degrees for simplicity
@@ -69,7 +105,17 @@ class BeamformingNormalizer(object):
             
     def calculate_correction_factor(self, phi_e: float, theta_t: float, c_chan: bool):
         """
+        Calculates single correction factor
         
+        Parameters:
+            phi_e (float): phi escan value
+            theta_t (float): theta tilt value
+            c_chan (bool): if True, whole antenna array will be used. If false,
+                just a single element is used
+                
+        Returns:
+            cf (float): correction factor value
+            err (tuple): upper and lower error bounds
         """
         if c_chan:
             self.antenna.add_beam(phi_e,theta_t)
@@ -94,22 +140,19 @@ class BeamformingNormalizer(object):
         return cf, (low_bound,hig_bound)
     
     def _save_files(self, correction, par:AntennaPar, file_name: str):
-        """
-        
-        """
         np.savez(file_name,
                  correction_factor = correction,
                  parameters = par)
     
 if __name__ == '__main__':
     """
-    
+    Plots correction factor for horizontal and vertical planes.
     """
     import matplotlib.pyplot as plt
     
     # Create normalizer object
-    resolution = 5
-    tolerance = 5e-1
+    resolution = 2.5
+    tolerance = 1e-1
     norm = BeamformingNormalizer(resolution,tolerance)
     
     # Antenna parameters
@@ -146,6 +189,7 @@ if __name__ == '__main__':
     plt.plot(norm.phi_vals_deg,cf,
              norm.phi_vals_deg,err_low,'r--',
              norm.phi_vals_deg,err_high,'r--')
+    plt.xlim(-180,180)
     plt.ylabel(r"Correction factor [dB]")
     plt.xlabel(r"Azimuth angle $\phi$ [deg]")
     plt.title(r"Elevation angle $\theta$ = 90 deg")
@@ -162,6 +206,7 @@ if __name__ == '__main__':
     plt.plot(norm.theta_vals_deg,np.transpose(cf),
              norm.theta_vals_deg,np.transpose(err_low),'r--',
              norm.theta_vals_deg,np.transpose(err_high),'r--')
+    plt.xlim(0,180)
     plt.ylabel(r"Correction factor [dB]")
     plt.xlabel(r"Elevation angle $\theta$ [deg]")
     plt.title(r"Azimuth angle $\phi$ = 0 deg")
