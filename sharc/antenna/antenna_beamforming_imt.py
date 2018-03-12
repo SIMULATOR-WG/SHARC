@@ -8,6 +8,7 @@ Created on Sat Apr 15 15:35:51 2017
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
 
 from sharc.antenna.antenna_element_imt_m2101 import AntennaElementImtM2101
 from sharc.antenna.antenna_element_imt_f1336 import AntennaElementImtF1336
@@ -66,7 +67,26 @@ class AntennaBeamformingImt(Antenna):
         self.n_cols = par.n_columns
         self.dh = par.element_horiz_spacing
         self.dv = par.element_vert_spacing
-
+        
+        # Beamforming normalization
+        self.normalize = par.normalization
+        self.co_cf_list = []
+        self.adj_cf = 0.0
+        if self.normalize:
+            # Load co-channel data
+            file_name = str(hash((True,par))) + '.npz'
+            file_path = os.path.join('..',
+                                     'beamforming_normalization',
+                                     file_name)
+            self.co_channel_norm_data = np.load(file_path)
+            
+            # Load adjacent channel data
+            file_name = str(hash((False,par))) + '.npz'
+            file_path = os.path.join('..',
+                                     'beamforming_normalization',
+                                     file_name)
+            self.adj_channel_norm_data = np.load(file_path)
+            self.adj_cf = self.adj_channel_norm_data["correction_factor"]
 
     def add_beam(self, phi_etilt: float, theta_etilt: float):
         """
@@ -82,6 +102,13 @@ class AntennaBeamformingImt(Antenna):
         phi, theta = self.to_local_coord(phi_etilt, theta_etilt)
         self.beams_list.append((phi, theta-90))
         self.w_vec_list.append(self._weight_vector(phi, theta-90))
+        
+        if self.normalize:
+            lin = int(phi/self.co_channel_norm_data["resolution"])
+            col = int(theta/self.co_channel_norm_data["resolution"])
+            self.co_cf_list.append(self.co_channel_norm_data["correction_factor"][lin,col])
+        else:
+            self.co_cf_list.append(0.0)
 
     def calculate_gain(self, *args, **kwargs) -> np.array:
         """
@@ -121,17 +148,18 @@ class AntennaBeamformingImt(Antenna):
         if(co_channel):
             for g in range(n_direct):
                 gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g],
-                                           beams_l[g])
+                                           beams_l[g]) + self.co_cf_list[g]
         else:
             for g in range(n_direct):
                 gains[g] = self.element.element_pattern(lo_phi_vec[g],
-                                                        lo_theta_vec[g])
+                                                        lo_theta_vec[g]) + self.adj_cf
 
         return gains
 
     def reset_beams(self):
         self.beams_list = []
         self.w_vec_list = []
+        self.co_cf_list = []
 
     def _super_position_vector(self,phi: float, theta: float) -> np.array:
         """
