@@ -52,11 +52,12 @@ class BeamformingNormalizer(object):
         if c_chan:
             # Correction factor numpy array
             cf = np.zeros((len(self.phi_vals_deg),len(self.theta_vals_deg)))
+            err = np.empty((len(self.phi_vals_deg),len(self.theta_vals_deg)), dtype=tuple)
             
             # Loop throug all the possible beams
             for phi_idx, phi in enumerate(self.phi_vals_deg):
                 for theta_idx, theta in enumerate(self.theta_vals_deg):
-                    cf[phi_idx,theta_idx], err = self.calculate_correction_factor(phi,theta,c_chan)
+                    cf[phi_idx,theta_idx], err[phi_idx,theta_idx] = self.calculate_correction_factor(phi,theta,c_chan)
                 
         else:
             # Correction factor float
@@ -64,7 +65,7 @@ class BeamformingNormalizer(object):
           
         # Save in file
         self._save_files(cf,par,file_name)
-        return cf
+        return cf, err
             
     def calculate_correction_factor(self, phi_e: float, theta_t: float, c_chan: bool):
         """
@@ -139,9 +140,15 @@ if __name__ == '__main__':
     norm.theta_vals_deg = np.array([90])
     c_chan = True
     file_name = 'main_test.npz'
-    cf = norm.generate_correction_matrix(par,c_chan,file_name)
+    cf, err = norm.generate_correction_matrix(par,c_chan,file_name)
+    err_low, err_high = zip(*np.ravel(err))
     
-    plt.plot(norm.phi_vals_deg,cf)
+    plt.plot(norm.phi_vals_deg,cf,
+             norm.phi_vals_deg,err_low,'r--',
+             norm.phi_vals_deg,err_high,'r--')
+    plt.ylabel(r"Correction factor [dB]")
+    plt.xlabel(r"Azimuth angle $\phi$ [deg]")
+    plt.title(r"Elevation angle $\theta$ = 90 deg")
     plt.show()
     
     # Set range of values & calculate correction factor
@@ -149,9 +156,15 @@ if __name__ == '__main__':
     norm.phi_vals_deg = np.array([0])
     c_chan = True
     file_name = 'main_test.npz'
-    cf = norm.generate_correction_matrix(par,c_chan,file_name)
+    cf, err = norm.generate_correction_matrix(par,c_chan,file_name)
+    err_low, err_high = zip(*np.ravel(err))
     
-    plt.plot(norm.theta_vals_deg,np.transpose(cf))
+    plt.plot(norm.theta_vals_deg,np.transpose(cf),
+             norm.theta_vals_deg,np.transpose(err_low),'r--',
+             norm.theta_vals_deg,np.transpose(err_high),'r--')
+    plt.ylabel(r"Correction factor [dB]")
+    plt.xlabel(r"Elevation angle $\theta$ [deg]")
+    plt.title(r"Azimuth angle $\phi$ = 0 deg")
     plt.show()
     
     

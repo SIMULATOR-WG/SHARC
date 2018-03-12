@@ -10,7 +10,7 @@ import numpy as np
 import numpy.testing as npt
 import os
 
-from sharc.antenna.beamforming_normalization.beamforming_normalization import BeamformingNormalizer
+from sharc.antenna.beamforming_normalization.beamforming_normalizer import BeamformingNormalizer
 from sharc.support.named_tuples import AntennaPar
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 
@@ -160,9 +160,9 @@ class BeamformingNormalizationTest(unittest.TestCase):
         # Test 2: UE element pattern
         c_chan = False
         file_name = "test_2.npz"
-        c_fac = self.norm_2.generate_correction_matrix(self.par_2,
-                                                       c_chan,
-                                                       file_name)
+        c_fac, err = self.norm_2.generate_correction_matrix(self.par_2,
+                                                            c_chan,
+                                                            file_name)
         self.assertAlmostEqual(c_fac,2.4,delta = 1e-1)
         # Test saved file
         data = np.load(file_name)
@@ -174,9 +174,9 @@ class BeamformingNormalizationTest(unittest.TestCase):
         # Test 3: BS array
         c_chan = True
         file_name = "test_3.npz"
-        c_fac = self.norm_3.generate_correction_matrix(self.par_3,
-                                                       c_chan,
-                                                       file_name)
+        c_fac, err = self.norm_3.generate_correction_matrix(self.par_3,
+                                                            c_chan,
+                                                            file_name)
         npt.assert_allclose(c_fac,np.array([[8.0],[8.0]]),atol = 1e-1)
         # Test saved file
         data = np.load(file_name)
