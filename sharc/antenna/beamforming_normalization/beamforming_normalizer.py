@@ -141,6 +141,9 @@ class BeamformingNormalizer(object):
     
     def _save_files(self, correction, par:AntennaPar, file_name: str):
         np.savez(file_name,
+                 resolution = self.res_deg,
+                 phi_range = (self.phi_min_deg, self.phi_max_deg),
+                 theta_range = (self.theta_min_deg, self.theta_max_deg),
                  correction_factor = correction,
                  parameters = par)
     
