@@ -22,7 +22,8 @@ class ParametersAntennaImt(object):
     def get_antenna_parameters(self,sta_type: str, txrx: str)-> AntennaPar:
         if sta_type == "BS":
             if txrx == "TX":
-                tpl = AntennaPar(self.bs_element_pattern,
+                tpl = AntennaPar(self.normalization,
+                                 self.bs_element_pattern,
                                  self.bs_tx_element_max_g,
                                  self.bs_tx_element_phi_deg_3db,
                                  self.bs_tx_element_theta_deg_3db,
@@ -34,7 +35,8 @@ class ParametersAntennaImt(object):
                                  self.bs_tx_element_vert_spacing,
                                  self.bs_downtilt_deg)
             elif txrx == "RX":
-                tpl = AntennaPar(self.bs_element_pattern,
+                tpl = AntennaPar(self.normalization,
+                                 self.bs_element_pattern,
                                  self.bs_rx_element_max_g,
                                  self.bs_rx_element_phi_deg_3db,
                                  self.bs_rx_element_theta_deg_3db,
@@ -47,7 +49,8 @@ class ParametersAntennaImt(object):
                                  self.bs_downtilt_deg)
         elif sta_type == "UE":
             if txrx == "TX":
-                tpl = AntennaPar(self.ue_element_pattern,
+                tpl = AntennaPar(self.normalization,
+                                 self.ue_element_pattern,
                                  self.ue_tx_element_max_g,
                                  self.ue_tx_element_phi_deg_3db,
                                  self.ue_tx_element_theta_deg_3db,
@@ -59,7 +62,8 @@ class ParametersAntennaImt(object):
                                  self.ue_tx_element_vert_spacing,
                                  0)
             elif txrx == "RX":
-                tpl = AntennaPar(self.ue_element_pattern,
+                tpl = AntennaPar(self.normalization,
+                                 self.ue_element_pattern,
                                  self.ue_rx_element_max_g,
                                  self.ue_rx_element_phi_deg_3db,
                                  self.ue_rx_element_theta_deg_3db,
