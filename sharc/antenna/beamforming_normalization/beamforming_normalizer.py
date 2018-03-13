@@ -152,6 +152,7 @@ if __name__ == '__main__':
     Plots correction factor for horizontal and vertical planes.
     """
     import matplotlib.pyplot as plt
+    import os
     
     # Create normalizer object
     resolution = 2.5
@@ -214,5 +215,6 @@ if __name__ == '__main__':
     plt.xlabel(r"Elevation angle $\theta$ [deg]")
     plt.title(r"Azimuth angle $\phi$ = 0 deg")
     plt.show()
+    os.remove(file_name)
     
     
