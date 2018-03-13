@@ -75,14 +75,16 @@ class AntennaBeamformingImt(Antenna):
         if self.normalize:
             # Load co-channel data
             file_name = str(hash((True,par))) + '.npz'
-            file_path = os.path.join('..',
+            file_path = os.path.join('sharc',
+                                     'antenna',
                                      'beamforming_normalization',
                                      file_name)
             self.co_channel_norm_data = np.load(file_path)
             
             # Load adjacent channel data
             file_name = str(hash((False,par))) + '.npz'
-            file_path = os.path.join('..',
+            file_path = os.path.join('sharc',
+                                     'antenna',
                                      'beamforming_normalization',
                                      file_name)
             self.adj_channel_norm_data = np.load(file_path)
