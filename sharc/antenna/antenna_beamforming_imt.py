@@ -74,20 +74,8 @@ class AntennaBeamformingImt(Antenna):
         self.adj_cf = 0.0
         if self.normalize:
             # Load co-channel data
-            par_norm = par._replace(normalization=False)
-            file_name = str(hash((True,par_norm))) + '.npz'
-            file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                     'beamforming_normalization',
-                                     file_name)
-            self.co_channel_norm_data = np.load(file_path)
-            
-            # Load adjacent channel data
-            file_name = str(hash((False,par_norm))) + '.npz'
-            file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                     'beamforming_normalization',
-                                     file_name)
-            self.adj_channel_norm_data = np.load(file_path)
-            self.adj_cf = self.adj_channel_norm_data["correction_factor"]
+            self.norm_data = np.load(par.normalization_file)
+            self.adj_cf = self.norm_data["correction_factor_adj_channel"]
 
     def add_beam(self, phi_etilt: float, theta_etilt: float):
         """
@@ -105,9 +93,9 @@ class AntennaBeamformingImt(Antenna):
         self.w_vec_list.append(self._weight_vector(phi, theta-90))
         
         if self.normalize:
-            lin = int(phi/self.co_channel_norm_data["resolution"])
-            col = int(theta/self.co_channel_norm_data["resolution"])
-            self.co_cf_list.append(self.co_channel_norm_data["correction_factor"][lin,col])
+            lin = int(phi/self.norm_data["resolution"])
+            col = int(theta/self.norm_data["resolution"])
+            self.co_cf_list.append(self.norm_data["correction_factor_co_channel"][lin,col])
         else:
             self.co_cf_list.append(0.0)
 
@@ -144,11 +132,11 @@ class AntennaBeamformingImt(Antenna):
             beams_l = -1*np.ones_like(phi_vec)
             if co_channel:
                 if self.normalize:
-                    lin_f = phi_vec/self.co_channel_norm_data["resolution"]
-                    col_f = theta_vec/self.co_channel_norm_data["resolution"]
+                    lin_f = phi_vec/self.norm_data["resolution"]
+                    col_f = theta_vec/self.norm_data["resolution"]
                     lin = lin_f.astype(int)
                     col = col_f.astype(int)
-                    cf = self.co_channel_norm_data["correction_factor"][lin,col]
+                    cf = self.norm_data["correction_factor_co_channel"][lin,col]
                 else:
                     cf = np.zeros_like(phi_vec)
                 cf_idx = [i for i in range(len(cf))]

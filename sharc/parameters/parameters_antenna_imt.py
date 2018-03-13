@@ -23,6 +23,7 @@ class ParametersAntennaImt(object):
         if sta_type == "BS":
             if txrx == "TX":
                 tpl = AntennaPar(self.normalization,
+                                 self.bs_normalization_file,
                                  self.bs_element_pattern,
                                  self.bs_tx_element_max_g,
                                  self.bs_tx_element_phi_deg_3db,
@@ -36,6 +37,7 @@ class ParametersAntennaImt(object):
                                  self.bs_downtilt_deg)
             elif txrx == "RX":
                 tpl = AntennaPar(self.normalization,
+                                 self.bs_normalization_file,
                                  self.bs_element_pattern,
                                  self.bs_rx_element_max_g,
                                  self.bs_rx_element_phi_deg_3db,
@@ -50,6 +52,7 @@ class ParametersAntennaImt(object):
         elif sta_type == "UE":
             if txrx == "TX":
                 tpl = AntennaPar(self.normalization,
+                                 self.ue_normalization_file,
                                  self.ue_element_pattern,
                                  self.ue_tx_element_max_g,
                                  self.ue_tx_element_phi_deg_3db,
@@ -63,6 +66,7 @@ class ParametersAntennaImt(object):
                                  0)
             elif txrx == "RX":
                 tpl = AntennaPar(self.normalization,
+                                 self.ue_normalization_file,
                                  self.ue_element_pattern,
                                  self.ue_rx_element_max_g,
                                  self.ue_rx_element_phi_deg_3db,

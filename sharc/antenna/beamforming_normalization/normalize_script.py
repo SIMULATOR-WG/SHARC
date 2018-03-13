@@ -22,10 +22,8 @@ norm = BeamformingNormalizer(resolution,tolerance)
 # element_phi_deg_3db, element_theta_deg_3db, element_am, element_sla_v, 
 # n_rows, n_columns, element_horiz_spacing, element_vert_spacing, downtilt_deg
 param_list = [AntennaPar(False,"M2101",5,65,65,30,30,8,8,0.5,0.5,0),
-              AntennaPar(False,"M2101",5,90,90,25,25,4,4,0.5,0.5,0),
-              AntennaPar(False,"M2101",5,65,65,30,30,8,8,0.5,0.5,0),
               AntennaPar(False,"M2101",5,90,90,25,25,4,4,0.5,0.5,0)]
-co_channel_list = [True, True, False, False]
+co_channel_list = [False, False]
 
 #%% Normalize and save using parameters hash
 for par, c_chan in zip(param_list,co_channel_list):
