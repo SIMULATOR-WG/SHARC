@@ -74,17 +74,16 @@ class AntennaBeamformingImt(Antenna):
         self.adj_cf = 0.0
         if self.normalize:
             # Load co-channel data
-            file_name = str(hash((True,par))) + '.npz'
-            file_path = os.path.join('sharc',
-                                     'antenna',
+            par_norm = par._replace(normalization=False)
+            file_name = str(hash((True,par_norm))) + '.npz'
+            file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                      'beamforming_normalization',
                                      file_name)
             self.co_channel_norm_data = np.load(file_path)
             
             # Load adjacent channel data
-            file_name = str(hash((False,par))) + '.npz'
-            file_path = os.path.join('sharc',
-                                     'antenna',
+            file_name = str(hash((False,par_norm))) + '.npz'
+            file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                      'beamforming_normalization',
                                      file_name)
             self.adj_channel_norm_data = np.load(file_path)
@@ -145,8 +144,8 @@ class AntennaBeamformingImt(Antenna):
             beams_l = -1*np.ones_like(phi_vec)
             if co_channel:
                 if self.normalize:
-                    lin_f = int(phi_vec/self.co_channel_norm_data["resolution"])
-                    col_f = int(theta_vec/self.co_channel_norm_data["resolution"])
+                    lin_f = phi_vec/self.co_channel_norm_data["resolution"]
+                    col_f = theta_vec/self.co_channel_norm_data["resolution"]
                     lin = lin_f.astype(int)
                     col = col_f.astype(int)
                     cf = self.co_channel_norm_data["correction_factor"][lin,col]
