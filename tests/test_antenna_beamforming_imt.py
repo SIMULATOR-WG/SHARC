@@ -18,6 +18,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         #Array parameters
         self.param = ParametersAntennaImt()
 
+        self.param.normalization = False
         self.param.bs_element_pattern = "M2101"
         self.param.bs_downtilt_deg = 0
 

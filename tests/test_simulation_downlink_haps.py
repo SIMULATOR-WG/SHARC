@@ -75,6 +75,7 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
 
+        self.param.antenna_imt.normalization = False
         self.param.antenna_imt.bs_element_pattern = "M2101"
         self.param.antenna_imt.bs_tx_element_max_g = 10
         self.param.antenna_imt.bs_tx_element_phi_3db = 80

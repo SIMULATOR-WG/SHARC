@@ -19,6 +19,7 @@ class AntennaImtTest(unittest.TestCase):
 
         self.param.bs_element_pattern = "M2101"
         self.param.ue_element_pattern = "M2101"
+        self.param.normalization = False
         self.param.bs_downtilt_deg = 0
 
         self.param.bs_tx_element_max_g    = 5

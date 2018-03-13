@@ -12,7 +12,7 @@ from sharc.antenna.beamforming_normalization.beamforming_normalizer import Beamf
 
 # General parameters
 resolution = 2
-tolerance = 1e+2
+tolerance = 1e-2
 
 # Create object
 norm = BeamformingNormalizer(resolution,tolerance)

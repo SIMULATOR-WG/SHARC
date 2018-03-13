@@ -133,11 +133,24 @@ class AntennaBeamformingImt(Antenna):
         """
         phi_vec = np.asarray(kwargs["phi_vec"])
         theta_vec = np.asarray(kwargs["theta_vec"])
-        if("beams_l" in kwargs.keys()): beams_l = np.asarray(kwargs["beams_l"],
-                                                             dtype=int)
-        else: beams_l = -1*np.ones_like(phi_vec)
         if("co_channel" in kwargs.keys()): co_channel = kwargs["co_channel"]
         else: co_channel = True
+        if("beams_l" in kwargs.keys()): 
+            beams_l = np.asarray(kwargs["beams_l"],dtype=int)
+            cf = self.co_cf_list
+            cf_idx = beams_l
+        else: 
+            beams_l = -1*np.ones_like(phi_vec)
+            if co_channel:
+                if self.normalize:
+                    lin_f = int(phi_vec/self.co_channel_norm_data["resolution"])
+                    col_f = int(theta_vec/self.co_channel_norm_data["resolution"])
+                    lin = lin_f.astype(int)
+                    col = col_f.astype(int)
+                    cf = self.co_channel_norm_data["correction_factor"][lin,col]
+                else:
+                    cf = np.zeros_like(phi_vec)
+                cf_idx = [i for i in range(len(cf))]
 
         lo_phi_vec, lo_theta_vec = self.to_local_coord(phi_vec, theta_vec)
 
@@ -148,7 +161,7 @@ class AntennaBeamformingImt(Antenna):
         if(co_channel):
             for g in range(n_direct):
                 gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g],
-                                           beams_l[g]) + self.co_cf_list[g]
+                                           beams_l[g]) + cf[cf_idx[g]]
         else:
             for g in range(n_direct):
                 gains[g] = self.element.element_pattern(lo_phi_vec[g],

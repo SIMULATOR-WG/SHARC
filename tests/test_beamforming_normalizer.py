@@ -14,13 +14,14 @@ from sharc.antenna.beamforming_normalization.beamforming_normalizer import Beamf
 from sharc.support.named_tuples import AntennaPar
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 
-class BeamformingNormalizationTest(unittest.TestCase):
+class BeamformingNormalizerTest(unittest.TestCase):
     
     def setUp(self):
         # Test 1
         resolution = 30
         tolerance = 1e-2
         self.norm_1 = BeamformingNormalizer(resolution,tolerance)
+        norm = False
         element_pattern = "FIXED"
         element_max_g = 0
         element_phi_deg_3db = 65
@@ -32,7 +33,8 @@ class BeamformingNormalizationTest(unittest.TestCase):
         horiz_spacing = 0.5
         vert_spacing = 0.5
         down_tilt = 0
-        self.par_1 = AntennaPar(element_pattern,
+        self.par_1 = AntennaPar(norm,
+                                element_pattern,
                                 element_max_g,
                                 element_phi_deg_3db,
                                 element_theta_deg_3db,
@@ -48,6 +50,7 @@ class BeamformingNormalizationTest(unittest.TestCase):
         resolution = 5
         tolerance = 1e-2
         self.norm_2 = BeamformingNormalizer(resolution,tolerance)
+        norm = False
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 90
@@ -59,7 +62,8 @@ class BeamformingNormalizationTest(unittest.TestCase):
         horiz_spacing = 0.5
         vert_spacing = 0.5
         down_tilt = 0
-        self.par_2 = AntennaPar(element_pattern,
+        self.par_2 = AntennaPar(norm,
+                                element_pattern,
                                 element_max_g,
                                 element_phi_deg_3db,
                                 element_theta_deg_3db,
@@ -75,6 +79,7 @@ class BeamformingNormalizationTest(unittest.TestCase):
         resolution = 180
         tolerance = 5e-2
         self.norm_3 = BeamformingNormalizer(resolution,tolerance)
+        norm = False
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 65
@@ -86,7 +91,8 @@ class BeamformingNormalizationTest(unittest.TestCase):
         horiz_spacing = 0.5
         vert_spacing = 0.5
         down_tilt = 0
-        self.par_3 = AntennaPar(element_pattern,
+        self.par_3 = AntennaPar(norm,
+                                element_pattern,
                                 element_max_g,
                                 element_phi_deg_3db,
                                 element_theta_deg_3db,
