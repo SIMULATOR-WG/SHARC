@@ -22,6 +22,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
         tolerance = 1e-2
         self.norm_1 = BeamformingNormalizer(resolution,tolerance)
         norm = False
+        norm_file = None
         element_pattern = "FIXED"
         element_max_g = 0
         element_phi_deg_3db = 65
@@ -34,6 +35,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
         vert_spacing = 0.5
         down_tilt = 0
         self.par_1 = AntennaPar(norm,
+                                norm_file,
                                 element_pattern,
                                 element_max_g,
                                 element_phi_deg_3db,
@@ -51,6 +53,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
         tolerance = 1e-2
         self.norm_2 = BeamformingNormalizer(resolution,tolerance)
         norm = False
+        norm_file = None
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 90
@@ -63,6 +66,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
         vert_spacing = 0.5
         down_tilt = 0
         self.par_2 = AntennaPar(norm,
+                                norm_file,
                                 element_pattern,
                                 element_max_g,
                                 element_phi_deg_3db,
@@ -80,6 +84,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
         tolerance = 5e-2
         self.norm_3 = BeamformingNormalizer(resolution,tolerance)
         norm = False
+        norm_file = None
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 65
@@ -92,6 +97,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
         vert_spacing = 0.5
         down_tilt = 0
         self.par_3 = AntennaPar(norm,
+                                norm_file,
                                 element_pattern,
                                 element_max_g,
                                 element_phi_deg_3db,
@@ -163,31 +169,16 @@ class BeamformingNormalizerTest(unittest.TestCase):
         self.assertLess(err[1],8.5)
         
     def test_generate_correction_matrix(self):
-        # Test 2: UE element pattern
-        c_chan = False
+        # Test 3.1: BS element pattern
         file_name = "test_2.npz"
-        c_fac, err = self.norm_2.generate_correction_matrix(self.par_2,
-                                                            c_chan,
-                                                            file_name)
-        self.assertAlmostEqual(c_fac,2.4,delta = 1e-1)
-        # Test saved file
-        data = np.load(file_name)
-        self.assertEqual(data['correction_factor'],c_fac)
-        npt.assert_equal(data['parameters'],np.array(self.par_2))
-        data.close()
-        os.remove(file_name)
+        self.norm_3.generate_correction_matrix(self.par_3,file_name)
+        data = np.load(file_name) 
+        self.assertAlmostEqual(data['correction_factor_adj_channel'],
+                               4.8,delta = 1e-1)
         
-        # Test 3: BS array
-        c_chan = True
-        file_name = "test_3.npz"
-        c_fac, err = self.norm_3.generate_correction_matrix(self.par_3,
-                                                            c_chan,
-                                                            file_name)
-        npt.assert_allclose(c_fac,np.array([[8.0],[8.0]]),atol = 1e-1)
-        # Test saved file
-        data = np.load(file_name)
-        npt.assert_equal(data['correction_factor'],c_fac)
-        npt.assert_equal(data['parameters'],np.array(self.par_3))
+        # Test 3.2: BS array
+        npt.assert_allclose(data['correction_factor_co_channel'],
+                            np.array([[8.0],[8.0]]),atol = 1e-1)
         data.close()
         os.remove(file_name)
     
