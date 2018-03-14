@@ -336,9 +336,17 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         npt.assert_allclose(gains,np.array([1.6667]),atol=eps)
         
     def test_normalization(self):
-        # Create dummy normalization files
+        # Create dummy normalization data
         normalization = True
-        norm_file = 'dummy_file.npz'
+        norm_data = {'norm_file': 'dummy_file.npz',
+                     'resolution': 1,
+                     'phi_range': (-180,+180),
+                     'theta_range': (0,180),
+                     'correction_factor_co_channel': np.ones((360,180)),
+                     'error_co_channel': 0.0,
+                     'correction_factor_adj_channel': 5,
+                     'error_adj_channel': 0.0,
+                     'parameters': None}
         element_pattern = "M2101"
         element_max_g = 5
         element_phi_deg_3db = 65
@@ -351,7 +359,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         vert_spacing = 0.5
         down_tilt = 0
         par = AntennaPar(normalization,
-                         norm_file,
+                         norm_data,
                          element_pattern,
                          element_max_g,
                          element_phi_deg_3db,
@@ -363,15 +371,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
                          horiz_spacing,
                          vert_spacing,
                          down_tilt)
-        np.savez(norm_file,
-                 resolution = 1,
-                 phi_range = (-180,+180),
-                 theta_range = (0,180),
-                 correction_factor_co_channel = np.ones((360,180)),
-                 error_co_channel = 0.0,
-                 correction_factor_adj_channel = 5,
-                 error_adj_channel = 0.0,
-                 parameters = par)
+        
         
         # Create antenna objects
         self.antenna3 = AntennaBeamformingImt(par,0.0,0.0) # Normalized
