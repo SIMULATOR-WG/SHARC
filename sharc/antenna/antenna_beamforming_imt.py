@@ -76,6 +76,8 @@ class AntennaBeamformingImt(Antenna):
             # Load co-channel data
             self.norm_data = par.normalization_data
             self.adj_cf = self.norm_data["correction_factor_adj_channel"]
+            self.co_cf = self.norm_data["correction_factor_co_channel"]
+            self.resolution = self.norm_data["resolution"]
 
     def add_beam(self, phi_etilt: float, theta_etilt: float):
         """
@@ -93,9 +95,9 @@ class AntennaBeamformingImt(Antenna):
         self.w_vec_list.append(self._weight_vector(phi, theta-90))
         
         if self.normalize:
-            lin = int(phi/self.norm_data["resolution"])
-            col = int(theta/self.norm_data["resolution"])
-            self.co_cf_list.append(self.norm_data["correction_factor_co_channel"][lin,col])
+            lin = int(phi/self.resolution)
+            col = int(theta/self.resolution)
+            self.co_cf_list.append(self.co_cf[lin,col])
         else:
             self.co_cf_list.append(0.0)
 
@@ -132,11 +134,11 @@ class AntennaBeamformingImt(Antenna):
             beams_l = -1*np.ones_like(phi_vec)
             if co_channel:
                 if self.normalize:
-                    lin_f = phi_vec/self.norm_data["resolution"]
-                    col_f = theta_vec/self.norm_data["resolution"]
+                    lin_f = phi_vec/self.resolution
+                    col_f = theta_vec/self.resolution
                     lin = lin_f.astype(int)
                     col = col_f.astype(int)
-                    cf = self.norm_data["correction_factor_co_channel"][lin,col]
+                    cf = self.co_cf[lin,col]
                 else:
                     cf = np.zeros_like(phi_vec)
                 cf_idx = [i for i in range(len(cf))]
