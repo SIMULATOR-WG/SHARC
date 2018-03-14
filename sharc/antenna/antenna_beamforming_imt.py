@@ -74,7 +74,7 @@ class AntennaBeamformingImt(Antenna):
         self.adj_cf = 0.0
         if self.normalize:
             # Load co-channel data
-            self.norm_data = np.load(par.normalization_file)
+            self.norm_data = par.normalization_data
             self.adj_cf = self.norm_data["correction_factor_adj_channel"]
 
     def add_beam(self, phi_etilt: float, theta_etilt: float):

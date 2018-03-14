@@ -8,4 +8,4 @@ Created on Thu May 11 14:21:57 2017
 from collections import namedtuple
 
 AntennaPar = namedtuple("AntennaPar",
-                        "normalization normalization_file element_pattern element_max_g element_phi_deg_3db element_theta_deg_3db element_am element_sla_v n_rows n_columns element_horiz_spacing element_vert_spacing downtilt_deg")
+                        "normalization normalization_data element_pattern element_max_g element_phi_deg_3db element_theta_deg_3db element_am element_sla_v n_rows n_columns element_horiz_spacing element_vert_spacing downtilt_deg")

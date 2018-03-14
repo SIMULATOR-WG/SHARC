@@ -6,6 +6,7 @@ Created on Sat Apr 15 16:29:36 2017
 """
 
 from sharc.support.named_tuples import AntennaPar
+from numpy import load
 
 class ParametersAntennaImt(object):
     """
@@ -21,9 +22,17 @@ class ParametersAntennaImt(object):
 
     def get_antenna_parameters(self,sta_type: str, txrx: str)-> AntennaPar:
         if sta_type == "BS":
+            
+            if self.normalization:
+                self.bs_normalization_data = load(self.bs_normalization_file)
+                self.ue_normalization_data = load(self.ue_normalization_file)
+            else:
+                self.bs_normalization_data = None
+                self.ue_normalization_data = None
+            
             if txrx == "TX":
                 tpl = AntennaPar(self.normalization,
-                                 self.bs_normalization_file,
+                                 self.bs_normalization_data,
                                  self.bs_element_pattern,
                                  self.bs_tx_element_max_g,
                                  self.bs_tx_element_phi_deg_3db,
@@ -37,7 +46,7 @@ class ParametersAntennaImt(object):
                                  self.bs_downtilt_deg)
             elif txrx == "RX":
                 tpl = AntennaPar(self.normalization,
-                                 self.bs_normalization_file,
+                                 self.bs_normalization_data,
                                  self.bs_element_pattern,
                                  self.bs_rx_element_max_g,
                                  self.bs_rx_element_phi_deg_3db,
@@ -52,7 +61,7 @@ class ParametersAntennaImt(object):
         elif sta_type == "UE":
             if txrx == "TX":
                 tpl = AntennaPar(self.normalization,
-                                 self.ue_normalization_file,
+                                 self.ue_normalization_data,
                                  self.ue_element_pattern,
                                  self.ue_tx_element_max_g,
                                  self.ue_tx_element_phi_deg_3db,
@@ -66,7 +75,7 @@ class ParametersAntennaImt(object):
                                  0)
             elif txrx == "RX":
                 tpl = AntennaPar(self.normalization,
-                                 self.ue_normalization_file,
+                                 self.ue_normalization_data,
                                  self.ue_element_pattern,
                                  self.ue_rx_element_max_g,
                                  self.ue_rx_element_phi_deg_3db,
