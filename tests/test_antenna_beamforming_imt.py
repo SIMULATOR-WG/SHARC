@@ -8,11 +8,9 @@ Created on Sat Apr 15 15:36:22 2017
 import unittest
 import numpy as np
 import numpy.testing as npt
-import os
 
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
-from sharc.antenna.beamforming_normalization.beamforming_normalizer import BeamformingNormalizer
 from sharc.support.named_tuples import AntennaPar
 
 class AntennaBeamformingImtTest(unittest.TestCase):
