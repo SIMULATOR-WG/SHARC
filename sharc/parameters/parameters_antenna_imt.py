@@ -24,8 +24,16 @@ class ParametersAntennaImt(object):
         if sta_type == "BS":
             
             if self.normalization:
-                self.bs_normalization_data = load(self.bs_normalization_file)
-                self.ue_normalization_data = load(self.ue_normalization_file)
+                # Load data, save it in dict and close it
+                data = load(self.bs_normalization_file)
+                data_dict = {key:data[key] for key in data}
+                self.bs_normalization_data = data_dict
+                data.close()
+                # Same for UE
+                data = load(self.ue_normalization_file)
+                data_dict = {key:data[key] for key in data}
+                self.ue_normalization_data = data_dict
+                data.close()
             else:
                 self.bs_normalization_data = None
                 self.ue_normalization_data = None
