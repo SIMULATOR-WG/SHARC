@@ -21,20 +21,22 @@ def main(argv):
     param_file = ''
 
     try:
-        opts, args = getopt.getopt(argv, "hp:")
+        opts, args = getopt.getopt(argv, "h:p:o:")
     except getopt.GetoptError:
-        print("usage: main_cli.py -p <param_file>")
+        print("usage: main_cli.py -p <param_file> -o <output_directory>")
         sys.exit(2)
 
-    if not opts:
-        param_file = os.path.join(os.getcwd(), "parameters", "parameters.ini")
-    else:
+    param_file = os.path.join(os.getcwd(), "parameters", "parameters.ini")
+    out_dir = os.path.join(os.getcwd(),"output")
+    if opts:
         for opt, arg in opts:
             if opt == "-h":
-                print("usage: main_cli.py -p <param_file>")
+                print("usage: main_cli.py -p <param_file> -o <output_directory>")
                 sys.exit()
             elif opt == "-p":
-                param_file = param_file = os.path.join(os.getcwd(), arg)
+                param_file = os.path.join(os.getcwd(), arg)
+            elif opt == "-o":
+                out_dir = os.path.join(os.getcwd(), arg)
             
     Logging.setup_logging()
     
@@ -46,7 +48,7 @@ def main(argv):
     controller.set_model(model)
     model.add_observer(view_cli)
     
-    view_cli.initialize(param_file)
+    view_cli.initialize(param_file,out_dir)
 
 
 

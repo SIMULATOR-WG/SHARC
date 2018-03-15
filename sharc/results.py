@@ -12,7 +12,7 @@ import os
 
 class Results(object):
     
-    def __init__(self):
+    def __init__(self, out_dir):
         self.imt_ul_tx_power_density = list()
         self.imt_ul_tx_power = list()
         self.imt_ul_sinr_ext = list()
@@ -71,7 +71,7 @@ class Results(object):
 
         self.system_inr = list()
         self.system_inr_scaled = list()
-        self.output_directory = "output"
+        self.output_directory = out_dir
 
         
     def generate_plot_list(self, n_bins):
