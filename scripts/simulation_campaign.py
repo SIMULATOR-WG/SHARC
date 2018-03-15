@@ -7,11 +7,12 @@ Created on Wed Mar 14 19:03:36 2018
 
 import os
 import glob
+from traceback import print_tb
 
 from sharc.main_cli import main
 
 # Setup paths
-cases_folder = 'cases'
+cases_folder = os.path.join('..','cases')
 subfolders = [f.path for f in os.scandir(cases_folder) if f.is_dir()] 
 
 for folder in subfolders:
@@ -29,4 +30,9 @@ for folder in subfolders:
     
     # Run simulation
     file = files[0]
-    main(['-p',file,'-o',folder])
+    try:
+        main(['-p',file,'-o',folder])
+    except Exception as e:
+        print(str(e) + "\nTraceback: ")
+        print_tb(e.__traceback__)
+        print("\n Moving on...")
