@@ -102,6 +102,8 @@ class SimulationUplink(Simulation):
                 alpha = self.parameters.imt.ue_alpha
                 cl = self.coupling_loss_imt[bs,ue] + self.ue_power_gain
                 self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*cl)
+        if self.adjacent_channel: 
+            self.ue_power_diff = self.parameters.imt.ue_p_cmax - self.ue.tx_power
 
 
     def calculate_sinr(self):
@@ -206,7 +208,8 @@ class SimulationUplink(Simulation):
                 rx_interference += np.sum(weights*np.power(10, 0.1*interference_ue)) / 10**(acs/10.)
 
             if self.adjacent_channel:
-                oob_power = self.ue.spectral_mask.power_calc(self.param_system.frequency,self.system.bandwidth)
+                oob_power = self.ue.spectral_mask.power_calc(self.param_system.frequency,self.system.bandwidth)\
+                            - self.ue_power_diff[ue]
                 oob_interference_array = oob_power - self.coupling_loss_imt_system_adjacent[ue] \
                                             + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
                                               self.param_system.bandwidth) \

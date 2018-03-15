@@ -289,6 +289,7 @@ class SimulationAdjacentTest(unittest.TestCase):
 
         # there is no power control, so UE's will transmit at maximum power
         self.simulation.power_control()
+        npt.assert_equal(self.simulation.ue_power_diff,np.zeros(4))
         tx_power = 20
         npt.assert_allclose(self.simulation.ue.tx_power, tx_power*np.ones(4))
 
