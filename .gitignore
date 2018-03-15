@@ -69,3 +69,6 @@ target/
 # pyenv python configuration file
 .python-version
 /sharc/antenna/figs
+/scripts/cases/3/*.txt
+*.txt
+*.png

@@ -119,7 +119,7 @@ class Simulation(ABC, Observable):
         # calculates the number of RB per UE on a given BS
         self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.parameters.imt.ue_k)
 
-        self.results = Results()
+        self.results = Results(kwargs['out_dir'] if 'out_dir' in kwargs.keys() else 'output')
 
 
     def finalize(self, *args, **kwargs):

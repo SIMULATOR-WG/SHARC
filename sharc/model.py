@@ -6,7 +6,7 @@ Created on Mon Dec 26 17:03:51 2016
 """
 
 from sharc.support.observable import Observable
-from support.observer import Observer
+from sharc.support.observer import Observer
 from sharc.support.enumerations import State
 from sharc.simulation_downlink import SimulationDownlink
 from sharc.simulation_uplink import SimulationUplink
@@ -35,6 +35,11 @@ class Model(Observable):
         self.notify_observers(source = __name__,
                               message = "Loading file:\n" + self.param_file)
         
+    def set_out_dir(self, out_dir):
+        self.out_dir = out_dir
+        self.notify_observers(source = __name__,
+                              message = "Output directory:\n" + self.out_dir)
+        
         
     def initialize(self):
         """
@@ -59,7 +64,7 @@ class Model(Observable):
                               message=description + "\nSimulation is running...",
                               state=State.RUNNING )
         self.current_snapshot = 0
-        self.simulation.initialize()
+        self.simulation.initialize(out_dir = self.out_dir)
         
         
     def get_description(self) -> str:

@@ -8,7 +8,7 @@ Created on Mon Dec 26 17:32:02 2016
 from sharc.support.enumerations import Action 
 from sharc.model import Model
 
-from thread_simulation import ThreadSimulation
+from sharc.thread_simulation import ThreadSimulation
 
 class Controller:
     """
@@ -40,10 +40,12 @@ class Controller:
         
         if action is Action.START_SIMULATION:
             self.model.set_param_file(kwargs["param_file"])
+            self.model.set_out_dir(kwargs["out_dir"])
             self.simulation_thread = ThreadSimulation(self.model)
             self.simulation_thread.start()
         if action is Action.START_SIMULATION_SINGLE_THREAD:
             self.model.set_param_file(kwargs["param_file"])
+            self.model.set_out_dir(kwargs["out_dir"])
             self.simulation_thread = ThreadSimulation(self.model)
             # call run method directly, without starting a new thread
             self.simulation_thread.run()        

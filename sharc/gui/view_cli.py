@@ -22,9 +22,10 @@ class ViewCli(Observer):
         self.parent = parent
 
         
-    def initialize(self, param_file):
+    def initialize(self, param_file, out_dir):
         self.controller.action(action = Action.START_SIMULATION_SINGLE_THREAD, 
-                                     param_file = param_file)
+                               param_file = param_file,
+                               out_dir = out_dir)
         
         
     def set_controller(self, controller: Controller):
