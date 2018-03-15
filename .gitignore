@@ -71,3 +71,4 @@ target/
 /sharc/antenna/figs
 /scripts/cases/3/*.txt
 *.txt
+*.png
