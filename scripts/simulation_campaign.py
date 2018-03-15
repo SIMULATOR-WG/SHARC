@@ -5,6 +5,9 @@ Created on Wed Mar 14 19:03:36 2018
 @author: Calil
 """
 
+print("_____SIMULATION SCRIPT_____")
+print("Setting up..")
+
 import os
 import glob
 from traceback import print_tb
@@ -15,7 +18,9 @@ from sharc.main_cli import main
 cases_folder = os.path.join('..','cases')
 subfolders = [f.path for f in os.scandir(cases_folder) if f.is_dir()] 
 
-for folder in subfolders:
+print("Beginning simulation cases...")
+
+for k, folder in enumerate(subfolders):
     case = os.path.basename(os.path.normpath(folder))
     print("\n\nCURRENT CASE: " + case)
     # Get ini file
@@ -36,3 +41,8 @@ for folder in subfolders:
         print(str(e) + "\nTraceback: ")
         print_tb(e.__traceback__)
         print("\n Moving on...")
+        
+    print("\n" + case + " case finished." + str(len(subfolders) - k - 1)\
+          + " cases to go.\n")
+    
+print('DONE SIMULATING')
