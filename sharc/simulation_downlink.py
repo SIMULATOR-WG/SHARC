@@ -7,6 +7,13 @@ Created on Wed Jan 11 19:06:41 2017
 
 import numpy as np
 import math
+from scipy.stats import binom
+import os
+import pickle
+
+# convergence analysis
+import scipy as scp
+import csv
 
 from sharc.simulation import Simulation
 from sharc.parameters.parameters import Parameters
@@ -23,6 +30,7 @@ class SimulationDownlink(Simulation):
 
     def __init__(self, parameters: Parameters, parameter_file: str):
         super().__init__(parameters, parameter_file)
+
 
     def snapshot(self, *args, **kwargs):
         write_to_file = kwargs["write_to_file"]
@@ -236,6 +244,20 @@ class SimulationDownlink(Simulation):
                 self.results.system_pfd.extend([self.system.pfd])
                 self.results.system_dl_interf_power.extend([self.system.rx_interference])
 
+            # convergence analysis
+            self.results.system_inr_lin.append(10**(self.system.inr/10))
+            if len(self.results.system_inr_ordered) == 0:
+                self.results.system_inr_ordered = self.system.inr.tolist()
+            else:
+                index = 0
+                for inr in self.results.system_inr_ordered:
+                    if inr > self.system.inr:
+                        break
+                    index += 1
+                self.results.system_inr_ordered = self.results.system_inr_ordered[:index] + \
+                                                  self.system.inr.tolist() + \
+                                                  self.results.system_inr_ordered[index:]
+
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
@@ -275,4 +297,70 @@ class SimulationDownlink(Simulation):
         if write_to_file:
             self.results.write_files(snapshot_number)
             self.notify_observers(source=__name__, results=self.results)
+
+            # Convergence Analysis
+
+            # calculate confidence interval of INR mean/variance
+            confidence = .95
+
+            [mean, var, std] = scp.stats.bayes_mvs(self.results.system_inr, confidence)
+            [mean_lin, var, std_lin] = scp.stats.bayes_mvs(self.results.system_inr_lin, confidence)
+
+            filename = os.path.join( self.results.output_directory, 'convergence_mean.csv')
+
+            with open(filename, 'a', newline='') as csvfile:
+                convwriter = csv.writer(csvfile, delimiter=';')
+                convwriter.writerow([snapshot_number,
+                                     mean.minmax[0], mean.minmax[1],
+                                     std.minmax[0], std.minmax[1],
+                                     mean_lin.minmax[0], mean_lin.minmax[1],
+                                     std_lin.minmax[0], std_lin.minmax[1]])
+
+            # calculate confidence interval of quartiles
+            n_samples = len(self.results.system_inr_ordered)
+
+            row = list()
+
+            row.append(snapshot_number)
+            for quartile in self.quartiles:
+                upper = int(np.ceil(n_samples * quartile))
+                lower = int(np.floor(n_samples * quartile))
+
+                if upper == lower:
+                    prob = binom.pmf(lower, n_samples, quartile)
+                else:
+                    prob = binom.pmf(lower, n_samples, quartile) + binom.pmf(upper, n_samples, quartile)
+
+                while prob < confidence:
+                    prob_lower = binom.pmf(lower - 1, n_samples, quartile)
+                    prob_upper = binom.pmf(upper + 1, n_samples, quartile)
+
+                    if (prob_lower > prob_upper and lower > 0) or (upper == n_samples):
+                        lower -= 1
+                        prob += prob_lower
+                    else:
+                        upper += 1
+                        prob += prob_upper
+
+                if lower > 1:
+                    lower -= 1
+
+                row.append(self.results.system_inr_ordered[lower-1])
+                row.append(self.results.system_inr_ordered[upper-1])
+
+            filename = os.path.join (self.results.output_directory, 'convergence_quartile.csv')
+            with open(filename, 'a', newline='') as csvfile:
+                    convwriter = csv.writer(csvfile, delimiter=';')
+                    convwriter.writerow(row)
+
+        if ( not snapshot_number % 500 ) or ((not snapshot_number % 50) and snapshot_number < 500) :
+            # save CDF
+            filename = 'ordered_sample_' + str(snapshot_number) + ".dat"
+            filename = os.path.join(self.results.output_directory, filename)
+
+            with open(filename, 'wb') as fp:
+                pickle.dump(self.results.system_inr_ordered, fp)
+
+
+
 

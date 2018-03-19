@@ -13,9 +13,10 @@ import datetime
 
 from shutil import copy
 
+
 class Results(object):
 
-    def __init__(self, parameters_filename: str, overwrite_output: bool):
+    def __init__(self, parameters_filename: str, overwrite_output: bool, output_dir = ""):
         self.imt_ul_tx_power_density = list()
         self.imt_ul_tx_power = list()
         self.imt_ul_sinr_ext = list()
@@ -49,6 +50,10 @@ class Results(object):
         self.system_dl_interf_power = list()
 
         self.system_inr = list()
+        # convergence
+        self.system_inr_ordered = list()
+        self.system_inr_lin = list()
+
         self.system_pfd = list()
         self.system_rx_interf = list()
         self.system_inr_scaled = list()
@@ -68,8 +73,6 @@ class Results(object):
             copy(parameters_filename, self.output_directory)
         else:
             self.output_directory = 'output'
-
-
 
     def generate_plot_list(self, n_bins):
         self.plot_list = list()

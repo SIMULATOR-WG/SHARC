@@ -21,12 +21,10 @@ class ViewCli(Observer):
         super().__init__()
         self.parent = parent
 
-        
-    def initialize(self, param_file):
-        self.controller.action(action = Action.START_SIMULATION_SINGLE_THREAD, 
-                                     param_file = param_file)
-        
-        
+    def initialize(self, param_file, output_dir):
+        self.controller.action(action = Action.START_SIMULATION_SINGLE_THREAD,
+                               param_file = param_file, output_dir=output_dir)
+
     def set_controller(self, controller: Controller):
         """
         Keeps the reference to the controller
@@ -37,7 +35,7 @@ class ViewCli(Observer):
         """
         self.controller = controller
 
-        
+
     def notify_observer(self, *args, **kwargs):
         """
         Implements the method from Observer class. See documentation on the
@@ -51,7 +49,7 @@ class ViewCli(Observer):
         if "message" in kwargs:
             self.insert_text(kwargs["source"], kwargs["message"])
 
-            
+
     def insert_text(self, source: str, text: str):
         """
         This method can be called to display a message on the console. The same
@@ -66,4 +64,3 @@ class ViewCli(Observer):
         """
         logger = logging.getLogger(source)
         logger.info(text)
-        

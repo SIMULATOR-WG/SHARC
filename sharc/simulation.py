@@ -7,6 +7,8 @@ Created on Wed Jan 11 19:04:03 2017
 
 from abc import ABC, abstractmethod
 from sharc.support.observable import Observable
+import os
+import csv
 
 import numpy as np
 import math
@@ -158,6 +160,28 @@ class Simulation(ABC, Observable):
         self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.parameters.imt.ue_k)
 
         self.results = Results(self.parameters_filename, self.parameters.general.overwrite_output)
+
+        # convergence analysis
+        self.quartiles = [.001, .01, .1, .25, .5, .75, .9, .99, .999]
+        header = list()
+
+        header.append('drops')
+        for quartile in self.quartiles:
+            str_aux = 'lower:' + str(quartile)
+            header.append(str_aux)
+            str_aux = 'upper:' + str(quartile)
+            header.append(str_aux)
+
+        filename = os.path.join(self.results.output_directory, 'convergence_quartile.csv')
+        with open(filename, 'w', newline='') as csvfile:
+            convwriter = csv.writer(csvfile, delimiter=';')
+            convwriter.writerow(header)
+
+        filename = os.path.join(self.results.output_directory, 'convergence_mean.csv')
+        with open(filename, 'w', newline='') as csvfile:
+            convwriter = csv.writer(csvfile, delimiter=';')
+            convwriter.writerow(['drops', 'mean_min', 'mean_max', 'std_min', 'std_max',
+                                 'mean_lin_min', 'mean_lin_max', 'std_lin_min', 'std_lin_max'])
 
     def finalize(self, *args, **kwargs):
         """
