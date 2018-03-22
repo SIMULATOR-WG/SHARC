@@ -112,7 +112,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
     
     def test_construction(self):
         # Test 1
-        self.assertEqual(self.norm_1.res_deg,30)
+        self.assertEqual(self.norm_1.resolution_deg,30)
         self.assertEqual(self.norm_1.phi_min_deg,-180)
         self.assertEqual(self.norm_1.phi_max_deg,180)
         self.assertEqual(self.norm_1.theta_min_deg,0)

@@ -47,8 +47,8 @@ class BeamformingNormalizer(object):
             tol (float): absolute tolerance for integration
         """
         # Initialize attributes
-        self.res_deg = res_deg
-        self.tol = tol
+        self.resolution_deg = res_deg
+        self.tolerance = tol
         
         self.phi_min_deg = -180
         self.phi_max_deg = 180
@@ -85,19 +85,24 @@ class BeamformingNormalizer(object):
         
         # For co-channel beamforming
         # Correction factor numpy array
-        cf_co = np.zeros((len(self.phi_vals_deg),len(self.theta_vals_deg)))
-        err_co = np.empty((len(self.phi_vals_deg),len(self.theta_vals_deg)), dtype=tuple)
+        correction_factor_co = np.zeros((len(self.phi_vals_deg),len(self.theta_vals_deg)))
+        error_co = np.empty((len(self.phi_vals_deg),len(self.theta_vals_deg)), dtype=tuple)
             
         # Loop throug all the possible beams
         for phi_idx, phi in enumerate(self.phi_vals_deg):
             for theta_idx, theta in enumerate(self.theta_vals_deg):
-                cf_co[phi_idx,theta_idx], err_co[phi_idx,theta_idx] = self.calculate_correction_factor(phi,theta,True)
+                correction_factor_co[phi_idx,theta_idx], error_co[phi_idx,theta_idx] = self.calculate_correction_factor(phi,theta,True)
                 
 
-        cf_adj, err_adj = self.calculate_correction_factor(0,0,False)
+        correction_factor_adj, error_adj = self.calculate_correction_factor(0,0,False)
           
         # Save in file
-        self._save_files(cf_co,err_co,cf_adj,err_adj,par,file_name)
+        self._save_files(correction_factor_co,
+                         error_co,
+                         correction_factor_adj,
+                         error_adj,
+                         par,
+                         file_name)
             
     def calculate_correction_factor(self, phi_e: float, theta_t: float, c_chan: bool):
         """
@@ -122,22 +127,22 @@ class BeamformingNormalizer(object):
             int_f = lambda t,p: \
             np.power(10,self.antenna.element.element_pattern(np.rad2deg(p),np.rad2deg(t))/10)*np.sin(t)
         
-        int_val, err = dblquad(int_f,self.phi_min_rad,self.phi_max_rad,
+        integral_val, err = dblquad(int_f,self.phi_min_rad,self.phi_max_rad,
                           lambda p: self.theta_min_rad, 
                           lambda p: self.theta_max_rad,
-                          epsabs=self.tol,
+                          epsabs=self.tolerance,
                           epsrel=0.0)
         
-        cf = -10*np.log10(int_val/(4*np.pi))
+        correction_factor = -10*np.log10(integral_val/(4*np.pi))
         
-        hig_bound = -10*np.log10((int_val - err)/(4*np.pi))
-        low_bound = -10*np.log10((int_val + err)/(4*np.pi))
+        hig_bound = -10*np.log10((integral_val - err)/(4*np.pi))
+        low_bound = -10*np.log10((integral_val + err)/(4*np.pi))
         
-        return cf, (low_bound,hig_bound)
+        return correction_factor, (low_bound,hig_bound)
     
     def _save_files(self, cf_co, err_co, cf_adj, err_adj, par, file_name):
         np.savez(file_name,
-                 resolution = self.res_deg,
+                 resolution = self.resolution_deg,
                  phi_range = (self.phi_min_deg, self.phi_max_deg),
                  theta_range = (self.theta_min_deg, self.theta_max_deg),
                  correction_factor_co_channel = cf_co,
@@ -191,10 +196,10 @@ if __name__ == '__main__':
     file_name = 'main_test.npz'
     norm.generate_correction_matrix(par,file_name)
     data = np.load(file_name)
-    cf = data['correction_factor_co_channel']
+    correction_factor = data['correction_factor_co_channel']
     err_low, err_high = zip(*np.ravel(data['error_co_channel']))
     
-    plt.plot(norm.phi_vals_deg,cf,
+    plt.plot(norm.phi_vals_deg,correction_factor,
              norm.phi_vals_deg,err_low,'r--',
              norm.phi_vals_deg,err_high,'r--')
     plt.xlim(-180,180)
@@ -209,10 +214,10 @@ if __name__ == '__main__':
     norm.phi_vals_deg = np.array([0])
     norm.generate_correction_matrix(par,file_name)
     data = np.load(file_name)
-    cf = data['correction_factor_co_channel']
+    correction_factor = data['correction_factor_co_channel']
     err_low, err_high = zip(*np.ravel(data['error_co_channel']))
     
-    plt.plot(norm.theta_vals_deg,np.transpose(cf),
+    plt.plot(norm.theta_vals_deg,np.transpose(correction_factor),
              norm.theta_vals_deg,np.transpose(err_low),'r--',
              norm.theta_vals_deg,np.transpose(err_high),'r--')
     plt.xlim(0,180)
