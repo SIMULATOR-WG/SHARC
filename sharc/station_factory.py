@@ -343,7 +343,7 @@ class StationFactory(object):
     @staticmethod
     def generate_system(parameters: Parameters, topology: Topology, random_number_gen: np.random.RandomState ):
         if parameters.general.system == "FSS_ES":
-            return StationFactory.generate_fss_earth_station(parameters.fss_es, topology, random_number_gen)
+            return StationFactory.generate_fss_earth_station(parameters.fss_es, random_number_gen, topology)
         elif parameters.general.system == "FSS_SS":
             return StationFactory.generate_fss_space_station(parameters.fss_ss)
         elif parameters.general.system == "FS":
