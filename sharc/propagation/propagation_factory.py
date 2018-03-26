@@ -11,7 +11,6 @@ import numpy.random as rnd
 from sharc.parameters.parameters import Parameters
 from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_free_space import PropagationFreeSpace
-from sharc.propagation.propagation_close_in import PropagationCloseIn
 from sharc.propagation.propagation_p619 import PropagationP619
 from sharc.propagation.propagation_sat_simple import PropagationSatSimple
 from sharc.propagation.propagation_ter_simple import PropagationTerSimple
