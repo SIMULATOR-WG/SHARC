@@ -74,8 +74,10 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.shadowing = False
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
-
+        
+        self.param.antenna_imt.normalization = False
         self.param.antenna_imt.bs_element_pattern = "M2101"
+        self.param.antenna_imt.bs_normalization_file = None
         self.param.antenna_imt.bs_tx_element_max_g = 10
         self.param.antenna_imt.bs_tx_element_phi_3db = 80
         self.param.antenna_imt.bs_tx_element_theta_3db = 80
@@ -96,6 +98,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.antenna_imt.bs_rx_element_vert_spacing = 0.5
         self.param.antenna_imt.bs_downtilt_deg = 10
         self.param.antenna_imt.ue_element_pattern = "M2101"
+        self.param.antenna_imt.ue_normalization_file = None
         self.param.antenna_imt.ue_tx_element_max_g = 5
         self.param.antenna_imt.ue_tx_element_phi_deg_3db = 65
         self.param.antenna_imt.ue_tx_element_theta_deg_3db = 65
