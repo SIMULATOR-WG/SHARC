@@ -213,7 +213,6 @@ class SimulationUplink(Simulation):
                 oob_interference_array = oob_power - self.coupling_loss_imt_system_adjacent[ue] \
                                             + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
                                               self.param_system.bandwidth) \
-                                            - self.parameters.imt.ue_ohmic_loss \
                                             - self.parameters.imt.ue_body_loss
                 rx_interference += np.sum(np.power(10,0.1*oob_interference_array))
 
