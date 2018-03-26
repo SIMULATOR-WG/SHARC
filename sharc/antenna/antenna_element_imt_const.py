@@ -42,6 +42,6 @@ class AntennaElementImtConst(object):
         -------
             gain (np.array): element radiation pattern gain value
         """
-        gain = np.ones(phi.shape) * self.g_max
+        gain = np.ones(np.shape(phi)) * self.g_max
 
         return gain

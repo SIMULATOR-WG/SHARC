@@ -18,6 +18,8 @@ class StationTest(unittest.TestCase):
         #Array parameters
         self.param = ParametersAntennaImt()
 
+        self.param.normalization = False
+        self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
         self.param.bs_rx_element_max_g = 10
         self.param.bs_rx_element_phi_deg_3db = 65
@@ -42,6 +44,7 @@ class StationTest(unittest.TestCase):
         self.param.bs_downtilt_deg = 0
 
         self.param.ue_element_pattern = "M2101"
+        self.param.ue_normalization_file = None
         self.param.ue_rx_element_max_g = 10
         self.param.ue_rx_element_phi_deg_3db = 75
         self.param.ue_rx_element_theta_deg_3db = 65

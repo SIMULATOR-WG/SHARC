@@ -11,6 +11,7 @@ import numpy.testing as npt
 
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.support.named_tuples import AntennaPar
 
 class AntennaBeamformingImtTest(unittest.TestCase):
 
@@ -18,6 +19,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         #Array parameters
         self.param = ParametersAntennaImt()
 
+        self.param.normalization = False
+        self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
         self.param.bs_downtilt_deg = 0
 
@@ -42,6 +45,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.bs_rx_element_vert_spacing = 1
 
         self.param.ue_element_pattern = "M2101"
+        self.param.ue_normalization_file = None
 
         self.param.ue_tx_element_max_g    = 10
         self.param.ue_tx_element_phi_deg_3db  = 75
@@ -330,7 +334,75 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         gains = self.antenna1.calculate_gain(phi_vec=phi, theta_vec=theta,
                                              co_channel=False)
         npt.assert_allclose(gains,np.array([1.6667]),atol=eps)
-
+        
+    def test_normalization(self):
+        # Create dummy normalization data
+        normalization = True
+        norm_data = {'norm_file': 'dummy_file.npz',
+                     'resolution': 1,
+                     'phi_range': (-180,+180),
+                     'theta_range': (0,180),
+                     'correction_factor_co_channel': np.ones((360,180)),
+                     'error_co_channel': 0.0,
+                     'correction_factor_adj_channel': 5,
+                     'error_adj_channel': 0.0,
+                     'parameters': None}
+        element_pattern = "M2101"
+        element_max_g = 5
+        element_phi_deg_3db = 65
+        element_theta_deg_3db = 65
+        element_am = 30
+        element_sla_v = 30
+        n_rows = 8
+        n_columns = 8
+        horiz_spacing = 0.5
+        vert_spacing = 0.5
+        down_tilt = 0
+        par = AntennaPar(normalization,
+                         norm_data,
+                         element_pattern,
+                         element_max_g,
+                         element_phi_deg_3db,
+                         element_theta_deg_3db,
+                         element_am,
+                         element_sla_v,
+                         n_rows,
+                         n_columns,
+                         horiz_spacing,
+                         vert_spacing,
+                         down_tilt)
+        
+        
+        # Create antenna objects
+        self.antenna3 = AntennaBeamformingImt(par,0.0,0.0) # Normalized
+        par = par._replace(normalization = False)
+        self.antenna4 = AntennaBeamformingImt(par,0.0,0.0) # Unormalized
+        
+        # Test co-channel gain: no beam
+        phi_v = np.array([11.79, -0.71])
+        theta_v = np.array([50.31, 120.51])
+        gain_ref = self.antenna4.calculate_gain(phi_vec=phi_v, theta_vec=theta_v)
+        gain = self.antenna3.calculate_gain(phi_vec=phi_v, theta_vec=theta_v)
+        npt.assert_equal(gain,gain_ref + 1)
+        
+        # Test co-channel gain: add beam
+        phi_scan = 11.79
+        theta_tilt = 185.31
+        self.antenna3.add_beam(phi_scan, theta_tilt)
+        self.antenna4.add_beam(phi_scan, theta_tilt)
+        beams_l = np.zeros_like(phi_v, dtype=int)
+        gain_ref = self.antenna4.calculate_gain(phi_vec=phi_v, theta_vec=theta_v,
+                                             beams_l=beams_l)
+        gain = self.antenna3.calculate_gain(phi_vec=phi_v, theta_vec=theta_v,
+                                             beams_l=beams_l)
+        npt.assert_equal(gain,gain_ref + 1)
+        
+        # Test adjacent channel
+        phi_v = np.array([11.79, -0.71])
+        theta_v = np.array([50.31, 120.51])
+        gain_ref = self.antenna4.calculate_gain(phi_vec=phi_v, theta_vec=theta_v, co_channel=False)
+        gain = self.antenna3.calculate_gain(phi_vec=phi_v, theta_vec=theta_v, co_channel=False)
+        npt.assert_equal(gain,gain_ref + 5)
 
     def test_to_local_coord(self):
         # Angles to be converted
