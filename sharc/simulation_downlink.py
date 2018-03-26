@@ -209,9 +209,8 @@ class SimulationDownlink(Simulation):
 
                 oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[active_beams[0]] \
                                    + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
-                                                 self.param_system.bandwidth) \
-                                   - self.parameters.imt.bs_ohmic_loss
-
+                                                 self.param_system.bandwidth)
+                                   
                 rx_interference += math.pow(10, 0.1*oob_interference)
 
         self.system.rx_interference = 10*np.log10(rx_interference)
