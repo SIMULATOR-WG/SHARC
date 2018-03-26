@@ -32,6 +32,14 @@ class AntennaBeamformingImt(Antenna):
         dh (float): horizontal element spacing over wavelenght (d/lambda)
         dv (float): vertical element spacing over wavelenght (d/lambda)
         beams_list (list): vertical and horizontal tilts of beams
+        normalize (bool): if normalization is applied
+        norm_data (dict): data used for beamforming normalization
+        adj_correction_factor (float): correction factor for adjacent channel
+            single element pattern
+        co_correction_factor (2D np.array): correction factor for co-channel
+            antenna array pattern for given beam pointing direction
+        resolution (float): beam pointing resolution [deg] of co-channel
+            correction factor array
     """
 
     def __init__(self, par: AntennaPar, azimuth: float, elevation: float):

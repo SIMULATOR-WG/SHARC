@@ -18,8 +18,8 @@ class BeamformingNormalizer(object):
     returns its correction factor.
     
     Attributes:
-        res_deg (float): correction factor matrix resolution [degreees]
-        tol (float): integral absolute tolerance
+        resolution_deg (float): correction factor matrix resolution [degreees]
+        tolerance (float): integral absolute tolerance
         pni_min_deg (float): minimum phi escan value for correction factor
             matrix [degrees]. Hardcoded as -180 degrees
         phi_max_deg (float): maximum phi escan value for correction factor
@@ -71,12 +71,9 @@ class BeamformingNormalizer(object):
         Generates the correction factor matrix and saves it in a file
         
         Parameters:
-            par (AntennaPar): set of parameters antenna parameters to be used
+            par (AntennaPar): set of antenna parameters to which calculate the
+                correction factor
             file_name (str): name of file to which save the correction matrix
-            
-        Returns:
-            cf (np.array): corraction factor matrix
-            err (np.array): error matrix
         """
         # Create antenna object
         azi = 0 # Antenna azimuth: 0 degrees for simplicity
@@ -104,22 +101,23 @@ class BeamformingNormalizer(object):
                          par,
                          file_name)
             
-    def calculate_correction_factor(self, phi_e: float, theta_t: float, c_chan: bool):
+    def calculate_correction_factor(self, phi_beam: float, theta_beam: float, c_chan: bool):
         """
         Calculates single correction factor
         
         Parameters:
-            phi_e (float): phi escan value
-            theta_t (float): theta tilt value
-            c_chan (bool): if True, whole antenna array will be used. If false,
-                just a single element is used
+            phi_beam (float): azimuth angle of beam pointing direction [deg]
+            theta_beam (float): elevation angle of beam pointing direction [deg]
+            c_chan (bool): if True, correction factor for whole antenna array
+                is calculated. Otherwise, correction factor for a single
+                element is calcualted
                 
         Returns:
-            cf (float): correction factor value
-            err (tuple): upper and lower error bounds
+            correction_factor (float): correction factor value [dB]
+            error (tuple): upper and lower error bounds [dB]
         """
         if c_chan:
-            self.antenna.add_beam(phi_e,theta_t)
+            self.antenna.add_beam(phi_beam,theta_beam)
             beam = int(len(self.antenna.beams_list) - 1)
             int_f = lambda t,p: \
             np.power(10,self.antenna._beam_gain(np.rad2deg(p),np.rad2deg(t),beam)/10)*np.sin(t)
@@ -141,6 +139,41 @@ class BeamformingNormalizer(object):
         return correction_factor, (low_bound,hig_bound)
     
     def _save_files(self, cf_co, err_co, cf_adj, err_adj, par, file_name):
+        """
+        Saves input correction factor and error values to npz file.
+        Data is saved in an .npz file in a dict like data structure with the 
+        following keys:
+            resolution (float): antenna array correction factor matrix angle 
+                resolution [deg]
+            phi_range (tuple): range of beam pointing azimuth angle values 
+                [deg]
+            theta_range (tuple): range of beam pointing elevation angle values 
+                [deg]
+            correction_factor_co_channel (2D np.array): correction factor [dB]
+                for the co-channel scenario (antenna array) for each of the phi 
+                theta pairs in phi_range and theta_range. Phi is associated 
+                with the lines and Theta is associated with the columns of the 
+                array
+            error_co_channel (2D np.array of tuples): lower and upper bounds of 
+                calculated correction factors [dB], considering integration
+                error
+            correction_factor_adj_channel (float):correction factor for single 
+                antenna element
+            error_adj_channel (tuple): lower and upper bounds [dB] of single 
+                antenna element correction factor
+            parameters (AntennaPar): antenna parameters used in the 
+                normalization
+                
+        Parameters:
+            cf_co (2D np.array): co-channel correction factor [dB]
+            err_co (2D np.array): co-channel correction factor lower and upper
+                bounds considering integration errors [dB]
+            cf_adj (float): adjacent channel correction factor [dB]
+            err_adj (float): adjancet channel correction factor lower and upper
+                bounds considering integration errors [dB]
+            par (AtennaPar): antenna parameters used in normalization
+            file_name (str): name of file to which save normalization data
+        """
         np.savez(file_name,
                  resolution = self.resolution_deg,
                  phi_range = (self.phi_min_deg, self.phi_max_deg),
