@@ -731,7 +731,7 @@ class PropagationClearAir(Propagation):
         Hre = np.asarray(es_params.Hre)
         N0 = np.asarray(es_params.N0)
         deltaN = np.asarray(es_params.delta_N)
-        p = np.asarray(es_params.percentage_p)/100
+        p = np.asarray(es_params.percentage_p)
 
         tx_lat = es_params.tx_lat
         rx_lat = es_params.rx_lat
