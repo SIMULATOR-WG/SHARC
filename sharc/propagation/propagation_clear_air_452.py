@@ -89,14 +89,16 @@ class PropagationClearAir(Propagation):
     @staticmethod
     def longest_cont_dist(d, zone, zone_r):
         dm = 0
+
         if zone_r == 12:
-            aux = np.where((zone == 1) + (zone == 2)) # Fix that find_intervals
-            start = aux[0][0]
-            stop = aux[0][-1]
+            aux = (zone == 1) + (zone == 2)
         else:
-            aux = np.where(zone == zone_r)
-            start = aux[0][0]
-            stop = aux[0][-1]
+            aux = zone == zone_r
+
+        aux = np.append(0,np.append(aux,0))
+        aux = np.diff(aux)
+        start = np.where(aux==1)[0]
+        stop = np.where(aux==-1)[0] - 1
 
         start = np.atleast_1d(start)
         stop = np.atleast_1d(stop)
@@ -637,7 +639,7 @@ class PropagationClearAir(Propagation):
                 # Use the method in Sec.4.2.2.1 for adft ) aem to obtain Ldft
                 Ldft = PropagationClearAir.dl_se_ft(d, hte, hre, aem, f, omega)
 
-                if Ldft < 0:
+                if (Ldft < 0).any():
                     Ldsph =np.array([0,0])
                 else:
                     Ldsph = (1 - hse / hreq) * Ldft
