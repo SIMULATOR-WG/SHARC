@@ -89,14 +89,16 @@ class PropagationClearAir(Propagation):
     @staticmethod
     def longest_cont_dist(d, zone, zone_r):
         dm = 0
+
         if zone_r == 12:
-            aux = np.nonzero((zone == 1) + (zone == 2)) # Fix that find_intervals
-            start = aux[0][0]
-            stop = aux[0][-1]
+            aux = (zone == 1) + (zone == 2)
         else:
-            aux = np.nonzero(zone == zone_r)
-            start = aux[0][0]
-            stop = aux[0][-1]
+            aux = zone == zone_r
+
+        aux = np.append(0,np.append(aux,0))
+        aux = np.diff(aux)
+        start = np.where(aux==1)[0]
+        stop = np.where(aux==-1)[0] - 1
 
         start = np.atleast_1d(start)
         stop = np.atleast_1d(stop)
@@ -637,7 +639,7 @@ class PropagationClearAir(Propagation):
                 # Use the method in Sec.4.2.2.1 for adft ) aem to obtain Ldft
                 Ldft = PropagationClearAir.dl_se_ft(d, hte, hre, aem, f, omega)
 
-                if Ldft < 0:
+                if (Ldft < 0).any():
                     Ldsph =np.array([0,0])
                 else:
                     Ldsph = (1 - hse / hreq) * Ldft
@@ -741,13 +743,13 @@ class PropagationClearAir(Propagation):
 
         # Modify the path according to Section 4.5.4, Step 1  and compute clutter losses
         # consider no obstacles profile
+        profile_length = 100
         num_dists = d_km.size
-        d = np.empty([num_dists,100])
+        d = np.empty([num_dists, profile_length])
         for ii in range(num_dists):
-            d[ii, :] = np.linspace(0,d_km[0][ii],100)
+            d[ii, :] = np.linspace(0,d_km[0][ii],profile_length)
 
         h = np.zeros(d.shape)
-        zone = np.ones(d.shape) * 2
 
         ha_t = []
         ha_r = []
@@ -764,7 +766,9 @@ class PropagationClearAir(Propagation):
         dtm = np.empty(num_dists)
         dlm = np.empty(num_dists)
 
+        zone = np.ones(profile_length) * 2
         for index in range(num_dists):
+
             zone_r = 12
             dtm[index] = self.longest_cont_dist(d[index,:], zone, zone_r)
 
@@ -796,7 +800,7 @@ class PropagationClearAir(Propagation):
         KSI = 0.8
 
         for ii in range(num_dists):
-            [dc, hc, zonec, htg, hrg, Aht, Ahr] = self.closs_corr(f, d[ii,:], h[ii,:], zone[ii,:], Hte, Hre, ha_t, ha_r, dk_t, dk_r)
+            [dc, hc, zonec, htg, hrg, Aht, Ahr] = self.closs_corr(f, d[ii,:], h[ii,:], zone, Hte, Hre, ha_t, ha_r, dk_t, dk_r)
             d[ii,:] = dc
             h[ii,:] = hc
 
