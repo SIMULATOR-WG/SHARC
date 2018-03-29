@@ -615,9 +615,9 @@ class StationFactory(object):
             sys.stderr.write("ERROR\nInvalid RAS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
 
-        ras_station.noise_temperature = np.array([param.antenna_noise_temperature + \
-                                                  param.receiver_noise_temperature])
-        ras_station.bandwidth = np.array([param.bandwidth])
+        ras_station.noise_temperature = np.array(param.antenna_noise_temperature + \
+                                                  param.receiver_noise_temperature)
+        ras_station.bandwidth = np.array(param.bandwidth)
 
         return ras_station
 
