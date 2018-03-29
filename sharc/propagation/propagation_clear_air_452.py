@@ -855,8 +855,8 @@ class PropagationClearAir(Propagation):
             Lminb0p = Lb0p + (1 - omega[ii]) * Ldp
 
             if p >= b0[ii]:
-                Fi = inv_cum_norm(p / 100) / inv_cum_norm(b0 / 100)
-                Lminb0p = Lbd50 + (Lb0b + (1 - omega) * Ldp - Lbd50) * Fi
+                Fi = inv_cum_norm(p / 100) / inv_cum_norm(b0[ii] / 100)
+                Lminb0p = Lbd50 + (Lb0b + (1 - omega[ii]) * Ldp - Lbd50) * Fi
 
             # Calculate a notional minimum basic transmission loss associated with LoS
             # and transhorizon signal enhancements
