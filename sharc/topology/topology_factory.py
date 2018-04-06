@@ -14,17 +14,19 @@ from sharc.topology.topology_single_base_station import TopologySingleBaseStatio
 from sharc.parameters.parameters import Parameters
 
 class TopologyFactory(object):
-    
+
     @staticmethod
     def createTopology(parameters: Parameters) -> Topology:
         if parameters.imt.topology == "SINGLE_BS":
-            return TopologySingleBaseStation(parameters.imt.intersite_distance*2/3, parameters.imt.num_clusters)
+            return TopologySingleBaseStation(parameters.imt.intersite_distance*2/3)
         elif parameters.imt.topology == "MACROCELL":
-            return TopologyMacrocell(parameters.imt.intersite_distance, parameters.imt.num_clusters)
+            return TopologyMacrocell(parameters.imt.intersite_distance, parameters.imt.num_clusters, 3)
         elif parameters.imt.topology == "HOTSPOT":
             return TopologyHotspot(parameters.hotspot, parameters.imt.intersite_distance, parameters.imt.num_clusters)
         elif parameters.imt.topology == "INDOOR":
             return TopologyIndoor(parameters.indoor)
+        elif parameters.imt.topology == "HAPS":
+            return TopologyMacrocell(parameters.imt.intersite_distance, parameters.imt.num_clusters, 1)
         else:
             sys.stderr.write("ERROR\nInvalid topology: " + parameters.imt.topology)
-            sys.exit(1)            
+            sys.exit(1)
