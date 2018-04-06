@@ -100,7 +100,8 @@ class SimulationUplink(Simulation):
                 m_pusch = self.num_rb_per_ue
                 p_o_pusch = self.parameters.imt.ue_p_o_pusch
                 alpha = self.parameters.imt.ue_alpha
-                cl = self.coupling_loss_imt[bs,ue] + self.ue_power_gain
+                cl = self.coupling_loss_imt[bs,ue] + self.parameters.imt.bs_ohmic_loss \
+                            + self.parameters.imt.ue_ohmic_loss + self.parameters.imt.ue_body_loss
                 self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*cl)
         if self.adjacent_channel: 
             self.ue_power_diff = self.parameters.imt.ue_p_cmax - self.ue.tx_power
