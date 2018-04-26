@@ -6,6 +6,7 @@ Created on Wed Aug  9 19:35:52 2017
 """
 
 import configparser
+import numpy as np
 
 from sharc.parameters.parameters_general import ParametersGeneral
 from sharc.parameters.parameters_imt import ParametersImt
@@ -270,7 +271,7 @@ class Parameters(object):
         self.haps.frequency               = config.getfloat("HAPS", "frequency")
         self.haps.bandwidth               = config.getfloat("HAPS", "bandwidth")
         self.haps.antenna_gain            = config.getfloat("HAPS", "antenna_gain")
-        self.haps.tx_power_density        = config.getfloat("HAPS", "eirp_density") - self.haps.antenna_gain - 60
+        self.haps.tx_power_density        = config.getfloat("HAPS", "eirp_density") - self.haps.antenna_gain - 10*np.log10(1e6) + 30
         self.haps.altitude                = config.getfloat("HAPS", "altitude")
         self.haps.lat_deg                 = config.getfloat("HAPS", "lat_deg")
         self.haps.elevation               = config.getfloat("HAPS", "elevation")
