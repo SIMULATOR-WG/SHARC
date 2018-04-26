@@ -68,6 +68,9 @@ class StationFactory(object):
         imt_base_stations.sinr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.sinr_ext = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
         imt_base_stations.inr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.pfd = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.pfd_level = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
+        imt_base_stations.pfd_interfered = dict([(bs, np.zeros(param.ue_k, dtype = bool)) for bs in range(num_bs)])
 
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
         par = param_ant.get_antenna_parameters("BS", "RX")
@@ -519,7 +522,7 @@ class StationFactory(object):
 
     @staticmethod
     def generate_haps(param: ParametersHaps, intersite_distance: int, random_number_gen: np.random.RandomState()):
-        num_haps = 1
+        num_haps = 4
         haps = StationManager(num_haps)
         haps.station_type = StationType.HAPS
 
@@ -527,8 +530,8 @@ class StationFactory(object):
 #        h = (d/3)*math.sqrt(3)/2
 #        haps.x = np.array([0, 7*d/2, -d/2, -4*d, -7*d/2, d/2, 4*d])
 #        haps.y = np.array([0, 9*h, 15*h, 6*h, -9*h, -15*h, -6*h])
-        haps.x = np.array([0])
-        haps.y = np.array([0])
+        haps.x = np.zeros(num_haps)
+        haps.y = np.zeros(num_haps)
 
         haps.height = param.altitude * np.ones(num_haps)
 
@@ -551,7 +554,7 @@ class StationFactory(object):
             sys.stderr.write("ERROR\nInvalid HAPS (airbone) antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
 
-        haps.bandwidth = np.array([param.bandwidth])
+        haps.bandwidth = param.bandwidth*np.ones(num_haps)
 
         return haps
 

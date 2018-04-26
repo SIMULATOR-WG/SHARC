@@ -22,6 +22,10 @@ class Results(object):
         self.imt_ul_sinr = list()
         self.imt_ul_snr = list()
         self.imt_ul_inr = list()
+        self.imt_ul_pfd = list()
+        self.imt_ul_pfd_level = list()
+        self.imt_ul_pfd_interfered = 0
+        self.imt_ul_pfd_total = 0
         self.imt_ul_tput_ext = list()
         self.imt_ul_tput = list()
 
@@ -39,6 +43,10 @@ class Results(object):
         self.imt_dl_sinr = list()
         self.imt_dl_snr = list()
         self.imt_dl_inr = list()
+        self.imt_dl_pfd = list()
+        self.imt_dl_pfd_level = list()
+        self.imt_dl_pfd_interfered = 0
+        self.imt_dl_pfd_total = 0
         self.imt_dl_tput_ext = list()
         self.imt_dl_tput = list()
 
@@ -192,6 +200,30 @@ class Results(object):
             #x_limits = (-15, 20)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_ul_pfd) > 0:
+            values, base = np.histogram(self.imt_ul_pfd, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of maximum UL PFD"
+            x_label = "$PFD$ [dBm/m² in 1 Hz]"
+            y_label = "Probability of $PFD$ < $X$"
+            file_name = title
+            #x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_ul_pfd_level) > 0:
+            values, base = np.histogram(self.imt_ul_pfd_level, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of UL PFD"
+            x_label = "$PFD$ [dBm/m² in 1 Hz]"
+            y_label = "Probability of $PFD$ < $X$"
+            file_name = title
+            #x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_ul_tput_ext) > 0:
             values, base = np.histogram(self.imt_ul_tput_ext, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -297,6 +329,31 @@ class Results(object):
             #x_limits = (-15, 20)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_dl_pfd) > 0:
+            values, base = np.histogram(self.imt_dl_pfd, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of maximum DL PFD"
+            x_label = "$PFD$ [dBm/m² in 1 Hz]"
+            y_label = "Probability of $PFD$ < $X$"
+            file_name = title
+            #x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_dl_pfd_level) > 0:
+            values, base = np.histogram(self.imt_dl_pfd_level, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[IMT] CDF of DL PFD"
+            x_label = "$PFD$ [dBm/m² in 1 Hz]"
+            y_label = "Probability of $PFD$ < $X$"
+            file_name = title
+            #x_limits = (-15, 20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+            
         if len(self.imt_dl_tput_ext) > 0:
             values, base = np.histogram(self.imt_dl_tput_ext, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -392,7 +449,7 @@ class Results(object):
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
 
     def write_files(self, snapshot_number: int):
-        n_bins = 200
+        n_bins = 300
         file_extension = ".txt"
         header_text = "Results collected after " + str(snapshot_number) + " snapshots."
         self.generate_plot_list(n_bins)
@@ -400,6 +457,19 @@ class Results(object):
         for plot in self.plot_list:
             np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension),
                        np.transpose([plot.x, plot.y]),
-                       fmt="%.5f", delimiter="\t", header=header_text,
+                       fmt="%.7f", delimiter="\t", header=header_text,
                        newline=os.linesep)
 
+        if self.imt_ul_pfd_total > 0:
+            ul_pfd_interf_file = "[IMT] UL PFD interfered"
+            np.savetxt(os.path.join(self.output_directory, ul_pfd_interf_file + file_extension),
+                       np.array([self.imt_ul_pfd_interfered, self.imt_ul_pfd_total]),
+                       fmt="%u", delimiter="\t", header=header_text,
+                       newline=os.linesep)
+            
+        if self.imt_dl_pfd_total > 0:
+            dl_pfd_interf_file = "[IMT] DL PFD interfered"
+            np.savetxt(os.path.join(self.output_directory, dl_pfd_interf_file + file_extension),
+                       np.array([self.imt_dl_pfd_interfered, self.imt_dl_pfd_total]),
+                       fmt="%u", delimiter="\t", header=header_text,
+                       newline=os.linesep)            
