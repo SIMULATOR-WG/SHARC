@@ -58,6 +58,7 @@ class Simulation(ABC, Observable):
         self.imt_system_antenna_gain = list()
 
         self.path_loss_imt = np.empty(0)
+        self.path_loss_imt_system = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
         self.coupling_loss_imt_system = np.empty(0)
         self.coupling_loss_imt_system_adjacent = np.empty(0)
@@ -150,6 +151,61 @@ class Simulation(ABC, Observable):
         snapshot_number = kwargs["snapshot_number"]
         self.results.write_files(snapshot_number)
 
+    def calculate_coupling_loss_haps_platform(self,
+                                              station_a: StationManager,
+                                              station_b: StationManager,
+                                              propagation: Propagation,
+                                              c_channel = True) -> np.array:
+        # Calculate distance from transmitters to receivers. The result is a
+        # num_bs x num_ue array
+        #d_2D = station_a.get_distance_to(station_b)
+        d_3D = station_a.get_3d_distance_to(station_b)
+        
+        # calculate elevation angles
+        elevation_angles = np.empty(d_3D.shape)
+        for n in range(station_a.num_stations):
+            rel_x = station_a.x[n] - station_b.x
+            rel_y = station_a.y[n] - station_b.y
+            rel_z = station_a.height[n] - station_b.height
+            gts = np.sqrt(rel_x**2 + rel_y**2)
+            elevation_angles[n,:] = np.degrees(np.arctan2(rel_z, gts))   
+        elevation = {'free_space': elevation_angles[0,:], 'apparent': elevation_angles[0,:]}
+        
+        freq = self.parameters.imt.frequency
+
+        if self.parameters.imt.interfered_with:
+            earth_to_space = False
+            single_entry = True
+        else:
+            earth_to_space = True
+            single_entry = False
+
+        if station_b.station_type is StationType.IMT_UE:
+            gain_a = self.calculate_gains_haps(station_a, station_b)
+            gain_b = np.transpose(self.calculate_gains_haps(station_b, station_a, c_channel))
+            sectors_in_node = 1
+        else:
+            gain_a = np.repeat(self.calculate_gains_haps(station_a, station_b), self.parameters.imt.ue_k, 1)
+            gain_b = np.transpose(self.calculate_gains_haps(station_b, station_a, c_channel))
+            sectors_in_node = self.parameters.imt.ue_k    
+
+        path_loss = propagation.get_loss(distance_3D=d_3D[0,:],
+                                         frequency=freq*np.ones(d_3D.shape)[0,:],
+                                         indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1))[0,:],
+                                         elevation=elevation, sat_params = self.param_system,
+                                         earth_to_space = earth_to_space, earth_station_antenna_gain=gain_b[0,:],
+                                         single_entry=single_entry, number_of_sectors=sectors_in_node)
+        pl = np.transpose(np.tile(path_loss[:,np.newaxis], station_a.num_stations))
+
+        coupling_loss = np.squeeze(pl - gain_a - gain_b)
+        self.path_loss_imt_system = pl
+        self.system_imt_antenna_gain = gain_a
+        self.imt_system_antenna_gain = gain_b
+
+        # calculate coupling loss
+        return coupling_loss         
+        
+        
     def calculate_coupling_loss(self,
                                 station_a: StationManager,
                                 station_b: StationManager,
@@ -299,6 +355,43 @@ class Simulation(ABC, Observable):
             ue = self.link[bs]
             self.bs.bandwidth[bs] = self.num_rb_per_ue*self.parameters.imt.rb_bandwidth
             self.ue.bandwidth[ue] = self.num_rb_per_ue*self.parameters.imt.rb_bandwidth
+
+
+    def calculate_gains_haps(self,
+                             station_1: StationManager,
+                             station_2: StationManager,
+                             c_channel = True) -> np.array:
+        phi, theta = station_1.get_pointing_vector_to(station_2)
+        station_1_active = np.where(station_1.active)[0]
+        station_2_active = np.where(station_2.active)[0]        
+        if(station_1.station_type is StationType.HAPS):
+            gains = np.zeros(phi.shape)
+            off_axis_angle = station_1.get_off_axis_angle(station_2)
+            for k in station_1_active:
+                gains[k,station_2_active] = station_1.antenna[0].calculate_gain(off_axis_angle_vec=off_axis_angle[k,station_2_active])
+        elif(station_1.station_type is StationType.IMT_UE):
+            gains = np.zeros(phi.shape)
+            beams_idx = np.zeros(len(station_2_active),dtype=int)
+            for k in station_1_active:
+                gains[k,station_2_active] = station_1.antenna[k].calculate_gain(phi_vec = phi[k,station_2_active],
+                                                                                theta_vec = theta[k,station_2_active],
+                                                                                beams_l = beams_idx,
+                                                                                co_channel = c_channel)
+        elif(station_1.station_type is StationType.IMT_BS):
+            phi = np.repeat(phi[:,0], self.parameters.imt.ue_k, 0)
+            theta = np.repeat(theta[:,0], self.parameters.imt.ue_k, 0)
+            beams_idx = np.tile(np.arange(self.parameters.imt.ue_k),self.bs.num_stations)
+            gains = np.zeros(phi.shape)
+            for k in station_1_active:
+                for b in range(k*self.parameters.imt.ue_k, (k+1)*self.parameters.imt.ue_k):
+                    gains[b] = station_1.antenna[k].calculate_gain(phi_vec = phi[b],
+                                                                   theta_vec = theta[b],
+                                                                   beams_l = np.array([beams_idx[b]]),
+                                                                   co_channel = c_channel)
+            gains = np.transpose(np.tile(gains, (station_2.num_stations, 1)))
+        return gains
+            
+
 
     def calculate_gains(self,
                         station_1: StationManager,
