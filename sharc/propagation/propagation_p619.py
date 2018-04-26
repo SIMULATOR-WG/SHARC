@@ -202,12 +202,14 @@ class PropagationP619(Propagation):
             error_message = "different frequencies not supported in P619"
             raise ValueError(error_message)
 
-        atmospheric_gasses_loss = self._get_atmospheric_gasses_loss(frequency_MHz=freq_set,
-                                                                    apparent_elevation=np.mean(elevation["apparent"]),
-                                                                    sat_params=sat_params)
-        beam_spreading_attenuation = self._get_beam_spreading_att(elevation["free_space"],
-                                                                  sat_params.imt_altitude,
-                                                                  earth_to_space)
+        atmospheric_gasses_loss = 2
+#        atmospheric_gasses_loss = self._get_atmospheric_gasses_loss(frequency_MHz=freq_set,
+#                                                                    apparent_elevation=np.mean(elevation["apparent"]),
+#                                                                    sat_params=sat_params)
+        beam_spreading_attenuation = 0
+#        beam_spreading_attenuation = self._get_beam_spreading_att(elevation["free_space"],
+#                                                                  sat_params.imt_altitude,
+#                                                                  earth_to_space)
         diffraction_loss = 0
 
         if single_entry:
@@ -220,12 +222,15 @@ class PropagationP619(Propagation):
 
             loss = (free_space_loss + self.depolarization_loss +
                     atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
-            loss = np.repeat(loss, number_of_sectors, 1) + tropo_scintillation_loss
+            loss = np.repeat(loss, number_of_sectors) + tropo_scintillation_loss
+            #loss = loss + tropo_scintillation_loss
         else:
-            clutter_loss = self.clutter.get_loss(frequency=f, distance=d,
-                                                 elevation=elevation["free_space"],
-                                                 station_type=StationType.FSS_SS)
-            building_loss = self.building_entry.get_loss(f, elevation["apparent"]) * indoor_stations
+            clutter_loss = 0
+#            clutter_loss = self.clutter.get_loss(frequency=f, distance=d,
+#                                                 elevation=elevation["free_space"],
+#                                                 station_type=StationType.FSS_SS)
+            building_loss = 0
+            #building_loss = self.building_entry.get_loss(f, elevation["apparent"]) * indoor_stations
 
             loss = (free_space_loss + clutter_loss + building_loss + self.polarization_mismatch_loss +
                     atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
