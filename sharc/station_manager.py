@@ -171,11 +171,11 @@ class StationManager(object):
         Calculates the off-axis angle between this station and the input station
         """
         Az, b = self.get_pointing_vector_to(station)
-        #Az0 = self.azimuth
-        Az0 = np.transpose(np.tile(self.azimuth, (station.num_stations, 1)))
+        Az0 = self.azimuth
+        #Az0 = np.transpose(np.tile(self.azimuth, (station.num_stations, 1)))
 
-        #a = 90 - self.elevation
-        a = np.transpose(np.tile(90 - self.elevation, (station.num_stations, 1)))
+        a = 90 - self.elevation
+        #a = np.transpose(np.tile(90 - self.elevation, (station.num_stations, 1)))
         C = Az0 - Az
 
         phi = np.arccos(np.cos(np.radians(a))*np.cos(np.radians(b)) \
