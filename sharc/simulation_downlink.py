@@ -155,9 +155,15 @@ class SimulationDownlink(Simulation):
         # calculate interference only to active UE's
         ue = np.where(self.ue.active)[0]
 
-        tx_power_sys = self.param_system.tx_power_density + 10*np.log10(self.ue.bandwidth[ue[0]]*1e6)
-        rx_interference = tx_power_sys - self.coupling_loss_imt_system[:,ue] \
-                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss
+        # EIRP [dBW/60MHz]
+        eirp = self.param_system.eirp + 10*np.log10(self.ue.bandwidth[ue[0]])
+        polarization_loss = 3
+        thermal_noise = -144 # dBW/MHz
+        gw_antenna_factor = self.param_system.antenna_gain - self.system_imt_antenna_gain
+        rx_interference = (eirp + 30) - gw_antenna_factor[0,ue] - self.path_loss_imt_system[0,ue] \
+                            + self.imt_system_antenna_gain[0,ue] \
+                            - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss \
+                            - polarization_loss
         self.ue.ext_interference[ue] = 10*np.log10(np.sum(10**(0.1*rx_interference), 0))
         self.ue.sinr_ext[ue] = self.ue.rx_power[ue] \
             - (10*np.log10(np.power(10, 0.1*self.ue.total_interference[ue]) + np.power(10, 0.1*self.ue.ext_interference[ue])))
@@ -165,9 +171,9 @@ class SimulationDownlink(Simulation):
         protection_criteria = -6
         lambda_imt = 299792458/(self.parameters.imt.frequency*1e6)
         self.ue.pfd[ue] = protection_criteria + 10*np.log10(4*np.pi/(lambda_imt**2)) \
-                            - self.imt_system_antenna_gain[0,ue] - 174 + self.parameters.imt.ue_noise_figure
-        pfd_level = self.param_system.tx_power_density + self.system_imt_antenna_gain[:,ue] \
-                    - self.path_loss_imt_system[:,ue] - self.parameters.imt.ue_body_loss - 3
+                            - self.imt_system_antenna_gain[0,ue] + thermal_noise + self.parameters.imt.ue_noise_figure
+        pfd_level = eirp - gw_antenna_factor[0,ue] \
+                    - self.path_loss_imt_system[:,ue] - self.parameters.imt.ue_body_loss - polarization_loss
         self.ue.pfd_level[ue] = 10*np.log10(np.sum(10**(0.1*pfd_level), 0))
         self.ue.pfd_interfered[ue] = self.ue.pfd[ue] < self.ue.pfd_level[ue]
 
