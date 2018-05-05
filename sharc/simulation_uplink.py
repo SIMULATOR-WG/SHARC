@@ -161,11 +161,18 @@ class SimulationUplink(Simulation):
                                                        c_channel = self.co_channel)        
 
         bs_active = np.where(self.bs.active)[0]
-        tx_power = self.param_system.tx_power_density + 10*np.log10(self.bs.bandwidth[bs_active[0]]*1e6)
+        # maximum EIRP [dBW/60 MHz]
+        eirp = self.param_system.eirp + 10*np.log10(self.bs.bandwidth[bs_active[0]])
+        polarization_loss = 3
+        thermal_noise = -144 # dBW/MHz
+        
         for bs in bs_active:
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
-            rx_interference = tx_power - self.coupling_loss_imt_system[:,active_beams] \
-                                            - self.parameters.imt.bs_ohmic_loss
+            gw_antenna_factor = self.param_system.antenna_gain - self.system_imt_antenna_gain[0,active_beams]
+            rx_interference = (eirp + 30) - gw_antenna_factor \
+                                - self.path_loss_imt_system[0,active_beams] \
+                                + self.imt_system_antenna_gain[0,active_beams] \
+                                - self.parameters.imt.ue_ohmic_loss - polarization_loss
             self.bs.ext_interference[bs] = 10*np.log10(np.sum(10**(0.1*rx_interference), 0))
 
             self.bs.sinr_ext[bs] = self.bs.rx_power[bs] \
@@ -174,9 +181,9 @@ class SimulationUplink(Simulation):
             protection_criteria = -6
             lambda_imt = 299792458/(self.parameters.imt.frequency*1e6)
             self.bs.pfd[bs] = protection_criteria + 10*np.log10(4*np.pi/(lambda_imt**2)) \
-                                - self.imt_system_antenna_gain[0,active_beams] - 174 + self.parameters.imt.bs_noise_figure
-            pfd_level = self.param_system.tx_power_density + self.system_imt_antenna_gain[:,active_beams] \
-                        - self.path_loss_imt_system[:,active_beams] - 3
+                                - self.imt_system_antenna_gain[0,active_beams] + thermal_noise + self.parameters.imt.bs_noise_figure
+            pfd_level = eirp - gw_antenna_factor \
+                        - self.path_loss_imt_system[:,active_beams] - polarization_loss
             self.bs.pfd_level[bs] = 10*np.log10(np.sum(10**(0.1*pfd_level), 0))
             self.bs.pfd_interfered[bs] = self.bs.pfd[bs] < self.bs.pfd_level[bs]
 
