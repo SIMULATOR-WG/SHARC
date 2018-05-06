@@ -57,6 +57,8 @@ class Simulation(ABC, Observable):
         self.system_imt_antenna_gain = list()
         self.imt_system_antenna_gain = list()
 
+        self.att_gases = np.empty(0)
+        self.distance_imt_system = np.empty(0)
         self.path_loss_imt = np.empty(0)
         self.path_loss_imt_system = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
@@ -160,6 +162,10 @@ class Simulation(ABC, Observable):
         # num_bs x num_ue array
         #d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
+        if station_b is StationType.IMT_UE:
+            self.distance_imt_system = d_3D
+        else:
+            self.distance_imt_system = np.repeat(d_3D, self.parameters.imt.ue_k, axis = 1)
         
         # calculate elevation angles
         elevation_angles = np.empty(d_3D.shape)
@@ -189,15 +195,18 @@ class Simulation(ABC, Observable):
             gain_b = np.transpose(self.calculate_gains_haps(station_b, station_a, c_channel))
             sectors_in_node = self.parameters.imt.ue_k    
 
-        path_loss = propagation.get_loss(distance_3D=d_3D[0,:],
+        path_loss, att_gases = propagation.get_loss(distance_3D=d_3D[0,:],
                                          frequency=freq*np.ones(d_3D.shape)[0,:],
                                          indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1))[0,:],
                                          elevation=elevation, sat_params = self.param_system,
                                          earth_to_space = earth_to_space, earth_station_antenna_gain=gain_b[0,:],
-                                         single_entry=single_entry, number_of_sectors=sectors_in_node)
+                                         single_entry=single_entry, number_of_sectors=sectors_in_node,
+                                         height = station_b.height[0])
         pl = np.transpose(np.tile(path_loss[:,np.newaxis], station_a.num_stations))
 
         coupling_loss = np.squeeze(pl - gain_a - gain_b)
+        
+        self.att_gases = np.transpose(np.tile(att_gases[:,np.newaxis], station_a.num_stations))
         self.path_loss_imt_system = pl
         self.system_imt_antenna_gain = gain_a
         self.imt_system_antenna_gain = gain_b

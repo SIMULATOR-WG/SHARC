@@ -160,8 +160,8 @@ class SimulationDownlink(Simulation):
         polarization_loss = 3
         thermal_noise = -144 # dBW/MHz
         gw_antenna_factor = self.param_system.antenna_gain - self.system_imt_antenna_gain
-        rx_interference = (eirp + 30) - gw_antenna_factor[0,ue] - self.path_loss_imt_system[0,ue] \
-                            + self.imt_system_antenna_gain[0,ue] \
+        rx_interference = (eirp + 30) - gw_antenna_factor[:,ue] - self.path_loss_imt_system[:,ue] \
+                            + self.imt_system_antenna_gain[:,ue] \
                             - self.parameters.imt.ue_body_loss - self.parameters.imt.ue_ohmic_loss \
                             - polarization_loss
         self.ue.ext_interference[ue] = 10*np.log10(np.sum(10**(0.1*rx_interference), 0))
@@ -172,8 +172,10 @@ class SimulationDownlink(Simulation):
         lambda_imt = 299792458/(self.parameters.imt.frequency*1e6)
         self.ue.pfd[ue] = protection_criteria + 10*np.log10(4*np.pi/(lambda_imt**2)) \
                             - self.imt_system_antenna_gain[0,ue] + thermal_noise + self.parameters.imt.ue_noise_figure
-        pfd_level = eirp - gw_antenna_factor[0,ue] \
-                    - self.path_loss_imt_system[:,ue] - self.parameters.imt.ue_body_loss - polarization_loss
+        pfd_level = self.param_system.eirp - gw_antenna_factor[:,ue] \
+                    - 10*np.log10(4*np.pi*(self.distance_imt_system[:,ue]**2)) \
+                    - self.att_gases[:,ue] \
+                    - self.parameters.imt.ue_body_loss - polarization_loss
         self.ue.pfd_level[ue] = 10*np.log10(np.sum(10**(0.1*pfd_level), 0))
         self.ue.pfd_interfered[ue] = self.ue.pfd[ue] < self.ue.pfd_level[ue]
 

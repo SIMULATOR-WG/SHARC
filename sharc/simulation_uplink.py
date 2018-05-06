@@ -168,10 +168,10 @@ class SimulationUplink(Simulation):
         
         for bs in bs_active:
             active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
-            gw_antenna_factor = self.param_system.antenna_gain - self.system_imt_antenna_gain[0,active_beams]
-            rx_interference = (eirp + 30) - gw_antenna_factor \
-                                - self.path_loss_imt_system[0,active_beams] \
-                                + self.imt_system_antenna_gain[0,active_beams] \
+            gw_antenna_factor = self.param_system.antenna_gain - self.system_imt_antenna_gain
+            rx_interference = (eirp + 30) - gw_antenna_factor[:,active_beams] \
+                                - self.path_loss_imt_system[:,active_beams] \
+                                + self.imt_system_antenna_gain[:,active_beams] \
                                 - self.parameters.imt.ue_ohmic_loss - polarization_loss
             self.bs.ext_interference[bs] = 10*np.log10(np.sum(10**(0.1*rx_interference), 0))
 
@@ -182,8 +182,11 @@ class SimulationUplink(Simulation):
             lambda_imt = 299792458/(self.parameters.imt.frequency*1e6)
             self.bs.pfd[bs] = protection_criteria + 10*np.log10(4*np.pi/(lambda_imt**2)) \
                                 - self.imt_system_antenna_gain[0,active_beams] + thermal_noise + self.parameters.imt.bs_noise_figure
-            pfd_level = eirp - gw_antenna_factor \
-                        - self.path_loss_imt_system[:,active_beams] - polarization_loss
+            pfd_level = self.param_system.eirp - gw_antenna_factor[:,active_beams] \
+                        - 10*np.log10(4*np.pi*(self.distance_imt_system[:,active_beams]**2)) \
+                        - self.att_gases[:,active_beams] \
+                        - polarization_loss   
+            #self.bs.pfd_level = pfd_level
             self.bs.pfd_level[bs] = 10*np.log10(np.sum(10**(0.1*pfd_level), 0))
             self.bs.pfd_interfered[bs] = self.bs.pfd[bs] < self.bs.pfd_level[bs]
 
