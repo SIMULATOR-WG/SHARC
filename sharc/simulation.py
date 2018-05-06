@@ -162,7 +162,7 @@ class Simulation(ABC, Observable):
         # num_bs x num_ue array
         #d_2D = station_a.get_distance_to(station_b)
         d_3D = station_a.get_3d_distance_to(station_b)
-        if station_b is StationType.IMT_UE:
+        if station_b.station_type is StationType.IMT_UE:
             self.distance_imt_system = d_3D
         else:
             self.distance_imt_system = np.repeat(d_3D, self.parameters.imt.ue_k, axis = 1)
