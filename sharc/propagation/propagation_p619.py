@@ -189,6 +189,8 @@ class PropagationP619(Propagation):
         f = kwargs["frequency"]
         indoor_stations = kwargs["indoor_stations"]
         elevation = kwargs["elevation"]
+        elevation = elevation["free_space"]
+        height = kwargs["height"]
         sat_params = kwargs["sat_params"]
         earth_to_space = kwargs["earth_to_space"]
         earth_station_antenna_gain = kwargs["earth_station_antenna_gain"]
@@ -202,7 +204,10 @@ class PropagationP619(Propagation):
             error_message = "different frequencies not supported in P619"
             raise ValueError(error_message)
 
-        atmospheric_gasses_loss = 2
+        atmospheric_gasses_loss = 22.73/(1 + 0.9463*elevation \
+                                         + 0.03455*elevation*elevation \
+                                         + (height/1e3)*(0.3232 + 0.4519*elevation) \
+                                         + ((height/1e3)**2)*(0.2486 + 0.1317*elevation))
 #        atmospheric_gasses_loss = self._get_atmospheric_gasses_loss(frequency_MHz=freq_set,
 #                                                                    apparent_elevation=np.mean(elevation["apparent"]),
 #                                                                    sat_params=sat_params)
@@ -213,16 +218,18 @@ class PropagationP619(Propagation):
         diffraction_loss = 0
 
         if single_entry:
-            elevation_sectors = np.repeat(elevation["free_space"], number_of_sectors)
-            tropo_scintillation_loss = \
-                self.scintillation.get_tropospheric_attenuation(elevation = elevation_sectors,
-                                                                antenna_gain_dB = earth_station_antenna_gain,
-                                                                frequency_MHz = freq_set,
-                                                                sat_params = sat_params)
+            elevation_sectors = np.repeat(elevation, number_of_sectors)
+            tropo_scintillation_loss = 0
+#                self.scintillation.get_tropospheric_attenuation(elevation = elevation_sectors,
+#                                                                antenna_gain_dB = earth_station_antenna_gain,
+#                                                                frequency_MHz = freq_set,
+#                                                                sat_params = sat_params)
 
-            loss = (free_space_loss + self.depolarization_loss +
-                    atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
-            loss = np.repeat(loss, number_of_sectors) + tropo_scintillation_loss
+#            loss = (free_space_loss + self.depolarization_loss +
+#                    atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
+            loss = free_space_loss + atmospheric_gasses_loss
+            loss = np.repeat(loss, number_of_sectors)
+            atmospheric_gasses_loss = np.repeat(atmospheric_gasses_loss, number_of_sectors)
             #loss = loss + tropo_scintillation_loss
         else:
             clutter_loss = 0
@@ -236,7 +243,7 @@ class PropagationP619(Propagation):
                     atmospheric_gasses_loss + beam_spreading_attenuation + diffraction_loss)
             loss = np.repeat(loss, number_of_sectors, 1)
 
-        return loss
+        return loss, atmospheric_gasses_loss
 
 if __name__ == '__main__':
     from sharc.parameters.parameters import Parameters
