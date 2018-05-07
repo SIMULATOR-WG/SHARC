@@ -172,7 +172,7 @@ class SimulationUplink(Simulation):
             rx_interference = (eirp + 30) - gw_antenna_factor[:,active_beams] \
                                 - self.path_loss_imt_system[:,active_beams] \
                                 + self.imt_system_antenna_gain[:,active_beams] \
-                                - self.parameters.imt.ue_ohmic_loss - polarization_loss
+                                - self.parameters.imt.bs_ohmic_loss - polarization_loss
             self.bs.ext_interference[bs] = 10*np.log10(np.sum(10**(0.1*rx_interference), 0))
 
             self.bs.sinr_ext[bs] = self.bs.rx_power[bs] \
@@ -185,6 +185,7 @@ class SimulationUplink(Simulation):
             pfd_level = self.param_system.eirp - gw_antenna_factor[:,active_beams] \
                         - 10*np.log10(4*np.pi*(self.distance_imt_system[:,active_beams]**2)) \
                         - self.att_gases[:,active_beams] \
+                        - self.parameters.imt.bs_ohmic_loss \
                         - polarization_loss   
             #self.bs.pfd_level = pfd_level
             self.bs.pfd_level[bs] = 10*np.log10(np.sum(10**(0.1*pfd_level), 0))
