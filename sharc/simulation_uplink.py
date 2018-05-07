@@ -181,11 +181,11 @@ class SimulationUplink(Simulation):
             protection_criteria = -6
             lambda_imt = 299792458/(self.parameters.imt.frequency*1e6)
             self.bs.pfd[bs] = protection_criteria + 10*np.log10(4*np.pi/(lambda_imt**2)) \
+                                + self.parameters.imt.bs_ohmic_loss \
                                 - self.imt_system_antenna_gain[0,active_beams] + thermal_noise + self.parameters.imt.bs_noise_figure
             pfd_level = self.param_system.eirp - gw_antenna_factor[:,active_beams] \
                         - 10*np.log10(4*np.pi*(self.distance_imt_system[:,active_beams]**2)) \
                         - self.att_gases[:,active_beams] \
-                        - self.parameters.imt.bs_ohmic_loss \
                         - polarization_loss   
             #self.bs.pfd_level = pfd_level
             self.bs.pfd_level[bs] = 10*np.log10(np.sum(10**(0.1*pfd_level), 0))
