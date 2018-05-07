@@ -168,10 +168,16 @@ class SimulationDownlink(Simulation):
         self.ue.inr[ue] = self.ue.ext_interference[ue] - self.ue.thermal_noise[ue]
         protection_criteria = -6
         lambda_imt = 299792458/(self.parameters.imt.frequency*1e6)
+        effective_area = (lambda_imt**2)/(4*np.pi)
         self.ue.pfd[ue] = protection_criteria + 10*np.log10(4*np.pi/(lambda_imt**2)) \
+                            + self.parameters.imt.ue_ohmic_loss \
                             - self.imt_system_antenna_gain[0,ue] - 144 + self.parameters.imt.ue_noise_figure
-        self.ue.pfd_level[ue] = eirp - gw_antenna_factor[0,ue] \
-                    - self.path_loss_imt_system[:,ue] - self.parameters.imt.ue_body_loss - polarization_loss
+        self.ue.pfd_level[ue] = self.param_system.eirp - gw_antenna_factor[0,ue] \
+                            - self.path_loss_imt_system[0,ue] \
+                            + self.imt_system_antenna_gain[0,ue] \
+                            - self.parameters.imt.ue_body_loss \
+                            - polarization_loss \
+                            - 10*np.log10(effective_area)       
         self.ue.pfd_interfered[ue] = self.ue.pfd[ue] < self.ue.pfd_level[ue]
 
     def calculate_external_interference(self):

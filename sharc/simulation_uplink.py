@@ -177,10 +177,15 @@ class SimulationUplink(Simulation):
             self.bs.inr[bs] = self.bs.ext_interference[bs] - self.bs.thermal_noise[bs]
             protection_criteria = -6
             lambda_imt = 299792458/(self.parameters.imt.frequency*1e6)
+            effective_area = (lambda_imt**2)/(4*np.pi)
             self.bs.pfd[bs] = protection_criteria + 10*np.log10(4*np.pi/(lambda_imt**2)) \
+                                + self.parameters.imt.bs_ohmic_loss \
                                 - self.imt_system_antenna_gain[0,active_beams] - 144 + self.parameters.imt.bs_noise_figure
-            self.bs.pfd_level[bs] = eirp - gw_antenna_factor \
-                        - self.path_loss_imt_system[:,active_beams] - polarization_loss
+            self.bs.pfd_level[bs] = self.param_system.eirp - gw_antenna_factor \
+                            - self.path_loss_imt_system[0,active_beams] \
+                            + self.imt_system_antenna_gain[0,active_beams] \                            
+                            - polarization_loss \
+                            - 10*np.log10(effective_area) 
             self.bs.pfd_interfered[bs] = self.bs.pfd[bs] < self.bs.pfd_level[bs]
 
 
