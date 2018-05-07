@@ -183,9 +183,9 @@ class SimulationUplink(Simulation):
                                 - self.imt_system_antenna_gain[0,active_beams] - 144 + self.parameters.imt.bs_noise_figure
             self.bs.pfd_level[bs] = self.param_system.eirp - gw_antenna_factor \
                             - self.path_loss_imt_system[0,active_beams] \
-                            + self.imt_system_antenna_gain[0,active_beams] \                            
+                            + self.imt_system_antenna_gain[0,active_beams] \
                             - polarization_loss \
-                            - 10*np.log10(effective_area) 
+                            - 10*np.log10(effective_area)
             self.bs.pfd_interfered[bs] = self.bs.pfd[bs] < self.bs.pfd_level[bs]
 
 

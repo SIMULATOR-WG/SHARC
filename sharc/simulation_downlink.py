@@ -177,7 +177,7 @@ class SimulationDownlink(Simulation):
                             + self.imt_system_antenna_gain[0,ue] \
                             - self.parameters.imt.ue_body_loss \
                             - polarization_loss \
-                            - 10*np.log10(effective_area)       
+                            - 10*np.log10(effective_area)
         self.ue.pfd_interfered[ue] = self.ue.pfd[ue] < self.ue.pfd_level[ue]
 
     def calculate_external_interference(self):
