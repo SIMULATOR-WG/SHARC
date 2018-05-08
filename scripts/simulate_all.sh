@@ -7,7 +7,7 @@ python3 plot_all.py
 
 echo "Save tar..."
 cd ..
-tar -czvf scripts/simulation_resutls.tar cases
+tar -czvf scripts/simulation_resutls.tar.gz cases
 cd scripts
 
 echo "Notify you..."
