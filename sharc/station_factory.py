@@ -435,6 +435,7 @@ class StationFactory(object):
         if param.location.upper() == "FIXED":
             fss_earth_station.x = np.array([param.x])
             fss_earth_station.y = np.array([param.y])
+            radius = np.sqrt(param.x**2 + param.y**2)
         elif param.location.upper() == "CELL":
             x, y, dummy1, dummy2 = StationFactory.get_random_position(1, topology, random_number_gen,
                                                                       param.min_dist_to_bs, True)
