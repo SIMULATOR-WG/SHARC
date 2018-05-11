@@ -262,7 +262,7 @@ class ResultsCDF(Results):
             x = base[:-1]
             y = cumulative / cumulative[-1]
             title = "[IMT] CDF of IMT throughput"
-            x_label = "UL throughput [Mbits/s]"
+            x_label = "Throughput [Mbits/s]"
             y_label = "Probability of UL throughput < $X$"
             file_name = title
             y_limits = (0, 1)
