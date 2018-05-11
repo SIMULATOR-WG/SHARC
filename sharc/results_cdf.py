@@ -16,7 +16,8 @@ class ResultsCDF(Results):
     def __init__(self, out_dir):
         super().__init__(out_dir)
         
-    def generate_plot_list(self, n_bins):
+    def generate_plot_list(self, *args):
+        n_bins = args[0]
         self.plot_list = list()
         if len(self.system_imt_antenna_gain) > 0:
             values, base = np.histogram(self.system_imt_antenna_gain, bins=n_bins)

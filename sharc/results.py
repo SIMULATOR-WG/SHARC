@@ -75,7 +75,7 @@ class Results(object):
         self.plot_list = list()
 
     @abc.abstractmethod
-    def generate_plot_list(self, n_bins):
+    def generate_plot_list(self, *args):
         pass            
             
     @abc.abstractmethod
