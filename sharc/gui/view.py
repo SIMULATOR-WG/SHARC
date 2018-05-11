@@ -9,7 +9,7 @@ from sharc.controller import Controller
 from sharc.support.observer import Observer
 from sharc.support.enumerations import Action, State
 from sharc.gui.thread_safe_scrolled_text import ThreadSafeScrolledText
-from sharc.results import Results
+from sharc.results_cdf import ResultsCDF
 
 import matplotlib.pyplot as plt
 
@@ -143,7 +143,7 @@ class View(tkinter.Tk, Observer):
         self.__scrolledtext.config(state = tkinter.DISABLED)
         self.__popup("Copied to clipboard.")
 
-    def __plot_results(self, results: Results):
+    def __plot_results(self, results: ResultsCDF):
         file_extension = ".png"
         transparent_figure = False
         
@@ -242,7 +242,7 @@ class View(tkinter.Tk, Observer):
         if "results" in kwargs:
             self.__update_results_queue(kwargs["results"])
 
-    def __update_results_queue(self, results: Results):
+    def __update_results_queue(self, results: ResultsCDF):
         self.__results_queue.put(results)
 
     def __popup(self, message: str):
