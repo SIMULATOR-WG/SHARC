@@ -22,6 +22,7 @@ from sharc.parameters.parameters import Parameters
 from sharc.propagation.propagation import Propagation
 from sharc.station_manager import StationManager
 from sharc.results_cdf import ResultsCDF
+from sharc.results_samples import ResultsSamples
 
 class Simulation(ABC, Observable):
 
@@ -119,7 +120,10 @@ class Simulation(ABC, Observable):
         # calculates the number of RB per UE on a given BS
         self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.parameters.imt.ue_k)
 
-        self.results = ResultsCDF(kwargs['out_dir'] if 'out_dir' in kwargs.keys() else 'output')
+        if self.parameters.general.results_format == "CDF":
+            self.results = ResultsCDF(kwargs['out_dir'] if 'out_dir' in kwargs.keys() else 'output')
+        if self.parameters.general.results_format == "SAMPLES":
+            self.results = ResultsSamples(kwargs['out_dir'] if 'out_dir' in kwargs.keys() else 'output')
 
 
     def finalize(self, *args, **kwargs):
