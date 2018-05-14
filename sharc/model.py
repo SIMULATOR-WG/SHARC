@@ -95,7 +95,7 @@ class Model(Observable):
         write_to_file = False
         self.current_snapshot += 1
 
-        if not self.current_snapshot % 10:
+        if not self.current_snapshot % self.parameters.general.save_snapshot:
             write_to_file = True
             self.notify_observers(source=__name__,
                                   message="Snapshot #" + str(self.current_snapshot))
