@@ -326,31 +326,33 @@ class SimulationFullDuplex(Simulation):
             ue = self.link[bs]
             self.results.imt_path_loss.extend(self.path_loss_imt[bs,ue])
             self.results.imt_coupling_loss.extend(self.coupling_loss_imt[bs,ue])
-            self.results.imt_coupling_loss_all.extend(self.coupling_loss_imt[bs,:])
             
-            bs_bs_pl = self.path_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
-            self.results.imt_bs_bs_path_loss.extend(bs_bs_pl)
+            if not self.parameters.general.suppress_large_results:
+                self.results.imt_coupling_loss_all.extend(self.coupling_loss_imt[bs,:])
             
-            ue_ue_pl = np.ravel(self.path_loss_imt_ue_ue[ue])
-            ue_ue_pl = ue_ue_pl[~np.isnan(ue_ue_pl)]
-            self.results.imt_ue_ue_path_loss.extend(ue_ue_pl)
+                bs_bs_pl = self.path_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
+                self.results.imt_bs_bs_path_loss.extend(bs_bs_pl)
             
-            bs_bs_cl = self.coupling_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
-            self.results.imt_coupling_loss_bs_bs.extend(bs_bs_cl)
+                ue_ue_pl = np.ravel(self.path_loss_imt_ue_ue[ue])
+                ue_ue_pl = ue_ue_pl[~np.isnan(ue_ue_pl)]
+                self.results.imt_ue_ue_path_loss.extend(ue_ue_pl)
             
-            ue_ue_cl = np.ravel(self.coupling_loss_imt_ue_ue[ue])
-            ue_ue_cl = ue_ue_cl[~np.isnan(ue_ue_cl)]
-            self.results.imt_coupling_loss_ue_ue.extend(ue_ue_cl)
+                bs_bs_cl = self.coupling_loss_imt_bs_bs[bs, ~np.isnan(self.coupling_loss_imt_bs_bs[bs,:])]
+                self.results.imt_coupling_loss_bs_bs.extend(bs_bs_cl)
+            
+                ue_ue_cl = np.ravel(self.coupling_loss_imt_ue_ue[ue])
+                ue_ue_cl = ue_ue_cl[~np.isnan(ue_ue_cl)]
+                self.results.imt_coupling_loss_ue_ue.extend(ue_ue_cl)
+            
+                bs_bs_ag = self.imt_bs_bs_antenna_gain[bs, ~np.isnan(self.imt_bs_bs_antenna_gain[bs,:])]
+                self.results.imt_bs_bs_antenna_gain.extend(bs_bs_ag)
+            
+                ue_ue_ag = np.ravel(self.imt_ue_ue_antenna_gain[ue])
+                ue_ue_ag = ue_ue_ag[~np.isnan(ue_ue_ag)]
+                self.results.imt_ue_ue_antenna_gain.extend(ue_ue_ag)
             
             self.results.imt_bs_antenna_gain.extend(self.imt_bs_antenna_gain[bs,ue])
             self.results.imt_ue_antenna_gain.extend(self.imt_ue_antenna_gain[bs,ue])
-            
-            bs_bs_ag = self.imt_bs_bs_antenna_gain[bs, ~np.isnan(self.imt_bs_bs_antenna_gain[bs,:])]
-            self.results.imt_bs_bs_antenna_gain.extend(bs_bs_ag)
-            
-            ue_ue_ag = np.ravel(self.imt_ue_ue_antenna_gain[ue])
-            ue_ue_ag = ue_ue_ag[~np.isnan(ue_ue_ag)]
-            self.results.imt_ue_ue_antenna_gain.extend(ue_ue_ag)
             
             
             tput = self.calculate_imt_tput(self.ue.sinr[ue],
