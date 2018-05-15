@@ -42,9 +42,12 @@ class Parameters(object):
         #######################################################################
         # GENERAL
         #######################################################################
-        self.general.num_snapshots   = config.getint("GENERAL", "num_snapshots")
-        self.general.imt_link        = config.get("GENERAL", "imt_link")
-        self.general.system          = config.get("GENERAL", "system")
+        self.general.num_snapshots          = config.getint("GENERAL", "num_snapshots")
+        self.general.imt_link               = config.get("GENERAL", "imt_link")
+        self.general.system                 = config.get("GENERAL", "system")
+        self.general.results_format         = config.get("GENERAL", "results_format")
+        self.general.save_snapshot          = config.getint("GENERAL", "save_snapshot")
+        self.general.suppress_large_results = config.getboolean("GENERAL", "suppress_large_results")
 
         #######################################################################
         # IMT
