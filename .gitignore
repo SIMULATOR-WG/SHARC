@@ -72,3 +72,4 @@ target/
 /scripts/cases/3/*.txt
 *.txt
 *.png
+/scripts/bot_email
