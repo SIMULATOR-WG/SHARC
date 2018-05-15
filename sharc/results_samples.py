@@ -10,7 +10,7 @@ from sharc.results import Results
 
 import numpy as np
 from os.path import join
-from os import fdopen, remove, linesep
+from os import fdopen, remove, linesep, listdir
 from tempfile import mkstemp
 from shutil import move
 
@@ -18,6 +18,13 @@ class ResultsSamples(Results):
     
     def __init__(self, out_dir):
         super().__init__(out_dir)
+        
+        # Remove old result files to overwrite them
+        out_dir_files = listdir(out_dir)
+
+        for item in out_dir_files:
+            if item.endswith(".txt"):
+                open(join(out_dir, item),'r+').truncate()
         
     def generate_plot_list(self, *args):
         self.plot_list = list()
@@ -369,30 +376,98 @@ class ResultsSamples(Results):
             
     def write_files(self, snapshot_number: int):
         file_extension = ".txt"
-        new_header_text = "Results collected after " + str(snapshot_number) + " snapshots."
-        old_header_text = "Results collected after " + str(snapshot_number) + " snapshots."
+        header_text = "Results collected after " + str(snapshot_number) + " snapshots.\n"
         self.generate_plot_list()
             
         for plot in self.plot_list:
             
             file_name = join(self.output_directory, plot.file_name + file_extension)
-            self.replace(file_name,old_header_text,new_header_text)
+            self.write_head(file_name,header_text)
             
             with open(file_name,'a') as f:
-                np.savetxt(f,np.transpose([plot.x, plot.y]),
-                           fmt="%.5f", delimiter="\t", 
-                           newline=linesep)
+                for x, y in zip(plot.x, plot.y):
+                    f.write('{} \t {} \n'.format(x,y))
+        
+        self.reset_results()
             
-    def replace(self,file_path, pattern, subst):
+    def write_head(self,file_path, header):
         #Create temp file
         fh, abs_path = mkstemp()
         with fdopen(fh,'w') as new_file:
-            with open(file_path) as old_file:                
-                for line in old_file:
-                    new_file.write(line.replace(pattern, subst))
-        #Remove original file
-        remove(file_path)
+            try:
+                with open(file_path) as old_file:
+                    new_file.write(header)
+                    old_file.readline()
+                    for line in old_file:
+                        new_file.write(line)
+                #Remove original file
+                remove(file_path)
+            except FileNotFoundError:
+                new_file.write(header)
         #Move new file
         move(abs_path, file_path)
+        
+        
+    def reset_results(self):
+        self.imt_ul_tx_power_density = list()
+        self.imt_ul_tx_power = list()
+        self.imt_ul_sinr_ext = list()
+        self.imt_ul_sinr = list()
+        self.imt_ul_snr = list()
+        self.imt_ul_inr = list()
+        self.imt_ul_tput_ext = list()
+        self.imt_ul_tput = list()
+        
+        self.imt_total_tput = list()
+
+        self.imt_path_loss = list()
+        self.imt_coupling_loss = list()
+        self.imt_coupling_loss_all = list()
+        self.imt_bs_antenna_gain = list()
+        self.imt_ue_antenna_gain = list()
+        
+        self.imt_coupling_loss_bs_bs = list()
+        self.imt_coupling_loss_ue_ue = list()
+        
+        self.system_imt_antenna_gain = list()
+        self.imt_system_antenna_gain = list()
+        
+        self.system_imt_ue_antenna_gain = list()
+        self.system_imt_bs_antenna_gain = list()
+        self.imt_ue_system_antenna_gain = list()
+        self.imt_bs_system_antenna_gain = list()
+
+        self.imt_dl_tx_power_density = list()
+        self.imt_dl_tx_power = list()
+        self.imt_dl_sinr_ext = list()
+        self.imt_dl_sinr = list()
+        self.imt_dl_snr = list()
+        self.imt_dl_inr = list()
+        self.imt_dl_tput_ext = list()
+        self.imt_dl_tput = list()
+        
+        self.imt_bs_bs_path_loss = list()
+        self.imt_ue_ue_path_loss = list()
+        
+        self.imt_bs_bs_antenna_gain = list()
+        self.imt_ue_ue_antenna_gain = list()
+        
+        self.system_ul_coupling_loss = list()
+        self.system_ul_interf_power = list()
+        self.system_ul_inr_scaled = list()
+
+        self.system_dl_coupling_loss = list()
+        self.system_dl_interf_power = list()
+        self.system_dl_inr_scaled = list()
+        
+        self.imt_dl_rx_power = list()
+        self.imt_ul_rx_power = list()
+        self.imt_dl_ue_interf = list()
+        self.imt_ul_bs_interf = list()
+
+        self.system_inr = list()
+        self.system_inr_scaled = list()
+        
+        self.plot_list = list()
 
       
