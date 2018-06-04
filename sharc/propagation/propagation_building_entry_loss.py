@@ -88,7 +88,7 @@ class PropagationBuildingEntryLoss(Propagation):
 
 if __name__ == '__main__':
 
-    entry_loss = PropagationBuildingEntryLoss()
+    entry_loss = PropagationBuildingEntryLoss(np.random.RandomState())
 
     freq_GHz_log = np.arange(-1,2.1,.1)
     freq_GHz = 10 ** freq_GHz_log

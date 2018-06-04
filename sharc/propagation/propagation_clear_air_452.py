@@ -11,6 +11,7 @@ from sharc.propagation.clear_air_452_aux import p676_ga
 from sharc.propagation.clear_air_452_aux import inv_cum_norm
 from sharc.support.enumerations import StationType
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
+from sharc.propagation.propagation_building_entry_loss import PropagationBuildingEntryLoss
 
 import numpy as np
 
@@ -22,6 +23,7 @@ class PropagationClearAir(Propagation):
         super().__init__(random_number_gen)
 
         self.clutter = PropagationClutterLoss(random_number_gen)
+        self.building_entry = PropagationBuildingEntryLoss(self.random_number_gen)
 
         self.building_loss = 20
 
@@ -718,6 +720,7 @@ class PropagationClearAir(Propagation):
         f = np.asarray(kwargs["frequency"])*(1e-3)  #GHz
         number_of_sectors = kwargs.pop("number_of_sectors",1)
         indoor_stations = kwargs.pop("indoor_stations",1)
+        elevation = kwargs["elevation"]
 
         f = np.unique(f)
         if len(f) > 1:
@@ -899,14 +902,16 @@ class PropagationClearAir(Propagation):
         else:
             clutter_loss = np.zeros(d_km.shape)
 
-        building_loss = self.building_loss * indoor_stations
+#        building_loss = self.building_loss * indoor_stations
+        b_loss = np.transpose(self.building_entry.get_loss(f, elevation))
+        building_loss = b_loss * indoor_stations
 
         if number_of_sectors > 1:
             Lb = np.repeat(Lb, number_of_sectors, 1)
             clutter_loss = np.repeat(clutter_loss, number_of_sectors, 1)
             building_loss = np.repeat(building_loss, number_of_sectors, 1)
 
-        Lb = Lb + clutter_loss + building_loss
+        Lb_new = Lb + clutter_loss + building_loss
 
-        return Lb
+        return Lb_new
 
