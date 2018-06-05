@@ -33,23 +33,20 @@ class TopologyIndoor(Topology):
         self.b_w = 120
         self.b_d = 50
         self.b_h = 3
-
-        # This value is hard coded because initially this is the only supported
-        # value
-        intersite_distance = 40
         
-        cell_radius = intersite_distance/2
-        super().__init__(intersite_distance, cell_radius)
+        cell_radius = param.intersite_distance/2
+        super().__init__(param.intersite_distance, cell_radius)
         
         self.n_rows = param.n_rows
         self.n_colums = param.n_colums
         self.street_width = param.street_width
         self.ue_indoor_percent = param.ue_indoor_percent
         self.building_class = param.building_class
+        self.num_cells = param.num_cells
         
         
         
-    def calculate_coordinates(self):
+    def calculate_coordinates(self, random_number_gen=np.random.RandomState()):
         """
         Calculates the coordinates of the stations according to the inter-site
         distance parameter. This method is invoked in all snapshots but it can 
@@ -59,8 +56,8 @@ class TopologyIndoor(Topology):
         if not self.static_base_stations:
             self.static_base_stations = True
             
-            x_base = np.array([ self.cell_radius, 3*self.cell_radius, 5*self.cell_radius])
-            y_base = self.b_d/2*np.ones(3)
+            x_base = np.array([ (2*k + 1)*self.cell_radius for k in range(self.num_cells)])
+            y_base = self.b_d/2*np.ones(self.num_cells)
             
             for r in range(self.n_rows):
                 for c in range(self.n_colums):
@@ -77,9 +74,9 @@ class TopologyIndoor(Topology):
             
     def plot(self, ax: matplotlib.axes.Axes):
         # create the building
-        for b in range(int(self.num_base_stations/3)):
-            x_b = self.x[3*b] - self.cell_radius
-            y_b = self.y[3*b] - self.b_d/2
+        for b in range(int(self.num_base_stations/self.num_cells)):
+            x_b = self.x[self.num_cells*b] - self.cell_radius
+            y_b = self.y[self.num_cells*b] - self.b_d/2
             points = list([[x_b, y_b],
                            [x_b + self.b_w, y_b],
                            [x_b + self.b_w, y_b + self.b_d],
@@ -89,8 +86,8 @@ class TopologyIndoor(Topology):
 
             for q in range(8):
                 points = list()
-                x_b = self.x[3*b] - self.cell_radius + q*15
-                y_b = self.y[3*b] + 10
+                x_b = self.x[self.num_cells*b] - self.cell_radius + q*15
+                y_b = self.y[self.num_cells*b] + 10
                 points.extend([[x_b, y_b],
                                [x_b + 15, y_b],
                                [x_b + 15, y_b + 15],
@@ -100,8 +97,8 @@ class TopologyIndoor(Topology):
                 
             for q in range(8):
                 points = list()
-                x_b = self.x[3*b] - self.cell_radius + q*15
-                y_b = self.y[3*b] - self.b_d/2
+                x_b = self.x[self.num_cells*b] - self.cell_radius + q*15
+                y_b = self.y[self.num_cells*b] - self.b_d/2
                 points.extend([[x_b, y_b],
                                [x_b + 15, y_b],
                                [x_b + 15, y_b + 15],
@@ -116,10 +113,12 @@ class TopologyIndoor(Topology):
 
 if __name__ == '__main__':
     param = ParametersIndoor()
-    param.intersite_distance = 40
-    param.n_rows = 4
-    param.n_colums = 2
+    param.intersite_distance = 20
+    param.n_rows = 6
+    param.n_colums = 6
     param.street_width = 30
+    param.intersite_distance = 40
+    param.num_cells = 3
     param.ue_indoor_percent = 0.95
     param.building_class = "TRADITIONAL"
     topology = TopologyIndoor(param)
@@ -137,8 +136,8 @@ if __name__ == '__main__':
     plt.tight_layout()    
     
     axes = plt.gca()
-    axes.set_xlim([-param.street_width, param.n_colums*3*param.intersite_distance + (param.n_colums-1)*param.street_width + param.street_width])
-    axes.set_ylim([-param.street_width, param.n_rows*topology.b_d + (param.n_rows-1)*param.street_width + param.street_width])
+#    axes.set_xlim([-param.street_width, param.n_colums*3*param.intersite_distance + (param.n_colums-1)*param.street_width + param.street_width])
+#    axes.set_ylim([-param.street_width, param.n_rows*topology.b_d + (param.n_rows-1)*param.street_width + param.street_width])
     
     plt.show()    
     

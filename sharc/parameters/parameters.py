@@ -172,6 +172,8 @@ class Parameters(object):
         self.indoor.n_rows = config.getint("INDOOR", "n_rows")
         self.indoor.n_colums = config.getint("INDOOR", "n_colums")
         self.indoor.street_width = config.getint("INDOOR", "street_width")
+        self.indoor.intersite_distance = config.getfloat("INDOOR", "intersite_distance")
+        self.indoor.num_cells = config.getint("INDOOR", "num_cells")
         self.indoor.ue_indoor_percent = config.getfloat("INDOOR", "ue_indoor_percent")
         self.indoor.building_class = config.get("INDOOR", "building_class")
 
