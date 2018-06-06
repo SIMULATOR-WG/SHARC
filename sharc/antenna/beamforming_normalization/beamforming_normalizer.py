@@ -87,6 +87,7 @@ class BeamformingNormalizer(object):
 
         # Loop throug all the possible beams
         for phi_idx, phi in enumerate(self.phi_vals_deg):
+            print('\n' + str(100*phi_idx/len(self.phi_vals_deg)) + '%')
             for theta_idx, theta in enumerate(self.theta_vals_deg):
                 s = '\tphi = ' + str(phi) + ', theta = ' + str(theta)
                 print(s)
