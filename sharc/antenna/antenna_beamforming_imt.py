@@ -288,7 +288,7 @@ class PlotAntennaPattern(object):
 
     def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, antenna_type: str, plot_type: str):
 
-        phi_escan = 45
+        phi_escan = 30
         theta_tilt = 90
 
         # Plot horizontal pattern
@@ -310,13 +310,13 @@ class PlotAntennaPattern(object):
 
         ax1.plot(phi,gain)
         ax1.grid(True)
-        ax1.set_xlabel(r"$\varphi$ [deg]")
-        ax1.set_ylabel("Gain [dB]")
+        ax1.set_xlabel(r"$\varphi$ [graus]")
+        ax1.set_ylabel("Ganho [dBi]")
 
         if plot_type == "ELEMENT":
-            ax1.set_title("IMT " + sta_type + " element horizontal antenna pattern")
+            ax1.set_title("IMT " + sta_type + " diagrama horizontal")
         elif plot_type == "ARRAY":
-            ax1.set_title("IMT " + sta_type + " horizontal antenna pattern")
+            ax1.set_title("IMT " + sta_type +  " diagrama horizontal")
 
         ax1.set_xlim(-180, 180)
 
@@ -335,13 +335,13 @@ class PlotAntennaPattern(object):
 
         ax2.plot(theta,gain)
         ax2.grid(True)
-        ax2.set_xlabel(r"$\theta$ [deg]")
-        ax2.set_ylabel("Gain [dB]")
+        ax2.set_xlabel(r"$\theta$ [graus]")
+        ax2.set_ylabel("Ganho [dBi]")
 
         if plot_type == "ELEMENT":
-            ax2.set_title("IMT " + sta_type + " element vertical antenna pattern")
+            ax2.set_title("IMT " + sta_type + " diagrama vertical")
         elif plot_type == "ARRAY":
-            ax2.set_title("IMT " + sta_type + " vertical antenna pattern")
+            ax2.set_title("IMT " + sta_type + " diagrama vertical")
 
         ax2.set_xlim(0, 180)
         if(np.max(gain) > top_y_lim): top_y_lim = np.ceil(np.max(gain)/10)*10
@@ -364,13 +364,15 @@ class PlotAntennaPattern(object):
 
         #plt.savefig(file_name)
         plt.show()
+        return fig
 
 if __name__ == '__main__':
 
     figs_dir = "figs/"
 
     param = ParametersAntennaImt()
-
+    param.normalization = False
+    
     param.bs_element_pattern = "M2101"
     param.bs_tx_element_max_g    = 5
     param.bs_tx_element_phi_deg_3db  = 65
@@ -378,7 +380,7 @@ if __name__ == '__main__':
     param.bs_tx_element_am       = 30
     param.bs_tx_element_sla_v    = 30
     param.bs_tx_n_rows           = 8
-    param.bs_tx_n_columns        = 8
+    param.bs_tx_n_columns        = 16
     param.bs_tx_element_horiz_spacing = 0.5
     param.bs_tx_element_vert_spacing = 0.5
     param.bs_downtilt_deg = 0
@@ -400,8 +402,10 @@ if __name__ == '__main__':
     # Plot BS TX radiation patterns
     par = param.get_antenna_parameters("BS","TX")
     bs_array = AntennaBeamformingImt(par,0,0)
-    plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
-    plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
+    f = plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
+    f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
+    f = plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
+    f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
 
     # Plot UE TX radiation patterns
     par = param.get_antenna_parameters("UE","TX")

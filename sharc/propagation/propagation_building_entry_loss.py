@@ -145,6 +145,31 @@ if __name__ == '__main__':
     plt.title("Median Building Entry Loss - horizontal entry")
 
     plt.show()
+    plt.close()
+    
+    # parameters
+    freq_MHz = 40e3
+    probability = np.linspace(0,1)
+    elevations = np.array([0, 45, 90])
+    loss = np.zeros((len(elevations),len(probability)))
+    
+    # calculate loss
+    for n,el in enumerate(elevations):
+        for m,pb in enumerate(probability):
+            loss[n,m] = entry_loss.get_loss( freq_MHz, el, prob=pb,
+                                          building_class="TRADITIONAL")
+            
+    for n,el in enumerate(elevations):
+        lbl = str(el) + " deg"
+        plt.plot(loss[n],probability,label=lbl)
+    
+    plt.xlabel("Building Entry Loss [dB]")
+    plt.ylabel("Probability that loss is exceeded")
+    plt.ylim((0,1))
+    plt.xlim((0,65))
+    plt.grid()
+    plt.legend()
+    plt.show()
 
 
 

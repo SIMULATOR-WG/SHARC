@@ -114,8 +114,8 @@ class TopologyIndoor(Topology):
 if __name__ == '__main__':
     param = ParametersIndoor()
     param.intersite_distance = 20
-    param.n_rows = 6
-    param.n_colums = 6
+    param.n_rows = 3
+    param.n_colums = 3
     param.street_width = 30
     param.intersite_distance = 40
     param.num_cells = 3

@@ -120,12 +120,12 @@ if __name__ == '__main__':
     height_diff = np.tile(h_bs, (num_bs, 3)) - np.tile(h_ue, (num_bs, 1))
     elevation = np.degrees(np.arctan(height_diff/distance_2D))
 
-    propagation_indoor = PropagationIndoor(params, np.random.RandomState())
+    propagation_indoor = PropagationIndoor(np.random.RandomState(),params)
     loss_indoor = propagation_indoor.get_loss(distance_3D = distance_3D,
                                               distance_2D = distance_2D,
                                               elevation = elevation,
                                               frequency = frequency,
-                                              indoor = indoor,
+                                              indoor_stations = indoor,
                                               shadowing = False)
 
 

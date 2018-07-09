@@ -898,7 +898,8 @@ class PropagationClearAir(Propagation):
         if es_params.clutter_loss:
             clutter_loss = self.clutter.get_loss(frequency=f * 1000,
                                                  distance=d_km * 1000,
-                                                 station_type=StationType.FSS_ES)
+                                                 station_type=StationType.FSS_ES,
+                                                 loc_percentage=0.5)
         else:
             clutter_loss = np.zeros(d_km.shape)
 
