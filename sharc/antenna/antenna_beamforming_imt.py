@@ -288,7 +288,7 @@ class PlotAntennaPattern(object):
 
     def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, antenna_type: str, plot_type: str):
 
-        phi_escan = 30
+        phi_escan = 45
         theta_tilt = 90
 
         # Plot horizontal pattern
@@ -310,13 +310,13 @@ class PlotAntennaPattern(object):
 
         ax1.plot(phi,gain)
         ax1.grid(True)
-        ax1.set_xlabel(r"$\varphi$ [graus]")
-        ax1.set_ylabel("Ganho [dBi]")
+        ax1.set_xlabel(r"$\varphi$ [deg]")
+        ax1.set_ylabel("Gain [dBi]")
 
         if plot_type == "ELEMENT":
-            ax1.set_title("IMT " + sta_type + " diagrama horizontal")
+            ax1.set_title("IMT " + sta_type + " element horizontal antenna pattern")
         elif plot_type == "ARRAY":
-            ax1.set_title("IMT " + sta_type +  " diagrama horizontal")
+            ax1.set_title("IMT " + sta_type + " horizontal antenna pattern")
 
         ax1.set_xlim(-180, 180)
 
@@ -335,13 +335,13 @@ class PlotAntennaPattern(object):
 
         ax2.plot(theta,gain)
         ax2.grid(True)
-        ax2.set_xlabel(r"$\theta$ [graus]")
-        ax2.set_ylabel("Ganho [dBi]")
+        ax2.set_xlabel(r"$\theta$ [deg]")
+        ax2.set_ylabel("Gain [dBi]")
 
         if plot_type == "ELEMENT":
-            ax2.set_title("IMT " + sta_type + " diagrama vertical")
+            ax2.set_title("IMT " + sta_type + " element vertical antenna pattern")
         elif plot_type == "ARRAY":
-            ax2.set_title("IMT " + sta_type + " diagrama vertical")
+            ax2.set_title("IMT " + sta_type + " vertical antenna pattern")
 
         ax2.set_xlim(0, 180)
         if(np.max(gain) > top_y_lim): top_y_lim = np.ceil(np.max(gain)/10)*10
@@ -371,14 +371,16 @@ if __name__ == '__main__':
     figs_dir = "figs/"
 
     param = ParametersAntennaImt()
-    param.normalization = False
+    param.normalization = True
+    param.bs_normalization_file = 'beamforming_normalization\\bs_indoor_norm.npz'
+    param.ue_normalization_file = 'beamforming_normalization\\ue_norm.npz'
     
     param.bs_element_pattern = "M2101"
     param.bs_tx_element_max_g    = 5
-    param.bs_tx_element_phi_deg_3db  = 65
-    param.bs_tx_element_theta_deg_3db = 65
-    param.bs_tx_element_am       = 30
-    param.bs_tx_element_sla_v    = 30
+    param.bs_tx_element_phi_deg_3db  = 90
+    param.bs_tx_element_theta_deg_3db = 90
+    param.bs_tx_element_am       = 25
+    param.bs_tx_element_sla_v    = 25
     param.bs_tx_n_rows           = 8
     param.bs_tx_n_columns        = 16
     param.bs_tx_element_horiz_spacing = 0.5
