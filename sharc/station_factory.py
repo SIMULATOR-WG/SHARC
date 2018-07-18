@@ -267,15 +267,19 @@ class StationFactory(object):
 
         for bs in range(num_bs):
             idx = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]
-            if bs % 3 == 0:
+            # Right most cell
+            if bs % topology.num_cells == 0:
                 x_min = topology.x[bs] - topology.cell_radius - delta_x
                 x_max = topology.x[bs] + topology.cell_radius
-            if bs % 3 == 1:
-                x_min = topology.x[bs] - topology.cell_radius
-                x_max = topology.x[bs] + topology.cell_radius
-            if bs % 3 == 2:
+            # Left most cell
+            elif bs % topology.num_cells == topology.num_cells - 1:
                 x_min = topology.x[bs] - topology.cell_radius
                 x_max = topology.x[bs] + topology.cell_radius + delta_x
+            # Center cells
+            else:
+                x_min = topology.x[bs] - topology.cell_radius
+                x_max = topology.x[bs] + topology.cell_radius
+            
             y_min = topology.y[bs] - topology.b_d/2 - delta_y
             y_max = topology.y[bs] + topology.b_d/2 + delta_y
             x = (x_max - x_min)*random_number_gen.random_sample(num_ue_per_bs) + x_min
@@ -295,16 +299,16 @@ class StationFactory(object):
             imt_ue.elevation[idx] = elevation[idx] + psi
 
             # check if UE is indoor
-            if bs % 3 == 0:
+            if bs % topology.num_cells == 0:
                 out = (x < topology.x[bs] - topology.cell_radius) | \
                       (y > topology.y[bs] + topology.b_d/2) | \
                       (y < topology.y[bs] - topology.b_d/2)
-            if bs % 3 == 1:
-                out = (y > topology.y[bs] + topology.b_d/2) | \
-                      (y < topology.y[bs] - topology.b_d/2)
-            if bs % 3 == 2:
+            elif bs % topology.num_cells == topology.num_cells - 1:
                 out = (x > topology.x[bs] + topology.cell_radius) | \
                       (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            else:
+                out = (y > topology.y[bs] + topology.b_d/2) | \
                       (y < topology.y[bs] - topology.b_d/2)
             imt_ue.indoor[idx] = ~ out
 
