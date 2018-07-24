@@ -413,6 +413,125 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         lo_phi, lo_theta = self.antenna1.to_local_coord(phi, theta)
         npt.assert_equal(lo_phi,np.array([120, 70, 20, -120]))
         npt.assert_equal(lo_theta,np.array([80, 170, 40, 10]))
+        
+        # Testing carthesian coordinates
+        ### Test 1: rotate only in azimuth
+        par = self.param.get_antenna_parameters("BS","RX")
+        azi = -45.0
+        ele = 0.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        phi = 0
+        theta = 90
+        phi_rad = np.deg2rad(phi)
+        theta_rad = np.deg2rad(theta)
+        
+        point = np.matrix([[np.sin(theta_rad)*np.cos(phi_rad)],
+                           [np.sin(theta_rad)*np.sin(phi_rad)],
+                           [np.cos(theta_rad)]])
+    
+        alpha = np.deg2rad(azi)
+        beta = np.deg2rad(ele)
+        gamma = 0.0
+    
+        Rx = np.matrix([[1.0,           0.0,           0.0],
+                        [0.0, np.cos(gamma),-np.sin(gamma)],
+                        [0.0, np.sin(gamma), np.cos(gamma)]])
+        Ry = np.matrix([[ np.cos(beta), 0.0, np.sin(beta)],
+                        [          0.0, 1.0,       0.0],
+                        [-np.sin(beta), 0.0, np.cos(beta)]])
+        Rz = np.matrix([[np.cos(alpha),-np.sin(alpha), 0.0],
+                        [np.sin(alpha), np.cos(alpha), 0.0],
+                        [          0.0,           0.0, 1.0]])
+        # The order of multiplication is zyx, not xyz
+        R = np.transpose(Rz)*Ry*Rx
+        
+        rotated_point = R*point
+        rotated_phi = np.asscalar(np.rad2deg(np.arctan2(rotated_point[1],rotated_point[0])))
+        rotated_theta = np.asscalar(np.rad2deg(np.arccos(rotated_point[2]/np.linalg.norm(rotated_point))))
+        
+        local_phi, local_theta = self.antenna3.to_local_coord(phi,theta)
+        
+        self.assertAlmostEqual(np.asscalar(local_phi),rotated_phi,delta=1e-2)
+        self.assertAlmostEqual(np.asscalar(local_theta),rotated_theta,delta=1e-2)
+        
+        ### Test 2: rotate only in elevation
+        par = self.param.get_antenna_parameters("BS","RX")
+        azi = 0.0
+        ele = +10.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        phi = 0
+        theta = 90
+        phi_rad = np.deg2rad(phi)
+        theta_rad = np.deg2rad(theta)
+        
+        point = np.matrix([[np.sin(theta_rad)*np.cos(phi_rad)],
+                           [np.sin(theta_rad)*np.sin(phi_rad)],
+                           [np.cos(theta_rad)]])
+    
+        alpha = np.deg2rad(azi)
+        beta = np.deg2rad(ele)
+        gamma = 0.0
+    
+        Rx = np.matrix([[1.0,           0.0,           0.0],
+                        [0.0, np.cos(gamma),-np.sin(gamma)],
+                        [0.0, np.sin(gamma), np.cos(gamma)]])
+        Ry = np.matrix([[ np.cos(beta), 0.0, np.sin(beta)],
+                        [          0.0, 1.0,       0.0],
+                        [-np.sin(beta), 0.0, np.cos(beta)]])
+        Rz = np.matrix([[np.cos(alpha),-np.sin(alpha), 0.0],
+                        [np.sin(alpha), np.cos(alpha), 0.0],
+                        [          0.0,           0.0, 1.0]])
+        R = np.transpose(Rz)*Ry*Rx
+        
+        rotated_point = R*point
+        rotated_phi = np.asscalar(np.rad2deg(np.arctan2(rotated_point[1],rotated_point[0])))
+        rotated_theta = np.asscalar(np.rad2deg(np.arccos(rotated_point[2]/np.linalg.norm(rotated_point))))
+        
+        local_phi, local_theta = self.antenna3.to_local_coord(phi,theta)
+        
+        self.assertAlmostEqual(np.asscalar(local_phi),rotated_phi,delta=1e-2)
+        self.assertAlmostEqual(np.asscalar(local_theta),rotated_theta,delta=1e-2)
+        
+        ### Test 3: rotate azimuth and elevation
+        par = self.param.get_antenna_parameters("BS","RX")
+        azi = -45.0
+        ele = +10.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        phi = -20
+        theta = 30
+        phi_rad = np.deg2rad(phi)
+        theta_rad = np.deg2rad(theta)
+        
+        point = np.matrix([[np.sin(theta_rad)*np.cos(phi_rad)],
+                           [np.sin(theta_rad)*np.sin(phi_rad)],
+                           [np.cos(theta_rad)]])
+    
+        alpha = np.deg2rad(azi)
+        beta = np.deg2rad(ele)
+        gamma = 0.0
+    
+        Rx = np.matrix([[1.0,           0.0,           0.0],
+                        [0.0, np.cos(gamma),-np.sin(gamma)],
+                        [0.0, np.sin(gamma), np.cos(gamma)]])
+        Ry = np.matrix([[ np.cos(beta), 0.0, np.sin(beta)],
+                        [          0.0, 1.0,       0.0],
+                        [-np.sin(beta), 0.0, np.cos(beta)]])
+        Rz = np.matrix([[np.cos(alpha),-np.sin(alpha), 0.0],
+                        [np.sin(alpha), np.cos(alpha), 0.0],
+                        [          0.0,           0.0, 1.0]])
+        R = np.transpose(Rz)*Ry*Rx
+        
+        rotated_point = R*point
+        rotated_phi = np.asscalar(np.rad2deg(np.arctan2(rotated_point[1],rotated_point[0])))
+        rotated_theta = np.asscalar(np.rad2deg(np.arccos(rotated_point[2]/np.linalg.norm(rotated_point))))
+        
+        local_phi, local_theta = self.antenna3.to_local_coord(phi,theta)
+        
+        self.assertAlmostEqual(np.asscalar(local_phi),rotated_phi,delta=1e-2)
+        self.assertAlmostEqual(np.asscalar(local_theta),rotated_theta,delta=1e-2)
 
 if __name__ == '__main__':
     unittest.main()
