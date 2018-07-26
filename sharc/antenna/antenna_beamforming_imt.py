@@ -265,17 +265,30 @@ class AntennaBeamformingImt(Antenna):
 
     def to_local_coord(self,phi: float, theta: float) -> tuple:
 
-        lo_theta = np.ravel(np.array([theta + self.elevation]))
-        lo_phi = np.ravel(np.array([phi - self.azimuth]))
-
-        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
-        lo_theta[ofb_theta] = np.mod((360 - lo_theta[ofb_theta]),180)
-        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
-
-        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
-        lo_phi[ofb_phi] = np.mod(lo_phi[ofb_phi],360)
-        ofb_phi = np.where(lo_phi > 180)
-        lo_phi[ofb_phi] = lo_phi[ofb_phi] - 360
+        # Old implementation: kept for testing purpuses
+#        lo_theta = np.ravel(np.array([theta + self.elevation]))
+#        lo_phi = np.ravel(np.array([phi - self.azimuth]))
+#
+#        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
+#        lo_theta[ofb_theta] = np.mod((360 - lo_theta[ofb_theta]),180)
+#        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
+#
+#        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
+#        lo_phi[ofb_phi] = np.mod(lo_phi[ofb_phi],360)
+#        ofb_phi = np.where(lo_phi > 180)
+#        lo_phi[ofb_phi] = lo_phi[ofb_phi] - 360
+        
+        phi_rad = np.ravel(np.array([np.deg2rad(phi)]))
+        theta_rad = np.ravel(np.array([np.deg2rad(theta)]))
+        
+        points = np.matrix([np.sin(theta_rad)*np.cos(phi_rad),
+                           np.sin(theta_rad)*np.sin(phi_rad),
+                           np.cos(theta_rad)])
+    
+        rotated_points = self.rotation_mtx*points
+        
+        lo_phi = np.ravel(np.asarray(np.rad2deg(np.arctan2(rotated_points[1],rotated_points[0]))))
+        lo_theta = np.ravel(np.asarray(np.rad2deg(np.arccos(rotated_points[2]))))
 
         return lo_phi, lo_theta
     
