@@ -473,7 +473,7 @@ class Simulation(ABC, Observable):
         plt.tight_layout()
         plt.show()
 
-        sys.exit(0)
+#        sys.exit(0)
 
     @abstractmethod
     def snapshot(self, *args, **kwargs):

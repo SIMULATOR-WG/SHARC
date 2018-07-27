@@ -157,7 +157,7 @@ class AntennaBeamformingImt(Antenna):
         n_direct = len(lo_theta_vec)
 
         gains = np.zeros(n_direct)
-
+        
         if(co_channel):
             for g in range(n_direct):
                 gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g],
@@ -265,7 +265,7 @@ class AntennaBeamformingImt(Antenna):
 
     def to_local_coord(self,phi: float, theta: float) -> tuple:
 
-        # Old implementation: kept for testing purpuses
+#        # Old implementation: kept for testing purpuses
 #        lo_theta = np.ravel(np.array([theta + self.elevation]))
 #        lo_phi = np.ravel(np.array([phi - self.azimuth]))
 #
@@ -320,7 +320,7 @@ class PlotAntennaPattern(object):
     def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, antenna_type: str, plot_type: str):
 
         phi_escan = 45
-        theta_tilt = 90
+        theta_tilt = 120
 
         # Plot horizontal pattern
         phi = np.linspace(-180, 180, num = 360)
@@ -434,7 +434,7 @@ if __name__ == '__main__':
 
     # Plot BS TX radiation patterns
     par = param.get_antenna_parameters("BS","TX")
-    bs_array = AntennaBeamformingImt(par,0,0)
+    bs_array = AntennaBeamformingImt(par,45,-30)
     f = plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
     f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
     f = plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
