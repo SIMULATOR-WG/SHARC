@@ -43,7 +43,9 @@ class TopologyIndoor(Topology):
         self.ue_indoor_percent = param.ue_indoor_percent
         self.building_class = param.building_class
         self.num_cells = param.num_cells
+        self.num_floors = param.num_floors
         
+        self.height = np.empty(0)
         
         
     def calculate_coordinates(self, random_number_gen=np.random.RandomState()):
@@ -59,10 +61,18 @@ class TopologyIndoor(Topology):
             x_base = np.array([ (2*k + 1)*self.cell_radius for k in range(self.num_cells)])
             y_base = self.b_d/2*np.ones(self.num_cells)
             
+            floor_x = np.empty(0)
+            floor_y = np.empty(0)
             for r in range(self.n_rows):
                 for c in range(self.n_colums):
-                    self.x = np.concatenate((self.x, x_base + c*(self.b_w + self.street_width)))
-                    self.y = np.concatenate((self.y, y_base + r*(self.b_d + self.street_width)))
+                    floor_x = np.concatenate((floor_x, x_base + c*(self.b_w + self.street_width)))
+                    floor_y = np.concatenate((floor_y, y_base + r*(self.b_d + self.street_width)))
+
+            for f in range(self.num_floors):
+                self.x = np.concatenate((self.x, floor_x))
+                self.y = np.concatenate((self.y, floor_y))
+                self.height = np.concatenate((self.height,
+                                             (f+1)*self.b_h*np.ones_like(floor_x)))
 
             # In the end, we have to update the number of base stations
             self.num_base_stations = len(self.x)        
@@ -71,8 +81,14 @@ class TopologyIndoor(Topology):
             self.elevation = -90*np.ones(self.num_base_stations)
             self.indoor = np.ones(self.num_base_stations, dtype = bool)
                 
-            
-    def plot(self, ax: matplotlib.axes.Axes):
+    
+    def plot(self, ax: matplotlib.axes.Axes, top_view = True):
+        if top_view:
+            self.plot_top_view(ax)
+        else:
+            self.plot_side_view(ax)
+    
+    def plot_top_view(self, ax: matplotlib.axes.Axes):
         # create the building
         for b in range(int(self.num_base_stations/self.num_cells)):
             x_b = self.x[self.num_cells*b] - self.cell_radius
@@ -109,13 +125,30 @@ class TopologyIndoor(Topology):
         
         # indoor base stations
         ax.scatter(self.x, self.y, color='k', edgecolor="k", linewidth=2, label="Base station")
-
+        
+    def plot_side_view(self, ax: matplotlib.axes.Axes):
+        
+        # Loop on each floor of each column of buildings
+        for f in range(int(self.num_floors)):
+            for c in range(int(self.n_colums)):
+                total_bs_level = self.n_rows*self.n_colums*self.num_cells
+                x_b = self.x[f*total_bs_level + c*self.num_cells]  - self.cell_radius 
+                z_b = self.height[f*total_bs_level + c*self.num_cells]
+                points = list([[x_b, z_b],
+                               [x_b + self.b_w, z_b],
+                               [x_b + self.b_w, z_b - self.b_h],
+                               [x_b, z_b - self.b_h]])
+                sector = plt.Polygon(points, fill=None, edgecolor='k')
+                ax.add_patch(sector) 
+        
+        ax.scatter(self.x, self.height-0.05, color='k', edgecolor="k", linewidth=2, label="Base station")
 
 if __name__ == '__main__':
     param = ParametersIndoor()
     param.intersite_distance = 20
     param.n_rows = 2
     param.n_colums = 2
+    param.num_floors = 3
     param.street_width = 30
     param.intersite_distance = 30
     param.num_cells = 4
@@ -124,7 +157,8 @@ if __name__ == '__main__':
     topology = TopologyIndoor(param)
     topology.calculate_coordinates()
     
-    fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')  # create a figure object
+    # Plot top view
+    fig = plt.figure(figsize=(10,8), facecolor='w', edgecolor='k')  # create a figure object
     ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
     
     topology.plot(ax)
@@ -141,3 +175,17 @@ if __name__ == '__main__':
     
     plt.show()    
     
+    # Plot side view
+    fig = plt.figure(figsize=(10,8), facecolor='w', edgecolor='k')  # create a figure object
+    ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
+    
+    topology.plot(ax,top_view=False)
+    
+    plt.title("Indoor topology")
+    plt.xlabel("x-coordinate [m]")
+    plt.ylabel("z-coordinate [m]")  
+    plt.tight_layout()
+    
+    axes = plt.gca()
+    axes.set_ylim((0,3*param.num_floors + 1))
+    plt.show()  
