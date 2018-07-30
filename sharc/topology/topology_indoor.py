@@ -44,6 +44,7 @@ class TopologyIndoor(Topology):
         self.building_class = param.building_class
         self.num_cells = param.num_cells
         self.num_floors = param.num_floors
+        self.total_bs_level = self.n_rows*self.n_colums*self.num_cells
         
         self.height = np.empty(0)
         
@@ -131,9 +132,8 @@ class TopologyIndoor(Topology):
         # Loop on each floor of each column of buildings
         for f in range(int(self.num_floors)):
             for c in range(int(self.n_colums)):
-                total_bs_level = self.n_rows*self.n_colums*self.num_cells
-                x_b = self.x[f*total_bs_level + c*self.num_cells]  - self.cell_radius 
-                z_b = self.height[f*total_bs_level + c*self.num_cells]
+                x_b = self.x[f*self.total_bs_level + c*self.num_cells]  - self.cell_radius 
+                z_b = self.height[f*self.total_bs_level + c*self.num_cells]
                 points = list([[x_b, z_b],
                                [x_b + self.b_w, z_b],
                                [x_b + self.b_w, z_b - self.b_h],
