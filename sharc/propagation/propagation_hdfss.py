@@ -23,8 +23,8 @@ class PropagationHDFSS(Propagation):
     def __init__(self, random_number_gen: np.random.RandomState):
         super().__init__(random_number_gen)
         
-        self.propagation_p1411 = PropagationP1411(rnd)
-        self.propagation_fspl = PropagationFreeSpace(rnd)
+        self.propagation_p1411 = PropagationP1411(random_number_gen)
+        self.propagation_fspl = PropagationFreeSpace(random_number_gen)
         
         self.fspl_dist = 55
         self.p1411_los_dist = 260

@@ -20,6 +20,7 @@ from sharc.propagation.propagation_abg import PropagationABG
 from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
 from sharc.propagation.propagation_tvro import PropagationTvro
 from sharc.propagation.propagation_indoor import PropagationIndoor
+from sharc.propagation.propagation_hdfss import PropagationHDFSS
 
 class PropagationFactory(object):
 
@@ -45,6 +46,8 @@ class PropagationFactory(object):
             return PropagationClearAir(random_number_gen)
         elif channel_model == "TVRO":
             return PropagationTvro(random_number_gen)
+        elif channel_model == "HDFSS":
+            return PropagationHDFSS(random_number_gen)
         elif channel_model == "INDOOR":
             return PropagationIndoor(random_number_gen, param.indoor)
         else:
