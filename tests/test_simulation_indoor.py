@@ -121,6 +121,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.indoor.building_class = "TRADITIONAL"
         self.param.indoor.intersite_distance = 30
         self.param.indoor.num_cells = 4
+        self.param.indoor.num_floors = 1
 
         self.param.fss_es.x = 135
         self.param.fss_es.y = 65
