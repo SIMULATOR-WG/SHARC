@@ -100,7 +100,7 @@ class AntennaBeamformingImt(Antenna):
             theta_etilt (float): elevation electrical tilt angle [degrees]
         """
         phi, theta = self.to_local_coord(phi_etilt, theta_etilt)
-        self.beams_list.append((phi, theta-90))
+        self.beams_list.append((np.asscalar(phi), np.asscalar(theta-90)))
         self.w_vec_list.append(self._weight_vector(phi, theta-90))
         
         if self.normalize:
@@ -434,7 +434,7 @@ if __name__ == '__main__':
 
     # Plot BS TX radiation patterns
     par = param.get_antenna_parameters("BS","TX")
-    bs_array = AntennaBeamformingImt(par,45,-30)
+    bs_array = AntennaBeamformingImt(par,0,0)
     f = plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
     f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
     f = plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
