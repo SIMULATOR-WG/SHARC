@@ -686,33 +686,33 @@ class SimulationUplinkTest(unittest.TestCase):
 
         # Test beams pointing
         npt.assert_allclose(self.simulation.bs.antenna[0].beams_list[0],
-                            np.array([[0.0],[-4.857]]),atol=eps)
+                           (0.0,-4.857),atol=eps)
         npt.assert_allclose(self.simulation.bs.antenna[0].beams_list[1],
-                            np.array([[30.0],[-4.857]]),atol=eps)
+                            (29.92,-3.53),atol=eps)
         npt.assert_allclose(self.simulation.bs.antenna[1].beams_list[0],
-                            np.array([[0.0],[-4.857]]),atol=eps)
+                            (0.0,-4.857),atol=eps)
         npt.assert_allclose(self.simulation.bs.antenna[1].beams_list[1],
-                            np.array([[-60.0],[-4.857]]),atol=eps)
+                            (-59.60,0.10),atol=eps)
         npt.assert_allclose(self.simulation.ue.antenna[0].beams_list[0],
-                            np.array([[0.0],[-35.143]]),atol=eps)
+                            (0.0,-35.143),atol=eps)
         npt.assert_allclose(self.simulation.ue.antenna[1].beams_list[0],
-                            np.array([[-60.0],[-20.143]]),atol=eps)
+                            (-62.04,-12.44),atol=eps)
         npt.assert_allclose(self.simulation.ue.antenna[2].beams_list[0],
-                            np.array([[-90.0],[9.857]]),atol=eps)
+                            (-88.66,-4.96),atol=eps)
         npt.assert_allclose(self.simulation.ue.antenna[3].beams_list[0],
-                            np.array([[30.0],[24.857]]),atol=eps)
+                            (32.16,20.71),atol=eps)
 
         # BS Gain matrix
-        ref_gain = np.array([[ 10.954, 8.397, 10.788, 9.469],
-                             [ 10.788, 3.497, 10.954, 0.729]])
+        ref_gain = np.array([[ 10.954,   8.441,  10.788,   9.460],
+                             [ 10.788,   3.365,  10.954,   0.931]])
         gain = self.simulation.calculate_gains(self.simulation.bs,self.simulation.ue)
         npt.assert_allclose(gain,ref_gain,atol=eps)
 
         # UE Gain matrix
-        ref_gain = np.array([[  4.503, -22.016],
-                             [ -3.367, -11.416],
-                             [-15.533, -15.272],
-                             [-10.793,   3.699]])
+        ref_gain = np.array([[  4.503, -44.198],
+                             [ -3.362, -11.206],
+                             [-14.812, -14.389],
+                             [ -9.726,   3.853]])
         gain = self.simulation.calculate_gains(self.simulation.ue,self.simulation.bs)
         npt.assert_allclose(gain,ref_gain,atol=eps)
 

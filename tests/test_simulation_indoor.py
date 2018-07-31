@@ -201,10 +201,10 @@ class SimulationIndoorTest(unittest.TestCase):
                         (np.array([ 86.57]),np.array([ 90.00])),
                         (np.array([-86.57]),np.array([ 90.00])),
                         (np.array([ 86.57]),np.array([ 59.08]))]
-        expected_beam = [(np.array([-86.57]),np.array([30.92])),
-                         (np.array([ 86.57]),np.array([ 0.00])),
-                         (np.array([-86.57]),np.array([ 0.00])),
-                         (np.array([ 86.57]),np.array([-30.92]))]
+        expected_beam = [(-86.57,30.92),
+                         ( 86.57, 0.00),
+                         (-86.57, 0.00),
+                         ( 86.57,-30.92)]
         for k in range(self.simulation.bs.num_stations):
             
             self.assertEqual(self.simulation.bs.antenna[k].azimuth,0.0)
