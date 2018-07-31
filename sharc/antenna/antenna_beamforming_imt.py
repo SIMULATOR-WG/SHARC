@@ -264,19 +264,6 @@ class AntennaBeamformingImt(Antenna):
         return gain
 
     def to_local_coord(self,phi: float, theta: float) -> tuple:
-
-#        # Old implementation: kept for testing purpuses
-#        lo_theta = np.ravel(np.array([theta + self.elevation]))
-#        lo_phi = np.ravel(np.array([phi - self.azimuth]))
-#
-#        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
-#        lo_theta[ofb_theta] = np.mod((360 - lo_theta[ofb_theta]),180)
-#        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
-#
-#        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
-#        lo_phi[ofb_phi] = np.mod(lo_phi[ofb_phi],360)
-#        ofb_phi = np.where(lo_phi > 180)
-#        lo_phi[ofb_phi] = lo_phi[ofb_phi] - 360
         
         phi_rad = np.ravel(np.array([np.deg2rad(phi)]))
         theta_rad = np.ravel(np.array([np.deg2rad(theta)]))
@@ -296,18 +283,14 @@ class AntennaBeamformingImt(Antenna):
         
         alpha = np.deg2rad(self.azimuth)
         beta = np.deg2rad(self.elevation)
-        gamma = 0.0
-        
-        Rx = np.matrix([[1.0,           0.0,           0.0],
-                        [0.0, np.cos(gamma),-np.sin(gamma)],
-                        [0.0, np.sin(gamma), np.cos(gamma)]])
+
         Ry = np.matrix([[ np.cos(beta), 0.0, np.sin(beta)],
                         [          0.0, 1.0,       0.0],
                         [-np.sin(beta), 0.0, np.cos(beta)]])
         Rz = np.matrix([[np.cos(alpha),-np.sin(alpha), 0.0],
                         [np.sin(alpha), np.cos(alpha), 0.0],
                         [          0.0,           0.0, 1.0]])
-        self.rotation_mtx = Rx*Ry*np.transpose(Rz)
+        self.rotation_mtx = Ry*np.transpose(Rz)
 
 ###############################################################################
 class PlotAntennaPattern(object):
