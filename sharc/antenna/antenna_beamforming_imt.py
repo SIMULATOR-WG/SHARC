@@ -307,7 +307,7 @@ class AntennaBeamformingImt(Antenna):
         Rz = np.matrix([[np.cos(alpha),-np.sin(alpha), 0.0],
                         [np.sin(alpha), np.cos(alpha), 0.0],
                         [          0.0,           0.0, 1.0]])
-        self.rotation_mtx = np.transpose(Rz)*Ry*Rx
+        self.rotation_mtx = Rx*Ry*np.transpose(Rz)
 
 ###############################################################################
 class PlotAntennaPattern(object):
