@@ -52,7 +52,7 @@ class PropagationHDFSS(Propagation):
         else:
             d = kwargs["distance_2D"]
 
-        f = kwargs["frequency"]/1e3
+        f = kwargs["frequency"]
         shad = kwargs.pop("shadow",True)
         number_of_sectors = kwargs.pop("number_of_sectors",1)
         
