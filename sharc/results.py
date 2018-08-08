@@ -57,18 +57,21 @@ class Results(object):
             today = datetime.date.today()
 
             results_number = 1
-            results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}".format(results_number)
-            while os.path.exists(results_dir_head):
-                results_number += 1
-                results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}".format(results_number)
-
-            os.makedirs(results_dir_head)
-
-            self.output_directory = results_dir_head
+            results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}"
+            self.create_dir(results_number,results_dir_head)
             copy(parameters_filename, self.output_directory)
         else:
             self.output_directory = 'output'
 
+    def create_dir(self,results_number,dir_head):
+        
+        dir_head_complete = dir_head.format(results_number)
+        
+        try:
+            os.makedirs(dir_head_complete)
+            self.output_directory = dir_head_complete
+        except FileExistsError as e:
+            self.create_dir(results_number + 1, dir_head)
 
 
     def generate_plot_list(self, n_bins):
