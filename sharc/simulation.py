@@ -223,7 +223,8 @@ class Simulation(ABC, Observable):
                                              frequency=freq*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, es_params=self.param_system,
-                                             tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node)
+                                             tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node,
+                                             imt_sta_type=station_b.station_type)
 
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b

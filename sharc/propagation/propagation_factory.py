@@ -47,7 +47,7 @@ class PropagationFactory(object):
         elif channel_model == "TVRO":
             return PropagationTvro(random_number_gen)
         elif channel_model == "HDFSS":
-            return PropagationHDFSS(random_number_gen)
+            return PropagationHDFSS(param.fss_es,random_number_gen)
         elif channel_model == "INDOOR":
             return PropagationIndoor(random_number_gen, param.indoor)
         else:

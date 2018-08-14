@@ -6,6 +6,7 @@ Created on Mon Jul 30 17:28:47 2018
 """
 
 import numpy as np
+import sys
 
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.propagation.propagation import Propagation
@@ -60,7 +61,7 @@ class PropagationHDFSS(Propagation):
         else:
             d = kwargs["distance_2D"]
             
-        elevation = kwargs["elevation"]
+        elevation = np.transpose(kwargs["elevation"])
         imt_sta_type = kwargs["imt_sta_type"]
         f = kwargs["frequency"]
         shad = kwargs.pop("shadow",True)
@@ -132,7 +133,8 @@ class PropagationHDFSS(Propagation):
         loss = (dist-self.los_dist)*(nlos_loss - los_loss)/(self.los_to_nlos_dist - self.los_dist) + los_loss
         
         if shad:
-            interp_sigma = (dist-self.los_dist)*(self.propagation_p1411.nlos_sigma - self.propagation_p1411.los_sigma)/(self.los_to_nlos_dist - self.los_dist)
+            interp_sigma = (dist-self.los_dist)*(self.propagation_p1411.nlos_sigma - self.propagation_p1411.los_sigma)/(self.los_to_nlos_dist - self.los_dist) +\
+                           self.propagation_p1411.los_sigma
             loss = loss + self.random_number_gen.normal(0.0,interp_sigma)
             
         return loss
@@ -141,12 +143,16 @@ class PropagationHDFSS(Propagation):
         if imt_sta_type is StationType.IMT_UE:
             build_loss = self.building_entry.get_loss(f, elevation)
         elif imt_sta_type is StationType.IMT_BS:
-            if self.param.bs_building_entry_loss_type == 'P.2109_RANDOM':
+            if self.param.bs_building_entry_loss_type == 'P2109_RANDOM':
                 build_loss = self.building_entry.get_loss(f, elevation)
-            elif self.param.bs_building_entry_loss_type == 'P.2109_FIXED':
+            elif self.param.bs_building_entry_loss_type == 'P2109_FIXED':
                 build_loss = self.building_entry.get_loss(f, elevation, prob=self.param.bs_building_entry_loss_prob)
             elif self.param.bs_building_entry_loss_type == 'FIXED_VALUE':
                 build_loss = self.param.bs_building_entry_loss_value
+            else:
+                sys.stderr.write("ERROR\nBuilding entry loss type: " + 
+                                 self.param.bs_building_entry_loss_type)
+                sys.exit(1)
                 
         return build_loss
     
@@ -167,11 +173,35 @@ if __name__ == '__main__':
     ele = np.zeros_like(d)
     sta_type = StationType.IMT_BS
         
-    loss = prop.get_loss(distance_3D=d,
+    # Without shadow
+    loss_interp = prop.get_loss(distance_3D=d,
                          frequency=f,
                          elevation=ele,
                          imt_sta_type=sta_type,
                          shadow=False)
+    prop.fspl_dist = prop.fspl_to_los_dist
+    prop.los_dist = prop.los_to_nlos_dist
+    loss_no_interp = prop.get_loss(distance_3D=d,
+                                   frequency=f,
+                                   elevation=ele,
+                                   imt_sta_type=sta_type,
+                                   shadow=False)
+    
+    plt.plot(d,loss_interp,'k-',label='Interpolated')
+    plt.plot(d,loss_no_interp,'k--',label='Not Interpolated')
+    plt.legend()
+    plt.xlabel("Distance [m]")
+    plt.ylabel("Path Loss [dB]")
+    plt.grid()
+    plt.show()
+    
+    # With shadow
+    prop = PropagationHDFSS(par,rnd)
+    loss = prop.get_loss(distance_3D=d,
+                         frequency=f,
+                         elevation=ele,
+                         imt_sta_type=sta_type,
+                         shadow=True)
     
     plt.plot(d,loss)
     plt.xlabel("Distance [m]")
