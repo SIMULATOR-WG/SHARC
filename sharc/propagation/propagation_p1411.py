@@ -15,6 +15,19 @@ class PropagationP1411(Propagation):
     
     Frequency in MHz and distance in meters!
     """
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
+        
+        self.los_alpha = 2.29 
+        self.los_beta = 28.6 
+        self.los_gamma = 1.96 
+        self.los_sigma = 3.48
+        
+        self.nlos_alpha = 4.39
+        self.nlos_beta = -6.27
+        self.nlos_gamma = 2.30
+        self.nlos_sigma = 6.89
+    
     def get_loss(self, *args, **kwargs) -> np.array:
         if "distance_3D" in kwargs:
             d = kwargs["distance_3D"]
@@ -27,15 +40,15 @@ class PropagationP1411(Propagation):
         number_of_sectors = kwargs.pop("number_of_sectors",1)
         
         if los:
-            alpha = 2.29 
-            beta = 28.6 
-            gamma = 1.96 
-            sigma = 3.48
+            alpha = self.los_alpha 
+            beta = self.los_beta 
+            gamma = self.los_gamma 
+            sigma = self.los_sigma
         else:
-            alpha = 4.39
-            beta = -6.27
-            gamma = 2.30
-            sigma = 6.89
+            alpha = self.nlos_alpha
+            beta = self.nlos_beta
+            gamma = self.nlos_gamma
+            sigma = self.nlos_sigma
             
         if shadow:
             shadow_loss = self.random_number_gen.normal(0.0,sigma,d.shape)
