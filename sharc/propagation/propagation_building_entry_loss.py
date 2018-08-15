@@ -149,7 +149,7 @@ if __name__ == '__main__':
     
     # parameters
     freq_MHz = 40e3
-    probability = np.linspace(0,1)
+    probability = np.linspace(0,1,num=1000)
     elevations = np.array([0, 45, 90])
     loss = np.zeros((len(elevations),len(probability)))
     
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     plt.xlabel("Building Entry Loss [dB]")
     plt.ylabel("Probability that loss is exceeded")
     plt.ylim((0,1))
-    plt.xlim((0,65))
+#    plt.xlim((0,65))
     plt.grid()
     plt.legend()
     plt.show()
