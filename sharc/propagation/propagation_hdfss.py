@@ -64,8 +64,10 @@ class PropagationHDFSS(Propagation):
         elevation = np.transpose(kwargs["elevation"])
         imt_sta_type = kwargs["imt_sta_type"]
         f = kwargs["frequency"]
-        shad = kwargs.pop("shadow",True)
         number_of_sectors = kwargs.pop("number_of_sectors",1)
+        
+        es_params = kwargs["es_params"]
+        shad = es_params.shadow_enabled
         
         fspl_idx = np.where(d <= self.fspl_dist)
         fspl_to_los_idx = np.where(np.logical_and(d > self.fspl_dist,d <= self.fspl_to_los_dist))
@@ -168,7 +170,7 @@ if __name__ == '__main__':
     par.bs_building_entry_loss_value = 50
     prop = PropagationHDFSS(par,rnd)
     
-    d = np.linspace(5,1000,num=2000)
+    d = np.linspace(5,6000,num=2000)
     f = 40e3*np.ones_like(d)
     ele = np.zeros_like(d)
     sta_type = StationType.IMT_BS
