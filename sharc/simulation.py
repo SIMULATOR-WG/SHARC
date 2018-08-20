@@ -228,6 +228,7 @@ class Simulation(ABC, Observable):
 
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b
+            self.imt_system_path_loss = path_loss
         else:
             path_loss = propagation.get_loss(distance_3D=d_3D,
                                              distance_2D=d_2D,

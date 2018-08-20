@@ -267,9 +267,11 @@ class SimulationUplink(Simulation):
                 active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
+                self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,active_beams])
             else:
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
+                self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,ue])
 
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
             imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue])/(self.num_rb_per_ue*self.parameters.imt.rb_bandwidth*1e6))
