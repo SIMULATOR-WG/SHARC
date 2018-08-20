@@ -31,7 +31,7 @@ class PropagationIndoor(Propagation):
     # interference is much higher than inter-building interference
     HIGH_PATH_LOSS = 400
 
-    def __init__(self, random_number_gen: np.random.RandomState, param: ParametersIndoor):
+    def __init__(self, random_number_gen: np.random.RandomState, param: ParametersIndoor,ue_per_cell):
         super().__init__(random_number_gen)
 
         if param.basic_path_loss == "FSPL":
@@ -44,6 +44,8 @@ class PropagationIndoor(Propagation):
 
         self.bel = PropagationBuildingEntryLoss(random_number_gen)
         self.building_class = param.building_class
+        self.bs_per_building = param.num_cells
+        self.ue_per_building = ue_per_cell*param.num_cells
 
     def get_loss(self, *args, **kwargs) -> np.array:
         """
@@ -72,14 +74,12 @@ class PropagationIndoor(Propagation):
         shadowing = kwargs["shadowing"]
 
         loss = PropagationIndoor.HIGH_PATH_LOSS*np.ones(frequency.shape)
-        bs_per_building = 3
-        ue_per_building = 3*bs_per_building
-        iter = int(frequency.shape[0]/bs_per_building)
+        iter = int(frequency.shape[0]/self.bs_per_building)
         for i in range(iter):
-            bi = int(bs_per_building*i)
-            bf = int(bs_per_building*(i+1))
-            ui = int(ue_per_building*i)
-            uf = int(ue_per_building*(i+1))
+            bi = int(self.bs_per_building*i)
+            bf = int(self.bs_per_building*(i+1))
+            ui = int(self.ue_per_building*i)
+            uf = int(self.ue_per_building*(i+1))
 
             # calculate basic path loss
             loss[bi:bf,ui:uf] = self.bpl.get_loss(distance_3D = distance_3D[bi:bf,ui:uf],
@@ -104,6 +104,7 @@ if __name__ == '__main__':
     params.n_colums = 1
 #    params.street_width = 30
     params.ue_indoor_percent = .95
+    params.num_cells = 3
     params.building_class = "TRADITIONAL"
 
     bs_per_building = 3
@@ -120,7 +121,7 @@ if __name__ == '__main__':
     height_diff = np.tile(h_bs, (num_bs, 3)) - np.tile(h_ue, (num_bs, 1))
     elevation = np.degrees(np.arctan(height_diff/distance_2D))
 
-    propagation_indoor = PropagationIndoor(np.random.RandomState(),params)
+    propagation_indoor = PropagationIndoor(np.random.RandomState(),params,ue_per_bs)
     loss_indoor = propagation_indoor.get_loss(distance_3D = distance_3D,
                                               distance_2D = distance_2D,
                                               elevation = elevation,

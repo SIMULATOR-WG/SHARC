@@ -49,7 +49,8 @@ class PropagationFactory(object):
         elif channel_model == "HDFSS":
             return PropagationHDFSS(param.fss_es,random_number_gen)
         elif channel_model == "INDOOR":
-            return PropagationIndoor(random_number_gen, param.indoor)
+            return PropagationIndoor(random_number_gen, param.indoor, 
+                                     param.imt.ue_k*param.imt.ue_k_m)
         else:
             sys.stderr.write("ERROR\nInvalid channel_model: " + channel_model)
             sys.exit(1)
