@@ -83,7 +83,7 @@ class PropagationHDFSS(Propagation):
             same_build = self.is_same_building(imt_x,imt_y,
                                                es_x, es_y)
         else:
-            same_build = np.zeros_like(d, dtype=bool)  
+            same_build = np.zeros_like(d, dtype=bool)
         not_same_build = np.logical_not(same_build)
         
         fspl_bool = np.logical_and(d <= self.fspl_dist,not_same_build)
@@ -100,6 +100,7 @@ class PropagationHDFSS(Propagation):
         
         nlos_bool = np.logical_and(d > self.los_to_nlos_dist,not_same_build)
         
+        same_build_idx = np.where(same_build)
         fspl_idx = np.where(fspl_bool)
         fspl_to_los_idx = np.where(fspl_to_los_bool)
         los_idx = np.where(los_bool)
@@ -107,6 +108,8 @@ class PropagationHDFSS(Propagation):
         nlos_idx = np.where(nlos_bool)
         
         loss = np.zeros_like(d)
+        
+        loss[same_build_idx] = self.HIGH_LOSS
         
         loss[fspl_idx] = self.propagation_fspl.get_loss(distance_3D=d[fspl_idx],
                                                         frequency=f[fspl_idx])
@@ -191,8 +194,8 @@ class PropagationHDFSS(Propagation):
     
     def is_same_building(self,imt_x,imt_y, es_x, es_y):
         
-        building_x_range = (1 + self.b_tol)*np.array([es_x - self.w/2, es_x + self.w/2])
-        building_y_range = (1 + self.b_tol)*np.array([es_y - self.d/2, es_y + self.d/2])
+        building_x_range = (1 + self.b_tol)*np.array([es_x - self.b_w/2, es_x + self.b_w/2])
+        building_y_range = (1 + self.b_tol)*np.array([es_y - self.b_d/2, es_y + self.b_d/2])
         
         is_in_x = np.logical_and(imt_x >= building_x_range[0],imt_x <= building_x_range[1])
         is_in_y = np.logical_and(imt_y >= building_y_range[0],imt_y <= building_y_range[1])

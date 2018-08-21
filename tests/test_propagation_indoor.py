@@ -26,6 +26,7 @@ class PropagationIndoorTest(unittest.TestCase):
     #    params.street_width = 30
         params.ue_indoor_percent = .95
         params.building_class = "TRADITIONAL"
+        params.num_cells = 3
 
         bs_per_building = 3
         ue_per_bs = 3
@@ -41,7 +42,7 @@ class PropagationIndoorTest(unittest.TestCase):
         height_diff = np.tile(h_bs, (num_bs, 3)) - np.tile(h_ue, (num_bs, 1))
         elevation = np.degrees(np.arctan(height_diff/distance_2D))
 
-        propagation_indoor = PropagationIndoor(np.random.RandomState(), params)
+        propagation_indoor = PropagationIndoor(np.random.RandomState(), params, ue_per_bs)
 
 if __name__ == '__main__':
     unittest.main()

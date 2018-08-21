@@ -19,6 +19,8 @@ class PropagationHDFSSTest(unittest.TestCase):
         rnd = np.random.RandomState(101)
         par = ParametersFssEs()
         par.building_loss_enabled = False
+        par.shadow_enabled = False
+        par.same_building_enabled = True
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.5
         par.bs_building_entry_loss_value = 50
@@ -27,7 +29,9 @@ class PropagationHDFSSTest(unittest.TestCase):
         # Propagation with fixed BEL
         rnd = np.random.RandomState(101)
         par = ParametersFssEs()
-        par.building_loss_enabled = True
+        par.building_loss_enabled = False
+        par.shadow_enabled = False
+        par.same_building_enabled = True
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
@@ -36,7 +40,9 @@ class PropagationHDFSSTest(unittest.TestCase):
         # Propagation with fixed probability
         rnd = np.random.RandomState(101)
         par = ParametersFssEs()
-        par.building_loss_enabled = True
+        par.building_loss_enabled = False
+        par.shadow_enabled = False
+        par.same_building_enabled = True
         par.bs_building_entry_loss_type = 'P2109_FIXED'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
@@ -45,11 +51,24 @@ class PropagationHDFSSTest(unittest.TestCase):
         # Propagation with random probability
         rnd = np.random.RandomState(101)
         par = ParametersFssEs()
-        par.building_loss_enabled = True
+        par.building_loss_enabled = False
+        par.shadow_enabled = False
+        par.same_building_enabled = True
         par.bs_building_entry_loss_type = 'P2109_RANDOM'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
         self.propagation_random_prob = PropagationHDFSS(par,rnd)
+        
+        # Same building disabled
+        rnd = np.random.RandomState(101)
+        par = ParametersFssEs()
+        par.building_loss_enabled = False
+        par.shadow_enabled = False
+        par.same_building_enabled = False
+        par.bs_building_entry_loss_type = 'FIXED_VALUE'
+        par.bs_building_entry_loss_prob = 0.5
+        par.bs_building_entry_loss_value = 50
+        self.propagation_same_build_disabled = PropagationHDFSS(par,rnd)
         
     def test_get_loss(self):
         d = np.array([10.0, 20.0, 30.0, 60.0, 90.0, 300.0, 1000.0])
@@ -59,8 +78,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         loss = self.propagation.get_loss(distance_3D=d,
                                          frequency=f,
                                          elevation=ele,
-                                         imt_sta_type=StationType.IMT_BS,
-                                         shadow=False)
+                                         imt_sta_type=StationType.IMT_BS)
         
         expected_loss = np.array([84.48, 90.50, 94.02, 100.72, 104.75, 139.33, 162.28])
         
@@ -110,6 +128,40 @@ class PropagationHDFSSTest(unittest.TestCase):
                                                                     ele)
         npt.assert_allclose(build_loss,expected_build_loss,atol=1e-1)
         
+    def test_same_building(self):
+        # Test is_same_building()
+        es_x = np.array([0.0])
+        es_y = np.array([0.0])
+        es_z = np.array([19.0])
+        imt_x = np.array([0.0, 0.0,80.0,-70.0,12.0])
+        imt_y = np.array([0.0,30.0, 0.0,-29.3,-3.6])
+        imt_z = 3*np.ones_like(imt_x)
+        
+        expected_in_build = np.array([True,False,False,False,True])
+        in_build = self.propagation_same_build_disabled.is_same_building(imt_x,
+                                                                        imt_y,
+                                                                        es_x,
+                                                                        es_y)
+        npt.assert_array_equal(in_build,expected_in_build)
+        
+        # Test loss
+        d = np.sqrt(np.power(imt_x,2) + np.power(imt_y,2))
+        f = 40000*np.ones_like(d)
+        ele = np.zeros_like(d)
+        
+        loss = self.propagation_same_build_disabled.get_loss(distance_3D=d,
+                                                             frequency=f,
+                                                             elevation=ele,
+                                                             imt_sta_type=StationType.IMT_BS,
+                                                             imt_x=imt_x,
+                                                             imt_y=imt_y,
+                                                             imt_z=imt_z,
+                                                             es_x=es_x,
+                                                             es_y=es_y,
+                                                             es_z=es_z)
+        expected_loss = np.array([400.0,94.0,103.6,103.1,400.0])
+        
+        npt.assert_allclose(loss,expected_loss,atol=1e-1)
     
 if __name__ == '__main__':
     unittest.main()
