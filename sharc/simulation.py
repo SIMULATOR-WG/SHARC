@@ -224,7 +224,13 @@ class Simulation(ABC, Observable):
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, es_params=self.param_system,
                                              tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node,
-                                             imt_sta_type=station_b.station_type)
+                                             imt_sta_type=station_b.station_type,
+                                             imt_x=station_b.x,
+                                             imt_y=station_b.y,
+                                             imt_z=station_b.height,
+                                             es_x=station_a.x,
+                                             es_y=station_a.y,
+                                             es_z=station_a.height)
 
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b
