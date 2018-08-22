@@ -100,31 +100,31 @@ class PropagationHDFSS(Propagation):
         
         nlos_bool = np.logical_and(d > self.los_to_nlos_dist,not_same_build)
         
-        same_build_idx = np.where(same_build)
-        fspl_idx = np.where(fspl_bool)
-        fspl_to_los_idx = np.where(fspl_to_los_bool)
-        los_idx = np.where(los_bool)
-        los_to_nlos_idx = np.where(los_to_nlos_bool)
-        nlos_idx = np.where(nlos_bool)
+        same_build_idx = np.where(same_build)[0]
+        fspl_idx = np.where(fspl_bool)[1]
+        fspl_to_los_idx = np.where(fspl_to_los_bool)[1]
+        los_idx = np.where(los_bool)[1]
+        los_to_nlos_idx = np.where(los_to_nlos_bool)[1]
+        nlos_idx = np.where(nlos_bool)[1]
         
         loss = np.zeros_like(d)
         
-        loss[same_build_idx] = self.HIGH_LOSS
+        loss[0,same_build_idx] = self.HIGH_LOSS
         
-        loss[fspl_idx] = self.propagation_fspl.get_loss(distance_3D=d[fspl_idx],
-                                                        frequency=f[fspl_idx])
-        loss[fspl_to_los_idx] = self.interpolate_fspl_to_los(d[fspl_to_los_idx],
-                                                             f[fspl_to_los_idx],
+        loss[0,fspl_idx] = self.propagation_fspl.get_loss(distance_3D=d[:,fspl_idx],
+                                                        frequency=f[:,fspl_idx])
+        loss[0,fspl_to_los_idx] = self.interpolate_fspl_to_los(d[:,fspl_to_los_idx],
+                                                             f[:,fspl_to_los_idx],
                                                              self.param.shadow_enabled)
-        loss[los_idx] = self.propagation_p1411.get_loss(distance_3D=d[los_idx],
-                                                        frequency=f[los_idx],
+        loss[0,los_idx] = self.propagation_p1411.get_loss(distance_3D=d[:,los_idx],
+                                                        frequency=f[:,los_idx],
                                                         los=True,
                                                         shadow=self.param.shadow_enabled)
-        loss[los_to_nlos_idx] = self.interpolate_los_to_nlos(d[los_to_nlos_idx],
-                                                             f[los_to_nlos_idx],
+        loss[0,los_to_nlos_idx] = self.interpolate_los_to_nlos(d[:,los_to_nlos_idx],
+                                                             f[:,los_to_nlos_idx],
                                                              self.param.shadow_enabled)
-        loss[nlos_idx] = self.propagation_p1411.get_loss(distance_3D=d[nlos_idx],
-                                                         frequency=f[nlos_idx],
+        loss[0,nlos_idx] = self.propagation_p1411.get_loss(distance_3D=d[:,nlos_idx],
+                                                         frequency=f[:,nlos_idx],
                                                          los=False,
                                                          shadow=self.param.shadow_enabled)
     
@@ -219,8 +219,9 @@ if __name__ == '__main__':
     prop = PropagationHDFSS(par,rnd)
     
     d = np.linspace(5,1000,num=2000)
+    d = np.array([list(d)])
     f = 40e3*np.ones_like(d)
-    ele = np.zeros_like(d)
+    ele = np.transpose(np.zeros_like(d))
     sta_type = StationType.IMT_BS
         
     # Without shadow
@@ -235,8 +236,11 @@ if __name__ == '__main__':
                                    elevation=ele,
                                    imt_sta_type=sta_type)
     
-    plt.plot(d,loss_interp,'k-',label='Interpolated')
-    plt.plot(d,loss_no_interp,'k--',label='Not Interpolated')
+    ravel_d = np.ravel(d)
+    ravel_loss_interp = np.ravel(loss_interp)
+    ravel_loss_no_interp = np.ravel(loss_no_interp)
+    plt.plot(ravel_d,ravel_loss_interp,'k-',label='Interpolated')
+    plt.plot(ravel_d,ravel_loss_no_interp,'k--',label='Not Interpolated')
     plt.legend()
     plt.xlabel("Distance [m]")
     plt.ylabel("Path Loss [dB]")
@@ -251,7 +255,8 @@ if __name__ == '__main__':
                          elevation=ele,
                          imt_sta_type=sta_type)
     
-    plt.plot(d,loss)
+    ravel_loss = np.ravel(loss)
+    plt.plot(ravel_d,ravel_loss)
     plt.xlabel("Distance [m]")
     plt.ylabel("Path Loss [dB]")
     plt.grid()

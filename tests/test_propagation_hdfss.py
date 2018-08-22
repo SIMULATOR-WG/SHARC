@@ -71,22 +71,22 @@ class PropagationHDFSSTest(unittest.TestCase):
         self.propagation_same_build_disabled = PropagationHDFSS(par,rnd)
         
     def test_get_loss(self):
-        d = np.array([10.0, 20.0, 30.0, 60.0, 90.0, 300.0, 1000.0])
+        d = np.array([[10.0, 20.0, 30.0, 60.0, 90.0, 300.0, 1000.0]])
         f = 40000*np.ones_like(d)
-        ele = np.zeros_like(d)
+        ele = np.transpose(np.zeros_like(d))
         
         loss = self.propagation.get_loss(distance_3D=d,
                                          frequency=f,
                                          elevation=ele,
                                          imt_sta_type=StationType.IMT_BS)
         
-        expected_loss = np.array([84.48, 90.50, 94.02, 100.72, 104.75, 139.33, 162.28])
+        expected_loss = np.array([[84.48, 90.50, 94.02, 100.72, 104.75, 139.33, 162.28]])
         
         npt.assert_allclose(loss,expected_loss,atol=1e-1)
     
     def test_get_build_loss(self):
         # Initialize variables
-        ele = np.array([ 0.0, 45.0, 90.0])
+        ele = np.array([[ 0.0, 45.0, 90.0]])
         f = 40000*np.ones_like(ele)
         sta_type = StationType.IMT_BS
         
@@ -98,14 +98,14 @@ class PropagationHDFSSTest(unittest.TestCase):
         self.assertEqual(build_loss,expected_build_loss)
         
         # Test 2: fixed probability
-        expected_build_loss = np.array([24.4, 33.9, 43.4])
+        expected_build_loss = np.array([[24.4, 33.9, 43.4]])
         build_loss = self.propagation_fixed_prob.get_building_loss(sta_type,
                                                                    f,
                                                                    ele)
         npt.assert_allclose(build_loss,expected_build_loss,atol=1e-1)
         
         # Test 3: random probability
-        expected_build_loss = np.array([21.7, 32.9, 15.9])
+        expected_build_loss = np.array([[21.7, 32.9, 15.9]])
         build_loss = self.propagation_random_prob.get_building_loss(sta_type,
                                                                     f,
                                                                     ele)
@@ -113,7 +113,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         
         # Test 4: UE station
         sta_type = StationType.IMT_UE
-        expected_build_loss = np.array([21.7, 32.9, 15.9])
+        expected_build_loss = np.array([[21.7, 32.9, 15.9]])
         build_loss = self.propagation_fixed_value.get_building_loss(sta_type,
                                                                     f,
                                                                     ele)
@@ -122,7 +122,7 @@ class PropagationHDFSSTest(unittest.TestCase):
                                                                     f,
                                                                     ele)
         npt.assert_allclose(build_loss,expected_build_loss,atol=1e-1)
-        expected_build_loss = np.array([10.1, 36.8, 52.6])
+        expected_build_loss = np.array([[10.1, 36.8, 52.6]])
         build_loss = self.propagation_random_prob.get_building_loss(sta_type,
                                                                     f,
                                                                     ele)
@@ -146,8 +146,9 @@ class PropagationHDFSSTest(unittest.TestCase):
         
         # Test loss
         d = np.sqrt(np.power(imt_x,2) + np.power(imt_y,2))
+        d = np.array([list(d)])
         f = 40000*np.ones_like(d)
-        ele = np.zeros_like(d)
+        ele = np.transpose(np.zeros_like(d))
         
         loss = self.propagation_same_build_disabled.get_loss(distance_3D=d,
                                                              frequency=f,
@@ -159,7 +160,7 @@ class PropagationHDFSSTest(unittest.TestCase):
                                                              es_x=es_x,
                                                              es_y=es_y,
                                                              es_z=es_z)
-        expected_loss = np.array([400.0,94.0,103.6,103.1,400.0])
+        expected_loss = np.array([[400.0,94.0,103.6,103.1,400.0]])
         
         npt.assert_allclose(loss,expected_loss,atol=1e-1)
     
