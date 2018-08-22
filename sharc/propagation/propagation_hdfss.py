@@ -7,6 +7,7 @@ Created on Mon Jul 30 17:28:47 2018
 
 import numpy as np
 import sys
+from shapely.geometry import LineString, Polygon, Point
 
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.propagation.propagation import Propagation
@@ -44,6 +45,8 @@ class PropagationHDFSS(Propagation):
         self.propagation_fspl = PropagationFreeSpace(random_number_gen)
         self.propagation_p1411 = PropagationP1411(random_number_gen)
         self.building_entry = PropagationBuildingEntryLoss(self.random_number_gen)
+        
+        self.SPEED_OF_LIGHT = 299792458.0
         
     def get_loss(self, *args, **kwargs) -> np.array:
         """
@@ -132,8 +135,15 @@ class PropagationHDFSS(Propagation):
             build_loss = self.get_building_loss(imt_sta_type,f,elevation)
         else:
             build_loss = 0.0
+            
+        if self.param.diffraction_enabled:
+            diff_loss = self.get_diffraction_loss(imt_x,imt_y, imt_z, 
+                                                   es_x, es_y, es_z, 
+                                                   f)
+        else:
+            diff_loss = 0.0
                 
-        loss = loss + build_loss
+        loss = loss + build_loss + diff_loss
         
         if number_of_sectors > 1:
             loss = np.repeat(loss, number_of_sectors, 1)
@@ -204,6 +214,55 @@ class PropagationHDFSS(Propagation):
         
         return is_in_building
     
+    def get_diff_distances(self,imt_x,imt_y, imt_z, es_x, es_y, es_z, dist_2D=False):
+        
+        build_poly = Polygon([[es_x + self.b_w/2, es_y + self.b_d/2],
+                              [es_x - self.b_w/2, es_y + self.b_d/2],
+                              [es_x - self.b_w/2, es_y - self.b_d/2],
+                              [es_x + self.b_w/2, es_y - self.b_d/2]])
+        es_point = Point([es_x,es_y])
+        
+        d1_2D = np.zeros_like(imt_x)
+        d2_2D = np.zeros_like(imt_x)
+        dist = np.zeros_like(imt_x)
+        for k,(x,y) in enumerate(zip(imt_x,imt_y)):
+            line = LineString([[es_x,es_y],[x,y]])
+            intersection_line = line.intersection(build_poly)
+            d1_2D[k] = intersection_line.length
+            
+            imt_point = Point([x,y])
+            dist[k] = es_point.distance(imt_point)
+            d2_2D[k] = dist[k] - d1_2D[k]
+            
+        if dist_2D:
+            return d1_2D, d2_2D
+        
+        build_height = es_z - 1
+        z_in_build = imt_z + (es_z - imt_z)*d2_2D/dist
+        h = build_height - z_in_build
+        
+        d1 = np.sqrt(1**2 + np.power(d1_2D,2))
+        d2 = np.sqrt(np.power((build_height - imt_z),2) + np.power(d2_2D,2))
+        
+        return h, d1, d2
+    
+    def get_diffraction_loss(self,imt_x,imt_y, imt_z, es_x, es_y, es_z, f):
+        
+        h, d1, d2 = self.get_diff_distances(imt_x,imt_y, imt_z, es_x, es_y, es_z)
+        
+        wavelength =  self.SPEED_OF_LIGHT/(f*1e6)
+        
+        v = h*np.sqrt((2/wavelength)*(1/d1 + 1/d2))
+        
+        loss = np.zeros_like(v)
+        
+        v_idx = np.where(v > -0.7)[0]
+        
+        loss[v_idx] = 6.9 + 20*np.log10(np.sqrt(np.power((v[v_idx] - 0.1), 2) + 1)\
+                                        + v[v_idx] - 0.1)
+        
+        return loss
+    
 if __name__ == '__main__':
     
     import matplotlib.pyplot as plt
@@ -261,3 +320,5 @@ if __name__ == '__main__':
     plt.ylabel("Path Loss [dB]")
     plt.grid()
     plt.show()
+    
+    

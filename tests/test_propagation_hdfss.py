@@ -163,6 +163,38 @@ class PropagationHDFSSTest(unittest.TestCase):
         expected_loss = np.array([[400.0,94.0,103.6,103.1,400.0]])
         
         npt.assert_allclose(loss,expected_loss,atol=1e-1)
+        
+    def test_get_diff_distances(self):
+        es_x = np.array([10.0])
+        es_y = np.array([15.0])
+        es_z = np.array([19.0])
+        imt_x = np.array([ 80.0, 50.0, 10.0,-80.0,  0.0])
+        imt_y = np.array([ 15.0, 55.0, 95.0, 15.0,-40.0])
+        imt_z = np.array([  1.5,  3.0,  6.0,  7.5, 20.5])
+        
+        # 2D distances
+        distances = self.propagation.get_diff_distances(imt_x,
+                                                        imt_y, 
+                                                        imt_z, 
+                                                        es_x, 
+                                                        es_y, 
+                                                        es_z, 
+                                                        dist_2D=True)
+        expected_distances = (np.array([60.0,35.4,25.0,60.0,25.4]),
+                              np.array([10.0,21.2,55.0,30.0,30.5]))
+        npt.assert_allclose(distances,expected_distances,atol=1e-1)
+        
+        # 3D distances
+        distances = self.propagation.get_diff_distances(imt_x,
+                                                        imt_y, 
+                                                        imt_z, 
+                                                        es_x, 
+                                                        es_y, 
+                                                        es_z)
+        expected_distances = (np.array([]),
+                              np.array([60.0,35.4,25.0,60.0,25.4]),
+                              np.array([10.0,21.2,55.0,30.0,30.5]))
+#        npt.assert_allclose(distances,expected_distances,atol=1e-1)
     
 if __name__ == '__main__':
     unittest.main()
