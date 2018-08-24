@@ -21,6 +21,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.building_loss_enabled = False
         par.shadow_enabled = False
         par.same_building_enabled = True
+        par.diffraction_enabled = False
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.5
         par.bs_building_entry_loss_value = 50
@@ -32,6 +33,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.building_loss_enabled = False
         par.shadow_enabled = False
         par.same_building_enabled = True
+        par.diffraction_enabled = False
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
@@ -43,6 +45,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.building_loss_enabled = False
         par.shadow_enabled = False
         par.same_building_enabled = True
+        par.diffraction_enabled = False
         par.bs_building_entry_loss_type = 'P2109_FIXED'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
@@ -54,6 +57,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.building_loss_enabled = False
         par.shadow_enabled = False
         par.same_building_enabled = True
+        par.diffraction_enabled = False
         par.bs_building_entry_loss_type = 'P2109_RANDOM'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
@@ -65,10 +69,23 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.building_loss_enabled = False
         par.shadow_enabled = False
         par.same_building_enabled = False
+        par.diffraction_enabled = False
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.5
         par.bs_building_entry_loss_value = 50
         self.propagation_same_build_disabled = PropagationHDFSS(par,rnd)
+        
+        # Diffraction loss enabled
+        rnd = np.random.RandomState(101)
+        par = ParametersFssEs()
+        par.building_loss_enabled = False
+        par.shadow_enabled = False
+        par.same_building_enabled = True
+        par.diffraction_enabled = True
+        par.bs_building_entry_loss_type = 'FIXED_VALUE'
+        par.bs_building_entry_loss_prob = 0.5
+        par.bs_building_entry_loss_value = 50
+        self.propagation_diff_enabled = PropagationHDFSS(par,rnd)
         
     def test_get_loss(self):
         d = np.array([[10.0, 20.0, 30.0, 60.0, 90.0, 300.0, 1000.0]])
@@ -195,6 +212,21 @@ class PropagationHDFSSTest(unittest.TestCase):
                               np.array([60.0,35.4,25.0,60.0,25.4]),
                               np.array([10.0,21.2,55.0,30.0,30.5]))
 #        npt.assert_allclose(distances,expected_distances,atol=1e-1)
+        
+    def test_diffration_loss(self):
+        # Test diffraction loss
+        h = np.array([7.64,-0.56,-1.2,-0.1])
+        d1 = np.array([34.99,1060.15,5.0,120.0])
+        d2 = np.array([25.02,25.02,2.33,245.0])
+        f = 40000*np.ones_like(h)
+        
+        loss = self.propagation_diff_enabled.get_diffraction_loss(h,d1,d2,f)
+        expected_loss = np.array([43.17,0.0,0.0,4.48])
+        
+        npt.assert_allclose(loss,expected_loss,atol=1e-1)
+        
+        # Test get loss
+        
     
 if __name__ == '__main__':
     unittest.main()

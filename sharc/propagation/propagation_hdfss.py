@@ -137,9 +137,9 @@ class PropagationHDFSS(Propagation):
             build_loss = 0.0
             
         if self.param.diffraction_enabled:
-            diff_loss = self.get_diffraction_loss(imt_x,imt_y, imt_z, 
-                                                   es_x, es_y, es_z, 
-                                                   f)
+            h, d1, d2 = self.get_diff_distances(imt_x,imt_y, imt_z, 
+                                                 es_x, es_y,  es_z)
+            diff_loss = self.get_diffraction_loss(h,d1,d2,f)
         else:
             diff_loss = 0.0
                 
@@ -246,9 +246,7 @@ class PropagationHDFSS(Propagation):
         
         return h, d1, d2
     
-    def get_diffraction_loss(self,imt_x,imt_y, imt_z, es_x, es_y, es_z, f):
-        
-        h, d1, d2 = self.get_diff_distances(imt_x,imt_y, imt_z, es_x, es_y, es_z)
+    def get_diffraction_loss(self,h, d1, d2, f):
         
         wavelength =  self.SPEED_OF_LIGHT/(f*1e6)
         
