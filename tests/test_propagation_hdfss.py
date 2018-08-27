@@ -208,10 +208,10 @@ class PropagationHDFSSTest(unittest.TestCase):
                                                         es_x, 
                                                         es_y, 
                                                         es_z)
-        expected_distances = (np.array([]),
-                              np.array([60.0,35.4,25.0,60.0,25.4]),
-                              np.array([10.0,21.2,55.0,30.0,30.5]))
-#        npt.assert_allclose(distances,expected_distances,atol=1e-1)
+        expected_distances = (np.array([ 14.0,  9.0,  3.0,  6.7, -1.7]),
+                              np.array([ 60.0, 35.4, 25.0, 60.0, 25.4]),
+                              np.array([ 19.3, 25.9, 56.3, 31.8, 30.6]))
+        npt.assert_allclose(distances,expected_distances,atol=1e-1)
         
     def test_diffration_loss(self):
         # Test diffraction loss
@@ -224,8 +224,6 @@ class PropagationHDFSSTest(unittest.TestCase):
         expected_loss = np.array([43.17,0.0,0.0,4.48])
         
         npt.assert_allclose(loss,expected_loss,atol=1e-1)
-        
-        # Test get loss
         
     
 if __name__ == '__main__':
