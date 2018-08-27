@@ -76,15 +76,16 @@ class PropagationHDFSS(Propagation):
         f = kwargs["frequency"]
         number_of_sectors = kwargs.pop("number_of_sectors",1)
         
+        imt_x = kwargs['imt_x']
+        imt_y = kwargs['imt_y']
+        imt_z = kwargs['imt_z']
+        es_x = kwargs["es_x"]
+        es_y = kwargs["es_y"]
+        es_z = kwargs["es_z"]
+        same_build_sations = self.is_same_building(imt_x,imt_y,
+                                                   es_x, es_y)
         if not self.param.same_building_enabled:
-            imt_x = kwargs['imt_x']
-            imt_y = kwargs['imt_y']
-            imt_z = kwargs['imt_z']
-            es_x = kwargs["es_x"]
-            es_y = kwargs["es_y"]
-            es_z = kwargs["es_z"]
-            same_build = self.is_same_building(imt_x,imt_y,
-                                               es_x, es_y)
+            same_build = same_build_sations
         else:
             same_build = np.zeros_like(d, dtype=bool)
         not_same_build = np.logical_not(same_build)
@@ -139,7 +140,12 @@ class PropagationHDFSS(Propagation):
         if self.param.diffraction_enabled:
             h, d1, d2 = self.get_diff_distances(imt_x,imt_y, imt_z, 
                                                  es_x, es_y,  es_z)
-            diff_loss = self.get_diffraction_loss(h,d1,d2,f)
+            not_same = np.logical_not(same_build_sations)
+            diff_loss = np.zeros_like(loss)
+            diff_loss[0,not_same] = self.get_diffraction_loss(h[not_same],
+                                                            d1[not_same],
+                                                            d2[not_same],
+                                                            f[:,not_same])
         else:
             diff_loss = 0.0
                 
@@ -251,6 +257,9 @@ class PropagationHDFSS(Propagation):
         wavelength =  self.SPEED_OF_LIGHT/(f*1e6)
         
         v = h*np.sqrt((2/wavelength)*(1/d1 + 1/d2))
+        
+        # Correction for sations on the same building
+        
         
         loss = np.zeros_like(v)
         
