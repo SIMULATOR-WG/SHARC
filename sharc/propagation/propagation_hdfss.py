@@ -204,8 +204,8 @@ class PropagationHDFSS(Propagation):
     
     def is_same_building(self,imt_x,imt_y, es_x, es_y):
         
-        building_x_range = (1 + self.b_tol)*np.array([es_x - self.b_w/2, es_x + self.b_w/2])
-        building_y_range = (1 + self.b_tol)*np.array([es_y - self.b_d/2, es_y + self.b_d/2])
+        building_x_range = es_x + (1 + self.b_tol)*np.array([-self.b_w/2,+self.b_w/2])
+        building_y_range = es_y + (1 + self.b_tol)*np.array([-self.b_d/2,+self.b_d/2])
         
         is_in_x = np.logical_and(imt_x >= building_x_range[0],imt_x <= building_x_range[1])
         is_in_y = np.logical_and(imt_y >= building_y_range[0],imt_y <= building_y_range[1])
