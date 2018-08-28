@@ -142,7 +142,7 @@ class PropagationHDFSS(Propagation):
             build_loss = np.zeros_like(loss)
             build_loss[0,not_same_build] = self.get_building_loss(imt_sta_type,
                                                                   f[:,not_same_build],
-                                                                  elevation[not_same_build])
+                                                                  elevation[:,not_same_build])
         else:
             build_loss = 0.0
             
