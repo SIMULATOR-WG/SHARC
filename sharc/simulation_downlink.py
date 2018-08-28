@@ -262,11 +262,15 @@ class SimulationDownlink(Simulation):
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
                 self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,ue])
+                self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[0,ue])
+                self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[0,ue])
             else:
                 active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
                 self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,active_beams])
+                self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[:,bs])
+                self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[:,bs])
 
             self.results.imt_dl_tx_power.extend(self.bs.tx_power[bs].tolist())
 

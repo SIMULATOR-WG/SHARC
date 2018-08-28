@@ -164,7 +164,7 @@ class PropagationHDFSS(Propagation):
         if number_of_sectors > 1:
             loss = np.repeat(loss, number_of_sectors, 1)
             
-        return loss
+        return loss, build_loss, diff_loss
     
     def interpolate_fspl_to_los(self,dist,freq,shad): 
         fspl_loss = self.propagation_fspl.get_loss(distance_3D=self.fspl_dist,

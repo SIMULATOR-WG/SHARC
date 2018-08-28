@@ -56,6 +56,9 @@ class Simulation(ABC, Observable):
         self.imt_ue_antenna_gain = list()
         self.system_imt_antenna_gain = list()
         self.imt_system_antenna_gain = list()
+        self.imt_system_path_loss = list()
+        self.imt_system_build_entry_loss = list()
+        self.imt_system_diffraction_loss = list()
 
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
@@ -231,6 +234,10 @@ class Simulation(ABC, Observable):
                                              es_x=station_a.x,
                                              es_y=station_a.y,
                                              es_z=station_a.height)
+                if self.param_system.channel_model == "HDFSS":
+                    self.imt_system_build_entry_loss = path_loss[1]
+                    self.imt_system_diffraction_loss = path_loss[2]
+                    path_loss = path_loss[0]
 
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b
