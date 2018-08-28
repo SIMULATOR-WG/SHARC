@@ -30,7 +30,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         # Propagation with fixed BEL
         rnd = np.random.RandomState(101)
         par = ParametersFssEs()
-        par.building_loss_enabled = False
+        par.building_loss_enabled = True
         par.shadow_enabled = False
         par.same_building_enabled = True
         par.diffraction_enabled = False
@@ -42,7 +42,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         # Propagation with fixed probability
         rnd = np.random.RandomState(101)
         par = ParametersFssEs()
-        par.building_loss_enabled = False
+        par.building_loss_enabled = True
         par.shadow_enabled = False
         par.same_building_enabled = True
         par.diffraction_enabled = False
@@ -54,7 +54,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         # Propagation with random probability
         rnd = np.random.RandomState(101)
         par = ParametersFssEs()
-        par.building_loss_enabled = False
+        par.building_loss_enabled = True
         par.shadow_enabled = False
         par.same_building_enabled = True
         par.diffraction_enabled = False
@@ -88,6 +88,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         self.propagation_diff_enabled = PropagationHDFSS(par,rnd)
         
     def test_get_loss(self):
+        # Not on same building
         d = np.array([[10.0, 20.0, 30.0, 60.0, 90.0, 300.0, 1000.0]])
         f = 40000*np.ones_like(d)
         ele = np.transpose(np.zeros_like(d))
@@ -95,9 +96,41 @@ class PropagationHDFSSTest(unittest.TestCase):
         loss = self.propagation.get_loss(distance_3D=d,
                                          frequency=f,
                                          elevation=ele,
-                                         imt_sta_type=StationType.IMT_BS)
+                                         imt_sta_type=StationType.IMT_BS,
+                                         imt_x = 100.0*np.ones(7),
+                                         imt_y = 100.0*np.ones(7),
+                                         imt_z = 100.0*np.ones(7),
+                                         es_x = np.array([0.0]),
+                                         es_y = np.array([0.0]),
+                                         es_z = np.array([0.0]))
         
         expected_loss = np.array([[84.48, 90.50, 94.02, 100.72, 104.75, 139.33, 162.28]])
+        
+        npt.assert_allclose(loss,expected_loss,atol=1e-1)
+        
+        # On same building
+        d = np.array([[10.0, 20.0, 30.0]])
+        f = 40000*np.ones_like(d)
+        ele = np.transpose(np.zeros_like(d))
+        es_x = np.array([0.0])
+        es_y = np.array([0.0])
+        es_z = np.array([10.0])
+        imt_x = np.array([ 0.0, 20.0, 30.0])
+        imt_y = np.array([10.0,  0.0,  0.0])
+        imt_z = np.array([ 1.5,  6.0,  7.5])
+        
+        loss = self.propagation.get_loss(distance_3D=d,
+                                         frequency=f,
+                                         elevation=ele,
+                                         imt_sta_type=StationType.IMT_BS,
+                                         imt_x=imt_x,
+                                         imt_y=imt_y,
+                                         imt_z=imt_z,
+                                         es_x=es_x,
+                                         es_y=es_y,
+                                         es_z=es_z)
+        
+        expected_loss = np.array([[150 + 84.48, 100 + 90.50, 50 + 94.02]])
         
         npt.assert_allclose(loss,expected_loss,atol=1e-1)
     
@@ -150,8 +183,8 @@ class PropagationHDFSSTest(unittest.TestCase):
         es_x = np.array([0.0])
         es_y = np.array([0.0])
         es_z = np.array([19.0])
-        imt_x = np.array([0.0, 0.0,80.0,-70.0,12.0])
-        imt_y = np.array([0.0,30.0, 0.0,-29.3,-3.6])
+        imt_x = np.array([1.0, 0.0,80.0,-70.0,12.0])
+        imt_y = np.array([1.0,30.0, 0.0,-29.3,-3.6])
         imt_z = 3*np.ones_like(imt_x)
         
         expected_in_build = np.array([True,False,False,False,True])
@@ -177,7 +210,7 @@ class PropagationHDFSSTest(unittest.TestCase):
                                                              es_x=es_x,
                                                              es_y=es_y,
                                                              es_z=es_z)
-        expected_loss = np.array([[400.0,94.0,103.6,103.1,400.0]])
+        expected_loss = np.array([[4067.5,94.0,103.6,103.1,4086.5]])
         
         npt.assert_allclose(loss,expected_loss,atol=1e-1)
         

@@ -40,7 +40,8 @@ class PropagationHDFSS(Propagation):
         self.b_d = 50
         self.b_tol = 0.05
         
-        self.HIGH_LOSS = 400
+        self.HIGH_LOSS = 4000
+        self.LOSS_PER_FLOOR = 50
         
         self.propagation_fspl = PropagationFreeSpace(random_number_gen)
         self.propagation_p1411 = PropagationP1411(random_number_gen)
@@ -66,6 +67,7 @@ class PropagationHDFSS(Propagation):
             array with path loss values with dimensions of distance_2D
 
         """
+        # Parse entries
         if "distance_3D" in kwargs:
             d = kwargs["distance_3D"]
         else:
@@ -82,28 +84,26 @@ class PropagationHDFSS(Propagation):
         es_x = kwargs["es_x"]
         es_y = kwargs["es_y"]
         es_z = kwargs["es_z"]
-        same_build_sations = self.is_same_building(imt_x,imt_y,
-                                                   es_x, es_y)
-        if not self.param.same_building_enabled:
-            same_build = same_build_sations
-        else:
-            same_build = np.zeros_like(d, dtype=bool)
+        
+        # Define boolean ranges
+        same_build = self.is_same_building(imt_x,imt_y,
+                                           es_x, es_y)
         not_same_build = np.logical_not(same_build)
         
-        fspl_bool = np.logical_and(d <= self.fspl_dist,not_same_build)
+        fspl_bool = d <= self.fspl_dist
         
         fspl_to_los_bool = np.logical_and(d > self.fspl_dist,
                                           d <= self.fspl_to_los_dist)
-        fspl_to_los_bool = np.logical_and(fspl_to_los_bool,not_same_build)
         
-        los_bool = np.logical_and(d > self.fspl_to_los_dist,d <= self.los_dist)
-        los_bool = np.logical_and(los_bool,not_same_build)
+        los_bool = np.logical_and(d > self.fspl_to_los_dist,
+                                  d <= self.los_dist)
         
-        los_to_nlos_bool = np.logical_and(d > self.los_dist,d <= self.los_to_nlos_dist)
-        los_to_nlos_bool = np.logical_and(los_to_nlos_bool,not_same_build)
+        los_to_nlos_bool = np.logical_and(d > self.los_dist,
+                                          d <= self.los_to_nlos_dist)
         
-        nlos_bool = np.logical_and(d > self.los_to_nlos_dist,not_same_build)
+        nlos_bool = d > self.los_to_nlos_dist
         
+        # Define indexes
         same_build_idx = np.where(same_build)[0]
         fspl_idx = np.where(fspl_bool)[1]
         fspl_to_los_idx = np.where(fspl_to_los_bool)[1]
@@ -111,44 +111,54 @@ class PropagationHDFSS(Propagation):
         los_to_nlos_idx = np.where(los_to_nlos_bool)[1]
         nlos_idx = np.where(nlos_bool)[1]
         
+        # Path loss
         loss = np.zeros_like(d)
         
-        loss[0,same_build_idx] = self.HIGH_LOSS
+        if not self.param.same_building_enabled:
+            loss[:,same_build_idx] += self.HIGH_LOSS
+        else:
+            loss[:,same_build_idx] += self.get_same_build_loss(imt_z[same_build_idx],
+                                                               es_z)
         
-        loss[0,fspl_idx] = self.propagation_fspl.get_loss(distance_3D=d[:,fspl_idx],
-                                                        frequency=f[:,fspl_idx])
-        loss[0,fspl_to_los_idx] = self.interpolate_fspl_to_los(d[:,fspl_to_los_idx],
-                                                             f[:,fspl_to_los_idx],
-                                                             self.param.shadow_enabled)
-        loss[0,los_idx] = self.propagation_p1411.get_loss(distance_3D=d[:,los_idx],
-                                                        frequency=f[:,los_idx],
-                                                        los=True,
-                                                        shadow=self.param.shadow_enabled)
-        loss[0,los_to_nlos_idx] = self.interpolate_los_to_nlos(d[:,los_to_nlos_idx],
-                                                             f[:,los_to_nlos_idx],
-                                                             self.param.shadow_enabled)
-        loss[0,nlos_idx] = self.propagation_p1411.get_loss(distance_3D=d[:,nlos_idx],
-                                                         frequency=f[:,nlos_idx],
-                                                         los=False,
-                                                         shadow=self.param.shadow_enabled)
+        loss[:,fspl_idx] += self.propagation_fspl.get_loss(distance_3D=d[:,fspl_idx],
+                                                           frequency=f[:,fspl_idx])
+        loss[:,fspl_to_los_idx] += self.interpolate_fspl_to_los(d[:,fspl_to_los_idx],
+                                                                f[:,fspl_to_los_idx],
+                                                                self.param.shadow_enabled)
+        loss[:,los_idx] += self.propagation_p1411.get_loss(distance_3D=d[:,los_idx],
+                                                           frequency=f[:,los_idx],
+                                                           los=True,
+                                                           shadow=self.param.shadow_enabled)
+        loss[:,los_to_nlos_idx] += self.interpolate_los_to_nlos(d[:,los_to_nlos_idx],
+                                                                f[:,los_to_nlos_idx],
+                                                                self.param.shadow_enabled)
+        loss[:,nlos_idx] += self.propagation_p1411.get_loss(distance_3D=d[:,nlos_idx],
+                                                            frequency=f[:,nlos_idx],
+                                                            los=False,
+                                                            shadow=self.param.shadow_enabled)
     
+        # Building entry loss
         if self.param.building_loss_enabled:
-            build_loss = self.get_building_loss(imt_sta_type,f,elevation)
+            build_loss = np.zeros_like(loss)
+            build_loss[0,not_same_build] = self.get_building_loss(imt_sta_type,
+                                                                  f[:,not_same_build],
+                                                                  elevation[not_same_build])
         else:
             build_loss = 0.0
             
+        # Diffraction loss
         if self.param.diffraction_enabled:
             h, d1, d2 = self.get_diff_distances(imt_x,imt_y, imt_z, 
                                                  es_x, es_y,  es_z)
-            not_same = np.logical_not(same_build_sations)
             diff_loss = np.zeros_like(loss)
-            diff_loss[0,not_same] = self.get_diffraction_loss(h[not_same],
-                                                            d1[not_same],
-                                                            d2[not_same],
-                                                            f[:,not_same])
+            diff_loss[0,not_same_build] = self.get_diffraction_loss(h[not_same_build],
+                                                                    d1[not_same_build],
+                                                                    d2[not_same_build],
+                                                                    f[:,not_same_build])
         else:
             diff_loss = 0.0
                 
+        # Compute final loss
         loss = loss + build_loss + diff_loss
         
         if number_of_sectors > 1:
@@ -219,6 +229,13 @@ class PropagationHDFSS(Propagation):
         is_in_building = np.logical_and(is_in_x,is_in_y)
         
         return is_in_building
+    
+    def get_same_build_loss(self,imt_z,es_z):
+        floor_number = np.floor_divide((es_z - imt_z),3) + 1
+        
+        loss = self.LOSS_PER_FLOOR*floor_number
+        
+        return loss
     
     def get_diff_distances(self,imt_x,imt_y, imt_z, es_x, es_y, es_z, dist_2D=False):
         
