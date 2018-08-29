@@ -65,6 +65,7 @@ class Parameters(object):
         # IMT
         #######################################################################
         self.imt.topology                = config.get("IMT", "topology")
+        self.imt.wrap_around             = config.getboolean("GENERAL", "wrap_around")
         self.imt.num_macrocell_sites     = config.getint("IMT", "num_macrocell_sites")
         self.imt.num_clusters            = config.getint("IMT", "num_clusters")
         self.imt.intersite_distance      = config.getfloat("IMT", "intersite_distance")
