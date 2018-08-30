@@ -34,10 +34,10 @@ class PropagationP1411(Propagation):
             self.los_gamma = 2.11 
             self.los_sigma = 5.06
         
-            self.nlos_alpha = 5.06
-            self.nlos_beta = -4.68
-            self.nlos_gamma = 2.02
-            self.nlos_sigma = 9.33
+            self.nlos_alpha = 4.00
+            self.nlos_beta = 10.20
+            self.nlos_gamma = 2.36
+            self.nlos_sigma = 7.60
             
     def get_loss(self, *args, **kwargs) -> np.array:
         if "distance_3D" in kwargs:

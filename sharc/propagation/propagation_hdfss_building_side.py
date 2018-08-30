@@ -70,7 +70,7 @@ class PropagationHDFSSBuildingSide(Propagation):
         # Define which stations are on the building in front
         next_build = self.is_next_building(imt_x,imt_y,
                                            es_x, es_y)
-        not_next_build = np.logical_not(same_build)
+        not_next_build = np.logical_not(next_build)
         
         # Define which stations are in other buildings
         other_build = np.logical_and(not_same_build,not_next_build)
@@ -78,17 +78,27 @@ class PropagationHDFSSBuildingSide(Propagation):
         # Path loss
         loss = np.zeros_like(d)
         
-        loss[:,same_build] += self.get_same_build_loss(imt_z[same_build],
-                                                       es_z)
+#        # Use a loss per floor
+#        loss[:,same_build] += self.get_same_build_loss(imt_z[same_build],
+#                                                       es_z)
         loss[:,same_build] += self.propagation_fspl.get_loss(distance_3D=d[:,same_build],
                                                              frequency=f[:,same_build])
+        
+        loss[:,next_build] += self.propagation_p1411.get_loss(distance_3D=d[:,next_build],
+                                                              frequency=f[:,next_build],
+                                                              los=True,
+                                                              shadow=self.param.shadow_enabled)
+        
+        loss[:,other_build] += self.propagation_p1411.get_loss(distance_3D=d[:,other_build],
+                                                               frequency=f[:,other_build],
+                                                               los=False,
+                                                               shadow=self.param.shadow_enabled)
     
         # Building entry loss
         if self.param.building_loss_enabled:
-            build_loss = np.zeros_like(loss)
-            build_loss[0,not_same_build] = self.get_building_loss(imt_sta_type,
-                                                                  f[:,not_same_build],
-                                                                  elevation[:,not_same_build])
+            build_loss = self.get_building_loss(imt_sta_type,
+                                                f,
+                                                elevation)
         else:
             build_loss = 0.0
                 

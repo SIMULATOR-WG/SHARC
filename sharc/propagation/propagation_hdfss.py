@@ -61,6 +61,6 @@ class PropagationHDFSS(Propagation):
                                 imt_y = i_y,
                                 imt_z = i_z,
                                 es_x = e_x,
-                                es_x = e_y,
-                                es_x = e_z)
+                                es_y = e_y,
+                                es_z = e_z)
         

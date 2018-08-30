@@ -65,7 +65,32 @@ class PropagationHDFSSBuildingSideTest(unittest.TestCase):
         self.propagation_random_prob = PropagationHDFSSBuildingSide(par,rnd)
         
     def test_get_loss(self):
-        pass
+        # On same building
+        d = np.array([[10.0, 80.0, 200.0]])
+        f = 40000*np.ones_like(d)
+        ele = np.transpose(np.zeros_like(d))
+        es_x = np.array([0.0])
+        es_y = np.array([25.0])
+        es_z = np.array([10.0])
+        imt_x = np.array([ 0.0,  0.0, -200.0])
+        imt_y = np.array([15.0, 80.0,   25.0])
+        imt_z = np.array([ 1.5,  6.0,  7.5])
+        
+        loss = self.propagation.get_loss(distance_3D=d,
+                                         frequency=f,
+                                         elevation=ele,
+                                         imt_sta_type=StationType.IMT_BS,
+                                         imt_x=imt_x,
+                                         imt_y=imt_y,
+                                         imt_z=imt_z,
+                                         es_x=es_x,
+                                         es_y=es_y,
+                                         es_z=es_z)
+        loss = loss[0]
+        
+        expected_loss = np.array([[84.48, 103.35, 140.05]])
+        
+        npt.assert_allclose(loss,expected_loss,atol=1e-1)
     
     def test_get_build_loss(self):
         # Initialize variables
