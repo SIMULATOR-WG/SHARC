@@ -27,6 +27,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.general.overwrite_output = True
 
         self.param.imt.topology = "SINGLE_BS"
+        self.param.imt.wrap_around = True
         self.param.imt.num_macrocell_sites = 19
         self.param.imt.num_clusters = 2
         self.param.imt.intersite_distance = 150
@@ -213,6 +214,8 @@ class SimulationUplinkTest(unittest.TestCase):
         # test connection method
         self.simulation.connect_ue_to_bs()
         self.assertEqual(self.simulation.link, {0: [0,1], 1: [2,3]})
+        self.simulation.select_ue(random_number_gen)
+        self.simulation.link = {0:[0,1],1:[2,3]}
 
         # We do not test the selection method here because in this specific
         # scenario we do not want to change the order of the UE's
@@ -358,6 +361,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.ue.active = np.ones(4, dtype=bool)
 
         self.simulation.connect_ue_to_bs()
+        self.simulation.select_ue(random_number_gen)
+        self.simulation.link = {0:[0,1],1:[2,3]}
 
         # We do not test the selection method here because in this specific
         # scenario we do not want to change the order of the UE's
@@ -540,10 +545,8 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.ue.active = np.ones(4, dtype=bool)
 
         self.simulation.connect_ue_to_bs()
-
-        # We do not test the selection method here because in this specific
-        # scenario we do not want to change the order of the UE's
-        #self.simulation.select_ue()
+        self.simulation.select_ue(random_number_gen)
+        self.simulation.link = {0:[0,1],1:[2,3]}
 
         self.simulation.propagation_imt = PropagationFactory.create_propagation(self.param.imt.channel_model,
                                                                                 self.param, random_number_gen)
@@ -621,7 +624,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.simulation.initialize()
 
         eps = 1e-2
-        random_number_gen = np.random.RandomState()
+        random_number_gen = np.random.RandomState(101)
 
         # Set scenario
         self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
@@ -669,6 +672,8 @@ class SimulationUplinkTest(unittest.TestCase):
                                           [180.0, 170.935, 180.0, 120.0  ]]),atol=eps)
         npt.assert_allclose(theta,np.array([[95.143, 95.143, 91.718, 91.430],
                                             [91.718, 91.624, 95.143, 95.143]]),atol=eps)
+        self.simulation.bs_to_ue_phi = phi
+        self.simulation.bs_to_ue_theta = theta
 
         # Add beams by brute force: since the SimulationUplink.select_ue()
         # method shufles the link dictionary, the order of the beams cannot be
