@@ -43,6 +43,11 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.rns
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
+            
+        self.wrap_around_enabled = self.parameters.imt.wrap_around and \
+                                  (self.parameters.imt.topology == 'MACROCELL' \
+                                   or self.parameters.imt.topology == 'HOTSPOT') and \
+                                   self.parameters.imt.num_clusters == 1
 
         self.co_channel = self.parameters.general.enable_cochannel
         self.adjacent_channel = self.parameters.general.enable_adjacent_channel
@@ -272,8 +277,7 @@ class Simulation(ABC, Observable):
         Select K UEs randomly from all the UEs linked to one BS as “chosen”
         UEs. These K “chosen” UEs will be scheduled during this snapshot.
         """
-        if self.parameters.imt.wrap_around and \
-           (self.parameters.imt.topology == 'MACROCELL' or self.parameters.imt.topology == 'HOTSPOT'):
+        if self.wrap_around_enabled:
             self.bs_to_ue_d_2D, self.bs_to_ue_d_3D, self.bs_to_ue_phi, self.bs_to_ue_theta = \
                 self.bs.get_dist_angles_wrap_around(self.ue)
         else:
