@@ -49,7 +49,7 @@ class StationManager(object):
         self.center_freq = np.empty(n)
         self.spectral_mask = None
         self.station_type = StationType.NONE
-        self.intesite_dist = 0.0
+        self.intersite_dist = 0.0
 
     def get_station_list(self, id=None) -> list:
         if(id is None):
@@ -116,33 +116,33 @@ class StationManager(object):
         # Initialize variables
         distance_3D = np.empty([self.num_stations, station.num_stations])
         distance_2D = np.inf*np.ones_like(distance_3D)
-        cluster_num = np.zeros_like(distance_3D)
+        cluster_num = np.zeros_like(distance_3D, dtype=int)
         
         # Cluster coordinates
         cluster_x = np.array([station.x,
-                              station.x + 3.5*self.intesite_dist,
-                              station.x - 0.5*self.intesite_dist,
-                              station.x - 4.0*self.intesite_dist,
-                              station.x - 3.5*self.intesite_dist,
-                              station.x + 0.5*self.intesite_dist,
-                              station.x + 4.0*self.intesite_dist])
+                              station.x + 3.5*self.intersite_dist,
+                              station.x - 0.5*self.intersite_dist,
+                              station.x - 4.0*self.intersite_dist,
+                              station.x - 3.5*self.intersite_dist,
+                              station.x + 0.5*self.intersite_dist,
+                              station.x + 4.0*self.intersite_dist])
     
         cluster_y = np.array([station.y,
-                              station.y + 1.5*np.sqrt(3.0)*self.intesite_dist,
-                              station.y + 2.5*np.sqrt(3.0)*self.intesite_dist,
-                              station.y + 1.0*np.sqrt(3.0)*self.intesite_dist,
-                              station.y - 1.5*np.sqrt(3.0)*self.intesite_dist,
-                              station.y - 2.5*np.sqrt(3.0)*self.intesite_dist,
-                              station.y - 1.0*np.sqrt(3.0)*self.intesite_dist])
+                              station.y + 1.5*np.sqrt(3.0)*self.intersite_dist,
+                              station.y + 2.5*np.sqrt(3.0)*self.intersite_dist,
+                              station.y + 1.0*np.sqrt(3.0)*self.intersite_dist,
+                              station.y - 1.5*np.sqrt(3.0)*self.intersite_dist,
+                              station.y - 2.5*np.sqrt(3.0)*self.intersite_dist,
+                              station.y - 1.0*np.sqrt(3.0)*self.intersite_dist])
         
         # Calculate 2D distance
         temp_distance = np.zeros_like(distance_2D)
         for k,(x,y) in enumerate(zip(cluster_x,cluster_y)):                
             temp_distance = np.sqrt(np.power(x - self.x[:,np.newaxis], 2) +
                                     np.power(y - self.y[:,np.newaxis], 2))
-            where_is_shoter = temp_distance < distance_2D
-            distance_2D[where_is_shoter] = temp_distance[where_is_shoter]
-            cluster_num[where_is_shoter] = k
+            is_shorter = temp_distance < distance_2D
+            distance_2D[is_shorter] = temp_distance[is_shorter]
+            cluster_num[is_shorter] = k
             
         # Calculate 3D distance
         distance_3D = np.sqrt(np.power(distance_2D, 2) +
@@ -154,11 +154,9 @@ class StationManager(object):
         point_vec_y = cluster_y[cluster_num,np.arange(station.num_stations)] \
                       - self.y[:,np.newaxis]
         point_vec_z = station.height - self.height[:,np.newaxis]
-
-        dist = self.get_3d_distance_to(station)
-
+        
         phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
-        theta = np.rad2deg(np.arccos(point_vec_z/dist))
+        theta = np.rad2deg(np.arccos(point_vec_z/distance_3D))
                 
         return distance_2D, distance_3D, phi, theta
 

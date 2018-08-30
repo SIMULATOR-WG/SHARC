@@ -238,7 +238,7 @@ class StationFactory(object):
         imt_ue.spectral_mask.set_mask()
         
         if param.topology == 'MACROCELL' or param.topology == 'HOTSPOT':
-            imt_ue.intesite_dist = param.intersite_distance
+            imt_ue.intersite_dist = param.intersite_distance
 
         return imt_ue
 
