@@ -11,9 +11,9 @@ import numpy.testing as npt
 
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.support.enumerations import StationType
-from sharc.propagation.propagation_hdfss import PropagationHDFSS
+from sharc.propagation.propagation_hdfss_roof_top import PropagationHDFSSRoofTop
 
-class PropagationHDFSSTest(unittest.TestCase):
+class PropagationHDFSSRoofTopTest(unittest.TestCase):
 
     def setUp(self):
         rnd = np.random.RandomState(101)
@@ -25,7 +25,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.5
         par.bs_building_entry_loss_value = 50
-        self.propagation = PropagationHDFSS(par,rnd)
+        self.propagation = PropagationHDFSSRoofTop(par,rnd)
         
         # Propagation with fixed BEL
         rnd = np.random.RandomState(101)
@@ -37,7 +37,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
-        self.propagation_fixed_value = PropagationHDFSS(par,rnd)
+        self.propagation_fixed_value = PropagationHDFSSRoofTop(par,rnd)
         
         # Propagation with fixed probability
         rnd = np.random.RandomState(101)
@@ -49,7 +49,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.bs_building_entry_loss_type = 'P2109_FIXED'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
-        self.propagation_fixed_prob = PropagationHDFSS(par,rnd)
+        self.propagation_fixed_prob = PropagationHDFSSRoofTop(par,rnd)
         
         # Propagation with random probability
         rnd = np.random.RandomState(101)
@@ -61,7 +61,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.bs_building_entry_loss_type = 'P2109_RANDOM'
         par.bs_building_entry_loss_prob = 0.6
         par.bs_building_entry_loss_value = 50
-        self.propagation_random_prob = PropagationHDFSS(par,rnd)
+        self.propagation_random_prob = PropagationHDFSSRoofTop(par,rnd)
         
         # Same building disabled
         rnd = np.random.RandomState(101)
@@ -73,7 +73,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.5
         par.bs_building_entry_loss_value = 50
-        self.propagation_same_build_disabled = PropagationHDFSS(par,rnd)
+        self.propagation_same_build_disabled = PropagationHDFSSRoofTop(par,rnd)
         
         # Diffraction loss enabled
         rnd = np.random.RandomState(101)
@@ -85,7 +85,7 @@ class PropagationHDFSSTest(unittest.TestCase):
         par.bs_building_entry_loss_type = 'FIXED_VALUE'
         par.bs_building_entry_loss_prob = 0.5
         par.bs_building_entry_loss_value = 50
-        self.propagation_diff_enabled = PropagationHDFSS(par,rnd)
+        self.propagation_diff_enabled = PropagationHDFSSRoofTop(par,rnd)
         
     def test_get_loss(self):
         # Not on same building
@@ -103,6 +103,7 @@ class PropagationHDFSSTest(unittest.TestCase):
                                          es_x = np.array([0.0]),
                                          es_y = np.array([0.0]),
                                          es_z = np.array([0.0]))
+        loss = loss[0]
         
         expected_loss = np.array([[84.48, 90.50, 94.02, 100.72, 104.75, 139.33, 162.28]])
         
@@ -129,6 +130,7 @@ class PropagationHDFSSTest(unittest.TestCase):
                                          es_x=es_x,
                                          es_y=es_y,
                                          es_z=es_z)
+        loss = loss[0]
         
         expected_loss = np.array([[150 + 84.48, 100 + 90.50, 50 + 94.02]])
         
@@ -210,6 +212,7 @@ class PropagationHDFSSTest(unittest.TestCase):
                                                              es_x=es_x,
                                                              es_y=es_y,
                                                              es_z=es_z)
+        loss = loss[0]
         expected_loss = np.array([[4067.5,94.0,103.6,103.1,4086.5]])
         
         npt.assert_allclose(loss,expected_loss,atol=1e-1)
