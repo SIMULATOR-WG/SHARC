@@ -246,6 +246,7 @@ class Parameters(object):
         self.fss_es.clutter_loss = config.getboolean("FSS_ES", "clutter_loss")
         
         # HDFSS propagation parameters
+        self.fss_es.es_position = config.get("FSS_ES", "es_position")
         self.fss_es.shadow_enabled = config.getboolean("FSS_ES", "shadow_enabled")
         self.fss_es.building_loss_enabled = config.getboolean("FSS_ES", "building_loss_enabled")
         self.fss_es.same_building_enabled = config.getboolean("FSS_ES", "same_building_enabled")
