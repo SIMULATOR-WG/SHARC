@@ -148,6 +148,7 @@ class PropagationHDFSSRoofTop(Propagation):
             build_loss = 0.0
             
         # Diffraction loss
+        diff_loss = np.zeros_like(loss)
         if self.param.diffraction_enabled:
             h, d1, d2 = self.get_diff_distances(imt_x,imt_y, imt_z, 
                                                  es_x, es_y,  es_z)
@@ -156,8 +157,6 @@ class PropagationHDFSSRoofTop(Propagation):
                                                                     d1[not_same_build],
                                                                     d2[not_same_build],
                                                                     f[:,not_same_build])
-        else:
-            diff_loss = 0.0
                 
         # Compute final loss
         loss = loss + build_loss + diff_loss
