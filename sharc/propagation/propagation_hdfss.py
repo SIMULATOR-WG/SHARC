@@ -11,7 +11,7 @@ import sys
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.propagation.propagation import Propagation
 from sharc.propagation.propagation_hdfss_roof_top import PropagationHDFSSRoofTop
-from sharc.propagation.propagation_hdfss_biulding_side import PropagationHDFSSBuildingSide
+from sharc.propagation.propagation_hdfss_building_side import PropagationHDFSSBuildingSide
 
 class PropagationHDFSS(Propagation):
     """
