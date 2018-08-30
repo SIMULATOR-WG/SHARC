@@ -276,16 +276,12 @@ class PropagationHDFSSRoofTop(Propagation):
         
         v = h*np.sqrt((2/wavelength)*(1/d1 + 1/d2))
         
-        # Correction for sations on the same building
-        
-        
         loss = np.zeros_like(v)
         
-        v_idx = np.where(v > -0.7)[0]
+        v_idx = v > -0.7
         
         loss[v_idx] = 6.9 + 20*np.log10(np.sqrt(np.power((v[v_idx] - 0.1), 2) + 1)\
-                                        + v[v_idx] - 0.1)
-        
+                                        + v[v_idx] - 0.1) 
         return loss
     
 if __name__ == '__main__':
