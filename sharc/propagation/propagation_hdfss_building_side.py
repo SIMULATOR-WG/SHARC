@@ -101,14 +101,17 @@ class PropagationHDFSSBuildingSide(Propagation):
                                                 elevation)
         else:
             build_loss = 0.0
+            
+        # Diffraction loss
+        diff_loss = np.zeros_like(loss)
                 
         # Compute final loss
-        loss = loss + build_loss
+        loss = loss + build_loss + diff_loss
         
         if number_of_sectors > 1:
             loss = np.repeat(loss, number_of_sectors, 1)
             
-        return loss, build_loss, 0.0
+        return loss, build_loss, diff_loss
     
     
     def get_building_loss(self,imt_sta_type,f,elevation):

@@ -40,7 +40,7 @@ class PropagationHDFSS(Propagation):
         else:
             d = kwargs["distance_2D"]
             
-        ele = np.transpose(kwargs["elevation"])
+        ele = kwargs["elevation"]
         sta_type = kwargs["imt_sta_type"]
         f = kwargs["frequency"]
         num_sec = kwargs.pop("number_of_sectors",1)
@@ -52,15 +52,15 @@ class PropagationHDFSS(Propagation):
         e_y = kwargs["es_y"]
         e_z = kwargs["es_z"]
         
-        return self.propatation(distance_3D = d,
-                                elevation = ele,
-                                imt_sta_type = sta_type,
-                                frequency = f,
-                                number_of_sectors = num_sec,
-                                imt_x = i_x,
-                                imt_y = i_y,
-                                imt_z = i_z,
-                                es_x = e_x,
-                                es_y = e_y,
-                                es_z = e_z)
+        return self.propagation.get_loss(distance_3D = d,
+                                         elevation = ele,
+                                         imt_sta_type = sta_type,
+                                         frequency = f,
+                                         number_of_sectors = num_sec,
+                                         imt_x = i_x,
+                                         imt_y = i_y,
+                                         imt_z = i_z,
+                                         es_x = e_x,
+                                         es_y = e_y,
+                                         es_z = e_z)
         
