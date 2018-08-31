@@ -33,6 +33,7 @@ class PropagationHDFSSBuildingSide(Propagation):
         self.s_w = 30
         self.b_tol = 0.05
         
+        self.HIGH_LOSS = 4000
         self.LOSS_PER_FLOOR = 50
         
         self.propagation_fspl = PropagationFreeSpace(random_number_gen)
@@ -81,6 +82,8 @@ class PropagationHDFSSBuildingSide(Propagation):
 #        # Use a loss per floor
 #        loss[:,same_build] += self.get_same_build_loss(imt_z[same_build],
 #                                                       es_z)
+        if not self.param.same_building_enabled:
+            loss[:,same_build] += self.HIGH_LOSS
         loss[:,same_build] += self.propagation_fspl.get_loss(distance_3D=d[:,same_build],
                                                              frequency=f[:,same_build])
         
