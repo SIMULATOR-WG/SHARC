@@ -32,6 +32,9 @@ class Results(object):
 
         self.system_imt_antenna_gain = list()
         self.imt_system_antenna_gain = list()
+        self.imt_system_path_loss = list()
+        self.imt_system_build_entry_loss = list()
+        self.imt_system_diffraction_loss = list()
 
         self.imt_dl_tx_power_density = list()
         self.imt_dl_tx_power = list()
@@ -57,18 +60,21 @@ class Results(object):
             today = datetime.date.today()
 
             results_number = 1
-            results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}".format(results_number)
-            while os.path.exists(results_dir_head):
-                results_number += 1
-                results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}".format(results_number)
-
-            os.makedirs(results_dir_head)
-
-            self.output_directory = results_dir_head
+            results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}"
+            self.create_dir(results_number,results_dir_head)
             copy(parameters_filename, self.output_directory)
         else:
             self.output_directory = 'output'
 
+    def create_dir(self,results_number,dir_head):
+        
+        dir_head_complete = dir_head.format(results_number)
+        
+        try:
+            os.makedirs(dir_head_complete)
+            self.output_directory = dir_head_complete
+        except FileExistsError as e:
+            self.create_dir(results_number + 1, dir_head)
 
 
     def generate_plot_list(self, n_bins):
@@ -93,6 +99,42 @@ class Results(object):
             x_label = "Antenna gain [dBi]"
             y_label = "Probability of antenna gain < $X$"
             title = "[IMT] CDF of IMT station antenna gain towards system"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_system_path_loss) > 0:
+            values, base = np.histogram(self.imt_system_path_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Path Loss [dB]"
+            y_label = "Probability of path loss < $X$"
+            title = "[SYS] CDF of IMT to system path loss"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_system_build_entry_loss) > 0:
+            values, base = np.histogram(self.imt_system_build_entry_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Building entry loss [dB]"
+            y_label = "Probability of loss < $X$"
+            title = "[SYS] CDF of IMT to system building entry loss"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_system_diffraction_loss) > 0:
+            values, base = np.histogram(self.imt_system_diffraction_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Building entry loss [dB]"
+            y_label = "Probability of loss < $X$"
+            title = "[SYS] CDF of IMT to system diffraction loss"
             file_name = title
             #x_limits = (0, 25)
             y_limits = (0, 1)

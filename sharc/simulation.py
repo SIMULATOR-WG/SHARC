@@ -61,6 +61,9 @@ class Simulation(ABC, Observable):
         self.imt_ue_antenna_gain = list()
         self.system_imt_antenna_gain = list()
         self.imt_system_antenna_gain = list()
+        self.imt_system_path_loss = list()
+        self.imt_system_build_entry_loss = list()
+        self.imt_system_diffraction_loss = list()
 
         self.path_loss_imt = np.empty(0)
         self.coupling_loss_imt = np.empty(0)
@@ -175,6 +178,8 @@ class Simulation(ABC, Observable):
              station_b.station_type is StationType.IMT_UE and \
              self.parameters.imt.topology == "INDOOR":
             elevation_angles = np.transpose(station_b.get_elevation(station_a))
+        elif station_a.station_type is StationType.FSS_ES:
+            elevation_angles = station_b.get_elevation(station_a)
         else:
             elevation_angles = None
 
@@ -227,10 +232,22 @@ class Simulation(ABC, Observable):
                                              frequency=freq*np.ones(d_3D.shape),
                                              indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                              elevation=elevation_angles, es_params=self.param_system,
-                                             tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node)
+                                             tx_gain = gain_a, rx_gain = gain_b, number_of_sectors=sectors_in_node,
+                                             imt_sta_type=station_b.station_type,
+                                             imt_x=station_b.x,
+                                             imt_y=station_b.y,
+                                             imt_z=station_b.height,
+                                             es_x=station_a.x,
+                                             es_y=station_a.y,
+                                             es_z=station_a.height)
+                if self.param_system.channel_model == "HDFSS":
+                    self.imt_system_build_entry_loss = path_loss[1]
+                    self.imt_system_diffraction_loss = path_loss[2]
+                    path_loss = path_loss[0]
 
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b
+            self.imt_system_path_loss = path_loss
         # IMT <-> IMT
         else:
             d_2D = self.bs_to_ue_d_2D
@@ -490,7 +507,24 @@ class Simulation(ABC, Observable):
         plt.tight_layout()
         plt.show()
 
-        sys.exit(0)
+        if self.parameters.imt.topology == "INDOOR":
+            fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')
+            ax = fig.gca()
+
+            # Plot network topology
+            self.topology.plot(ax,top_view=False)
+
+            # Plot user equipments
+            ax.scatter(self.ue.x, self.ue.height, color='r', edgecolor="w", linewidth=0.5, label="UE")
+
+            plt.title("Simulation scenario: side view")
+            plt.xlabel("x-coordinate [m]")
+            plt.ylabel("z-coordinate [m]")
+            plt.legend(loc="upper left", scatterpoints=1)
+            plt.tight_layout()
+            plt.show()
+        
+#        sys.exit(0)
 
     @abstractmethod
     def snapshot(self, *args, **kwargs):

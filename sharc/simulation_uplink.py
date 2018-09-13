@@ -233,7 +233,7 @@ class SimulationUplink(Simulation):
 
 
     def collect_results(self, write_to_file: bool, snapshot_number: int):
-        if not self.parameters.imt.interfered_with:
+        if not self.parameters.imt.interfered_with and np.any(self.bs.active):
             self.results.system_inr.extend(self.system.inr.tolist())
             self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
             if self.system.station_type is StationType.RAS:
@@ -267,9 +267,15 @@ class SimulationUplink(Simulation):
                 active_beams = [i for i in range(bs*self.parameters.imt.ue_k, (bs+1)*self.parameters.imt.ue_k)]
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
+                self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,active_beams])
+                self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[:,bs])
+                self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[:,bs])
             else:
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
+                self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,ue])
+                self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[:,ue])
+                self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[:,ue])
 
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
             imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue])/(self.num_rb_per_ue*self.parameters.imt.rb_bandwidth*1e6))

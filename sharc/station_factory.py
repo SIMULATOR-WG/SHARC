@@ -55,7 +55,10 @@ class StationFactory(object):
         imt_base_stations.y = topology.y
         imt_base_stations.azimuth = topology.azimuth
         imt_base_stations.elevation = topology.elevation
-        imt_base_stations.height = param.bs_height*np.ones(num_bs)
+        if param.topology == 'INDOOR':
+            imt_base_stations.height = topology.height
+        else:
+            imt_base_stations.height = param.bs_height*np.ones(num_bs)
 
         imt_base_stations.active = random_number_gen.rand(num_bs) < param.bs_load_probability
         imt_base_stations.tx_power = param.bs_conducted_power*np.ones(num_bs)
@@ -256,6 +259,7 @@ class StationFactory(object):
         imt_ue.station_type = StationType.IMT_UE
         ue_x = list()
         ue_y = list()
+        ue_z = list()
 
         # initially set all UE's as indoor
         imt_ue.indoor = np.ones(num_ue, dtype=bool)
@@ -273,21 +277,34 @@ class StationFactory(object):
 
         for bs in range(num_bs):
             idx = [i for i in range(bs*num_ue_per_bs, bs*num_ue_per_bs + num_ue_per_bs)]
-            if bs % 3 == 0:
+            # Right most cell of first floor
+            if bs % topology.num_cells == 0 and bs < topology.total_bs_level:
                 x_min = topology.x[bs] - topology.cell_radius - delta_x
                 x_max = topology.x[bs] + topology.cell_radius
-            if bs % 3 == 1:
-                x_min = topology.x[bs] - topology.cell_radius
-                x_max = topology.x[bs] + topology.cell_radius
-            if bs % 3 == 2:
+            # Left most cell of first floor
+            elif bs % topology.num_cells == topology.num_cells - 1 and bs < topology.total_bs_level:
                 x_min = topology.x[bs] - topology.cell_radius
                 x_max = topology.x[bs] + topology.cell_radius + delta_x
-            y_min = topology.y[bs] - topology.b_d/2 - delta_y
-            y_max = topology.y[bs] + topology.b_d/2 + delta_y
+            # Center cells and higher floors
+            else:
+                x_min = topology.x[bs] - topology.cell_radius
+                x_max = topology.x[bs] + topology.cell_radius
+            
+            # First floor
+            if bs < topology.total_bs_level:
+                y_min = topology.y[bs] - topology.b_d/2 - delta_y
+                y_max = topology.y[bs] + topology.b_d/2 + delta_y
+            # Higher floors
+            else:
+                y_min = topology.y[bs] - topology.b_d/2
+                y_max = topology.y[bs] + topology.b_d/2
+                
             x = (x_max - x_min)*random_number_gen.random_sample(num_ue_per_bs) + x_min
             y = (y_max - y_min)*random_number_gen.random_sample(num_ue_per_bs) + y_min
+            z = [topology.height[bs] - topology.b_h + param.ue_height for k in range(num_ue_per_bs)]
             ue_x.extend(x)
             ue_y.extend(y)
+            ue_z.extend(z)
 
             # theta is the horizontal angle of the UE wrt the serving BS
             theta = np.degrees(np.arctan2(y - topology.y[bs], x - topology.x[bs]))
@@ -301,24 +318,24 @@ class StationFactory(object):
             imt_ue.elevation[idx] = elevation[idx] + psi
 
             # check if UE is indoor
-            if bs % 3 == 0:
+            if bs % topology.num_cells == 0:
                 out = (x < topology.x[bs] - topology.cell_radius) | \
                       (y > topology.y[bs] + topology.b_d/2) | \
                       (y < topology.y[bs] - topology.b_d/2)
-            if bs % 3 == 1:
-                out = (y > topology.y[bs] + topology.b_d/2) | \
-                      (y < topology.y[bs] - topology.b_d/2)
-            if bs % 3 == 2:
+            elif bs % topology.num_cells == topology.num_cells - 1:
                 out = (x > topology.x[bs] + topology.cell_radius) | \
                       (y > topology.y[bs] + topology.b_d/2) | \
+                      (y < topology.y[bs] - topology.b_d/2)
+            else:
+                out = (y > topology.y[bs] + topology.b_d/2) | \
                       (y < topology.y[bs] - topology.b_d/2)
             imt_ue.indoor[idx] = ~ out
 
         imt_ue.x = np.array(ue_x)
         imt_ue.y = np.array(ue_y)
+        imt_ue.height = np.array(ue_z)
 
         imt_ue.active = np.zeros(num_ue, dtype=bool)
-        imt_ue.height = param.ue_height*np.ones(num_ue)
         imt_ue.rx_interference = -500*np.ones(num_ue)
         imt_ue.ext_interference = -500*np.ones(num_ue)
 

@@ -173,6 +173,9 @@ class Parameters(object):
         self.indoor.n_rows = config.getint("INDOOR", "n_rows")
         self.indoor.n_colums = config.getint("INDOOR", "n_colums")
         self.indoor.street_width = config.getint("INDOOR", "street_width")
+        self.indoor.intersite_distance = config.getfloat("INDOOR", "intersite_distance")
+        self.indoor.num_cells = config.getint("INDOOR", "num_cells")
+        self.indoor.num_floors = config.getint("INDOOR", "num_floors")
         self.indoor.ue_indoor_percent = config.getfloat("INDOOR", "ue_indoor_percent")
         self.indoor.building_class = config.get("INDOOR", "building_class")
 
@@ -242,6 +245,16 @@ class Parameters(object):
         self.fss_es.rx_lat = config.getfloat("FSS_ES", "rx_lat")
         self.fss_es.polarization = config.get("FSS_ES", "polarization")
         self.fss_es.clutter_loss = config.getboolean("FSS_ES", "clutter_loss")
+        
+        # HDFSS propagation parameters
+        self.fss_es.es_position = config.get("FSS_ES", "es_position")
+        self.fss_es.shadow_enabled = config.getboolean("FSS_ES", "shadow_enabled")
+        self.fss_es.building_loss_enabled = config.getboolean("FSS_ES", "building_loss_enabled")
+        self.fss_es.same_building_enabled = config.getboolean("FSS_ES", "same_building_enabled")
+        self.fss_es.diffraction_enabled = config.getboolean("FSS_ES", "diffraction_enabled")
+        self.fss_es.bs_building_entry_loss_type = config.get("FSS_ES", "bs_building_entry_loss_type")
+        self.fss_es.bs_building_entry_loss_prob = config.getfloat("FSS_ES", "bs_building_entry_loss_prob")
+        self.fss_es.bs_building_entry_loss_value = config.getfloat("FSS_ES", "bs_building_entry_loss_value")
 
         #######################################################################
         # Fixed wireless service

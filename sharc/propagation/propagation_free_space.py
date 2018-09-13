@@ -11,7 +11,8 @@ import numpy as np
 
 class PropagationFreeSpace(Propagation):
     """
-    Implements the Free Space propagation model
+    Implements the Free Space propagation model.
+    Frequency in MHz and distance in meters
     """
 
     def get_loss(self, *args, **kwargs) -> np.array:

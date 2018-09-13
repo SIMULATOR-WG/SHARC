@@ -70,6 +70,7 @@ class AntennaBeamformingImt(Antenna):
 
         self.azimuth = azimuth
         self.elevation = elevation
+        self._calculate_rotation_matrix()
 
         self.n_rows = par.n_rows
         self.n_cols = par.n_columns
@@ -99,7 +100,7 @@ class AntennaBeamformingImt(Antenna):
             theta_etilt (float): elevation electrical tilt angle [degrees]
         """
         phi, theta = self.to_local_coord(phi_etilt, theta_etilt)
-        self.beams_list.append((phi, theta-90))
+        self.beams_list.append((np.asscalar(phi), np.asscalar(theta-90)))
         self.w_vec_list.append(self._weight_vector(phi, theta-90))
         
         if self.normalize:
@@ -156,7 +157,7 @@ class AntennaBeamformingImt(Antenna):
         n_direct = len(lo_theta_vec)
 
         gains = np.zeros(n_direct)
-
+        
         if(co_channel):
             for g in range(n_direct):
                 gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g],
@@ -263,20 +264,33 @@ class AntennaBeamformingImt(Antenna):
         return gain
 
     def to_local_coord(self,phi: float, theta: float) -> tuple:
-
-        lo_theta = np.ravel(np.array([theta + self.elevation]))
-        lo_phi = np.ravel(np.array([phi - self.azimuth]))
-
-        ofb_theta = np.where(np.logical_or(lo_theta < 0,lo_theta > 180))
-        lo_theta[ofb_theta] = np.mod((360 - lo_theta[ofb_theta]),180)
-        lo_phi[ofb_theta] = lo_phi[ofb_theta] + 180
-
-        ofb_phi = np.where(np.logical_or(lo_phi < -180,lo_phi > 180))
-        lo_phi[ofb_phi] = np.mod(lo_phi[ofb_phi],360)
-        ofb_phi = np.where(lo_phi > 180)
-        lo_phi[ofb_phi] = lo_phi[ofb_phi] - 360
+        
+        phi_rad = np.ravel(np.array([np.deg2rad(phi)]))
+        theta_rad = np.ravel(np.array([np.deg2rad(theta)]))
+        
+        points = np.matrix([np.sin(theta_rad)*np.cos(phi_rad),
+                           np.sin(theta_rad)*np.sin(phi_rad),
+                           np.cos(theta_rad)])
+    
+        rotated_points = self.rotation_mtx*points
+        
+        lo_phi = np.ravel(np.asarray(np.rad2deg(np.arctan2(rotated_points[1],rotated_points[0]))))
+        lo_theta = np.ravel(np.asarray(np.rad2deg(np.arccos(rotated_points[2]))))
 
         return lo_phi, lo_theta
+    
+    def _calculate_rotation_matrix(self):
+        
+        alpha = np.deg2rad(self.azimuth)
+        beta = np.deg2rad(self.elevation)
+
+        Ry = np.matrix([[ np.cos(beta), 0.0, np.sin(beta)],
+                        [          0.0, 1.0,       0.0],
+                        [-np.sin(beta), 0.0, np.cos(beta)]])
+        Rz = np.matrix([[np.cos(alpha),-np.sin(alpha), 0.0],
+                        [np.sin(alpha), np.cos(alpha), 0.0],
+                        [          0.0,           0.0, 1.0]])
+        self.rotation_mtx = Ry*np.transpose(Rz)
 
 ###############################################################################
 class PlotAntennaPattern(object):
@@ -289,7 +303,7 @@ class PlotAntennaPattern(object):
     def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, antenna_type: str, plot_type: str):
 
         phi_escan = 45
-        theta_tilt = 90
+        theta_tilt = 120
 
         # Plot horizontal pattern
         phi = np.linspace(-180, 180, num = 360)
@@ -311,7 +325,7 @@ class PlotAntennaPattern(object):
         ax1.plot(phi,gain)
         ax1.grid(True)
         ax1.set_xlabel(r"$\varphi$ [deg]")
-        ax1.set_ylabel("Gain [dB]")
+        ax1.set_ylabel("Gain [dBi]")
 
         if plot_type == "ELEMENT":
             ax1.set_title("IMT " + sta_type + " element horizontal antenna pattern")
@@ -336,7 +350,7 @@ class PlotAntennaPattern(object):
         ax2.plot(theta,gain)
         ax2.grid(True)
         ax2.set_xlabel(r"$\theta$ [deg]")
-        ax2.set_ylabel("Gain [dB]")
+        ax2.set_ylabel("Gain [dBi]")
 
         if plot_type == "ELEMENT":
             ax2.set_title("IMT " + sta_type + " element vertical antenna pattern")
@@ -364,21 +378,25 @@ class PlotAntennaPattern(object):
 
         #plt.savefig(file_name)
         plt.show()
+        return fig
 
 if __name__ == '__main__':
 
     figs_dir = "figs/"
 
     param = ParametersAntennaImt()
-
+    param.normalization = True
+    param.bs_normalization_file = 'beamforming_normalization\\bs_indoor_norm.npz'
+    param.ue_normalization_file = 'beamforming_normalization\\ue_norm.npz'
+    
     param.bs_element_pattern = "M2101"
     param.bs_tx_element_max_g    = 5
-    param.bs_tx_element_phi_deg_3db  = 65
-    param.bs_tx_element_theta_deg_3db = 65
-    param.bs_tx_element_am       = 30
-    param.bs_tx_element_sla_v    = 30
+    param.bs_tx_element_phi_deg_3db  = 90
+    param.bs_tx_element_theta_deg_3db = 90
+    param.bs_tx_element_am       = 25
+    param.bs_tx_element_sla_v    = 25
     param.bs_tx_n_rows           = 8
-    param.bs_tx_n_columns        = 8
+    param.bs_tx_n_columns        = 16
     param.bs_tx_element_horiz_spacing = 0.5
     param.bs_tx_element_vert_spacing = 0.5
     param.bs_downtilt_deg = 0
@@ -400,8 +418,10 @@ if __name__ == '__main__':
     # Plot BS TX radiation patterns
     par = param.get_antenna_parameters("BS","TX")
     bs_array = AntennaBeamformingImt(par,0,0)
-    plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
-    plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
+    f = plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
+    f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
+    f = plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
+    f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
 
     # Plot UE TX radiation patterns
     par = param.get_antenna_parameters("UE","TX")

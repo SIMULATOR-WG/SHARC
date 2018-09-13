@@ -7,6 +7,7 @@ Created on Fri Mar  2 14:28:25 2018
 
 import numpy as np
 from scipy.integrate import dblquad
+from sys import stdout
 
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.support.named_tuples import AntennaPar
@@ -87,9 +88,11 @@ class BeamformingNormalizer(object):
 
         # Loop throug all the possible beams
         for phi_idx, phi in enumerate(self.phi_vals_deg):
+            print('\n' + str(100*phi_idx/len(self.phi_vals_deg)) + '%')
             for theta_idx, theta in enumerate(self.theta_vals_deg):
                 s = '\tphi = ' + str(phi) + ', theta = ' + str(theta)
                 print(s)
+                stdout.flush()
                 correction_factor_co[phi_idx,theta_idx], error_co[phi_idx,theta_idx] = self.calculate_correction_factor(phi,theta,True)
 
 

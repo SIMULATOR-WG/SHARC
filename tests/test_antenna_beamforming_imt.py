@@ -229,28 +229,31 @@ class AntennaBeamformingImtTest(unittest.TestCase):
 
 
     def test_add_beam(self):
-        # Error margin
+        # Error margin and antenna object
         eps = 1e-5
+        par = self.param.get_antenna_parameters("UE","TX")
+        self.antenna2 = AntennaBeamformingImt(par,0,0)
 
         # Add first beam
-        phi_scan = 11.79
-        theta_tilt = 125.31
+        phi_scan = 45
+        theta_tilt = 120
         self.antenna2.add_beam(phi_scan,theta_tilt)
 
         self.assertEqual(len(self.antenna2.beams_list),1)
         self.assertEqual(len(self.antenna2.w_vec_list),1)
 
         # Add second beam
-        phi_scan = 56.79
-        theta_tilt = 185.31
+        phi_scan = 90
+        theta_tilt = 180.0
         self.antenna2.add_beam(phi_scan,theta_tilt)
 
+        # Test beams_list
         self.assertEqual(len(self.antenna2.beams_list),2)
         self.assertEqual(len(self.antenna2.w_vec_list),2)
 
         # Test first beam
-        self.assertEqual(self.antenna2.beams_list[0][0],45)
-        self.assertEqual(self.antenna2.beams_list[0][1],30)
+        self.assertAlmostEqual(self.antenna2.beams_list[0][0],45,delta=eps)
+        self.assertAlmostEqual(self.antenna2.beams_list[0][1],30,delta=eps)
 
         w_vec = self.antenna2.w_vec_list[0]
         expected_w_vec = np.array([[0.5 + 0.0j, -0.172870 - 0.469169j],\
@@ -277,15 +280,17 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(len(self.antenna2.w_vec_list),0)
 
     def test_beam_gain(self):
-        # Error margin
+        # Error margin and antenna
         eps = 1e-4
+        par = self.param.get_antenna_parameters("UE","TX")
+        self.antenna2 = AntennaBeamformingImt(par,0,0)
 
         # Test 1
         phi = 45
         theta = 45
         beam = 0
-        phi_scan = 11.79
-        theta_tilt = 140.31
+        phi_scan = 45
+        theta_tilt = 135
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,1.594268,delta = eps)
@@ -294,8 +299,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         phi = 0
         theta = 60
         beam = 1
-        phi_scan = 11.79
-        theta_tilt = 185.31
+        phi_scan = 45
+        theta_tilt = 180
         self.antenna2.add_beam(phi_scan,theta_tilt)
         beam_g = self.antenna2._beam_gain(phi,theta,beam)
         self.assertAlmostEqual(beam_g,10.454087,delta = eps)
@@ -307,20 +312,24 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertAlmostEqual(beam_g,11.9636,delta = eps)
 
     def test_calculate_gain(self):
-        # Error margin
+        # Error margin and antenna
         eps = 1e-4
+        par = self.param.get_antenna_parameters("BS","RX")
+        self.antenna1 = AntennaBeamformingImt(par,0,0)
+        par = self.param.get_antenna_parameters("UE","TX")
+        self.antenna2 = AntennaBeamformingImt(par,0,0)
 
         # Test 1
-        phi_vec = np.array([11.79, -0.71])
-        theta_vec = np.array([50.31, 120.51])
+        phi_vec = np.array([45.0, 32.5])
+        theta_vec = np.array([45.0, 115.2])
         gains = self.antenna2.calculate_gain(phi_vec=phi_vec, theta_vec=theta_vec)
         npt.assert_allclose(gains,np.array([5.9491,11.9636]),atol=eps)
 
         # Test 2
-        phi = -33.21
-        theta = 65.31
-        phi_scan = 11.79
-        theta_tilt = 185.31
+        phi = 0.0
+        theta = 60.0
+        phi_scan = 45
+        theta_tilt = 180
         self.antenna2.add_beam(phi_scan, theta_tilt)
         beams_l = np.zeros_like(phi_vec, dtype=int)
         gains = self.antenna2.calculate_gain(phi_vec=phi, theta_vec=theta,
@@ -328,9 +337,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         npt.assert_allclose(gains,np.array([10.454087]),atol=eps)
 
         # Test 3
-        phi = -20
-        theta = 110
-        beams_l = np.zeros_like(phi_vec, dtype=int)
+        phi = 40
+        theta = 100
         gains = self.antenna1.calculate_gain(phi_vec=phi, theta_vec=theta,
                                              co_channel=False)
         npt.assert_allclose(gains,np.array([1.6667]),atol=eps)
@@ -405,14 +413,113 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         npt.assert_equal(gain,gain_ref + 5)
 
     def test_to_local_coord(self):
-        # Angles to be converted
-        phi = np.array([60, 190, 500, 0])
-        theta = np.array([90, 200, -30, 0])
+        # Test 1
+        # Create antenna object
+        par = self.param.get_antenna_parameters("BS","RX")
+        azi = 0.0
+        ele = 90.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        # Angles to be converted: z, x and y axis
+        phi = np.array([   0, 90, 0])
+        theta = np.array([90, 90, 0])
 
         # Convert to local coordinates
-        lo_phi, lo_theta = self.antenna1.to_local_coord(phi, theta)
-        npt.assert_equal(lo_phi,np.array([120, 70, 20, -120]))
-        npt.assert_equal(lo_theta,np.array([80, 170, 40, 10]))
+        lo_phi, lo_theta = self.antenna3.to_local_coord(phi, theta)
+        exp_lo_phi = np.array([0,90,0])
+        exp_lo_theta = np.array([180,90,90])
+        npt.assert_array_almost_equal(lo_phi,exp_lo_phi,decimal=2)
+        npt.assert_array_almost_equal(lo_theta,exp_lo_theta,decimal=2)
+        
+        # Test 2
+        # Create antenna object
+        azi = -15.0
+        ele = 90.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        # Angles to be converted
+        phi = np.array([  0,  0, 90, 10])
+        theta = np.array([0, 90, 90, 90])
 
+        # Convert to local coordinates
+        lo_phi, lo_theta = self.antenna3.to_local_coord(phi, theta)
+        exp_lo_phi = np.array([0, 90, 90, 90])
+        exp_lo_theta = np.array([90, 165, 75, 155])
+        npt.assert_array_almost_equal(lo_phi,exp_lo_phi,decimal=2)
+        npt.assert_array_almost_equal(lo_theta,exp_lo_theta,decimal=2)
+        
+        # Test 3
+        # Create antenna object
+        azi = +15.0
+        ele = 90.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        # Angles to be converted: z, x and y axis
+        phi = np.array([  0,  0, 90])
+        theta = np.array([0, 90, 90])
+
+        # Convert to local coordinates
+        lo_phi, lo_theta = self.antenna3.to_local_coord(phi, theta)
+        exp_lo_phi = np.array([0,-90, 90])
+        exp_lo_theta = np.array([90, 165, 105])
+        npt.assert_array_almost_equal(lo_phi,exp_lo_phi,decimal=2)
+        npt.assert_array_almost_equal(lo_theta,exp_lo_theta,decimal=2)
+        
+        # Test 4
+        # Create antenna object
+        azi = 0.0
+        ele = 15.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        # Angles to be converted: z, x and y axis
+        phi = np.array([  0,  0, 90])
+        theta = np.array([0, 90, 90])
+
+        # Convert to local coordinates
+        lo_phi, lo_theta = self.antenna3.to_local_coord(phi, theta)
+        exp_lo_phi = np.array([0, 0, 90])
+        exp_lo_theta = np.array([15, 105, 90])
+        npt.assert_array_almost_equal(lo_phi,exp_lo_phi,decimal=2)
+        npt.assert_array_almost_equal(lo_theta,exp_lo_theta,decimal=2)
+        
+        # Test 5
+        # Create antenna object
+        azi = 0.0
+        ele = -15.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        # Angles to be converted: z, x and y axis
+        phi = np.array([  0,  0, 90])
+        theta = np.array([0, 90, 90])
+
+        # Convert to local coordinates
+        lo_phi, lo_theta = self.antenna3.to_local_coord(phi, theta)
+        exp_lo_phi = np.array([180, 0, 90])
+        exp_lo_theta = np.array([15, 75, 90])
+        npt.assert_array_almost_equal(lo_phi,exp_lo_phi,decimal=2)
+        npt.assert_array_almost_equal(lo_theta,exp_lo_theta,decimal=2)
+        
+        # Test 6
+        # Create antenna object
+        azi = 180.0
+        ele = 45.0
+        self.antenna3 = AntennaBeamformingImt(par,azi,ele)
+        
+        # Angles to be converted: z, x and y axis
+        phi = np.array([  0,  0, 90])
+        theta = np.array([0, 90, 90])
+
+        # Convert to local coordinates
+        lo_phi, lo_theta = self.antenna3.to_local_coord(phi, theta)
+        exp_lo_phi = np.array([0, -180, -90])
+        exp_lo_theta = np.array([45, 45, 90])
+        npt.assert_array_almost_equal(lo_phi,exp_lo_phi,decimal=2)
+        npt.assert_array_almost_equal(lo_theta,exp_lo_theta,decimal=2)
+        
+        
 if __name__ == '__main__':
     unittest.main()
+#    
+#    suite = unittest.TestSuite()
+#    suite.addTest(AntennaBeamformingImtTest('test_calculate_gain'))
+#    unittest.TextTestRunner().run(suite)
