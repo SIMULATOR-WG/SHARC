@@ -43,6 +43,11 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.rns
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
+            
+        self.wrap_around_enabled = self.parameters.imt.wrap_around and \
+                                  (self.parameters.imt.topology == 'MACROCELL' \
+                                   or self.parameters.imt.topology == 'HOTSPOT') and \
+                                   self.parameters.imt.num_clusters == 1
 
         self.co_channel = self.parameters.general.enable_cochannel
         self.adjacent_channel = self.parameters.general.enable_adjacent_channel
@@ -62,6 +67,8 @@ class Simulation(ABC, Observable):
         self.coupling_loss_imt_system = np.empty(0)
         self.coupling_loss_imt_system_adjacent = np.empty(0)
 
+        self.bs_to_ue_d_2D = np.empty(0)
+        self.bs_to_ue_d_3D = np.empty(0)
         self.bs_to_ue_phi = np.empty(0)
         self.bs_to_ue_theta = np.empty(0)
         self.bs_to_ue_beam_rbs = np.empty(0)
@@ -160,16 +167,6 @@ class Simulation(ABC, Observable):
         Result is returned as a numpy array with dimensions num_a x num_b
         TODO: calculate coupling loss between activa stations only
         """
-        # Calculate distance from transmitters to receivers. The result is a
-        # num_bs x num_ue array
-        d_2D = station_a.get_distance_to(station_b)
-        d_3D = station_a.get_3d_distance_to(station_b)
-
-        if self.parameters.imt.interfered_with:
-            freq = self.param_system.frequency
-        else:
-            freq = self.parameters.imt.frequency
-
         if station_a.station_type is StationType.FSS_SS or \
            station_a.station_type is StationType.HAPS or \
            station_a.station_type is StationType.RNS:
@@ -187,6 +184,15 @@ class Simulation(ABC, Observable):
            station_a.station_type is StationType.FS or \
            station_a.station_type is StationType.RNS or \
            station_a.station_type is StationType.RAS:
+            # Calculate distance from transmitters to receivers. The result is a
+            # num_station_a x num_station_b
+            d_2D = station_a.get_distance_to(station_b)
+            d_3D = station_a.get_3d_distance_to(station_b)
+            
+            if self.parameters.imt.interfered_with:
+                freq = self.param_system.frequency
+            else:
+                freq = self.parameters.imt.frequency
 
             if station_b.station_type is StationType.IMT_UE:
                 # define antenna gains
@@ -225,7 +231,12 @@ class Simulation(ABC, Observable):
 
             self.system_imt_antenna_gain = gain_a
             self.imt_system_antenna_gain = gain_b
+        # IMT <-> IMT
         else:
+            d_2D = self.bs_to_ue_d_2D
+            d_3D = self.bs_to_ue_d_3D
+            freq = self.parameters.imt.frequency
+            
             path_loss = propagation.get_loss(distance_3D=d_3D,
                                              distance_2D=d_2D,
                                              frequency=self.parameters.imt.frequency*np.ones(d_2D.shape),
@@ -266,8 +277,13 @@ class Simulation(ABC, Observable):
         Select K UEs randomly from all the UEs linked to one BS as “chosen”
         UEs. These K “chosen” UEs will be scheduled during this snapshot.
         """
-        self.bs_to_ue_phi, self.bs_to_ue_theta = \
-            self.bs.get_pointing_vector_to(self.ue)
+        if self.wrap_around_enabled:
+            self.bs_to_ue_d_2D, self.bs_to_ue_d_3D, self.bs_to_ue_phi, self.bs_to_ue_theta = \
+                self.bs.get_dist_angles_wrap_around(self.ue)
+        else:
+            self.bs_to_ue_d_2D = self.bs.get_distance_to(self.ue)
+            self.bs_to_ue_d_3D = self.bs.get_3d_distance_to(self.ue)
+            self.bs_to_ue_phi, self.bs_to_ue_theta = self.bs.get_pointing_vector_to(self.ue)
 
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
@@ -308,14 +324,14 @@ class Simulation(ABC, Observable):
         Calculates the gains of antennas in station_1 in the direction of
         station_2
         """
-        phi, theta = station_1.get_pointing_vector_to(station_2)
-
         station_1_active = np.where(station_1.active)[0]
         station_2_active = np.where(station_2.active)[0]
 
         # Initialize variables (phi, theta, beams_idx)
         if(station_1.station_type is StationType.IMT_BS):
             if(station_2.station_type is StationType.IMT_UE):
+                phi = self.bs_to_ue_phi
+                theta = self.bs_to_ue_theta
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
             elif(station_2.station_type is StationType.FSS_SS or \
                  station_2.station_type is StationType.FSS_ES or \
@@ -323,11 +339,13 @@ class Simulation(ABC, Observable):
                  station_2.station_type is StationType.FS or \
                  station_2.station_type is StationType.RNS or \
                  station_2.station_type is StationType.RAS):
+                phi, theta = station_1.get_pointing_vector_to(station_2)
                 phi = np.repeat(phi,self.parameters.imt.ue_k,0)
                 theta = np.repeat(theta,self.parameters.imt.ue_k,0)
                 beams_idx = np.tile(np.arange(self.parameters.imt.ue_k),self.bs.num_stations)
 
         elif(station_1.station_type is StationType.IMT_UE):
+            phi, theta = station_1.get_pointing_vector_to(station_2)
             beams_idx = np.zeros(len(station_2_active),dtype=int)
 
         elif(station_1.station_type is StationType.FSS_SS or \
@@ -336,6 +354,7 @@ class Simulation(ABC, Observable):
              station_1.station_type is StationType.FS or \
              station_1.station_type is StationType.RNS or \
              station_1.station_type is StationType.RAS):
+            phi, theta = station_1.get_pointing_vector_to(station_2)
             beams_idx = np.zeros(len(station_2_active),dtype=int)
 
         # Calculate gains
