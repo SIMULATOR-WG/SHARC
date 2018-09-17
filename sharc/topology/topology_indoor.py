@@ -65,6 +65,7 @@ class TopologyIndoor(Topology):
         static_base_stations to True to avoid unnecessary calculations.
         """
         if not self.static_base_stations:
+            self.reset()
             self.static_base_stations = self.all_buildings
             
             x_base = np.array([ (2*k + 1)*self.cell_radius for k in range(self.num_cells)])
@@ -95,7 +96,16 @@ class TopologyIndoor(Topology):
             self.azimuth = np.zeros(self.num_base_stations)
             self.elevation = -90*np.ones(self.num_base_stations)
             self.indoor = np.ones(self.num_base_stations, dtype = bool)
-                
+            
+    def reset(self):
+        self.x = np.empty(0)
+        self.y = np.empty(0)
+        self.height = np.empty(0)
+        self.azimuth = np.empty(0)
+        self.elevation = np.empty(0)
+        self.indoor = np.empty(0)
+        self.num_base_stations = -1
+        self.static_base_stations = False
     
     def plot(self, ax: matplotlib.axes.Axes, top_view = True):
         if top_view:
