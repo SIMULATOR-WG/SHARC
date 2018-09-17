@@ -171,6 +171,7 @@ class Parameters(object):
         self.indoor.basic_path_loss = config.get("INDOOR", "basic_path_loss")
         self.indoor.n_rows = config.getint("INDOOR", "n_rows")
         self.indoor.n_colums = config.getint("INDOOR", "n_colums")
+        self.indoor.num_imt_buildings = config.get("INDOOR", "num_imt_buildings")
         self.indoor.street_width = config.getint("INDOOR", "street_width")
         self.indoor.intersite_distance = config.getfloat("INDOOR", "intersite_distance")
         self.indoor.num_cells = config.getint("INDOOR", "num_cells")
