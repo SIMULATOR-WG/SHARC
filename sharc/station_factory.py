@@ -92,6 +92,9 @@ class StationFactory(object):
         elif param.spectral_mask == "3GPP 36.104":
             imt_base_stations.spectral_mask = SpectralMask3Gpp(StationType.IMT_BS,param.frequency,\
                                                                param.bandwidth)
+            
+        if param.topology == 'MACROCELL' or param.topology == 'HOTSPOT':
+            imt_base_stations.intesite_dist = param.intersite_distance
 
         return imt_base_stations
 
@@ -236,6 +239,9 @@ class StationFactory(object):
                                                    param.bandwidth)
 
         imt_ue.spectral_mask.set_mask()
+        
+        if param.topology == 'MACROCELL' or param.topology == 'HOTSPOT':
+            imt_ue.intersite_dist = param.intersite_distance
 
         return imt_ue
 
