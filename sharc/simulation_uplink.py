@@ -268,14 +268,16 @@ class SimulationUplink(Simulation):
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,active_beams])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,active_beams])
                 self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,active_beams])
-                self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[:,bs])
-                self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[:,bs])
+                if self.param_system.channel_model == "HDFSS":
+                    self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[:,bs])
+                    self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[:,bs])
             else:
                 self.results.system_imt_antenna_gain.extend(self.system_imt_antenna_gain[0,ue])
                 self.results.imt_system_antenna_gain.extend(self.imt_system_antenna_gain[0,ue])
                 self.results.imt_system_path_loss.extend(self.imt_system_path_loss[0,ue])
-                self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[:,ue])
-                self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[:,ue])
+                if self.param_system.channel_model == "HDFSS":
+                    self.results.imt_system_build_entry_loss.extend(self.imt_system_build_entry_loss[:,ue])
+                    self.results.imt_system_diffraction_loss.extend(self.imt_system_diffraction_loss[:,ue])
 
             self.results.imt_ul_tx_power.extend(self.ue.tx_power[ue].tolist())
             imt_ul_tx_power_density = 10*np.log10(np.power(10, 0.1*self.ue.tx_power[ue])/(self.num_rb_per_ue*self.parameters.imt.rb_bandwidth*1e6))

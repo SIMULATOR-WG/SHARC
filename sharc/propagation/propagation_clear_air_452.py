@@ -737,9 +737,9 @@ class PropagationClearAir(Propagation):
         N0 = np.asarray(es_params.N0)
         deltaN = np.asarray(es_params.delta_N)
         if es_params.percentage_p == 'RANDOM':
-            p = self.random_number_gen.rand(d_km.shape[0],d_km.shape[1])
+            p = self.random_number_gen.rand(d_km.size)
         else:
-            p = float(es_params.percentage_p)*np.ones_like(d_km)
+            p = float(es_params.percentage_p)*np.ones(d_km.size)
 
         tx_lat = es_params.tx_lat
         rx_lat = es_params.rx_lat
@@ -868,7 +868,7 @@ class PropagationClearAir(Propagation):
             # and transhorizon signal enhancements
             eta = 2.5
 
-            Lba = self.tl_anomalous(dtot, dlt, dlr, Dct, Dcr, dlm[ii], hts, hrs, hte, hre, hm, theta_t, theta_r, f, p, T, Ph,
+            Lba = self.tl_anomalous(dtot, dlt, dlr, Dct, Dcr, dlm[ii], hts, hrs, hte, hre, hm, theta_t, theta_r, f, p[ii], T, Ph,
                                     omega[ii], ae, b0[ii])
 
             Lminbap = eta * np.log(np.exp(Lba / eta) + np.exp(Lb0p / eta))
