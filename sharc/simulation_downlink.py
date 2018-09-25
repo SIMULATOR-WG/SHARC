@@ -166,18 +166,17 @@ class SimulationDownlink(Simulation):
         """
         Calculates interference that IMT system generates on other system
         """
-        polarization_loss = 3
 
         if self.co_channel:
             self.coupling_loss_imt_system = self.calculate_coupling_loss(self.system,
                                                                      self.bs,
-                                                                     self.propagation_system) + polarization_loss
+                                                                     self.propagation_system) + self.polarization_loss
 
         if self.adjacent_channel:
             self.coupling_loss_imt_system_adjacent = self.calculate_coupling_loss(self.system,
                                                                      self.bs,
                                                                      self.propagation_system,
-                                                                     c_channel=False) + polarization_loss
+                                                                     c_channel=False) + self.polarization_loss
 
         # applying a bandwidth scaling factor since UE transmits on a portion
         # of the interfered systems bandwidth

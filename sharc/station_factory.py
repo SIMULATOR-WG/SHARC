@@ -632,6 +632,7 @@ class StationFactory(object):
 
         if param.antenna_pattern == "OMNI":
             ras_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+            ras_station.antenna[0].effective_area = param.SPEED_OF_LIGHT**2/(4*np.pi*(param.frequency*1e6)**2)
         elif param.antenna_pattern == "ITU-R SA.509":
             ras_station.antenna = np.array([AntennaSA509(param)])
         else:

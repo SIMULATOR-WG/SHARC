@@ -152,6 +152,11 @@ class Simulation(ABC, Observable):
         self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.parameters.imt.ue_k)
 
         self.results = Results(self.parameters_filename, self.parameters.general.overwrite_output)
+        
+        if self.parameters.general.system == 'RAS':
+            self.polarization_loss = 0.0
+        else:
+            self.polarization_loss = 3.0
 
     def finalize(self, *args, **kwargs):
         """
@@ -178,7 +183,8 @@ class Simulation(ABC, Observable):
              station_b.station_type is StationType.IMT_UE and \
              self.parameters.imt.topology == "INDOOR":
             elevation_angles = np.transpose(station_b.get_elevation(station_a))
-        elif station_a.station_type is StationType.FSS_ES:
+        elif station_a.station_type is StationType.FSS_ES or \
+            station_a.station_type is StationType.RAS:
             elevation_angles = station_b.get_elevation(station_a)
         else:
             elevation_angles = None
