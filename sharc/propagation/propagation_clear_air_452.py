@@ -737,7 +737,7 @@ class PropagationClearAir(Propagation):
         N0 = np.asarray(es_params.N0)
         deltaN = np.asarray(es_params.delta_N)
         if es_params.percentage_p == 'RANDOM':
-            p = self.random_number_gen.rand(d_km.size)
+            p = 50*self.random_number_gen.rand(d_km.size)
         else:
             p = float(es_params.percentage_p)*np.ones(d_km.size)
 
