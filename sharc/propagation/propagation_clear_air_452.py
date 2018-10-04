@@ -747,7 +747,7 @@ class PropagationClearAir(Propagation):
         num_dists = d_km.size
         d = np.empty([num_dists, profile_length])
         for ii in range(num_dists):
-            d[ii, :] = np.linspace(0,d_km[0][ii],profile_length)
+            d[ii, :] = np.linspace(0,d_km.flatten()[ii],profile_length)
 
         h = np.zeros(d.shape)
 
@@ -906,6 +906,7 @@ class PropagationClearAir(Propagation):
             clutter_loss = np.repeat(clutter_loss, number_of_sectors, 1)
             building_loss = np.repeat(building_loss, number_of_sectors, 1)
 
+        Lb = np.reshape(Lb, (8,-1))
         Lb = Lb + clutter_loss + building_loss
 
         return Lb

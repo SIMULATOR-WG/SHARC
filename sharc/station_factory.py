@@ -429,8 +429,12 @@ class StationFactory(object):
         """
         if len(args): topology = args[0]
 
-        fss_earth_station = StationManager(1)
+        num_haps_cpe = 8
+
+        fss_earth_station = StationManager(num_haps_cpe)
         fss_earth_station.station_type = StationType.FSS_ES
+        
+        cpe_radius = np.empty(num_haps_cpe)
 
         if param.location.upper() == "FIXED":
             fss_earth_station.x = np.array([param.x])
@@ -451,22 +455,17 @@ class StationFactory(object):
             angle = random_number_gen.uniform(-np.pi, np.pi)
             fss_earth_station.x[0] = np.array(dist * np.cos(angle))
             fss_earth_station.y[0] = np.array(dist * np.sin(angle))
-        elif param.location.upper() == "HAPS_GW":
-            inside_haps_area = False
-            while not inside_haps_area:
-                coords = random_number_gen.uniform(0, 50000, 2)
-                radius = np.sqrt(coords[0]**2 + coords[1]**2)
-                if radius < 50000:
-                    inside_haps_area = True
-            fss_earth_station.x[0] = coords[0]
-            fss_earth_station.y[0] = coords[1]
+        elif param.location.upper() == "HAPS_CPE":
+            x, y = StationFactory.get_cpe_position(random_number_gen)
+            fss_earth_station.x = x
+            fss_earth_station.y = y
         else:
             sys.stderr.write("ERROR\nFSS-ES location type {} not supported".format(param.location))
             sys.exit(1)
 
-        fss_earth_station.height = np.array([param.height])
+        fss_earth_station.height = param.height*np.ones(num_haps_cpe)
         
-        fss_earth_station.azimuth = np.degrees(np.arctan2(fss_earth_station.y[0], fss_earth_station.x[0]) + np.pi)
+        fss_earth_station.azimuth = np.degrees(np.arctan2(fss_earth_station.y, fss_earth_station.x) + np.pi)
 #        if param.azimuth.upper() == "RANDOM":
 #            fss_earth_station.azimuth = random_number_gen.uniform(-180., 180.)
 #        else:
@@ -474,9 +473,9 @@ class StationFactory(object):
 
         #elevation = random_number_gen.uniform(param.elevation_min, param.elevation_max)
         #fss_earth_station.elevation = np.array([elevation])
-        fss_earth_station.elevation = np.degrees(np.arctan2(50000 - fss_earth_station.height, radius))
+        fss_earth_station.elevation = np.degrees(np.arctan2(50000 - fss_earth_station.height, cpe_radius))
 
-        fss_earth_station.active = np.array([True])
+        fss_earth_station.active = np.ones(num_haps_cpe, dtype = bool)
         #fss_earth_station.tx_power = np.array([param.tx_power_density + 10*math.log10(param.bandwidth*1e6) + 30])
         fss_earth_station.rx_interference = -500
 
@@ -491,13 +490,14 @@ class StationFactory(object):
         elif param.antenna_pattern.upper() == "ITU-R S.580":
             fss_earth_station.antenna = np.array([AntennaS580(param)])
         elif param.antenna_pattern.upper() == "ITU-R F.1245":
-            fss_earth_station.antenna = np.array([AntennaF1245(param)])            
+            for i in range(num_haps_cpe):
+                fss_earth_station.antenna[i] = AntennaF1245(param)
         else:
             sys.stderr.write("ERROR\nInvalid FSS ES antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
 
         fss_earth_station.noise_temperature = param.noise_temperature
-        fss_earth_station.bandwidth = np.array([param.bandwidth])
+        fss_earth_station.bandwidth = param.bandwidth*np.ones(num_haps_cpe)
         fss_earth_station.noise_temperature = param.noise_temperature
         fss_earth_station.thermal_noise = -500
         fss_earth_station.total_interference = -500
@@ -695,6 +695,43 @@ class StationFactory(object):
         distance = np.sqrt((cell_x - x) ** 2 + (cell_y - y) ** 2)
 
         return x, y, theta, distance
+    
+    @staticmethod
+    def get_cpe_position(random_number_gen: np.random.RandomState) -> tuple:
+        """
+        Input azimuth and elevation describe the platform antenna pointing 
+        """
+        haps_height = 20000
+        haps_coverage_radius = 50000
+        num_platform_beams = 4
+        num_cpe_per_beam = 2
+        theta_3db = 3.4
+        
+        x = list()
+        y = list()
+        
+        for n in range(num_platform_beams):
+            inside_haps_area = False
+            while not inside_haps_area:
+                beam_coords = random_number_gen.uniform(0, haps_coverage_radius, 2)
+                beam_r = np.sqrt(beam_coords[0]**2 + beam_coords[1]**2)
+                if beam_r < haps_coverage_radius:
+                    inside_haps_area = True
+            phi = np.degrees(np.arctan2(haps_height, beam_r))
+            beam_radius = haps_height * np.sin(np.radians(theta_3db/2)) \
+                            /np.sin(np.radians(phi)) \
+                            /np.sin(np.radians(phi - theta_3db/2))
+            for c in range(num_cpe_per_beam):
+                inside_beam_area = False
+                while not inside_beam_area:                
+                    cpe_coords = random_number_gen.uniform(0, beam_radius, 2)
+                    cpe_r = np.sqrt(cpe_coords[0]**2 + cpe_coords[1]**2)
+                    if cpe_r < beam_radius:
+                        inside_beam_area = True                
+                x.append(cpe_coords[0] + beam_coords[0])
+                y.append(cpe_coords[1] + beam_coords[1])
+        
+        return np.array(x), np.array(y)
 
 
 if __name__ == '__main__':
