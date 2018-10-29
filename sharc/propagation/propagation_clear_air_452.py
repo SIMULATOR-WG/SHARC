@@ -736,7 +736,10 @@ class PropagationClearAir(Propagation):
         Hre = np.asarray(es_params.Hre)
         N0 = np.asarray(es_params.N0)
         deltaN = np.asarray(es_params.delta_N)
-        p = np.asarray(es_params.percentage_p)
+        if es_params.percentage_p == 'RANDOM':
+            p = 50*self.random_number_gen.rand(d_km.size)
+        else:
+            p = float(es_params.percentage_p)*np.ones(d_km.size)
 
         tx_lat = es_params.tx_lat
         rx_lat = es_params.rx_lat
@@ -843,9 +846,9 @@ class PropagationClearAir(Propagation):
 
             Fk = 1.0 - 0.5 * (1.0 + np.tanh(3.0 * kappa * (dtot - dsw) / dsw))
 
-            [Lbfsg, Lb0p, Lb0b] = self.pl_los(dtot, f, p, b0[ii], omega[ii], T, Ph, dlt, dlr)
+            [Lbfsg, Lb0p, Lb0b] = self.pl_los(dtot, f, p[ii], b0[ii], omega[ii], T, Ph, dlt, dlr)
 
-            [Ldp, Ld50] = self.dl_p(d[ii], h[ii], hts, hrs, hstd, hsrd, f, omega[ii], p, b0[ii], deltaN)
+            [Ldp, Ld50] = self.dl_p(d[ii], h[ii], hts, hrs, hstd, hsrd, f, omega[ii], p[ii], b0[ii], deltaN)
 
             # The median basic transmission loss associated with diffraction Eq (43)
             Lbd50 = Lbfsg + Ld50
@@ -857,15 +860,15 @@ class PropagationClearAir(Propagation):
             # propagation and over-sea sub-path diffraction
             Lminb0p = Lb0p + (1 - omega[ii]) * Ldp
 
-            if p >= b0[ii]:
-                Fi = inv_cum_norm(p / 100) / inv_cum_norm(b0[ii] / 100)
+            if p[ii] >= b0[ii]:
+                Fi = inv_cum_norm(p[ii] / 100) / inv_cum_norm(b0[ii] / 100)
                 Lminb0p = Lbd50 + (Lb0b + (1 - omega[ii]) * Ldp - Lbd50) * Fi
 
             # Calculate a notional minimum basic transmission loss associated with LoS
             # and transhorizon signal enhancements
             eta = 2.5
 
-            Lba = self.tl_anomalous(dtot, dlt, dlr, Dct, Dcr, dlm[ii], hts, hrs, hte, hre, hm, theta_t, theta_r, f, p, T, Ph,
+            Lba = self.tl_anomalous(dtot, dlt, dlr, Dct, Dcr, dlm[ii], hts, hrs, hte, hre, hm, theta_t, theta_r, f, p[ii], T, Ph,
                                     omega[ii], ae, b0[ii])
 
             Lminbap = eta * np.log(np.exp(Lba / eta) + np.exp(Lb0p / eta))
@@ -882,7 +885,7 @@ class PropagationClearAir(Propagation):
 
             # Calculate the basic transmission loss due to troposcatter not exceeded
             # for any time percantage p
-            Lbs = self.tl_tropo(dtot, theta, f, p, T, Ph, N0, Gt[ii], Gr[ii])
+            Lbs = self.tl_tropo(dtot, theta, f, p[ii], T, Ph, N0, Gt[ii], Gr[ii])
 
             # Calculate the final transmission loss not exceeded for p % time
             Lb_pol = -5 * np.log10(10 ** (-0.2 * Lbs) + 10** (-0.2 * Lbam)) + Aht + Ahr

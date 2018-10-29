@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.axes
 
 import numpy as np
+from itertools import product
 
 class TopologyIndoor(Topology):
     """
@@ -44,7 +45,14 @@ class TopologyIndoor(Topology):
         self.building_class = param.building_class
         self.num_cells = param.num_cells
         self.num_floors = param.num_floors
-        self.total_bs_level = self.n_rows*self.n_colums*self.num_cells
+        if param.num_imt_buildings == 'ALL':
+            self.all_buildings = True
+            self.num_imt_buildings = self.n_rows*self.n_colums
+        else:
+            self.all_buildings = False
+            self.num_imt_buildings = int(param.num_imt_buildings)
+        self.imt_buildings = list()
+        self.total_bs_level = self.num_imt_buildings*self.num_cells
         
         self.height = np.empty(0)
         
@@ -57,17 +65,24 @@ class TopologyIndoor(Topology):
         static_base_stations to True to avoid unnecessary calculations.
         """
         if not self.static_base_stations:
-            self.static_base_stations = True
+            self.reset()
+            self.static_base_stations = self.all_buildings
             
             x_base = np.array([ (2*k + 1)*self.cell_radius for k in range(self.num_cells)])
             y_base = self.b_d/2*np.ones(self.num_cells)
             
+            # Choose random buildings
+            all_buildings = list(product(range(self.n_rows),range(self.n_colums)))
+            random_number_gen.shuffle(all_buildings)
+            self.imt_buildings = all_buildings[:self.num_imt_buildings]
+            
             floor_x = np.empty(0)
             floor_y = np.empty(0)
-            for r in range(self.n_rows):
-                for c in range(self.n_colums):
-                    floor_x = np.concatenate((floor_x, x_base + c*(self.b_w + self.street_width)))
-                    floor_y = np.concatenate((floor_y, y_base + r*(self.b_d + self.street_width)))
+            for build in self.imt_buildings:
+                r = build[0]
+                c = build[1]
+                floor_x = np.concatenate((floor_x, x_base + c*(self.b_w + self.street_width)))
+                floor_y = np.concatenate((floor_y, y_base + r*(self.b_d + self.street_width)))
 
             for f in range(self.num_floors):
                 self.x = np.concatenate((self.x, floor_x))
@@ -81,7 +96,16 @@ class TopologyIndoor(Topology):
             self.azimuth = np.zeros(self.num_base_stations)
             self.elevation = -90*np.ones(self.num_base_stations)
             self.indoor = np.ones(self.num_base_stations, dtype = bool)
-                
+            
+    def reset(self):
+        self.x = np.empty(0)
+        self.y = np.empty(0)
+        self.height = np.empty(0)
+        self.azimuth = np.empty(0)
+        self.elevation = np.empty(0)
+        self.indoor = np.empty(0)
+        self.num_base_stations = -1
+        self.static_base_stations = False
     
     def plot(self, ax: matplotlib.axes.Axes, top_view = True):
         if top_view:
@@ -131,7 +155,8 @@ class TopologyIndoor(Topology):
         
         # Loop on each floor of each column of buildings
         for f in range(int(self.num_floors)):
-            for c in range(int(self.n_colums)):
+            for build in self.imt_buildings:
+                c = build[1]
                 x_b = self.x[f*self.total_bs_level + c*self.num_cells]  - self.cell_radius 
                 z_b = self.height[f*self.total_bs_level + c*self.num_cells]
                 points = list([[x_b, z_b],
@@ -146,12 +171,13 @@ class TopologyIndoor(Topology):
 if __name__ == '__main__':
     param = ParametersIndoor()
     param.intersite_distance = 20
-    param.n_rows = 2
-    param.n_colums = 2
+    param.n_rows = 5
+    param.n_colums = 5
+    param.num_imt_buildings = 5
     param.num_floors = 3
     param.street_width = 30
-    param.intersite_distance = 30
-    param.num_cells = 4
+    param.intersite_distance = 20
+    param.num_cells = 6
     param.ue_indoor_percent = 0.95
     param.building_class = "TRADITIONAL"
     topology = TopologyIndoor(param)

@@ -67,6 +67,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.imt.dl_sinr_max = 30
         self.param.imt.channel_model = "FSPL"
         self.param.imt.shadowing = False
+        self.param.imt.wrap_around = False
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
 
@@ -116,6 +117,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.indoor.basic_path_loss = "FSPL"
         self.param.indoor.n_rows = 1
         self.param.indoor.n_colums = 1
+        self.param.indoor.num_imt_buildings = 'ALL'
         self.param.indoor.street_width = 30
         self.param.indoor.ue_indoor_percent = 0.95
         self.param.indoor.building_class = "TRADITIONAL"

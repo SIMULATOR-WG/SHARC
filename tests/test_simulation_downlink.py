@@ -529,7 +529,7 @@ class SimulationDownlinkTest(unittest.TestCase):
 
         self.simulation.calculate_external_interference()
 
-        polarization_loss = 3.
+        polarization_loss = 0.
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]) + polarization_loss,
                             atol=1e-2)
