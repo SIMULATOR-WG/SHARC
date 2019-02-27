@@ -362,13 +362,18 @@ class StationFactory(object):
         imt_ue.center_freq = param.frequency*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
 
-        if param.spectral_mask == "ITU 265-E":
-            imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
-                                                   param.bandwidth,scenario = "INDOOR")
+        if param.spectral_mask == "IMT-2020":
+            imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,
+                                                   param.frequency,
+                                                   param.bandwidth,
+                                                   param.spurious_emissions,
+                                                   scenario = "INDOOR")
 
         elif param.spectral_mask == "3GPP 36.104":
-            imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,param.frequency,\
-                                                   param.bandwidth)
+            imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,
+                                                    param.frequency,
+                                                    param.bandwidth,
+                                                    param.spurious_emissions)
 
         imt_ue.spectral_mask.set_mask()
 
