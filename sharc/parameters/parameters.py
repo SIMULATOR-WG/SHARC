@@ -12,6 +12,7 @@ from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_hotspot import ParametersHotspot
 from sharc.parameters.parameters_indoor import ParametersIndoor
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.parameters.parameters_eess_passive import ParametersEessPassive
 from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
@@ -33,6 +34,7 @@ class Parameters(object):
         self.antenna_imt = ParametersAntennaImt()
         self.hotspot = ParametersHotspot()
         self.indoor = ParametersIndoor()
+        self.eess_passive = ParametersEessPassive()
         self.fs = ParametersFs()
         self.fss_ss = ParametersFssSs()
         self.fss_es = ParametersFssEs()
@@ -57,7 +59,7 @@ class Parameters(object):
         self.general.system          = config.get("GENERAL", "system")
         self.general.enable_cochannel = config.getboolean("GENERAL", "enable_cochannel")
         self.general.enable_adjacent_channel = config.getboolean("GENERAL", "enable_adjacent_channel")
-        self.general.seed            = config.get("GENERAL", "seed")
+        self.general.seed            = config.getint("GENERAL", "seed")
         self.general.overwrite_output = config.getboolean("GENERAL", "overwrite_output")
 
 
@@ -75,6 +77,7 @@ class Parameters(object):
         self.imt.bandwidth               = config.getfloat("IMT", "bandwidth")
         self.imt.rb_bandwidth            = config.getfloat("IMT", "rb_bandwidth")
         self.imt.spectral_mask           = config.get("IMT", "spectral_mask")
+        self.imt.spurious_emissions      = config.getfloat("IMT", "spurious_emissions")
         self.imt.guard_band_ratio        = config.getfloat("IMT", "guard_band_ratio")
         self.imt.bs_load_probability     = config.getfloat("IMT", "bs_load_probability")
         self.imt.bs_conducted_power      = config.getfloat("IMT", "bs_conducted_power")
@@ -361,3 +364,21 @@ class Parameters(object):
         self.ras.rx_lat = config.getfloat("RAS", "rx_lat")
         self.ras.polarization = config.get("RAS", "polarization")
         self.ras.clutter_loss = config.getboolean("RAS", "clutter_loss")
+
+        #######################################################################
+        # EESS passive
+        #######################################################################
+        self.eess_passive.frequency               = config.getfloat("EESS_PASSIVE", "frequency")
+        self.eess_passive.bandwidth               = config.getfloat("EESS_PASSIVE", "bandwidth")
+        self.eess_passive.nadir_angle             = config.getfloat("EESS_PASSIVE", "nadir_angle")
+        self.eess_passive.altitude                = config.getfloat("EESS_PASSIVE", "altitude")
+        self.eess_passive.antenna_pattern         = config.get("EESS_PASSIVE", "antenna_pattern")
+        self.eess_passive.antenna_efficiency      = config.getfloat("EESS_PASSIVE", "antenna_efficiency")
+        self.eess_passive.antenna_diameter        = config.getfloat("EESS_PASSIVE", "antenna_diameter")
+        self.eess_passive.antenna_gain            = config.getfloat("EESS_PASSIVE", "antenna_gain")
+        self.eess_passive.channel_model           = config.get("EESS_PASSIVE", "channel_model")
+        self.eess_passive.imt_altitude            = config.getfloat("EESS_PASSIVE", "imt_altitude")
+        self.eess_passive.imt_lat_deg             = config.getfloat("EESS_PASSIVE", "imt_lat_deg")
+        self.eess_passive.season                  = config.get("EESS_PASSIVE", "season")
+        self.eess_passive.BOLTZMANN_CONSTANT      = config.getfloat("EESS_PASSIVE", "BOLTZMANN_CONSTANT")
+        self.eess_passive.EARTH_RADIUS            = config.getfloat("EESS_PASSIVE", "EARTH_RADIUS")
