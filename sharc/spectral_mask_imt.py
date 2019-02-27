@@ -13,13 +13,12 @@ import matplotlib.pyplot as plt
 
 class SpectralMaskImt(SpectralMask):
     """
-    Implements spectral masks from document ITU 265-E. The masks are in the
-    document's tables 1 to 8.
+    Implements spectral masks for IMT-2020 according to Document 5-1/36-E. 
+    The masks are in the document's tables 1 to 8.
     
     Attributes:
         spurious_emissions (float): level of power emissions at spurious
-            domain (dBm/MHz). Hardcoded as -13 dBm/MHz,  as specified in
-            document ITU 265-E
+            domain [dBm/MHz]. 
         delta_f_lin (np.array): mask delta f breaking limits in MHz. Delta f 
             values for which the spectral mask changes value. Hard coded as
             [0, 20, 400]. In this context, delta f is the frequency distance to
@@ -34,7 +33,12 @@ class SpectralMaskImt(SpectralMask):
         p_tx (float): station's transmit power in dBm/MHz
         mask_dbm (np.array): spectral mask emission values in dBm
     """
-    def __init__(self,sta_type: StationType, freq_mhz: float, band_mhz: float, scenario = "OUTDOOR"):
+    def __init__(self, 
+                 sta_type: StationType, 
+                 freq_mhz: float, 
+                 band_mhz: float, 
+                 spurious_emissions : float, 
+                 scenario = "OUTDOOR"):
         """
         Class constructor.
         
@@ -44,10 +48,11 @@ class SpectralMaskImt(SpectralMask):
                 IMT_UE
             freq_mhz (float): center frequency of station in MHz
             band_mhs (float): transmitting bandwidth of station in MHz
+            spurious_emissions (float): level of spurious emissions [dBm/MHz]. 
             scenario (str): INDOOR or OUTDOOR scenario
         """
-        # Spurious domain limits [dDm/MHz]
-        self.spurious_emissions = -13
+        # Spurious domain limits [dBm/MHz]
+        self.spurious_emissions = spurious_emissions
         # Mask delta f breaking limits [MHz]
         self.delta_f_lim = np.array([0, 20, 400])
         
