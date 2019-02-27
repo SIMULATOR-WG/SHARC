@@ -71,7 +71,7 @@ class PropagationP619(Propagation):
         if not surf_water_vapour_density:
             dummy, dummy, surf_water_vapour_density = \
                 self.atmosphere.get_reference_atmosphere_p835(sat_params.imt_lat_deg,
-                                                               0, season="summer")
+                                                               0, season = sat_params.season)
 
         # first, check if atmospheric loss was already calculated
         if len(self.elevation_has_atmospheric_loss):
