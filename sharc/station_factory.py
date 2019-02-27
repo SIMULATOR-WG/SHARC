@@ -13,6 +13,7 @@ from sharc.support.enumerations import StationType
 from sharc.parameters.parameters import Parameters
 from sharc.parameters.parameters_imt import ParametersImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
+from sharc.parameters.parameters_eess_passive import ParametersEessPassive
 from sharc.parameters.parameters_fs import ParametersFs
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 from sharc.parameters.parameters_fss_es import ParametersFssEs
@@ -27,6 +28,7 @@ from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_f699 import AntennaF699
 from sharc.antenna.antenna_f1891 import AntennaF1891
 from sharc.antenna.antenna_m1466 import AntennaM1466
+from sharc.antenna.antenna_rs1813 import AntennaRS1813
 from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_modified_s465 import AntennaModifiedS465
 from sharc.antenna.antenna_s580 import AntennaS580
@@ -86,12 +88,17 @@ class StationFactory(object):
         imt_base_stations.noise_figure = param.bs_noise_figure*np.ones(num_bs)
         imt_base_stations.thermal_noise = -500*np.ones(num_bs)
 
-        if param.spectral_mask == "ITU 265-E":
-            imt_base_stations.spectral_mask = SpectralMaskImt(StationType.IMT_BS,param.frequency,\
-                                                              param.bandwidth,scenario = param.topology)
+        if param.spectral_mask == "IMT-2020":
+            imt_base_stations.spectral_mask = SpectralMaskImt(StationType.IMT_BS,
+                                                              param.frequency,
+                                                              param.bandwidth,
+                                                              param.spurious_emissions,
+                                                              scenario = param.topology)
         elif param.spectral_mask == "3GPP 36.104":
-            imt_base_stations.spectral_mask = SpectralMask3Gpp(StationType.IMT_BS,param.frequency,\
-                                                               param.bandwidth)
+            imt_base_stations.spectral_mask = SpectralMask3Gpp(StationType.IMT_BS,
+                                                               param.frequency,
+                                                               param.bandwidth,
+                                                               param.spurious_emissions)
             
         if param.topology == 'MACROCELL' or param.topology == 'HOTSPOT':
             imt_base_stations.intesite_dist = param.intersite_distance
@@ -230,13 +237,18 @@ class StationFactory(object):
         imt_ue.center_freq = param.frequency*np.ones(num_ue)
         imt_ue.noise_figure = param.ue_noise_figure*np.ones(num_ue)
 
-        if param.spectral_mask == "ITU 265-E":
-            imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,param.frequency,\
-                                                   param.bandwidth,scenario = "OUTDOOR")
+        if param.spectral_mask == "IMT-2020":
+            imt_ue.spectral_mask = SpectralMaskImt(StationType.IMT_UE,
+                                                   param.frequency,
+                                                   param.bandwidth,
+                                                   param.spurious_emissions,
+                                                   scenario = "OUTDOOR")
 
         elif param.spectral_mask == "3GPP 36.104":
-            imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,param.frequency,\
-                                                   param.bandwidth)
+            imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,
+                                                    param.frequency,
+                                                    param.bandwidth,
+                                                    param.spurious_emissions)
 
         imt_ue.spectral_mask.set_mask()
         
@@ -365,6 +377,8 @@ class StationFactory(object):
 
     @staticmethod
     def generate_system(parameters: Parameters, topology: Topology, random_number_gen: np.random.RandomState ):
+        if parameters.general.system == "EESS_PASSIVE":
+            return StationFactory.generate_eess_passive_sensor(parameters.eess_passive)
         if parameters.general.system == "FSS_ES":
             return StationFactory.generate_fss_earth_station(parameters.fss_es, random_number_gen, topology)
         elif parameters.general.system == "FSS_SS":
@@ -644,6 +658,55 @@ class StationFactory(object):
         ras_station.bandwidth = np.array(param.bandwidth)
 
         return ras_station
+
+
+    @staticmethod
+    def generate_eess_passive_sensor(param: ParametersEessPassive):
+        eess_passive_sensor = StationManager(1)
+        eess_passive_sensor.station_type = StationType.EESS_PASSIVE
+
+        # incidence angle according to Rec. ITU-R RS.1861-0
+        incidence_angle = math.degrees(math.asin(
+                math.sin(math.radians(param.nadir_angle))*(1 + (param.altitude/param.EARTH_RADIUS))))
+
+        # distance to field of view centre according to Rec. ITU-R RS.1861-0
+        distance = param.EARTH_RADIUS * \
+                    math.sin(math.radians(incidence_angle - param.nadir_angle)) / \
+                    math.sin(math.radians(param.nadir_angle))
+        
+        # Elevation at ground (centre of the footprint)
+        theta_grd_elev = 90 - incidence_angle
+
+        eess_passive_sensor.x = np.array([0])
+        eess_passive_sensor.y = np.array([distance * math.cos(math.radians(theta_grd_elev))])
+        eess_passive_sensor.height = np.array([distance * math.sin(math.radians(theta_grd_elev))])
+
+        # Elevation and azimuth at sensor wrt centre of the footprint
+        # It is assumed the sensor is at y-axis, hence azimuth is 270 deg
+        eess_passive_sensor.azimuth = 270 
+        eess_passive_sensor.elevation = -theta_grd_elev
+
+        eess_passive_sensor.active = np.array([True])
+        eess_passive_sensor.rx_interference = -500
+
+        if param.antenna_pattern == "OMNI":
+            eess_passive_sensor.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        elif param.antenna_pattern == "ITU-R RS.1813":
+            eess_passive_sensor.antenna = np.array([AntennaRS1813(param)])
+        else:
+            sys.stderr.write("ERROR\nInvalid EESS PASSIVE antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+
+        eess_passive_sensor.bandwidth = param.bandwidth
+        # Noise temperature is not an input parameter for EESS passive. 
+        # It is included here to calculate the useless I/N values
+        eess_passive_sensor.noise_temperature = 250
+        eess_passive_sensor.thermal_noise = -500
+        eess_passive_sensor.total_interference = -500
+
+        return eess_passive_sensor
+
+
 
     @staticmethod
     def get_random_position( num_stas: int, topology: Topology,
