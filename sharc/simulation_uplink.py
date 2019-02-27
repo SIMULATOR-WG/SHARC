@@ -30,11 +30,6 @@ class SimulationUplink(Simulation):
 
         random_number_gen = np.random.RandomState(seed)
 
-        self.propagation_imt = PropagationFactory.create_propagation(self.parameters.imt.channel_model, self.parameters,
-                                                                     random_number_gen)
-        self.propagation_system = PropagationFactory.create_propagation(self.param_system.channel_model, self.parameters,
-                                                                        random_number_gen)
-
         # In case of hotspots, base stations coordinates have to be calculated
         # on every snapshot. Anyway, let topology decide whether to calculate
         # or not
@@ -235,10 +230,9 @@ class SimulationUplink(Simulation):
     def collect_results(self, write_to_file: bool, snapshot_number: int):
         if not self.parameters.imt.interfered_with and np.any(self.bs.active):
             self.results.system_inr.extend(self.system.inr.tolist())
-            self.results.system_inr_scaled.extend([self.system.inr + 10*math.log10(self.param_system.inr_scaling)])
+            self.results.system_ul_interf_power.extend([self.system.rx_interference])
             if self.system.station_type is StationType.RAS:
                 self.results.system_pfd.extend([self.system.pfd])
-                self.results.system_ul_interf_power.extend([self.system.rx_interference])
 
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
