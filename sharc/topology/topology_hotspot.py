@@ -153,32 +153,6 @@ class TopologyHotspot(Topology):
         return False
 
 
-    def validade_min_dist_hotspots(self,
-                                   hotspot_x: np.array,
-                                   hotspot_y: np.array,
-                                   min_dist_hotspots: float) -> bool:
-        """
-        Checks minimum 2D distance between two hotspots. Currently not used.
-
-        Returns
-        -------
-        out : bool
-            True if hotspots coordinates meets the minimum 2D distance between
-            any two hotspots
-        """
-        # Here we have a 2D matrix whose values indicates the distance between
-        # the hotspots. The diagonal elements are obviously equal to zero
-        distance = np.sqrt((hotspot_x - hotspot_x.reshape((-1, 1)))**2 +
-                           (hotspot_y - hotspot_y.reshape((-1, 1)))**2)
-        num_hotpots = len(hotspot_x)
-        # count the number of values that are less than the minimum distance and
-        # return true if this value is equal os less than the number of hotspots.
-        # In other words, it returns True if only diagonal elements are less
-        # than the minimum distance
-        occ = np.where(distance < min_dist_hotspots)[0]
-        return len(occ) == num_hotpots
-
-
     def validade_min_dist_bs_hotspot(self,
                                      hotspot_x: np.array,
                                      hotspot_y: np.array,
@@ -230,7 +204,6 @@ if __name__ == '__main__':
     param.max_dist_hotspot_ue = 60
     param.min_dist_hotspot_ue = 5
     param.min_dist_bs_hotspot = 100
-    param.min_dist_hotspots = 2*param.max_dist_hotspot_ue
 
     #intersite_distance = 500
     intersite_distance = 339.81
