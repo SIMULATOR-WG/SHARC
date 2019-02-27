@@ -29,7 +29,6 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.general.overwrite_output = True
 
         self.param.imt.topology = "INDOOR"
-        self.param.imt.num_macrocell_sites = 19
         self.param.imt.num_clusters = 1
         self.param.imt.intersite_distance = 339
         self.param.imt.minimum_separation_distance_bs_ue = 10

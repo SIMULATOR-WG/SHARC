@@ -68,7 +68,6 @@ class Parameters(object):
         #######################################################################
         self.imt.topology                = config.get("IMT", "topology")
         self.imt.wrap_around             = config.getboolean("IMT", "wrap_around")
-        self.imt.num_macrocell_sites     = config.getint("IMT", "num_macrocell_sites")
         self.imt.num_clusters            = config.getint("IMT", "num_clusters")
         self.imt.intersite_distance      = config.getfloat("IMT", "intersite_distance")
         self.imt.minimum_separation_distance_bs_ue = config.getfloat("IMT", "minimum_separation_distance_bs_ue")
@@ -167,7 +166,6 @@ class Parameters(object):
         self.hotspot.num_hotspots_per_cell = config.getint("HOTSPOT", "num_hotspots_per_cell")
         self.hotspot.max_dist_hotspot_ue   = config.getfloat("HOTSPOT", "max_dist_hotspot_ue")
         self.hotspot.min_dist_bs_hotspot   = config.getfloat("HOTSPOT", "min_dist_bs_hotspot")
-        self.hotspot.min_dist_hotspots     = config.getfloat("HOTSPOT", "min_dist_hotspots")
 
         #######################################################################
         # INDOOR
