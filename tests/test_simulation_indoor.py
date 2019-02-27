@@ -23,6 +23,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param = Parameters()
 
         self.param.general.imt_link = "DOWNLINK"
+        self.param.general.seed = 101
         self.param.general.enable_cochannel = True
         self.param.general.enable_adjacent_channel = False
         self.param.general.overwrite_output = True
@@ -36,7 +37,8 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.imt.frequency = 40000
         self.param.imt.bandwidth = 200
         self.param.imt.rb_bandwidth = 0.180
-        self.param.imt.spectral_mask = "ITU 265-E"
+        self.param.imt.spectral_mask = "IMT-2020"
+        self.param.imt.spurious_emissions = -13
         self.param.imt.guard_band_ratio = 0.1
         self.param.imt.bs_load_probability = 1
         self.param.imt.num_resource_blocks = 10

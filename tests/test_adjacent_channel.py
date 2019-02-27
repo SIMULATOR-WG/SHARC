@@ -26,6 +26,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.param.general.enable_cochannel = False
         self.param.general.enable_adjacent_channel = True
         self.param.general.overwrite_output = True
+        self.param.general.seed = 101
 
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.wrap_around = False
@@ -36,7 +37,8 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.param.imt.interfered_with = False
         self.param.imt.frequency = 10000
         self.param.imt.bandwidth = 100
-        self.param.imt.spectral_mask = "ITU 265-E"
+        self.param.imt.spectral_mask = "IMT-2020"
+        self.param.imt.spurious_emissions = -13
         self.param.imt.rb_bandwidth = 0.180
         self.param.imt.guard_band_ratio = 0.1
         self.param.imt.ho_margin = 3

@@ -171,7 +171,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
     def test_generate_correction_matrix(self):
         # Test 3.1: BS element pattern
         file_name = "test_2.npz"
-        self.norm_3.generate_correction_matrix(self.par_3,file_name)
+        self.norm_3.generate_correction_matrix(self.par_3, file_name, True)
         data = np.load(file_name) 
         self.assertAlmostEqual(data['correction_factor_adj_channel'],
                                4.8,delta = 1e-1)
