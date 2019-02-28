@@ -70,15 +70,15 @@ if __name__ == '__main__':
 
     param.antenna_l_s = -20
     antenna = AntennaS672(param)
-    gain20 = antenna.calculate_gain(phi_vec=psi)
+    gain20 = antenna.calculate_gain(off_axis_angle_vec = psi)
 
     param.antenna_l_s = -25
     antenna = AntennaS672(param)
-    gain25 = antenna.calculate_gain(phi_vec=psi)
+    gain25 = antenna.calculate_gain(off_axis_angle_vec = psi)
 
     param.antenna_l_s = -30
     antenna = AntennaS672(param)
-    gain30 = antenna.calculate_gain(phi_vec=psi)
+    gain30 = antenna.calculate_gain(off_axis_angle_vec = psi)
 
     fig = plt.figure(figsize=(12,7), facecolor='w', edgecolor='k')  # create a figure object
 

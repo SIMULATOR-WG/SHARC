@@ -302,8 +302,8 @@ class PlotAntennaPattern(object):
 
     def plot_element_pattern(self,antenna: AntennaBeamformingImt, sta_type: str, antenna_type: str, plot_type: str):
 
-        phi_escan = 45
-        theta_tilt = 120
+        phi_escan = 0
+        theta_tilt = 90
 
         # Plot horizontal pattern
         phi = np.linspace(-180, 180, num = 360)
@@ -385,7 +385,7 @@ if __name__ == '__main__':
     figs_dir = "figs/"
 
     param = ParametersAntennaImt()
-    param.normalization = True
+    param.normalization = False
     param.bs_normalization_file = 'beamforming_normalization\\bs_indoor_norm.npz'
     param.ue_normalization_file = 'beamforming_normalization\\ue_norm.npz'
     
@@ -396,7 +396,7 @@ if __name__ == '__main__':
     param.bs_tx_element_am       = 25
     param.bs_tx_element_sla_v    = 25
     param.bs_tx_n_rows           = 8
-    param.bs_tx_n_columns        = 16
+    param.bs_tx_n_columns        = 8
     param.bs_tx_element_horiz_spacing = 0.5
     param.bs_tx_element_vert_spacing = 0.5
     param.bs_downtilt_deg = 0
@@ -419,9 +419,9 @@ if __name__ == '__main__':
     par = param.get_antenna_parameters("BS","TX")
     bs_array = AntennaBeamformingImt(par,0,0)
     f = plot.plot_element_pattern(bs_array,"BS","TX","ELEMENT")
-    f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
+    #f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
     f = plot.plot_element_pattern(bs_array,"BS","TX","ARRAY")
-    f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
+    #f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
 
     # Plot UE TX radiation patterns
     par = param.get_antenna_parameters("UE","TX")

@@ -285,6 +285,7 @@ class PropagationHDFSSRoofTop(Propagation):
     
 if __name__ == '__main__':
     
+    from sharc.propagation.propagation_hdfss import PropagationHDFSS
     import matplotlib.pyplot as plt
     
     rnd = np.random.RandomState(101)
@@ -295,6 +296,7 @@ if __name__ == '__main__':
     par.bs_building_entry_loss_type = 'FIXED_VALUE'
     par.bs_building_entry_loss_prob = 0.5
     par.bs_building_entry_loss_value = 50
+    par.es_position = "ROOFTOP"
     prop = PropagationHDFSS(par,rnd)
     
     d = np.linspace(5,1000,num=2000)

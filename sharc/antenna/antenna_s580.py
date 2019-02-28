@@ -55,7 +55,7 @@ if __name__ == '__main__':
     param27.diameter = 9.6
     antenna27 = AntennaS580(param27)
 
-    gain27 = antenna27.calculate_gain(phi_vec=phi)
+    gain27 = antenna27.calculate_gain(off_axis_angle_vec = phi)
 
     param = ParametersFssEs()
     param.antenna_pattern = "ITU-R S.580-6"
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     param.antenna_gain = 50
     param.diameter = 0.45
     antenna = AntennaS580(param)
-    gain = antenna.calculate_gain(phi_vec=phi)
+    gain = antenna.calculate_gain(off_axis_angle_vec = phi)
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
 

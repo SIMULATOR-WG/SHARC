@@ -76,7 +76,7 @@ if __name__ == '__main__':
     param_ss.antenna_3_dB = 0.8
     param_ss.antenna_l_s = -25
     antenna_fss = AntennaFssSs(param_ss)
-    gain_fss = antenna_fss.calculate_gain(phi_vec=psi)
+    gain_fss = antenna_fss.calculate_gain(off_axis_angle_vec = psi)
 
     param_672 = ParametersFssSs()
     param_672.antenna_gain = 51
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     param_672.antenna_3_dB = 0.65
     param_672.antenna_l_s = -20
     antenna_672 = AntennaS672(param_672)
-    gain_672 = antenna_672.calculate_gain(phi_vec=psi)
+    gain_672 = antenna_672.calculate_gain(off_axis_angle_vec = psi)
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
 

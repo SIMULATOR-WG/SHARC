@@ -226,7 +226,7 @@ if __name__ == '__main__':
                                    np.linspace(1, 10000, num=10000)[:,np.newaxis],
                                    np.linspace(1, 10000, num=10000)[:,np.newaxis]))
     h_ue = np.array([1.5, 17, 23])
-    uma = PropagationUMa()
+    uma = PropagationUMa(np.random.RandomState(101))
 
     los_probability = np.empty(distance_2D.shape)
     name = list()
@@ -263,7 +263,7 @@ if __name__ == '__main__':
 
     loss_los = uma.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     loss_nlos = uma.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
-    loss_fs = PropagationFreeSpace().get_loss(distance_2D=distance_2D, frequency=freq)
+    loss_fs = PropagationFreeSpace(np.random.RandomState(101)).get_loss(distance_2D=distance_2D, frequency=freq)
     
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()

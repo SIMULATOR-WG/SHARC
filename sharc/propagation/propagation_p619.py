@@ -249,7 +249,8 @@ if __name__ == '__main__':
 
     sat_params = params.fss_ss
 
-    propagation = PropagationP619()
+    random_number_gen = np.random.RandomState(101)
+    propagation = PropagationP619(random_number_gen)
 
     ##########################
     # Plot atmospheric loss

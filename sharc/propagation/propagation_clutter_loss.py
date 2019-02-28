@@ -148,10 +148,11 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     elevation_angle = np.array([90, 80, 70, 60, 50, 40, 30, 20, 15, 10, 5, 0])
-    loc_percentage = np.linspace(0, 1, 1001)
+    loc_percentage = np.linspace(0.01, 0.99, 1000)
     frequency = 27250 * np.ones(elevation_angle.shape)
 
-    cl = PropagationClutterLoss()
+    random_number_gen = np.random.RandomState(101)
+    cl = PropagationClutterLoss(random_number_gen)
     clutter_loss = np.empty([len(elevation_angle), len(loc_percentage)])
 
     for i in range(len(loc_percentage)):
@@ -174,6 +175,7 @@ if __name__ == '__main__':
     plt.legend(loc="lower right")
     plt.tight_layout()
     plt.grid()
+    plt.show()
 
     distance = np.linspace(250, 100000, 100000)
     frequency = np.array([2, 3, 6, 16, 40, 67]) * 1e3
@@ -199,3 +201,4 @@ if __name__ == '__main__':
 
     plt.title("Median clutter loss for terrestrial paths")
     plt.xlabel("Distance [km]")
+    plt.show()

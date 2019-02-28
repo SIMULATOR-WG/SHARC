@@ -77,9 +77,9 @@ if __name__ == '__main__':
     antenna10 = AntennaSA509(par)
 
     phi = np.linspace(0.1, 180, num = 100000)
-    gain1  = antenna1.calculate_gain(phi_vec = phi)
-    gain7  = antenna7.calculate_gain(phi_vec = phi)
-    gain10  = antenna10.calculate_gain(phi_vec = phi)
+    gain1  = antenna1.calculate_gain(off_axis_angle_vec = phi)
+    gain7  = antenna7.calculate_gain(off_axis_angle_vec = phi)
+    gain10  = antenna10.calculate_gain(off_axis_angle_vec = phi)
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
 

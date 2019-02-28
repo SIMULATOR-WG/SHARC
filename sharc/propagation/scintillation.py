@@ -122,7 +122,7 @@ class Scintillation():
 if __name__ == '__main__':
     from matplotlib import pyplot as plt
 
-    propagation = Scintillation()
+    propagation = Scintillation(np.random.RandomState(101))
 
     #################################
     # Plot troposcatter scintillation attenuation

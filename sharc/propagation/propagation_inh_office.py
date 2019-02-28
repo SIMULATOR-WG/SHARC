@@ -213,7 +213,7 @@ if __name__ == '__main__':
     ax.set_prop_cycle( cycler('color', ['r', 'b', 'g', 'y']) )
 
     ax.scatter(distance_2D, loss_inh, label = "InH-Office")
-    ax.plot(distance_2D, loss_fs, label = "free space")
+    ax.plot(distance_2D, loss_fs, "-b", label = "free space")
     ax.set_xscale('log')
 
     plt.title("InH-Office - path loss")

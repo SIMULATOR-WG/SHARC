@@ -115,7 +115,7 @@ if __name__ == '__main__':
     param_gt.diameter = 3
     antenna_gt = AntennaF699(param_gt)
 
-    gain_gt = antenna_gt.calculate_gain(phi_vec=phi)
+    gain_gt = antenna_gt.calculate_gain(off_axis_angle_vec = phi)
 
     param_lt = ParametersFs()
     param_lt.antenna_pattern = "ITU-R F.699"
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     param_lt.antenna_gain = 36.9
     param_lt.diameter = 0.3
     antenna_lt = AntennaF699(param_lt)
-    gain_lt = antenna_lt.calculate_gain(phi_vec=phi)
+    gain_lt = antenna_lt.calculate_gain(off_axis_angle_vec = phi)
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
 

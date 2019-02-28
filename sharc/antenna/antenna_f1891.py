@@ -57,11 +57,11 @@ if __name__ == '__main__':
 
     param.antenna_gain = 47
     antenna47 = AntennaF1891(param)
-    gain47 = antenna47.calculate_gain(phi_vec=psi)
+    gain47 = antenna47.calculate_gain(off_axis_angle_vec = psi)
 
     param.antenna_gain = 30
     antenna30 = AntennaF1891(param)
-    gain30 = antenna30.calculate_gain(phi_vec=psi)
+    gain30 = antenna30.calculate_gain(off_axis_angle_vec = psi)
 
     fig = plt.figure(figsize=(16,6), facecolor='w', edgecolor='k')  # create a figure object
     ax1 = fig.add_subplot(121)
