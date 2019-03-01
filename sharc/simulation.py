@@ -45,6 +45,9 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.rns
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
+        else:
+            sys.stderr.write("ERROR\nInvalid system: " + self.parameters.general.system)
+            sys.exit(1)
             
         self.wrap_around_enabled = self.parameters.imt.wrap_around and \
                                   (self.parameters.imt.topology == 'MACROCELL' \
