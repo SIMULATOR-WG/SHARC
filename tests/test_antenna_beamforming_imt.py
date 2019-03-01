@@ -19,6 +19,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         #Array parameters
         self.param = ParametersAntennaImt()
 
+        self.param.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.normalization = False
         self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
@@ -345,6 +346,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
     def test_normalization(self):
         # Create dummy normalization data
+        adjacent_antenna_model = "SINGLE_ELEMENT"
         normalization = True
         norm_data = {'norm_file': 'dummy_file.npz',
                      'resolution': 1,
@@ -366,7 +368,8 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         horiz_spacing = 0.5
         vert_spacing = 0.5
         down_tilt = 0
-        par = AntennaPar(normalization,
+        par = AntennaPar(adjacent_antenna_model,
+                         normalization,
                          norm_data,
                          element_pattern,
                          element_max_g,

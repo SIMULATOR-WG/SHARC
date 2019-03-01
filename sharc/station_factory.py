@@ -795,6 +795,7 @@ if __name__ == '__main__':
 
     ant_param = ParametersAntennaImt()
 
+    ant_param.adjacent_antenna_model = "SINGLE_ELEMENT"
     ant_param.bs_element_pattern = "F1336"
     ant_param.bs_tx_element_max_g = 5
     ant_param.bs_tx_element_phi_deg_3db = 65

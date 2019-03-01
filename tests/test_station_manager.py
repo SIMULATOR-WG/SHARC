@@ -22,6 +22,7 @@ class StationManagerTest(unittest.TestCase):
         #Array parameters
         self.param = ParametersAntennaImt()
          
+        self.param.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.normalization = False
         self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"

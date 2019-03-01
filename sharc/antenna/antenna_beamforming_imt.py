@@ -77,6 +77,8 @@ class AntennaBeamformingImt(Antenna):
         self.dh = par.element_horiz_spacing
         self.dv = par.element_vert_spacing
         
+        self.adjacent_antenna_model = par.adjacent_antenna_model
+        
         # Beamforming normalization
         self.normalize = par.normalization
         self.co_correction_factor_list = []
@@ -133,8 +135,26 @@ class AntennaBeamformingImt(Antenna):
         """
         phi_vec = np.asarray(kwargs["phi_vec"])
         theta_vec = np.asarray(kwargs["theta_vec"])
-        if("co_channel" in kwargs.keys()): co_channel = kwargs["co_channel"]
-        else: co_channel = True
+        
+        # Check if antenna gain has to be calculated on the co-channel or
+        # on the adjacent channel
+        if("co_channel" in kwargs.keys()): 
+            co_channel = kwargs["co_channel"]
+        else: 
+            co_channel = True
+            
+        # If gain has to be calculated on the adjacent channel, then check whether
+        # to use beamforming or single element pattern.
+        # Both options are explicitly written in order to improve readability
+        if not co_channel:
+            if self.adjacent_antenna_model == "SINGLE_ELEMENT":
+                co_channel = False
+            elif self.adjacent_antenna_model == "BEAMFORMING":
+                co_channel = True
+            else:
+                sys.stderr.write("ERROR\nInvalid antenna pattern for adjacent channel calculations: " + self.adjacent_antenna_model)
+                sys.exit(1)                
+            
         if("beams_l" in kwargs.keys()): 
             beams_l = np.asarray(kwargs["beams_l"],dtype=int)
             correction_factor = self.co_correction_factor_list
@@ -385,6 +405,7 @@ if __name__ == '__main__':
     figs_dir = "figs/"
 
     param = ParametersAntennaImt()
+    param.adjacent_antenna_model = "SINGLE_ELEMENT"
     param.normalization = False
     param.bs_normalization_file = 'beamforming_normalization\\bs_indoor_norm.npz'
     param.ue_normalization_file = 'beamforming_normalization\\ue_norm.npz'

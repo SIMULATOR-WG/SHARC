@@ -17,6 +17,7 @@ class AntennaImtTest(unittest.TestCase):
         #Element parameters
         self.param = ParametersAntennaImt()
 
+        self.param.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.bs_element_pattern = "M2101"
         self.param.ue_element_pattern = "M2101"
         self.param.normalization = False

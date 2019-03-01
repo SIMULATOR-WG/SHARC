@@ -72,6 +72,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
 
+        self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.antenna_imt.normalization = False
         self.param.antenna_imt.bs_normalization_file = path.join('..','sharc','antenna','beamforming_normalization','bs_indoor_norm.npz')
         self.param.antenna_imt.ue_normalization_file = path.join('..','sharc','antenna','beamforming_normalization','ue_norm.npz')

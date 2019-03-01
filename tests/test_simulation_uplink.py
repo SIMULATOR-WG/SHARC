@@ -77,6 +77,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
         
+        self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.antenna_imt.normalization = False
         self.param.antenna_imt.bs_element_pattern = "M2101"
         self.param.antenna_imt.bs_normalization_file = None

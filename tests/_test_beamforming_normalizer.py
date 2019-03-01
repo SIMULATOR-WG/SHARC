@@ -83,6 +83,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
         resolution = 180
         tolerance = 5e-2
         self.norm_3 = BeamformingNormalizer(resolution,tolerance)
+        adjacent_antenna_model = "SINGLE_ELEMENT"
         norm = False
         norm_file = None
         element_pattern = "M2101"
@@ -96,7 +97,8 @@ class BeamformingNormalizerTest(unittest.TestCase):
         horiz_spacing = 0.5
         vert_spacing = 0.5
         down_tilt = 0
-        self.par_3 = AntennaPar(norm,
+        self.par_3 = AntennaPar(adjacent_antenna_model,
+                                norm,
                                 norm_file,
                                 element_pattern,
                                 element_max_g,

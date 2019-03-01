@@ -39,7 +39,8 @@ class ParametersAntennaImt(object):
                 self.ue_normalization_data = None
             
             if txrx == "TX":
-                tpl = AntennaPar(self.normalization,
+                tpl = AntennaPar(self.adjacent_antenna_model,
+                                 self.normalization,
                                  self.bs_normalization_data,
                                  self.bs_element_pattern,
                                  self.bs_tx_element_max_g,
@@ -53,7 +54,8 @@ class ParametersAntennaImt(object):
                                  self.bs_tx_element_vert_spacing,
                                  self.bs_downtilt_deg)
             elif txrx == "RX":
-                tpl = AntennaPar(self.normalization,
+                tpl = AntennaPar(self.adjacent_antenna_model,
+                                 self.normalization,
                                  self.bs_normalization_data,
                                  self.bs_element_pattern,
                                  self.bs_rx_element_max_g,
@@ -68,7 +70,8 @@ class ParametersAntennaImt(object):
                                  self.bs_downtilt_deg)
         elif sta_type == "UE":
             if txrx == "TX":
-                tpl = AntennaPar(self.normalization,
+                tpl = AntennaPar(self.adjacent_antenna_model,
+                                 self.normalization,
                                  self.ue_normalization_data,
                                  self.ue_element_pattern,
                                  self.ue_tx_element_max_g,
@@ -82,7 +85,8 @@ class ParametersAntennaImt(object):
                                  self.ue_tx_element_vert_spacing,
                                  0)
             elif txrx == "RX":
-                tpl = AntennaPar(self.normalization,
+                tpl = AntennaPar(self.adjacent_antenna_model,
+                                 self.normalization,
                                  self.ue_normalization_data,
                                  self.ue_element_pattern,
                                  self.ue_rx_element_max_g,
