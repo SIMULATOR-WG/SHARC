@@ -412,10 +412,10 @@ if __name__ == '__main__':
     
     param.bs_element_pattern = "M2101"
     param.bs_tx_element_max_g    = 5
-    param.bs_tx_element_phi_deg_3db  = 90
-    param.bs_tx_element_theta_deg_3db = 90
-    param.bs_tx_element_am       = 25
-    param.bs_tx_element_sla_v    = 25
+    param.bs_tx_element_phi_deg_3db  = 65
+    param.bs_tx_element_theta_deg_3db = 65
+    param.bs_tx_element_am       = 30
+    param.bs_tx_element_sla_v    = 30
     param.bs_tx_n_rows           = 8
     param.bs_tx_n_columns        = 8
     param.bs_tx_element_horiz_spacing = 0.5
