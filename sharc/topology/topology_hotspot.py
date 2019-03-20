@@ -25,10 +25,6 @@ class TopologyHotspot(Topology):
     network topology (macro cell with hotspots).
     """
 
-    # Possible values for base station azimuth [degrees].
-    # The value is randomly chosen from this array
-    AZIMUTH = [0, 90, 180, 270]
-
     # Posible values for base station elevation [degrees]
     ELEVATION = -10
 
@@ -80,7 +76,7 @@ class TopologyHotspot(Topology):
                 hotspot_angle = 2*np.pi*random_number_gen.random_sample(self.param.num_hotspots_per_cell)
                 hotspot_x = hotspot_radius*np.cos(hotspot_angle) + macro_cell_x
                 hotspot_y = hotspot_radius*np.sin(hotspot_angle) + macro_cell_y
-                hotspot_azimuth = random_number_gen.choice(self.AZIMUTH, self.param.num_hotspots_per_cell)
+                hotspot_azimuth = 360*random_number_gen.rand(self.param.num_hotspots_per_cell)
                 # Hotspots within a cell are validated if they do not overlap
                 # and if they have the minimum separation distance from macro BS
                 hotspots_validated = (not self.overlapping_hotspots(hotspot_x,
