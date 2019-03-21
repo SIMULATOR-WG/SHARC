@@ -219,14 +219,18 @@ class Simulation(ABC, Observable):
                 # define antenna gains
                 gain_a = self.calculate_gains(station_a, station_b)
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a, c_channel))
-                sectors_in_node=1
-
+                sectors_in_node = 1
+                additional_loss = self.parameters.imt.ue_ohmic_loss \
+                                    + self.parameters.imt.ue_body_loss \
+                                    + self.polarization_loss
             else:
                 # define antenna gains
                 gain_a = np.repeat(self.calculate_gains(station_a, station_b), self.parameters.imt.ue_k, 1)
                 gain_b = np.transpose(self.calculate_gains(station_b, station_a, c_channel))
                 sectors_in_node = self.parameters.imt.ue_k
-
+                additional_loss = self.parameters.imt.bs_ohmic_loss \
+                                    + self.polarization_loss
+                
             if self.parameters.imt.interfered_with:
                 earth_to_space = False
                 single_entry = True
@@ -288,9 +292,12 @@ class Simulation(ABC, Observable):
             self.path_loss_imt = path_loss
             self.imt_bs_antenna_gain = gain_a
             self.imt_ue_antenna_gain = gain_b
+            additional_loss = self.parameters.imt.bs_ohmic_loss \
+                                + self.parameters.imt.ue_ohmic_loss \
+                                + self.parameters.imt.ue_body_loss
 
         # calculate coupling loss
-        coupling_loss = np.squeeze(path_loss - gain_a - gain_b)
+        coupling_loss = np.squeeze(path_loss - gain_a - gain_b) + additional_loss
 
         return coupling_loss
 
