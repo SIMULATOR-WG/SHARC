@@ -45,7 +45,8 @@ class PropagationUMi(Propagation):
 
         if std:
             shadowing_los = 4
-            shadowing_nlos = 7.82
+            #shadowing_nlos = 7.82    # option 1 for UMi NLOS
+            shadowing_nlos = 8.2    # option 2 for UMi NLOS
         else:
             shadowing_los = 0
             shadowing_nlos = 0
@@ -127,15 +128,17 @@ class PropagationUMi(Propagation):
                           equipments [m]
             frequency : center frequency [MHz]
             h_bs : array of base stations antenna heights [m]
-            h_ue : array of user equipments antenna heights [m]        """
-        loss_nlos = -37.55 + 35.3*np.log10(distance_3D) + 21.3*np.log10(frequency) \
-                        - 0.3*(h_ue - 1.5)
-
-        idl = np.where(distance_2D < 5000)
-        if len(idl[0]):
-            loss_los = self.get_loss_los(distance_2D, distance_3D,
-                 frequency, h_bs, h_ue, h_e, 0)
-            loss_nlos[idl] = np.maximum(loss_los[idl], loss_nlos[idl])
+            h_ue : array of user equipments antenna heights [m]
+        """
+        # option 1 for UMi NLOS
+#        loss_nlos = -37.55 + 35.3*np.log10(distance_3D) + 21.3*np.log10(frequency) \
+#                        - 0.3*(h_ue - 1.5)
+#
+#        loss_los = self.get_loss_los(distance_2D, distance_3D, frequency, h_bs, h_ue, h_e, 0)
+#        loss_nlos = np.maximum(loss_los, loss_nlos)
+        
+        # option 2 for UMi NLOS
+        loss_nlos = 31.9*np.log10(distance_3D) + 20*np.log10(frequency*1e-3) + 32.4
 
         if shadowing_std:
             shadowing = self.random_number_gen.normal(0, shadowing_std, distance_3D.shape)
@@ -246,10 +249,10 @@ if __name__ == '__main__':
     from propagation_free_space import PropagationFreeSpace
     shadowing_std = 0
     distance_2D = np.linspace(1, 1000, num=1000)[:,np.newaxis]
-    freq = 27000*np.ones(distance_2D.shape)
-    h_bs = 25*np.ones(len(distance_2D[:,0]))
+    freq = 24350*np.ones(distance_2D.shape)
+    h_bs = 6*np.ones(len(distance_2D[:,0]))
     h_ue = 1.5*np.ones(len(distance_2D[0,:]))
-    h_e = np.zeros(distance_2D.shape)
+    h_e = np.ones(distance_2D.shape)
     distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
 
     loss_los = umi.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
