@@ -77,6 +77,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.bs_normalization_file = path.join('..','sharc','antenna','beamforming_normalization','bs_indoor_norm.npz')
         self.param.antenna_imt.ue_normalization_file = path.join('..','sharc','antenna','beamforming_normalization','ue_norm.npz')
         self.param.antenna_imt.bs_element_pattern = "M2101"
+        self.param.antenna_imt.bs_minimum_array_gain = -200
         self.param.antenna_imt.bs_tx_element_max_g = 5
         self.param.antenna_imt.bs_tx_element_phi_3db = 90
         self.param.antenna_imt.bs_tx_element_theta_3db = 90
@@ -97,6 +98,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.bs_rx_element_vert_spacing = 0.5
         self.param.antenna_imt.bs_downtilt_deg = 10
         self.param.antenna_imt.ue_element_pattern = "M2101"
+        self.param.antenna_imt.ue_minimum_array_gain = -200
         self.param.antenna_imt.ue_tx_element_max_g = 5
         self.param.antenna_imt.ue_tx_element_phi_deg_3db = 90
         self.param.antenna_imt.ue_tx_element_theta_deg_3db = 90

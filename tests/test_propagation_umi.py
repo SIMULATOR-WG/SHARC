@@ -82,8 +82,8 @@ class PropagationUMiTest(unittest.TestCase):
         distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
         frequency = 30000*np.ones(distance_2D.shape)
         shadowing_std = 0
-        loss = np.array([[128.841, 138.727, 144.562, 148.645],
-                         [152.969, 155.453, 157.509, 159.252]])
+        loss = np.array([[126.265, 135.470, 141.014, 144.975],
+                         [148.069, 150.585, 152.714, 154.560]])
         npt.assert_allclose(self.umi.get_loss_nlos(distance_2D, distance_3D, frequency,
                                                   h_bs, h_ue, h_e, shadowing_std),
                             loss,
@@ -98,8 +98,8 @@ class PropagationUMiTest(unittest.TestCase):
         distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
         frequency = 300*np.ones(distance_2D.shape)
         shadowing_std = 0
-        loss = np.array([[120.968, 131.290, 145.036, 141.315],
-                         [137.805, 148.131, 150.194, 151.941]])
+        loss = np.array([[117.647, 127.246, 139.939, 136.848],
+                         [132.863, 142.465, 144.601, 146.451]])
         npt.assert_allclose(self.umi.get_loss_nlos(distance_2D, distance_3D, frequency,
                                                   h_bs, h_ue, h_e, shadowing_std),
                             loss,

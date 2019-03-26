@@ -158,6 +158,9 @@ class Parameters(object):
         self.antenna_imt.ue_rx_n_columns        = config.getfloat("IMT_ANTENNA", "ue_rx_n_columns")
         self.antenna_imt.ue_rx_element_horiz_spacing = config.getfloat("IMT_ANTENNA", "ue_rx_element_horiz_spacing")
         self.antenna_imt.ue_rx_element_vert_spacing = config.getfloat("IMT_ANTENNA", "ue_rx_element_vert_spacing")
+        
+        self.antenna_imt.bs_minimum_array_gain     = config.getfloat("IMT_ANTENNA", "bs_minimum_array_gain")
+        self.antenna_imt.ue_minimum_array_gain     = config.getfloat("IMT_ANTENNA", "ue_minimum_array_gain")
 
         self.antenna_imt.bs_downtilt_deg = config.getfloat("IMT_ANTENNA", "bs_downtilt_deg")
 

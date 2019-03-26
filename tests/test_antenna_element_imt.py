@@ -20,6 +20,8 @@ class AntennaImtTest(unittest.TestCase):
         self.param.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.bs_element_pattern = "M2101"
         self.param.ue_element_pattern = "M2101"
+        self.param.bs_minimum_array_gain = -200
+        self.param.ue_minimum_array_gain = -200
         self.param.normalization = False
         self.param.bs_downtilt_deg = 0
 

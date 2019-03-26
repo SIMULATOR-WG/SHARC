@@ -205,6 +205,7 @@ if __name__ == '__main__':
     norm = BeamformingNormalizer(resolution,tolerance)
 
     # Antenna parameters
+    adjacent_antenna_model = "SINGLE_ELEMENT"
     normalization = False
     norm_file = None
     element_pattern = "M2101"
@@ -217,6 +218,7 @@ if __name__ == '__main__':
     n_columns = 8
     horiz_spacing = 0.5
     vert_spacing = 0.5
+    minimum_array_gain = -200
     down_tilt = 0
     par = AntennaPar(normalization,
                      norm_file,

@@ -40,6 +40,7 @@ class AntennaBeamformingImt(Antenna):
             antenna array pattern for given beam pointing direction
         resolution (float): beam pointing resolution [deg] of co-channel
             correction factor array
+        minimum_array_gain (float): minimum array gain for beamforming
     """
 
     def __init__(self, par: AntennaPar, azimuth: float, elevation: float):
@@ -71,6 +72,7 @@ class AntennaBeamformingImt(Antenna):
         self.azimuth = azimuth
         self.elevation = elevation
         self._calculate_rotation_matrix()
+        self.minimum_array_gain = par.minimum_array_gain
 
         self.n_rows = par.n_rows
         self.n_cols = par.n_columns
@@ -189,6 +191,8 @@ class AntennaBeamformingImt(Antenna):
                                                         lo_theta_vec[g])\
                      + self.adj_correction_factor
 
+        gains = np.maximum(gains, self.minimum_array_gain)
+                     
         return gains
 
     def reset_beams(self):
@@ -409,6 +413,8 @@ if __name__ == '__main__':
     param.normalization = False
     param.bs_normalization_file = 'beamforming_normalization\\bs_indoor_norm.npz'
     param.ue_normalization_file = 'beamforming_normalization\\ue_norm.npz'
+    param.bs_minimum_array_gain = -200
+    param.ue_minimum_array_gain = -200
     
     param.bs_element_pattern = "M2101"
     param.bs_tx_element_max_g    = 5

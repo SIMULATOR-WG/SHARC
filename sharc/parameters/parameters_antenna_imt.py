@@ -52,6 +52,7 @@ class ParametersAntennaImt(object):
                                  self.bs_tx_n_columns,
                                  self.bs_tx_element_horiz_spacing,
                                  self.bs_tx_element_vert_spacing,
+                                 self.bs_minimum_array_gain,
                                  self.bs_downtilt_deg)
             elif txrx == "RX":
                 tpl = AntennaPar(self.adjacent_antenna_model,
@@ -67,6 +68,7 @@ class ParametersAntennaImt(object):
                                  self.bs_rx_n_columns,
                                  self.bs_rx_element_horiz_spacing,
                                  self.bs_rx_element_vert_spacing,
+                                 self.bs_minimum_array_gain,
                                  self.bs_downtilt_deg)
         elif sta_type == "UE":
             if txrx == "TX":
@@ -83,6 +85,7 @@ class ParametersAntennaImt(object):
                                  self.ue_tx_n_columns,
                                  self.ue_tx_element_horiz_spacing,
                                  self.ue_tx_element_vert_spacing,
+                                 self.ue_minimum_array_gain,
                                  0)
             elif txrx == "RX":
                 tpl = AntennaPar(self.adjacent_antenna_model,
@@ -98,6 +101,7 @@ class ParametersAntennaImt(object):
                                  self.ue_rx_n_columns,
                                  self.ue_rx_element_horiz_spacing,
                                  self.ue_rx_element_vert_spacing,
+                                 self.ue_minimum_array_gain,
                                  0)
 
         return tpl

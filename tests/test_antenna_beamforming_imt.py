@@ -23,6 +23,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.normalization = False
         self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
+        self.param.bs_minimum_array_gain = -200
         self.param.bs_downtilt_deg = 0
 
         self.param.bs_tx_element_max_g    = 5
@@ -47,6 +48,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
 
         self.param.ue_element_pattern = "M2101"
         self.param.ue_normalization_file = None
+        self.param.ue_minimum_array_gain = -200
 
         self.param.ue_tx_element_max_g    = 10
         self.param.ue_tx_element_phi_deg_3db  = 75
@@ -367,6 +369,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         n_columns = 8
         horiz_spacing = 0.5
         vert_spacing = 0.5
+        minimum_array_gain = -200
         down_tilt = 0
         par = AntennaPar(adjacent_antenna_model,
                          normalization,
@@ -381,6 +384,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
                          n_columns,
                          horiz_spacing,
                          vert_spacing,
+                         minimum_array_gain,
                          down_tilt)
         
         

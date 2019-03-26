@@ -25,7 +25,8 @@ Variables:
     norm (BeamformingNormalizer): object that calculates the normalization.
     param_list (list): list of antenna parameters to which calculate the
         correction factors. New parameters are added as:
-            AntennaPar(normalization,
+            AntennaPar(adjacent_antenna_model,
+                       normalization,
                        norm_data,
                        element_pattern,
                        element_max_g,
@@ -37,6 +38,7 @@ Variables:
                        n_columns,
                        element_horiz_spacing,
                        element_vert_spacing,
+                       minimum_array_gain,
                        downtilt_deg)
             normalization parameter must be set to False, otherwise script will
             try to normalize an already normalized antenna.
@@ -69,8 +71,8 @@ from sharc.antenna.beamforming_normalization.beamforming_normalizer import Beamf
 
 ###############################################################################
 ## List of antenna parameters to which calculate the normalization factors.
-param_list = [AntennaPar(False,None,"M2101",5,90,90,25,25,8,16,0.5,0.5,0)]
-file_names = ['bs_indoor_norm.npz']
+param_list = [AntennaPar("",False,None,"M2101",5,65,65,30,30,8,8,0.5,0.5,-200,0)]
+file_names = ['bs_norm.npz']
 ###############################################################################
 ## Setup
 # General parameters
