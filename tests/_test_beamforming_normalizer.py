@@ -158,41 +158,41 @@ class BeamformingNormalizerTest(unittest.TestCase):
         self.assertGreater(err[0],2.35)
         self.assertLess(err[1],2.45)
         
-#        # Test 3.1: BS element pattern
-#        azi = 0
-#        ele = 0
-#        self.norm_3.antenna = AntennaBeamformingImt(self.par_3,azi,ele)
-#        # Test adjacent channel case: single antenna element
-#        c_chan = False
-#        c_fac, err = self.norm_3.calculate_correction_factor(0,0,c_chan)
-#        self.assertAlmostEqual(c_fac,4.8,delta = 1e-1)
-#        self.assertGreater(err[0],4.75)
-#        self.assertLess(err[1],4.85)
-#        
-#        # Test 3.2: BS array
-#        azi = 0
-#        ele = 0
-#        self.norm_3.antenna = AntennaBeamformingImt(self.par_3,azi,ele)
-#        # Test adjacent channel case: single antenna element
-#        c_chan = True
-#        c_fac, err = self.norm_3.calculate_correction_factor(0,0,c_chan)
-#        self.assertAlmostEqual(c_fac,8.0,delta = 1e-1)
-#        self.assertGreater(err[0],7.5)
-#        self.assertLess(err[1],8.5)
+        # Test 3.1: BS element pattern
+        azi = 0
+        ele = 0
+        self.norm_3.antenna = AntennaBeamformingImt(self.par_3,azi,ele)
+        # Test adjacent channel case: single antenna element
+        c_chan = False
+        c_fac, err = self.norm_3.calculate_correction_factor(0,0,c_chan)
+        self.assertAlmostEqual(c_fac,4.8,delta = 1e-1)
+        self.assertGreater(err[0],4.75)
+        self.assertLess(err[1],4.85)
         
-#    def test_generate_correction_matrix(self):
-#        # Test 3.1: BS element pattern
-#        file_name = "test_2.npz"
-#        self.norm_3.generate_correction_matrix(self.par_3, file_name, True)
-#        data = np.load(file_name) 
-#        self.assertAlmostEqual(data['correction_factor_adj_channel'],
-#                               4.8,delta = 1e-1)
-#        
-#        # Test 3.2: BS array
-#        npt.assert_allclose(data['correction_factor_co_channel'],
-#                            np.array([[8.0],[8.0]]),atol = 1e-1)
-#        data.close()
-#        os.remove(file_name)
+        # Test 3.2: BS array
+        azi = 0
+        ele = 0
+        self.norm_3.antenna = AntennaBeamformingImt(self.par_3,azi,ele)
+        # Test adjacent channel case: single antenna element
+        c_chan = True
+        c_fac, err = self.norm_3.calculate_correction_factor(0,0,c_chan)
+        self.assertAlmostEqual(c_fac,8.0,delta = 1e-1)
+        self.assertGreater(err[0],7.5)
+        self.assertLess(err[1],8.5)
+        
+    def test_generate_correction_matrix(self):
+        # Test 3.1: BS element pattern
+        file_name = "test_2.npz"
+        self.norm_3.generate_correction_matrix(self.par_3, file_name, True)
+        data = np.load(file_name) 
+        self.assertAlmostEqual(data['correction_factor_adj_channel'],
+                               4.8,delta = 1e-1)
+        
+        # Test 3.2: BS array
+        npt.assert_allclose(data['correction_factor_co_channel'],
+                            np.array([[8.0],[8.0]]),atol = 1e-1)
+        data.close()
+        os.remove(file_name)
     
 if __name__ == '__main__':
     unittest.main()
