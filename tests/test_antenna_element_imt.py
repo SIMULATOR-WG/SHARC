@@ -35,6 +35,7 @@ class AntennaImtTest(unittest.TestCase):
         self.param.bs_tx_n_columns        = 8
         self.param.bs_tx_element_horiz_spacing = 0.5
         self.param.bs_tx_element_vert_spacing = 0.5
+        self.param.bs_tx_multiplication_k = 12
 
         self.param.bs_rx_element_max_g    = 5
         self.param.bs_rx_element_phi_deg_3db  = 80
@@ -45,6 +46,7 @@ class AntennaImtTest(unittest.TestCase):
         self.param.bs_rx_n_columns        = 8
         self.param.bs_rx_element_horiz_spacing = 0.5
         self.param.bs_rx_element_vert_spacing = 0.5
+        self.param.bs_rx_multiplication_k = 12
 
         self.param.ue_normalization_file = None
         self.param.ue_tx_element_max_g    = 10
@@ -56,6 +58,7 @@ class AntennaImtTest(unittest.TestCase):
         self.param.ue_tx_n_columns        = 4
         self.param.ue_tx_element_horiz_spacing = 0.5
         self.param.ue_tx_element_vert_spacing = 0.5
+        self.param.ue_tx_multiplication_k = 12
 
         self.param.ue_rx_element_max_g    = 10
         self.param.ue_rx_element_phi_deg_3db  = 75
@@ -66,6 +69,7 @@ class AntennaImtTest(unittest.TestCase):
         self.param.ue_rx_n_columns        = 4
         self.param.ue_rx_element_horiz_spacing = 0.5
         self.param.ue_rx_element_vert_spacing = 0.5
+        self.param.ue_rx_multiplication_k = 12
 
         # Create antenna IMT objects
         par = self.param.get_antenna_parameters("BS","TX")

@@ -32,6 +32,7 @@ class StationTest(unittest.TestCase):
         self.param.bs_rx_n_columns = 8
         self.param.bs_rx_element_horiz_spacing = 0.5
         self.param.bs_rx_element_vert_spacing = 0.5
+        self.param.bs_rx_multiplication_k = 12
 
         self.param.bs_tx_element_max_g = 5
         self.param.bs_tx_element_phi_deg_3db = 80
@@ -42,6 +43,7 @@ class StationTest(unittest.TestCase):
         self.param.bs_tx_n_columns = 16
         self.param.bs_tx_element_horiz_spacing = 1
         self.param.bs_tx_element_vert_spacing = 1
+        self.param.bs_tx_multiplication_k = 12
 
         self.param.bs_downtilt_deg = 0
 
@@ -57,6 +59,7 @@ class StationTest(unittest.TestCase):
         self.param.ue_rx_n_columns = 2
         self.param.ue_rx_element_horiz_spacing = 0.5
         self.param.ue_rx_element_vert_spacing = 0.5
+        self.param.ue_rx_multiplication_k = 12
 
         self.param.ue_tx_element_max_g = 10
         self.param.ue_tx_element_phi_deg_3db = 75
@@ -67,6 +70,7 @@ class StationTest(unittest.TestCase):
         self.param.ue_tx_n_columns = 2
         self.param.ue_tx_element_horiz_spacing = 0.5
         self.param.ue_tx_element_vert_spacing = 0.5
+        self.param.ue_tx_multiplication_k = 12
 
         self.station = Station()
         self.station.id = 1

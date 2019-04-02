@@ -87,6 +87,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.bs_tx_n_columns = 16
         self.param.antenna_imt.bs_tx_element_horiz_spacing = 0.5
         self.param.antenna_imt.bs_tx_element_vert_spacing = 0.5
+        self.param.antenna_imt.bs_tx_multiplication_k = 12
         self.param.antenna_imt.bs_rx_element_max_g = 5
         self.param.antenna_imt.bs_rx_element_phi_deg_3db = 90
         self.param.antenna_imt.bs_rx_element_theta_deg_3db = 90
@@ -96,6 +97,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.bs_rx_n_columns = 16
         self.param.antenna_imt.bs_rx_element_horiz_spacing = 0.5
         self.param.antenna_imt.bs_rx_element_vert_spacing = 0.5
+        self.param.antenna_imt.bs_rx_multiplication_k = 12
         self.param.antenna_imt.bs_downtilt_deg = 10
         self.param.antenna_imt.ue_element_pattern = "M2101"
         self.param.antenna_imt.ue_minimum_array_gain = -200
@@ -108,6 +110,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.ue_tx_n_columns = 4
         self.param.antenna_imt.ue_tx_element_horiz_spacing = 0.5
         self.param.antenna_imt.ue_tx_element_vert_spacing = 0.5
+        self.param.antenna_imt.ue_tx_multiplication_k = 12
         self.param.antenna_imt.ue_rx_element_max_g = 5
         self.param.antenna_imt.ue_rx_element_phi_3db = 90
         self.param.antenna_imt.ue_rx_element_theta_3db = 90
@@ -117,6 +120,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.ue_rx_n_columns = 4
         self.param.antenna_imt.ue_rx_element_horiz_spacing = 0.5
         self.param.antenna_imt.ue_rx_element_vert_spacing = 0.5
+        self.param.antenna_imt.ue_rx_multiplication_k = 12
 
         self.param.indoor.basic_path_loss = "FSPL"
         self.param.indoor.n_rows = 1

@@ -35,6 +35,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.bs_tx_n_columns        = 16
         self.param.bs_tx_element_horiz_spacing = 1
         self.param.bs_tx_element_vert_spacing = 1
+        self.param.bs_tx_multiplication_k = 12
 
         self.param.bs_rx_element_max_g    = 5
         self.param.bs_rx_element_phi_deg_3db  = 80
@@ -45,6 +46,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.bs_rx_n_columns        = 16
         self.param.bs_rx_element_horiz_spacing = 1
         self.param.bs_rx_element_vert_spacing = 1
+        self.param.bs_rx_multiplication_k = 12
 
         self.param.ue_element_pattern = "M2101"
         self.param.ue_normalization_file = None
@@ -59,6 +61,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.ue_tx_n_columns        = 2
         self.param.ue_tx_element_horiz_spacing = 0.5
         self.param.ue_tx_element_vert_spacing = 0.5
+        self.param.ue_tx_multiplication_k = 12
 
         self.param.ue_rx_element_max_g    = 10
         self.param.ue_rx_element_phi_deg_3db  = 75
@@ -69,6 +72,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.ue_rx_n_columns        = 2
         self.param.ue_rx_element_horiz_spacing = 0.5
         self.param.ue_rx_element_vert_spacing = 0.5
+        self.param.ue_rx_multiplication_k = 12
 
         # Create antenna objects
         par = self.param.get_antenna_parameters("BS","RX")
@@ -370,6 +374,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         horiz_spacing = 0.5
         vert_spacing = 0.5
         minimum_array_gain = -200
+        multiplication_k = 12
         down_tilt = 0
         par = AntennaPar(adjacent_antenna_model,
                          normalization,
@@ -384,6 +389,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
                          n_columns,
                          horiz_spacing,
                          vert_spacing,
+                         multiplication_k,
                          minimum_array_gain,
                          down_tilt)
         

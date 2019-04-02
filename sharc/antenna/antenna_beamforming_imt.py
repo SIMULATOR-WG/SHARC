@@ -426,6 +426,7 @@ if __name__ == '__main__':
     param.bs_tx_n_columns        = 8
     param.bs_tx_element_horiz_spacing = 0.5
     param.bs_tx_element_vert_spacing = 0.5
+    param.bs_tx_multiplication_k = 12
     param.bs_downtilt_deg = 0
 
     param.ue_element_pattern = "M2101"
@@ -438,6 +439,7 @@ if __name__ == '__main__':
     param.ue_tx_n_columns        = 4
     param.ue_tx_element_horiz_spacing = 0.5
     param.ue_tx_element_vert_spacing = 0.5
+    param.ue_tx_multiplication_k = 12
 
 
     plot = PlotAntennaPattern(figs_dir)
