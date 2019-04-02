@@ -45,8 +45,8 @@ class PropagationUMi(Propagation):
 
         if std:
             shadowing_los = 4
-            #shadowing_nlos = 7.82    # option 1 for UMi NLOS
-            shadowing_nlos = 8.2    # option 2 for UMi NLOS
+            shadowing_nlos = 7.82    # option 1 for UMi NLOS
+            #shadowing_nlos = 8.2    # option 2 for UMi NLOS
         else:
             shadowing_los = 0
             shadowing_nlos = 0
@@ -131,14 +131,14 @@ class PropagationUMi(Propagation):
             h_ue : array of user equipments antenna heights [m]
         """
         # option 1 for UMi NLOS
-#        loss_nlos = -37.55 + 35.3*np.log10(distance_3D) + 21.3*np.log10(frequency) \
-#                        - 0.3*(h_ue - 1.5)
-#
-#        loss_los = self.get_loss_los(distance_2D, distance_3D, frequency, h_bs, h_ue, h_e, 0)
-#        loss_nlos = np.maximum(loss_los, loss_nlos)
+        loss_nlos = -37.55 + 35.3*np.log10(distance_3D) + 21.3*np.log10(frequency) \
+                        - 0.3*(h_ue - 1.5)
+
+        loss_los = self.get_loss_los(distance_2D, distance_3D, frequency, h_bs, h_ue, h_e, 0)
+        loss_nlos = np.maximum(loss_los, loss_nlos)
         
         # option 2 for UMi NLOS
-        loss_nlos = 31.9*np.log10(distance_3D) + 20*np.log10(frequency*1e-3) + 32.4
+        #loss_nlos = 31.9*np.log10(distance_3D) + 20*np.log10(frequency*1e-3) + 32.4
 
         if shadowing_std:
             shadowing = self.random_number_gen.normal(0, shadowing_std, distance_3D.shape)
