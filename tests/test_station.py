@@ -9,6 +9,7 @@ import unittest
 
 from sharc.support.enumerations import StationType
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
+from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.station import Station
 
@@ -23,54 +24,31 @@ class StationTest(unittest.TestCase):
         self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
         self.param.bs_minimum_array_gain = -200
-        self.param.bs_rx_element_max_g = 10
-        self.param.bs_rx_element_phi_deg_3db = 65
-        self.param.bs_rx_element_theta_deg_3db = 75
-        self.param.bs_rx_element_am = 35
-        self.param.bs_rx_element_sla_v = 25
-        self.param.bs_rx_n_rows = 8
-        self.param.bs_rx_n_columns = 8
-        self.param.bs_rx_element_horiz_spacing = 0.5
-        self.param.bs_rx_element_vert_spacing = 0.5
-        self.param.bs_rx_multiplication_k = 12
-
-        self.param.bs_tx_element_max_g = 5
-        self.param.bs_tx_element_phi_deg_3db = 80
-        self.param.bs_tx_element_theta_deg_3db = 60
-        self.param.bs_tx_element_am = 30
-        self.param.bs_tx_element_sla_v = 30
-        self.param.bs_tx_n_rows = 16
-        self.param.bs_tx_n_columns = 16
-        self.param.bs_tx_element_horiz_spacing = 1
-        self.param.bs_tx_element_vert_spacing = 1
-        self.param.bs_tx_multiplication_k = 12
-
-        self.param.bs_downtilt_deg = 0
+        self.param.bs_element_max_g = 10
+        self.param.bs_element_phi_3db = 65
+        self.param.bs_element_theta_3db = 75
+        self.param.bs_element_am = 35
+        self.param.bs_element_sla_v = 25
+        self.param.bs_n_rows = 8
+        self.param.bs_n_columns = 8
+        self.param.bs_element_horiz_spacing = 0.5
+        self.param.bs_element_vert_spacing = 0.5
+        self.param.bs_multiplication_factor = 12
+        self.param.bs_downtilt = 0
 
         self.param.ue_element_pattern = "M2101"
         self.param.ue_normalization_file = None
         self.param.ue_minimum_array_gain = -200
-        self.param.ue_rx_element_max_g = 10
-        self.param.ue_rx_element_phi_deg_3db = 75
-        self.param.ue_rx_element_theta_deg_3db = 65
-        self.param.ue_rx_element_am = 25
-        self.param.ue_rx_element_sla_v = 35
-        self.param.ue_rx_n_rows = 2
-        self.param.ue_rx_n_columns = 2
-        self.param.ue_rx_element_horiz_spacing = 0.5
-        self.param.ue_rx_element_vert_spacing = 0.5
-        self.param.ue_rx_multiplication_k = 12
-
-        self.param.ue_tx_element_max_g = 10
-        self.param.ue_tx_element_phi_deg_3db = 75
-        self.param.ue_tx_element_theta_deg_3db = 65
-        self.param.ue_tx_element_am = 25
-        self.param.ue_tx_element_sla_v = 35
-        self.param.ue_tx_n_rows = 2
-        self.param.ue_tx_n_columns = 2
-        self.param.ue_tx_element_horiz_spacing = 0.5
-        self.param.ue_tx_element_vert_spacing = 0.5
-        self.param.ue_tx_multiplication_k = 12
+        self.param.ue_element_max_g = 10
+        self.param.ue_element_phi_3db = 75
+        self.param.ue_element_theta_3db = 65
+        self.param.ue_element_am = 25
+        self.param.ue_element_sla_v = 35
+        self.param.ue_n_rows = 2
+        self.param.ue_n_columns = 2
+        self.param.ue_element_horiz_spacing = 0.5
+        self.param.ue_element_vert_spacing = 0.5
+        self.param.ue_multiplication_factor = 12
 
         self.station = Station()
         self.station.id = 1
@@ -80,7 +58,7 @@ class StationTest(unittest.TestCase):
         self.station.height = 6
         self.station.tx_power = 20
         self.station.rx_power = -3
-        par = self.param.get_antenna_parameters("BS","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_BS)
         self.station.antenna = AntennaBeamformingImt(par,300,-10)
 
         self.station2 = Station()
@@ -91,7 +69,7 @@ class StationTest(unittest.TestCase):
         self.station2.height = 6
         self.station2.tx_power = 17
         self.station2.rx_power = 9
-        par = self.param.get_antenna_parameters("BS","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_UE)
         self.station2.antenna = AntennaBeamformingImt(par,270,2)
 
         self.station3 = Station()
@@ -102,8 +80,7 @@ class StationTest(unittest.TestCase):
         self.station3.height = 6
         self.station3.tx_power = 20
         self.station3.rx_power = -3
-        par = self.param.get_antenna_parameters("UE","TX")
-        self.station3.antenna = AntennaBeamformingImt(par,100,2)
+        self.station3.antenna = AntennaOmni(50)
 
     def test_id(self):
         self.assertEqual(self.station.id, 1)
@@ -126,18 +103,18 @@ class StationTest(unittest.TestCase):
     def test_rx_power(self):
         self.assertEqual(self.station.rx_power, -3)
 
-    def test_tx_antenna(self):
+    def test_antenna(self):
         self.assertEqual(self.station.antenna.azimuth, 300)
         self.assertEqual(self.station.antenna.elevation, -10)
-        self.assertEqual(self.station.antenna.n_rows, 16)
-        self.assertEqual(self.station.antenna.n_cols, 16)
-        self.assertEqual(self.station.antenna.dh, 1)
-        self.assertEqual(self.station.antenna.dv, 1)
-        self.assertEqual(self.station.antenna.element.g_max, 5)
-        self.assertEqual(self.station.antenna.element.phi_deg_3db, 80)
-        self.assertEqual(self.station.antenna.element.theta_deg_3db, 60)
-        self.assertEqual(self.station.antenna.element.am, 30)
-        self.assertEqual(self.station.antenna.element.sla_v, 30)
+        self.assertEqual(self.station.antenna.n_rows, 8)
+        self.assertEqual(self.station.antenna.n_cols, 8)
+        self.assertEqual(self.station.antenna.dh, 0.5)
+        self.assertEqual(self.station.antenna.dv, 0.5)
+        self.assertEqual(self.station.antenna.element.g_max, 10)
+        self.assertEqual(self.station.antenna.element.phi_3db, 65)
+        self.assertEqual(self.station.antenna.element.theta_3db, 75)
+        self.assertEqual(self.station.antenna.element.am, 35)
+        self.assertEqual(self.station.antenna.element.sla_v, 25)
 
     def test_eq(self):
         self.assertTrue(self.station == self.station2)

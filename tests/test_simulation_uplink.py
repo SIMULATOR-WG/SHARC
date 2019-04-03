@@ -15,6 +15,7 @@ from sharc.antenna.antenna_omni import AntennaOmni
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.station_factory import StationFactory
 from sharc.propagation.propagation_factory import PropagationFactory
+from sharc.support.enumerations import StationType
 
 class SimulationUplinkTest(unittest.TestCase):
 
@@ -82,50 +83,31 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.antenna_imt.bs_element_pattern = "M2101"
         self.param.antenna_imt.bs_minimum_array_gain = -200
         self.param.antenna_imt.bs_normalization_file = None
-        self.param.antenna_imt.bs_tx_element_max_g = 10
-        self.param.antenna_imt.bs_tx_element_phi_3db = 80
-        self.param.antenna_imt.bs_tx_element_theta_3db = 80
-        self.param.antenna_imt.bs_tx_element_am = 25
-        self.param.antenna_imt.bs_tx_element_sla_v = 25
-        self.param.antenna_imt.bs_tx_n_rows = 16
-        self.param.antenna_imt.bs_tx_n_columns = 16
-        self.param.antenna_imt.bs_tx_element_horiz_spacing = 1
-        self.param.antenna_imt.bs_tx_element_vert_spacing = 1
-        self.param.antenna_imt.bs_tx_multiplication_k = 12
-        self.param.antenna_imt.bs_rx_element_max_g = 5
-        self.param.antenna_imt.bs_rx_element_phi_deg_3db = 65
-        self.param.antenna_imt.bs_rx_element_theta_deg_3db = 65
-        self.param.antenna_imt.bs_rx_element_am = 30
-        self.param.antenna_imt.bs_rx_element_sla_v = 30
-        self.param.antenna_imt.bs_rx_n_rows = 2
-        self.param.antenna_imt.bs_rx_n_columns = 2
-        self.param.antenna_imt.bs_rx_element_horiz_spacing = 0.5
-        self.param.antenna_imt.bs_rx_element_vert_spacing = 0.5
-        self.param.antenna_imt.bs_rx_multiplication_k = 12
-        self.param.antenna_imt.bs_downtilt_deg = 10
+        self.param.antenna_imt.bs_element_max_g = 10
+        self.param.antenna_imt.bs_element_phi_3db = 80
+        self.param.antenna_imt.bs_element_theta_3db = 80
+        self.param.antenna_imt.bs_element_am = 25
+        self.param.antenna_imt.bs_element_sla_v = 25
+        self.param.antenna_imt.bs_n_rows = 16
+        self.param.antenna_imt.bs_n_columns = 16
+        self.param.antenna_imt.bs_element_horiz_spacing = 1
+        self.param.antenna_imt.bs_element_vert_spacing = 1
+        self.param.antenna_imt.bs_multiplication_factor = 12
+        self.param.antenna_imt.bs_downtilt = 10
+        
         self.param.antenna_imt.ue_element_pattern = "M2101"
         self.param.antenna_imt.ue_minimum_array_gain = -200
         self.param.antenna_imt.ue_normalization_file = None
-        self.param.antenna_imt.ue_tx_element_max_g = 5
-        self.param.antenna_imt.ue_tx_element_phi_deg_3db = 65
-        self.param.antenna_imt.ue_tx_element_theta_deg_3db = 65
-        self.param.antenna_imt.ue_tx_element_am = 30
-        self.param.antenna_imt.ue_tx_element_sla_v = 30
-        self.param.antenna_imt.ue_tx_n_rows = 2
-        self.param.antenna_imt.ue_tx_n_columns = 1
-        self.param.antenna_imt.ue_tx_element_horiz_spacing = 0.5
-        self.param.antenna_imt.ue_tx_element_vert_spacing = 0.5
-        self.param.antenna_imt.ue_tx_multiplication_k = 12
-        self.param.antenna_imt.ue_rx_element_max_g = 10
-        self.param.antenna_imt.ue_rx_element_phi_3db = 90
-        self.param.antenna_imt.ue_rx_element_theta_3db = 90
-        self.param.antenna_imt.ue_rx_element_am = 25
-        self.param.antenna_imt.ue_rx_element_sla_v = 25
-        self.param.antenna_imt.ue_rx_n_rows = 16
-        self.param.antenna_imt.ue_rx_n_columns = 16
-        self.param.antenna_imt.ue_rx_element_horiz_spacing = 1
-        self.param.antenna_imt.ue_rx_element_vert_spacing = 1
-        self.param.antenna_imt.ue_rx_multiplication_k = 12
+        self.param.antenna_imt.ue_element_max_g = 5
+        self.param.antenna_imt.ue_element_phi_3db = 65
+        self.param.antenna_imt.ue_element_theta_3db = 65
+        self.param.antenna_imt.ue_element_am = 30
+        self.param.antenna_imt.ue_element_sla_v = 30
+        self.param.antenna_imt.ue_n_rows = 2
+        self.param.antenna_imt.ue_n_columns = 1
+        self.param.antenna_imt.ue_element_horiz_spacing = 0.5
+        self.param.antenna_imt.ue_element_vert_spacing = 0.5
+        self.param.antenna_imt.ue_multiplication_factor = 12
 
         self.param.fss_ss.frequency = 10000
         self.param.fss_ss.bandwidth = 100
@@ -656,7 +638,7 @@ class SimulationUplinkTest(unittest.TestCase):
         # Change UE pointing
         self.simulation.ue.azimuth = np.array([180, -90, 90, -90])
         self.simulation.ue.elevation = np.array([-30, -15, 15, 30])
-        par = self.param.antenna_imt.get_antenna_parameters("UE","TX")
+        par = self.param.antenna_imt.get_antenna_parameters(StationType.IMT_UE)
         for i in range(self.simulation.ue.num_stations):
             self.simulation.ue.antenna[i] = AntennaBeamformingImt(par, self.simulation.ue.azimuth[i],
                                                                   self.simulation.ue.elevation[i])
@@ -716,8 +698,8 @@ class SimulationUplinkTest(unittest.TestCase):
                             (32.16,20.71),atol=eps)
 
         # BS Gain matrix
-        ref_gain = np.array([[ 10.954,   8.441,  10.788,   9.460],
-                             [ 10.788,   3.365,  10.954,   0.931]])
+        ref_gain = np.array([[ 34.03,  32.37,   8.41,  -9.71],
+                             [ 8.41,  -8.94,  34.03,  27.42]])
         gain = self.simulation.calculate_gains(self.simulation.bs,self.simulation.ue)
         npt.assert_allclose(gain,ref_gain,atol=eps)
 

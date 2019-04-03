@@ -27,55 +27,33 @@ class StationManagerTest(unittest.TestCase):
         self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
         self.param.bs_minimum_array_gain = -200
-        self.param.bs_downtilt_deg = 0
+        self.param.bs_downtilt = 0
 
-        self.param.bs_rx_element_max_g = 10
-        self.param.bs_rx_element_phi_deg_3db = 65
-        self.param.bs_rx_element_theta_deg_3db = 75
-        self.param.bs_rx_element_am = 35
-        self.param.bs_rx_element_sla_v = 25
-        self.param.bs_rx_n_rows = 8
-        self.param.bs_rx_n_columns = 8
-        self.param.bs_rx_element_horiz_spacing = 0.5
-        self.param.bs_rx_element_vert_spacing = 0.5
-        self.param.bs_rx_multiplication_k = 12
-
-        self.param.bs_tx_element_max_g = 5
-        self.param.bs_tx_element_phi_deg_3db = 80
-        self.param.bs_tx_element_theta_deg_3db = 60
-        self.param.bs_tx_element_am = 30
-        self.param.bs_tx_element_sla_v = 30
-        self.param.bs_tx_n_rows = 16
-        self.param.bs_tx_n_columns = 16
-        self.param.bs_tx_element_horiz_spacing = 1
-        self.param.bs_tx_element_vert_spacing = 1
-        self.param.bs_tx_multiplication_k = 12
+        self.param.bs_element_max_g = 10
+        self.param.bs_element_phi_3db = 65
+        self.param.bs_element_theta_3db = 75
+        self.param.bs_element_am = 35
+        self.param.bs_element_sla_v = 25
+        self.param.bs_n_rows = 8
+        self.param.bs_n_columns = 8
+        self.param.bs_element_horiz_spacing = 0.5
+        self.param.bs_element_vert_spacing = 0.5
+        self.param.bs_multiplication_factor = 12
 
         self.param.ue_element_pattern = "M2101"
         self.param.ue_normalization_file = None
         self.param.ue_minimum_array_gain = -200
 
-        self.param.ue_rx_element_max_g = 10
-        self.param.ue_rx_element_phi_deg_3db = 75
-        self.param.ue_rx_element_theta_deg_3db = 65
-        self.param.ue_rx_element_am = 25
-        self.param.ue_rx_element_sla_v = 35
-        self.param.ue_rx_n_rows = 2
-        self.param.ue_rx_n_columns = 2
-        self.param.ue_rx_element_horiz_spacing = 0.5
-        self.param.ue_rx_element_vert_spacing = 0.5
-        self.param.ue_rx_multiplication_k = 12
-
-        self.param.ue_tx_element_max_g = 10
-        self.param.ue_tx_element_phi_deg_3db = 75
-        self.param.ue_tx_element_theta_deg_3db = 65
-        self.param.ue_tx_element_am = 25
-        self.param.ue_tx_element_sla_v = 35
-        self.param.ue_tx_n_rows = 2
-        self.param.ue_tx_n_columns = 2
-        self.param.ue_tx_element_horiz_spacing = 0.5
-        self.param.ue_tx_element_vert_spacing = 0.5
-        self.param.ue_tx_multiplication_k = 12
+        self.param.ue_element_max_g = 10
+        self.param.ue_element_phi_3db = 75
+        self.param.ue_element_theta_3db = 65
+        self.param.ue_element_am = 25
+        self.param.ue_element_sla_v = 35
+        self.param.ue_n_rows = 2
+        self.param.ue_n_columns = 2
+        self.param.ue_element_horiz_spacing = 0.5
+        self.param.ue_element_vert_spacing = 0.5
+        self.param.ue_multiplication_factor = 12
 
         self.station_manager = StationManager(3)
         self.station_manager.x = np.array([10, 20, 30])
@@ -85,7 +63,7 @@ class StationManagerTest(unittest.TestCase):
         # this is for downlink
         self.station_manager.tx_power = dict({0: [27, 30], 1: [35], 2: [40]})
         self.station_manager.rx_power = np.array([-50, -35, -10])
-        par = self.param.get_antenna_parameters("BS","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_BS)
         self.station_manager.antenna = np.array([AntennaBeamformingImt(par,60,-10), AntennaBeamformingImt(par,180,-10), AntennaBeamformingImt(par,300,-10)])
         self.station_manager.station_type = StationType.IMT_BS
 
@@ -97,7 +75,7 @@ class StationManagerTest(unittest.TestCase):
         # this is for downlink
         self.station_manager2.tx_power = dict({0: [25], 1: [28,35]})
         self.station_manager2.rx_power = np.array([-50, -35])
-        par = self.param.get_antenna_parameters("BS","RX")
+        par = self.param.get_antenna_parameters(StationType.IMT_BS)
         self.station_manager2.antenna = np.array([AntennaBeamformingImt(par,0,-5), AntennaBeamformingImt(par,180,-5)])
         self.station_manager2.station_type = StationType.IMT_BS
 
@@ -109,7 +87,7 @@ class StationManagerTest(unittest.TestCase):
         # this is for uplink
         self.station_manager3.tx_power = 22
         self.station_manager3.rx_power = np.array([-50,-35])
-        par = self.param.get_antenna_parameters("UE","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_UE)
         self.station_manager3.antenna = np.array([AntennaBeamformingImt(par,0,-30), AntennaBeamformingImt(par,35,45)])
         self.station_manager3.station_type = StationType.IMT_UE
 
@@ -120,7 +98,7 @@ class StationManagerTest(unittest.TestCase):
         self.station.height = 1
         self.station.tx_power = 30
         self.station.rx_power = -50
-        par = self.param.get_antenna_parameters("UE","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_UE)
         self.station.antenna = AntennaBeamformingImt(par,100,-10)
         self.station.station_type = StationType.IMT_UE
 
@@ -131,7 +109,7 @@ class StationManagerTest(unittest.TestCase):
         self.station2.height = 2
         self.station2.tx_power = 35
         self.station2.rx_power = -35
-        par = self.param.get_antenna_parameters("BS","RX")
+        par = self.param.get_antenna_parameters(StationType.IMT_BS)
         self.station2.antenna = AntennaBeamformingImt(par,-90,-15)
         self.station2.station_type = StationType.IMT_BS
 
@@ -226,66 +204,39 @@ class StationManagerTest(unittest.TestCase):
     def test_antenna(self):
         self.assertEqual(self.station_manager.antenna[0].azimuth, 60)
         self.assertEqual(self.station_manager.antenna[0].elevation, -10)
-        self.assertEqual(self.station_manager.antenna[0].n_rows, 16)
-        self.assertEqual(self.station_manager.antenna[0].n_cols, 16)
-        self.assertEqual(self.station_manager.antenna[0].dh, 1)
-        self.assertEqual(self.station_manager.antenna[0].dv, 1)
-        self.assertEqual(self.station_manager.antenna[0].element.g_max, 5)
-        self.assertEqual(self.station_manager.antenna[0].element.phi_deg_3db, 80)
-        self.assertEqual(self.station_manager.antenna[0].element.theta_deg_3db, 60)
-        self.assertEqual(self.station_manager.antenna[0].element.am, 30)
-        self.assertEqual(self.station_manager.antenna[0].element.sla_v, 30)
+        self.assertEqual(self.station_manager.antenna[0].n_rows, 8)
+        self.assertEqual(self.station_manager.antenna[0].n_cols, 8)
+        self.assertEqual(self.station_manager.antenna[0].dh, 0.5)
+        self.assertEqual(self.station_manager.antenna[0].dv, 0.5)
+        self.assertEqual(self.station_manager.antenna[0].element.g_max, 10)
+        self.assertEqual(self.station_manager.antenna[0].element.phi_3db, 65)
+        self.assertEqual(self.station_manager.antenna[0].element.theta_3db, 75)
+        self.assertEqual(self.station_manager.antenna[0].element.am, 35)
+        self.assertEqual(self.station_manager.antenna[0].element.sla_v, 25)
 
         self.assertEqual(self.station_manager.antenna[1].azimuth, 180)
         self.assertEqual(self.station_manager.antenna[1].elevation, -10)
-        self.assertEqual(self.station_manager.antenna[1].n_rows, 16)
-        self.assertEqual(self.station_manager.antenna[1].n_cols, 16)
-        self.assertEqual(self.station_manager.antenna[1].dh, 1)
-        self.assertEqual(self.station_manager.antenna[1].dv, 1)
-        self.assertEqual(self.station_manager.antenna[1].element.g_max, 5)
-        self.assertEqual(self.station_manager.antenna[1].element.phi_deg_3db, 80)
-        self.assertEqual(self.station_manager.antenna[1].element.theta_deg_3db, 60)
-        self.assertEqual(self.station_manager.antenna[1].element.am, 30)
-        self.assertEqual(self.station_manager.antenna[1].element.sla_v, 30)
+        self.assertEqual(self.station_manager.antenna[1].n_rows, 8)
+        self.assertEqual(self.station_manager.antenna[1].n_cols, 8)
+        self.assertEqual(self.station_manager.antenna[1].dh, 0.5)
+        self.assertEqual(self.station_manager.antenna[1].dv, 0.5)
+        self.assertEqual(self.station_manager.antenna[1].element.g_max, 10)
+        self.assertEqual(self.station_manager.antenna[1].element.phi_3db, 65)
+        self.assertEqual(self.station_manager.antenna[1].element.theta_3db, 75)
+        self.assertEqual(self.station_manager.antenna[1].element.am, 35)
+        self.assertEqual(self.station_manager.antenna[1].element.sla_v, 25)
 
         self.assertEqual(self.station_manager.antenna[2].azimuth, 300)
         self.assertEqual(self.station_manager.antenna[2].elevation, -10)
-        self.assertEqual(self.station_manager.antenna[2].n_rows, 16)
-        self.assertEqual(self.station_manager.antenna[2].n_cols, 16)
-        self.assertEqual(self.station_manager.antenna[2].dh, 1)
-        self.assertEqual(self.station_manager.antenna[2].dv, 1)
-        self.assertEqual(self.station_manager.antenna[2].element.g_max, 5)
-        self.assertEqual(self.station_manager.antenna[2].element.phi_deg_3db, 80)
-        self.assertEqual(self.station_manager.antenna[2].element.theta_deg_3db, 60)
-        self.assertEqual(self.station_manager.antenna[2].element.am, 30)
-        self.assertEqual(self.station_manager.antenna[2].element.sla_v, 30)
-
-        par = self.param.get_antenna_parameters("BS","TX")
-        self.station_manager.antenna[[0,2]] = np.array([AntennaBeamformingImt(par,0,-5), AntennaBeamformingImt(par,180,-5)])
-
-        self.assertEqual(self.station_manager.antenna[0].azimuth, 0)
-        self.assertEqual(self.station_manager.antenna[0].elevation, -5)
-        self.assertEqual(self.station_manager.antenna[0].n_rows, 16)
-        self.assertEqual(self.station_manager.antenna[0].n_cols, 16)
-        self.assertEqual(self.station_manager.antenna[0].dh, 1)
-        self.assertEqual(self.station_manager.antenna[0].dv, 1)
-        self.assertEqual(self.station_manager.antenna[0].element.g_max, 5)
-        self.assertEqual(self.station_manager.antenna[0].element.phi_deg_3db, 80)
-        self.assertEqual(self.station_manager.antenna[0].element.theta_deg_3db, 60)
-        self.assertEqual(self.station_manager.antenna[0].element.am, 30)
-        self.assertEqual(self.station_manager.antenna[0].element.sla_v, 30)
-
-        self.assertEqual(self.station_manager.antenna[2].azimuth, 180)
-        self.assertEqual(self.station_manager.antenna[2].elevation, -5)
-        self.assertEqual(self.station_manager.antenna[2].n_rows, 16)
-        self.assertEqual(self.station_manager.antenna[2].n_cols, 16)
-        self.assertEqual(self.station_manager.antenna[2].dh, 1)
-        self.assertEqual(self.station_manager.antenna[2].dv, 1)
-        self.assertEqual(self.station_manager.antenna[2].element.g_max, 5)
-        self.assertEqual(self.station_manager.antenna[2].element.phi_deg_3db, 80)
-        self.assertEqual(self.station_manager.antenna[2].element.theta_deg_3db, 60)
-        self.assertEqual(self.station_manager.antenna[2].element.am, 30)
-        self.assertEqual(self.station_manager.antenna[2].element.sla_v, 30)
+        self.assertEqual(self.station_manager.antenna[2].n_rows, 8)
+        self.assertEqual(self.station_manager.antenna[2].n_cols, 8)
+        self.assertEqual(self.station_manager.antenna[2].dh, 0.5)
+        self.assertEqual(self.station_manager.antenna[2].dv, 0.5)
+        self.assertEqual(self.station_manager.antenna[2].element.g_max, 10)
+        self.assertEqual(self.station_manager.antenna[2].element.phi_3db, 65)
+        self.assertEqual(self.station_manager.antenna[2].element.theta_3db, 75)
+        self.assertEqual(self.station_manager.antenna[2].element.am, 35)
+        self.assertEqual(self.station_manager.antenna[2].element.sla_v, 25)
 
     def test_station(self):
         # test if manager returns the correct station

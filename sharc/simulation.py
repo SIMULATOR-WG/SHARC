@@ -130,10 +130,10 @@ class Simulation(ABC, Observable):
         num_bs = self.topology.num_base_stations
         num_ue = num_bs*self.parameters.imt.ue_k*self.parameters.imt.ue_k_m
 
-        self.bs_power_gain = 10*math.log10(self.parameters.antenna_imt.bs_tx_n_rows*
-                                           self.parameters.antenna_imt.bs_tx_n_columns)
-        self.ue_power_gain = 10*math.log10(self.parameters.antenna_imt.ue_tx_n_rows*
-                                           self.parameters.antenna_imt.ue_tx_n_columns)
+        self.bs_power_gain = 10*math.log10(self.parameters.antenna_imt.bs_n_rows*
+                                           self.parameters.antenna_imt.bs_n_columns)
+        self.ue_power_gain = 10*math.log10(self.parameters.antenna_imt.ue_n_rows*
+                                           self.parameters.antenna_imt.ue_n_columns)
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
         self.path_loss_imt = np.empty([num_bs, num_ue])

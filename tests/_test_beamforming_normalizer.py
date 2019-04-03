@@ -26,31 +26,33 @@ class BeamformingNormalizerTest(unittest.TestCase):
         norm_file = None
         element_pattern = "FIXED"
         element_max_g = 0
-        element_phi_deg_3db = 65
-        element_theta_deg_3db = 65
+        element_phi_3db = 65
+        element_theta_3db = 65
         element_am = 30
         element_sla_v = 30
         n_rows = 8
         n_columns = 8
         horiz_spacing = 0.5
         vert_spacing = 0.5
+        multiplication_factor = 12
         minimum_array_gain = -200
-        down_tilt = 0
+        downtilt = 0
         self.par_1 = AntennaPar(adjacent_antenna_model,
                                 norm,
                                 norm_file,
                                 element_pattern,
                                 element_max_g,
-                                element_phi_deg_3db,
-                                element_theta_deg_3db,
+                                element_phi_3db,
+                                element_theta_3db,
                                 element_am,
                                 element_sla_v,
                                 n_rows,
                                 n_columns,
                                 horiz_spacing,
                                 vert_spacing,
+                                multiplication_factor,
                                 minimum_array_gain,
-                                down_tilt)
+                                downtilt)
         
         # Test 2: UE configuration
         resolution = 5
@@ -69,8 +71,9 @@ class BeamformingNormalizerTest(unittest.TestCase):
         n_columns = 4
         horiz_spacing = 0.5
         vert_spacing = 0.5
+        multiplication_factor = 12
         minimum_array_gain = -200
-        down_tilt = 0
+        downtilt = 0
         self.par_2 = AntennaPar(adjacent_antenna_model,
                                 norm,
                                 norm_file,
@@ -84,8 +87,9 @@ class BeamformingNormalizerTest(unittest.TestCase):
                                 n_columns,
                                 horiz_spacing,
                                 vert_spacing,
+                                multiplication_factor,
                                 minimum_array_gain,
-                                down_tilt)
+                                downtilt)
         
         # Test 3: BS configuration
         resolution = 180
@@ -104,8 +108,9 @@ class BeamformingNormalizerTest(unittest.TestCase):
         n_columns = 8
         horiz_spacing = 0.5
         vert_spacing = 0.5
+        multiplication_factor = 12
         minimum_array_gain = -200
-        down_tilt = 0
+        downtilt = 0
         self.par_3 = AntennaPar(adjacent_antenna_model,
                                 norm,
                                 norm_file,
@@ -119,8 +124,9 @@ class BeamformingNormalizerTest(unittest.TestCase):
                                 n_columns,
                                 horiz_spacing,
                                 vert_spacing,
+                                multiplication_factor,
                                 minimum_array_gain,
-                                down_tilt)
+                                downtilt)
     
     def test_construction(self):
         # Test 1
