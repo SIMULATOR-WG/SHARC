@@ -69,22 +69,56 @@ following keys:
 from sharc.support.named_tuples import AntennaPar
 from sharc.antenna.beamforming_normalization.beamforming_normalizer import BeamformingNormalizer
 
-###############################################################################
-## List of antenna parameters to which calculate the normalization factors.
-param_list = [AntennaPar("",False,None,"M2101",5,65,65,30,30,8,8,0.5,0.5,-200,0)]
-file_names = ['bs_norm.npz']
-###############################################################################
-## Setup
-# General parameters
-resolution = 2
-tolerance = 1e-2
+if __name__ == "__main__":
 
-# Create object
-norm = BeamformingNormalizer(resolution,tolerance)
-###############################################################################
-## Normalize and save
-for par, file in zip(param_list,file_names):
-    s = 'Generating ' + file
-    print(s)
-
-    norm.generate_correction_matrix(par,file)
+    ###########################################################################
+    ## List of antenna parameters to which calculate the normalization factors.
+    adjacent_antenna_model = "" # not needed here
+    normalization = False       # not needed here
+    normalization_data = None   # not needed here
+    element_pattern = "M2101"
+    element_max_g = 5
+    element_phi_3db = 65
+    element_theta_3db = 65
+    element_am = 30
+    element_sla_v = 30
+    n_rows = 8
+    n_columns = 8
+    element_horiz_spacing = 0.5
+    element_vert_spacing = 0.5
+    multiplication_factor = 12
+    minimum_array_gain = -200
+    downtilt = 0
+        
+    file_names = ["bs_norm_8x8_050.npz"]
+    param_list = [AntennaPar(adjacent_antenna_model,
+                             normalization,
+                             normalization_data,
+                             element_pattern,
+                             element_max_g,
+                             element_phi_3db,
+                             element_theta_3db,
+                             element_am,
+                             element_sla_v,
+                             n_rows,
+                             n_columns,
+                             element_horiz_spacing,
+                             element_vert_spacing,
+                             multiplication_factor,
+                             minimum_array_gain,
+                             downtilt)]
+    ###########################################################################
+    ## Setup
+    # General parameters
+    resolution = 5
+    tolerance = 1e-2
+    
+    # Create object
+    norm = BeamformingNormalizer(resolution, tolerance)
+    ###########################################################################
+    ## Normalize and save
+    for par, file in zip(param_list, file_names):
+        s = 'Generating ' + file
+        print(s)
+    
+        norm.generate_correction_matrix(par,file)
