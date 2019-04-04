@@ -49,6 +49,7 @@ class StationFactory(object):
                                    param_ant: ParametersAntennaImt,
                                    topology: Topology,
                                    random_number_gen: np.random.RandomState):
+        par = param_ant.get_antenna_parameters(StationType.IMT_BS)
         num_bs = topology.num_base_stations
         imt_base_stations = StationManager(num_bs)
         imt_base_stations.station_type = StationType.IMT_BS
@@ -56,7 +57,7 @@ class StationFactory(object):
         imt_base_stations.x = topology.x
         imt_base_stations.y = topology.y
         imt_base_stations.azimuth = topology.azimuth
-        imt_base_stations.elevation = topology.elevation
+        imt_base_stations.elevation = -par.downtilt*np.ones(num_bs)
         if param.topology == 'INDOOR':
             imt_base_stations.height = topology.height
         else:
@@ -75,7 +76,6 @@ class StationFactory(object):
         imt_base_stations.inr = dict([(bs, -500 * np.ones(param.ue_k)) for bs in range(num_bs)])
 
         imt_base_stations.antenna = np.empty(num_bs, dtype=AntennaBeamformingImt)
-        par = param_ant.get_antenna_parameters(StationType.IMT_BS)
 
         for i in range(num_bs):
             imt_base_stations.antenna[i] = \

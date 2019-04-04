@@ -25,9 +25,6 @@ class TopologyHotspot(Topology):
     network topology (macro cell with hotspots).
     """
 
-    # Posible values for base station elevation [degrees]
-    ELEVATION = -10
-
     # Maximum number of tentatives when creating hotspots and checking if they overlap
     MAX_NUM_LOOPS = 1000
 
@@ -99,7 +96,6 @@ class TopologyHotspot(Topology):
         self.x = x
         self.y = y
         self.azimuth = azimuth
-        self.elevation = self.ELEVATION*np.ones(len(self.x))
         # In the end, we have to update the number of base stations
         self.num_base_stations = len(self.x)
         self.indoor = np.zeros(self.num_base_stations, dtype = bool)

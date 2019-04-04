@@ -93,19 +93,6 @@ class TopologySingleBaseStationTest(unittest.TestCase):
         npt.assert_equal(topology.azimuth, np.array([0, 180]))
         
 
-    def test_elevation(self):
-        cell_radius = 1500
-        num_clusters = 1
-        topology = TopologySingleBaseStation(cell_radius, num_clusters)
-        topology.calculate_coordinates()
-        self.assertEqual(topology.elevation, -10)
-        
-        cell_radius = 1000
-        num_clusters = 2
-        topology = TopologySingleBaseStation(cell_radius, num_clusters)
-        topology.calculate_coordinates()
-        npt.assert_equal(topology.elevation, np.array([-10, -10]))
-        
             
 if __name__ == '__main__':
     unittest.main()        

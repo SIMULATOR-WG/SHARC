@@ -88,7 +88,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.bs_element_horiz_spacing = 0.5
         self.param.antenna_imt.bs_element_vert_spacing = 0.5
         self.param.antenna_imt.bs_multiplication_factor = 12
-        self.param.antenna_imt.bs_downtilt = 10
+        self.param.antenna_imt.bs_downtilt = 90
 
         self.param.antenna_imt.ue_element_pattern = "M2101"
         self.param.antenna_imt.ue_minimum_array_gain = -200

@@ -17,9 +17,8 @@ class TopologySingleBaseStation(Topology):
     and elevation = -10° wrt x-y plane.
     """
 
-    # possible values for base station azimuth and elevation [degrees]
+    # possible values for base station azimuth [degrees]
     AZIMUTH = [0, 180]
-    ELEVATION = -10
     ALLOWED_NUM_CLUSTERS = [1, 2]
 
 
@@ -49,13 +48,11 @@ class TopologySingleBaseStation(Topology):
                 self.x = np.array([0])
                 self.y = np.array([0])
                 self.azimuth = TopologySingleBaseStation.AZIMUTH[0]*np.ones(1)
-                self.elevation = TopologySingleBaseStation.ELEVATION*np.ones(1)
                 self.num_base_stations = 1
             elif self.num_clusters == 2:
                 self.x = np.array([0, self.intersite_distance])
                 self.y = np.array([0, 0])
                 self.azimuth = np.array(TopologySingleBaseStation.AZIMUTH)
-                self.elevation = TopologySingleBaseStation.ELEVATION*np.ones(2)
                 self.num_base_stations = 2
             self.indoor = np.zeros(self.num_base_stations, dtype = bool)
 
