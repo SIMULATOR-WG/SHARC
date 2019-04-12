@@ -220,7 +220,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         rx_interf_bs2 = 10*math.log10(interf_pow)\
                           - coupling_loss_imt_system_adj[2]
         rx_interference = 10*math.log10(math.pow(10,0.1*rx_interf_bs1) + \
-                                        math.pow(10,0.1*rx_interf_bs2))
+                                        math.pow(10,0.1*rx_interf_bs2)) + 3
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
                                delta=.01)
@@ -310,7 +310,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         interf_pow = np.power(10, 0.1*(-13))*100
         interference = 10*math.log10(interf_pow) \
                           - coupling_loss_imt_system_adj
-        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
+        rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference))) + 3
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
                                delta=.01)

@@ -192,9 +192,15 @@ class SimulationDownlink(Simulation):
 
             if self.adjacent_channel:
 
-                oob_power = self.bs.spectral_mask.power_calc(self.param_system.frequency, self.system.bandwidth)
+                # The unwanted emission is calculated in terms of TRP (after 
+                # antenna). In SHARC implementation, ohmic losses are already 
+                # included in coupling loss. Then, care has to be taken; 
+                # otherwise ohmic loss will be included twice.
+                oob_power = self.bs.spectral_mask.power_calc(self.param_system.frequency, self.system.bandwidth) \
+                            + self.parameters.imt.bs_ohmic_loss
 
-                oob_interference = oob_power - self.coupling_loss_imt_system_adjacent[active_beams[0]] \
+                oob_interference = oob_power \
+                                   - self.coupling_loss_imt_system_adjacent[active_beams[0]] \
                                    + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
                                                  self.param_system.bandwidth)
                                    

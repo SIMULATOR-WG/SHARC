@@ -195,8 +195,13 @@ class SimulationUplink(Simulation):
                 rx_interference += np.sum(weights*np.power(10, 0.1*interference_ue)) / 10**(acs/10.)
 
             if self.adjacent_channel:
+                # The unwanted emission is calculated in terms of TRP (after 
+                # antenna). In SHARC implementation, ohmic losses are already 
+                # included in coupling loss. Then, care has to be taken; 
+                # otherwise ohmic loss will be included twice.                
                 oob_power = self.ue.spectral_mask.power_calc(self.param_system.frequency,self.system.bandwidth)\
-                            - self.ue_power_diff[ue]
+                            - self.ue_power_diff[ue] \
+                            + self.parameters.imt.ue_ohmic_loss
                 oob_interference_array = oob_power - self.coupling_loss_imt_system_adjacent[ue] \
                                             + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
                                               self.param_system.bandwidth) 
