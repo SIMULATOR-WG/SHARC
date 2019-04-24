@@ -95,8 +95,11 @@ class SimulationUplink(Simulation):
                 m_pusch = self.num_rb_per_ue
                 p_o_pusch = self.parameters.imt.ue_p_o_pusch
                 alpha = self.parameters.imt.ue_alpha
+                ue_power_dynamic_range = self.parameters.imt.ue_power_dynamic_range
                 cl = self.coupling_loss_imt[bs,ue] 
                 self.ue.tx_power[ue] = np.minimum(p_cmax, 10*np.log10(m_pusch) + p_o_pusch + alpha*cl)
+                # apply the power dymanic range
+                self.ue.tx_power[ue] = np.maximum(self.ue.tx_power[ue], p_cmax - ue_power_dynamic_range)
         if self.adjacent_channel: 
             self.ue_power_diff = self.parameters.imt.ue_p_cmax - self.ue.tx_power
 
