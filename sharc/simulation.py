@@ -282,8 +282,7 @@ class Simulation(ABC, Observable):
                                              bs_height=station_a.height,
                                              ue_height=station_b.height,
                                              elevation=elevation_angles,
-                                             shadowing=self.parameters.imt.shadowing,
-                                             line_of_sight_prob=self.parameters.imt.line_of_sight_prob)
+                                             shadowing=self.parameters.imt.shadowing)
             # define antenna gains
             gain_a = self.calculate_gains(station_a, station_b)
             gain_b = np.transpose(self.calculate_gains(station_b, station_a))

@@ -15,14 +15,16 @@ from sharc.propagation.propagation_umi import PropagationUMi
 class PropagationUMiTest(unittest.TestCase):
 
     def setUp(self):
-        self.umi = PropagationUMi(np.random.RandomState())
+        los_adjustment_factor = 18
+        self.umi = PropagationUMi(np.random.RandomState(), los_adjustment_factor)
 
     def test_los_probability(self):
         distance_2D = np.array([[10, 15, 40],
                                 [17, 60, 80]])
         los_probability = np.array([[1, 1,  0.631],
                                     [1, 0.432, 0.308]])
-        npt.assert_allclose(self.umi.get_los_probability(distance_2D), 
+        npt.assert_allclose(self.umi.get_los_probability(distance_2D,
+                                                         self.umi.los_adjustment_factor), 
                             los_probability,
                             atol=1e-2)
 

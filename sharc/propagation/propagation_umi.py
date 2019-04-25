@@ -11,11 +11,18 @@ import numpy as np
 
 class PropagationUMi(Propagation):
     """
-    Implements the Urban Micro path loss model (Street Canyon) with LOS probability according
-    to 3GPP TR 38.900 v14.2.0.
+    Implements the Urban Micro path loss model (Street Canyon) with LOS 
+    probability according to 3GPP TR 38.900 v14.2.0.
     TODO: calculate the effective environment height for the generic case
     """
 
+    def __init__(self, 
+                 random_number_gen: np.random.RandomState,
+                 los_adjustment_factor: float):
+        super().__init__(random_number_gen)
+        self.los_adjustment_factor = los_adjustment_factor
+    
+    
     def get_loss(self, *args, **kwargs) -> np.array:
         """
         Calculates path loss for LOS and NLOS cases with respective shadowing
@@ -51,7 +58,7 @@ class PropagationUMi(Propagation):
             shadowing_los = 0
             shadowing_nlos = 0
 
-        los_probability = self.get_los_probability(d_2D)
+        los_probability = self.get_los_probability(d_2D, self.los_adjustment_factor)
         los_condition = self.get_los_condition(los_probability)
 
         i_los = np.where(los_condition == True)[:2]
@@ -190,7 +197,9 @@ class PropagationUMi(Propagation):
         return los_condition
 
 
-    def get_los_probability(self, distance_2D: np.array) -> np.array:
+    def get_los_probability(self, 
+                            distance_2D: np.array,
+                            los_adjustment_factor: float) -> np.array:
         """
         Returns the line-of-sight (LOS) probability
 
@@ -198,7 +207,8 @@ class PropagationUMi(Propagation):
         ----------
             distance_2D : Two-dimensional array with 2D distance values from
                           base station to user terminal [m]
-            h_ue : antenna height of user terminal [m]
+            los_adjustment_factor : adjustment factor to increase/decrease the 
+                          LOS probability. Original value is 18 as per 3GPP
 
         Returns
         -------
@@ -206,8 +216,8 @@ class PropagationUMi(Propagation):
         """
 
         p_los = np.ones(distance_2D.shape)
-        idl = np.where(distance_2D > 18)
-        p_los[idl] = (18/distance_2D[idl] + np.exp(-distance_2D[idl]/36)*(1-18/distance_2D[idl]))
+        idl = np.where(distance_2D > los_adjustment_factor)
+        p_los[idl] = (los_adjustment_factor/distance_2D[idl] + np.exp(-distance_2D[idl]/36)*(1-los_adjustment_factor/distance_2D[idl]))
 
         return p_los
 
@@ -227,8 +237,9 @@ if __name__ == '__main__':
 
     los_probability = np.empty(distance_2D.shape)
     name = list()
-
-    los_probability = umi.get_los_probability(distance_2D)
+    
+    los_adjustment_factor = 18
+    los_probability = umi.get_los_probability(distance_2D, los_adjustment_factor)
 
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()

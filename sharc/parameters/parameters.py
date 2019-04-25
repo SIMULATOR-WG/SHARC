@@ -106,7 +106,7 @@ class Parameters(object):
         self.imt.dl_sinr_min             = config.getfloat("IMT", "dl_sinr_min")
         self.imt.dl_sinr_max             = config.getfloat("IMT", "dl_sinr_max")
         self.imt.channel_model           = config.get("IMT", "channel_model")
-        self.imt.line_of_sight_prob      = config.getfloat("IMT", "line_of_sight_prob")
+        self.imt.los_adjustment_factor   = config.getfloat("IMT", "los_adjustment_factor")
         self.imt.shadowing               = config.getboolean("IMT", "shadowing")
         self.imt.noise_temperature       = config.getfloat("IMT", "noise_temperature")
         self.imt.BOLTZMANN_CONSTANT      = config.getfloat("IMT", "BOLTZMANN_CONSTANT")
@@ -216,7 +216,6 @@ class Parameters(object):
         self.fss_es.antenna_envelope_gain = config.getfloat("FSS_ES", "antenna_envelope_gain")
         self.fss_es.diameter = config.getfloat("FSS_ES", "diameter")
         self.fss_es.channel_model = config.get("FSS_ES", "channel_model")
-        self.fss_es.line_of_sight_prob = config.getfloat("FSS_ES", "line_of_sight_prob")
         self.fss_es.BOLTZMANN_CONSTANT = config.getfloat("FSS_ES", "BOLTZMANN_CONSTANT")
         self.fss_es.EARTH_RADIUS = config.getfloat("FSS_ES", "EARTH_RADIUS")
 
@@ -263,7 +262,6 @@ class Parameters(object):
         self.fs.antenna_pattern         = config.get("FS", "antenna_pattern")
         self.fs.diameter                = config.getfloat("FS", "diameter")
         self.fs.channel_model           = config.get("FS", "channel_model")
-        self.fs.line_of_sight_prob      = config.getfloat("FS", "line_of_sight_prob")
         self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
         self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
 
@@ -330,7 +328,6 @@ class Parameters(object):
         self.ras.antenna_pattern            = config.get("RAS", "antenna_pattern")
         self.ras.diameter                   = config.getfloat("RAS", "diameter")
         self.ras.channel_model              = config.get("RAS", "channel_model")
-        self.ras.line_of_sight_prob         = config.getfloat("RAS", "line_of_sight_prob")
         self.ras.BOLTZMANN_CONSTANT         = config.getfloat("RAS", "BOLTZMANN_CONSTANT")
         self.ras.EARTH_RADIUS               = config.getfloat("RAS", "EARTH_RADIUS")
         self.ras.SPEED_OF_LIGHT             = config.getfloat("RAS", "SPEED_OF_LIGHT")
