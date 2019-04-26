@@ -229,29 +229,33 @@ if __name__ == '__main__':
 
     ###########################################################################
     # Print LOS probability
-    distance_2D = np.column_stack((np.linspace(1, 1000, num=1000)[:,np.newaxis],
-                                   np.linspace(1, 1000, num=1000)[:,np.newaxis],
-                                   np.linspace(1, 1000, num=1000)[:,np.newaxis]))
     #h_ue = np.array([1.5, 17, 23])
-    umi = PropagationUMi(np.random.RandomState(101))
+    distance_2D = np.linspace(1, 1000, num=1000)[:,np.newaxis]
+    umi = PropagationUMi(np.random.RandomState(101), 18)
 
     los_probability = np.empty(distance_2D.shape)
     name = list()
     
     los_adjustment_factor = 18
-    los_probability = umi.get_los_probability(distance_2D, los_adjustment_factor)
+    los_probability_18 = umi.get_los_probability(distance_2D, los_adjustment_factor)
 
-    fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+    los_adjustment_factor = 29
+    los_probability_29 = umi.get_los_probability(distance_2D, los_adjustment_factor)
+
+    fig = plt.figure(figsize=(6,5), facecolor='w', edgecolor='k')
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
-    ax.loglog(distance_2D, los_probability)
+    ax.loglog(distance_2D, 100*los_probability_18, label = r"$\alpha = 18$")
+    ax.loglog(distance_2D, 100*los_probability_29, label = r"$\alpha = 29$")
 
     plt.title("UMi - LOS probability")
-    plt.xlabel("distance [m]")
-    plt.ylabel("probability")
-    plt.xlim((0, distance_2D[-1,0]))
-    plt.ylim((0, 1.1))
+    plt.xlabel("distance between BS and UE [m]")
+    plt.ylabel("probability [%]")
+    ax.legend(loc = "lower left")
+    ax.grid(True, which = "both", color="grey", linestyle='-', linewidth=0.2)    
+    plt.xlim((10, 300))
+    plt.ylim((10, 102))
     plt.tight_layout()
     plt.grid()
 
