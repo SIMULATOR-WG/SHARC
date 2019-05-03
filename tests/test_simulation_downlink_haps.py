@@ -115,7 +115,6 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.haps.elevation = 270
         self.param.haps.azimuth = 0
         self.param.haps.eirp_density = 4.4
-        self.param.haps.inr_scaling = 1
         self.param.haps.antenna_gain = 28
         self.param.haps.tx_power_density = self.param.haps.eirp_density - self.param.haps.antenna_gain - 60
         self.param.haps.antenna_pattern = "OMNI"
