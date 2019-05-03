@@ -21,7 +21,7 @@ from sharc.parameters.parameters_haps import ParametersHaps
 from sharc.parameters.parameters_rns import ParametersRns
 from sharc.parameters.parameters_ras import ParametersRas
 from sharc.station_manager import StationManager
-from sharc.spectral_mask_imt import SpectralMaskImt
+from sharc.mask.spectral_mask_imt import SpectralMaskImt
 from sharc.antenna.antenna import Antenna
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
@@ -39,7 +39,7 @@ from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
-from sharc.spectral_mask_3gpp import SpectralMask3Gpp
+from sharc.mask.spectral_mask_3gpp import SpectralMask3Gpp
 
 
 class StationFactory(object):

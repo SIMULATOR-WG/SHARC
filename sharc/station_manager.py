@@ -11,8 +11,8 @@ import math
 from sharc.support.enumerations import StationType
 from sharc.station import Station
 from sharc.antenna.antenna import Antenna
-from sharc.spectral_mask_imt import SpectralMaskImt
-from sharc.spectral_mask_3gpp import SpectralMask3Gpp
+from sharc.mask.spectral_mask_imt import SpectralMaskImt
+from sharc.mask.spectral_mask_3gpp import SpectralMask3Gpp
 
 class StationManager(object):
     """

@@ -8,7 +8,7 @@ Created on Tue Dec  5 11:56:10 2017
 import unittest
 import numpy as np
 
-from sharc.spectral_mask_imt import SpectralMaskImt
+from sharc.mask.spectral_mask_imt import SpectralMaskImt
 from sharc.support.enumerations import StationType
 
 class SpectalMaskImtTest(unittest.TestCase):

@@ -6,7 +6,7 @@ Created on Tue Dec  5 11:06:56 2017
 """
 
 from sharc.support.enumerations import StationType
-from sharc.spectral_mask import SpectralMask
+from sharc.mask.spectral_mask import SpectralMask
 
 import numpy as np
 import matplotlib.pyplot as plt
