@@ -94,7 +94,7 @@ class StationFactory(object):
                                                               param.bandwidth,
                                                               param.spurious_emissions,
                                                               scenario = param.topology)
-        elif param.spectral_mask == "3GPP 36.104":
+        elif param.spectral_mask == "3GPP E-UTRA":
             imt_base_stations.spectral_mask = SpectralMask3Gpp(StationType.IMT_BS,
                                                                param.frequency,
                                                                param.bandwidth,
@@ -244,7 +244,7 @@ class StationFactory(object):
                                                    param.spurious_emissions,
                                                    scenario = "OUTDOOR")
 
-        elif param.spectral_mask == "3GPP 36.104":
+        elif param.spectral_mask == "3GPP E-UTRA":
             imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,
                                                     param.frequency,
                                                     param.bandwidth,
@@ -369,7 +369,7 @@ class StationFactory(object):
                                                    param.spurious_emissions,
                                                    scenario = "INDOOR")
 
-        elif param.spectral_mask == "3GPP 36.104":
+        elif param.spectral_mask == "3GPP E-UTRA":
             imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,
                                                     param.frequency,
                                                     param.bandwidth,
