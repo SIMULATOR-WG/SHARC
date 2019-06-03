@@ -18,7 +18,6 @@ class AntennaElementImtF1336(object):
     Attributes
     ----------
         g_max (float): maximum gain of element
-        downtilt_rad (float): mechanical downtilt in radians
         theta_3db (float): vertical 3dB beamwidth of single element [degrees]
         phi_3db (float): horizontal 3dB beamwidth of single element [degrees]
     """
@@ -34,7 +33,6 @@ class AntennaElementImtF1336(object):
         self.param = par
 
         self.g_max = par.element_max_g
-        self.downtilt_rad = par.downtilt / 180 * np.pi
         self.phi_3db = par.element_phi_3db
         if par.element_theta_3db > 0:
             self.theta_3db = par.element_theta_3db
@@ -51,7 +49,7 @@ class AntennaElementImtF1336(object):
         self.k_h = .7
         self.lambda_k_h = 3 * (1-.5**(-self.k_h))
         self.k_v = .3
-        self.incline_factor = np.log10(((180/self.theta_3db)**1.5 * (4**-1.5+self.k_v))/
+        self.incline_factor = 10*np.log10(((180/self.theta_3db)**1.5 * (4**-1.5+self.k_v))/
                                        (1 + 8 * self.k_p)) / np.log10(22.5 / self.theta_3db)
         self.x_k = np.sqrt(1 - .36 * self.k_v)
         self.lambda_k_v = 12 - self.incline_factor * np.log10(4) - 10 * np.log10(4**-1.5 + self.k_v)
@@ -71,13 +69,25 @@ class AntennaElementImtF1336(object):
         -------
             a_h (np.array): horizontal radiation pattern gain value
         """
-        x_h = abs(phi)/self.phi_3db
-        if x_h < 0.5:
-            gain = -12 * x_h ** 2
+        if type(phi) is not np.ndarray:
+            phi_a = np.array([phi])
         else:
-            gain = -12 * x_h ** (2 - self.k_h) - self.lambda_k_h
-        gain = max(gain, self.g_hr_180)
+            phi_a = phi
+        
+        x_h = np.abs(phi_a)/self.phi_3db
+        gain = np.zeros(np.size(phi_a))
 
+        i0 = np.where(x_h < 0.5)[0]
+        gain[i0] = -12 * np.power(x_h[i0], 2)
+
+        i1 = np.where(x_h >= 0.5)[0]
+        gain[i1] = -12 * np.power(x_h[i1], 2 - self.k_h) - self.lambda_k_h
+        
+        gain = np.maximum(gain, self.g_hr_180)
+        
+        if type(phi) is not np.ndarray:
+            gain = gain[0]
+        
         return gain
 
     def vertical_pattern(self, theta: np.array) -> np.array:
@@ -92,16 +102,31 @@ class AntennaElementImtF1336(object):
         -------
             a_v (np.array): vertical radiation pattern gain value
         """
-        x_v = abs(theta)/self.theta_3db
-
-        if x_v < self.x_k:
-            gain = -12 * x_v ** 2
-        elif x_v < 4:
-            gain = -12 + 10*np.log10(x_v**-1.5 + self.k_v)
-        elif x_v < 90 / self.theta_3db:
-            gain = - self.lambda_k_v - self.incline_factor * np.log10(x_v)
+        # This correction is needed because the simulator calculates theta 
+        # with respect to z-axis and equations of F.1336 assume that theta is
+        # calculated with respect to the direction of maximum gain
+        if type(theta) is np.ndarray:
+            theta_a = theta - 90
         else:
-            gain = self.g_hr_180
+            theta_a = np.array([theta]) - 90
+        
+        x_v = np.abs(theta_a)/self.theta_3db
+        gain = np.zeros(np.size(theta_a))
+
+        i0 = np.where(x_v < self.x_k)[0]
+        gain[i0] = -12 * np.power(x_v[i0], 2)
+            
+        i1 = np.where((x_v >= self.x_k) & (x_v < 4))[0]
+        gain[i1] = -12 + 10*np.log10(np.power(x_v[i1], -1.5) + self.k_v)
+            
+        i2 = np.where((x_v >= 4) & (x_v < 90 / self.theta_3db))[0]
+        gain[i2] = - self.lambda_k_v - self.incline_factor * np.log10(x_v[i2])
+            
+        i3 = np.where(x_v >= (90 / self.theta_3db))[0]
+        gain[i3] = self.g_hr_180
+
+        if type(theta) is not np.ndarray:
+            gain = gain[0]
 
         return gain
 
@@ -119,25 +144,6 @@ class AntennaElementImtF1336(object):
             gain (np.array): element radiation pattern gain value
         """
 
-        # recalculate angles considering mechanical tilt (eqs 3b/3c)
-        theta_rad = -theta / 180 * np.pi
-        phi_rad = phi / 180 * np.pi
-        new_theta_rad = np.arcsin(np.sin(theta_rad) * np.cos(self.downtilt_rad) +
-                                  np.cos(theta_rad) * np.cos(phi_rad) * np.sin(self.downtilt_rad))
-        cos = (-np.sin(theta_rad) * np.sin(self.downtilt_rad) +
-                np.cos(theta_rad) * np.cos(phi_rad) * np.cos(self.downtilt_rad))/np.cos(new_theta_rad)
-
-        # to avoid numerical errors, as sometimes cosines are slightly out of bounds
-        if cos > 1:
-            cos = 1
-        elif cos < -1:
-            cos = -1
-
-        phi_rad = np.arccos(cos)
-        theta = new_theta_rad / np.pi * 180
-        phi = phi_rad / np.pi * 180
-
-        #theta = theta - self.downtilt_rad * 180 / np.pi
         gain_hor = self.horizontal_pattern(phi)
         compression_ratio = (gain_hor - self.g_hr_180)/(self.g_hr_0 - self.g_hr_180)
         gain = self.g_max + gain_hor + compression_ratio * self.vertical_pattern(theta)
@@ -155,49 +161,34 @@ if __name__ == '__main__':
     param.element_phi_3db = 65
     param.element_theta_3db = 0
 
-    # 0 degrees tilt
-    param.downtilt = 0
-
     antenna = AntennaElementImtF1336( param )
 
-    phi_vec = np.arange(-180,180, step = 5)
-    theta_vec = np.arange(0,90, step = 3)
+    phi_vec = np.arange(-180, 180, step = 1)
+    theta_vec = np.arange(0, 180, step = 1)
 
-    pattern_hor_0deg = np.zeros(phi_vec.shape)
-    pattern_hor_10deg = np.zeros(phi_vec.shape)
-    pattern_hor_30deg = np.zeros(phi_vec.shape)
-    pattern_hor_60deg = np.zeros(phi_vec.shape)
-
-    pattern_ver_0deg = np.zeros(theta_vec.shape)
-    pattern_ver_30deg = np.zeros(theta_vec.shape)
-    pattern_ver_60deg = np.zeros(theta_vec.shape)
-    pattern_ver_90deg = np.zeros(theta_vec.shape)
-    pattern_ver_120deg = np.zeros(theta_vec.shape)
-
-    for phi, index in zip(phi_vec, range(len(phi_vec))):
-        pattern_hor_0deg[index] = antenna.element_pattern(phi,  0)
-        pattern_hor_10deg[index] = antenna.element_pattern(phi,  10)
-        pattern_hor_30deg[index] = antenna.element_pattern(phi, 30)
-        pattern_hor_60deg[index] = antenna.element_pattern(phi, 60)
+    pattern_hor_0deg = antenna.element_pattern(phi_vec, 0)
+    pattern_hor_10deg = antenna.element_pattern(phi_vec, 10)
+    pattern_hor_30deg = antenna.element_pattern(phi_vec, 30)
+    pattern_hor_60deg = antenna.element_pattern(phi_vec, 60)
+    pattern_hor_90deg = antenna.element_pattern(phi_vec, 90)
+    
+    pattern_ver_0deg = antenna.element_pattern(0, theta_vec)
+    pattern_ver_30deg = antenna.element_pattern(30, theta_vec)
+    pattern_ver_60deg = antenna.element_pattern(60, theta_vec)
+    pattern_ver_90deg = antenna.element_pattern(90, theta_vec)
+    pattern_ver_120deg = antenna.element_pattern(120, theta_vec)
 
     plt.figure(1)
     plt.plot(phi_vec, pattern_hor_0deg, label = 'elevation = 0 degrees')
     plt.plot(phi_vec, pattern_hor_10deg, label = 'elevation = 10 degrees')
     plt.plot(phi_vec, pattern_hor_30deg, label = 'elevation = 30 degrees')
     plt.plot(phi_vec, pattern_hor_60deg, label = 'elevation = 60 degrees')
+    plt.plot(phi_vec, pattern_hor_90deg, label = 'elevation = 90 degrees')
 
-    plt.title('downtilt = 0 degrees')
-    plt.xlabel ('azimuth (degrees)')
-    plt.ylabel ('gain (dBi)')
-
+    plt.title('horizontal pattern')
+    plt.xlabel('azimuth (degrees)')
+    plt.ylabel('gain (dBi)')
     plt.legend()
-
-    for theta, index in zip(theta_vec, range(len(theta_vec))):
-        pattern_ver_0deg[index] = antenna.element_pattern(0, theta)
-        pattern_ver_30deg[index] = antenna.element_pattern(30, theta)
-        pattern_ver_60deg[index] = antenna.element_pattern(60, theta)
-        pattern_ver_90deg[index] = antenna.element_pattern(90, theta)
-        pattern_ver_120deg[index] = antenna.element_pattern(120, theta)
 
     plt.figure(2)
     plt.plot(theta_vec, pattern_ver_0deg, label='azimuth = 0 degrees')
@@ -206,50 +197,9 @@ if __name__ == '__main__':
     plt.plot(theta_vec, pattern_ver_90deg, label='azimuth = 90 degrees')
     plt.plot(theta_vec, pattern_ver_120deg, label='azimuth = 120 degrees')
 
-    plt.title('downtilt = 0 degrees')
+    plt.title('vertical pattern')
     plt.xlabel('elevation (degrees)')
     plt.ylabel('gain (dBi)')
-
     plt.legend()
 
-    # x degrees tilt
-    param.downtilt_deg = 10
-    antenna = AntennaElementImtF1336(param)
-
-    for phi, index in zip(phi_vec, range(len(phi_vec))):
-        pattern_hor_0deg[index] = antenna.element_pattern(phi, 0)
-        pattern_hor_10deg[index] = antenna.element_pattern(phi, 10)
-        pattern_hor_30deg[index] = antenna.element_pattern(phi, 30)
-        pattern_hor_60deg[index] = antenna.element_pattern(phi, 60)
-
-    plt.figure(3)
-    plt.plot(phi_vec, pattern_hor_0deg, label='0 degrees')
-    plt.plot(phi_vec, pattern_hor_10deg, label='10 degrees')
-    plt.plot(phi_vec, pattern_hor_30deg, label='30 degrees')
-    plt.plot(phi_vec, pattern_hor_60deg, label='60 degrees')
-
-    plt.title('downtilt = {} degrees'.format(param.downtilt_deg))
-    plt.xlabel ('azimuth (degrees)')
-    plt.ylabel ('gain (dBi)')
-    plt.legend()
-
-    for theta, index in zip(theta_vec, range(len(theta_vec))):
-        pattern_ver_0deg[index] = antenna.element_pattern(0, theta)
-        pattern_ver_30deg[index] = antenna.element_pattern(30, theta)
-        pattern_ver_60deg[index] = antenna.element_pattern(60, theta)
-        pattern_ver_90deg[index] = antenna.element_pattern(90, theta)
-        pattern_ver_120deg[index] = antenna.element_pattern(120, theta)
-
-    plt.figure(4)
-    plt.plot(theta_vec, pattern_ver_0deg, label='azimuth = 0 degrees')
-    plt.plot(theta_vec, pattern_ver_30deg, label='azimuth = 30 degrees')
-    plt.plot(theta_vec, pattern_ver_60deg, label='azimuth = 60 degrees')
-    plt.plot(theta_vec, pattern_ver_90deg, label='azimuth = 90 degrees')
-    plt.plot(theta_vec, pattern_ver_120deg, label='azimuth = 120 degrees')
-
-    plt.title('downtilt = {} degrees'.format(param.downtilt_deg))
-    plt.xlabel('elevation (degrees)')
-    plt.ylabel('gain (dBi)')
-
-    plt.legend()
     plt.show()
