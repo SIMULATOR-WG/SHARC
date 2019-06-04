@@ -180,14 +180,14 @@ class SimulationDownlink(Simulation):
             if self.co_channel:
                 if self.overlapping_bandwidth:
                     acs = 0
+                    weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
+                                                        self.param_system.bandwidth,
+                                                        self.parameters.imt.ue_k)
                 else:
                     acs = self.param_system.adjacent_ch_selectivity
+                    weights = np.ones(self.parameters.imt.ue_k)
 
                 interference = self.bs.tx_power[bs] - self.coupling_loss_imt_system[active_beams]
-                weights = self.calculate_bw_weights(self.parameters.imt.bandwidth,
-                                                    self.param_system.bandwidth,
-                                                    self.parameters.imt.ue_k)
-
                 rx_interference += np.sum(weights*np.power(10, 0.1*interference)) / 10**(acs/10.)
 
             if self.adjacent_channel:
