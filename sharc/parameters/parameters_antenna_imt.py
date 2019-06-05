@@ -25,7 +25,7 @@ class ParametersAntennaImt(object):
 
     def get_antenna_parameters(self, sta_type: StationType)-> AntennaPar:
         if sta_type is StationType.IMT_BS:
-            if self.normalization:
+            if self.bs_normalization:
                 # Load data, save it in dict and close it
                 data = load(self.bs_normalization_file)
                 data_dict = {key:data[key] for key in data}
@@ -34,7 +34,7 @@ class ParametersAntennaImt(object):
             else:
                 self.bs_normalization_data = None
             tpl = AntennaPar(self.adjacent_antenna_model,
-                             self.normalization,
+                             self.bs_normalization,
                              self.bs_normalization_data,
                              self.bs_element_pattern,
                              self.bs_element_max_g,
@@ -50,7 +50,7 @@ class ParametersAntennaImt(object):
                              self.bs_minimum_array_gain,
                              self.bs_downtilt)
         elif sta_type is StationType.IMT_UE:
-            if self.normalization:
+            if self.ue_normalization:
                 # Load data, save it in dict and close it
                 data = load(self.ue_normalization_file)
                 data_dict = {key:data[key] for key in data}
@@ -59,7 +59,7 @@ class ParametersAntennaImt(object):
             else:
                 self.ue_normalization_data = None            
             tpl = AntennaPar(self.adjacent_antenna_model,
-                             self.normalization,
+                             self.ue_normalization,
                              self.ue_normalization_data,
                              self.ue_element_pattern,
                              self.ue_element_max_g,
