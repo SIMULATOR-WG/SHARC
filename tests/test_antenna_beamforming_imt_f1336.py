@@ -23,7 +23,7 @@ class AntennaBeamformingImtF1336Test(unittest.TestCase):
         self.param.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.bs_element_pattern = "F1336"
         self.param.bs_minimum_array_gain = -200
-        self.param.normalization = False
+        self.param.bs_normalization = False
         self.param.bs_downtilt = 0
 
         self.param.bs_normalization_file = None

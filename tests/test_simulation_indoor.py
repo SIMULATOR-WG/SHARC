@@ -73,7 +73,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
 
         self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
-        self.param.antenna_imt.normalization = False
+        self.param.antenna_imt.bs_normalization = False
         self.param.antenna_imt.bs_normalization_file = path.join('..','sharc','antenna','beamforming_normalization','bs_indoor_norm.npz')
         self.param.antenna_imt.ue_normalization_file = path.join('..','sharc','antenna','beamforming_normalization','ue_norm.npz')
         self.param.antenna_imt.bs_element_pattern = "M2101"
@@ -91,6 +91,7 @@ class SimulationIndoorTest(unittest.TestCase):
         self.param.antenna_imt.bs_downtilt = 90
 
         self.param.antenna_imt.ue_element_pattern = "M2101"
+        self.param.antenna_imt.ue_normalization = False
         self.param.antenna_imt.ue_minimum_array_gain = -200
         self.param.antenna_imt.ue_element_max_g = 5
         self.param.antenna_imt.ue_element_phi_3db = 90

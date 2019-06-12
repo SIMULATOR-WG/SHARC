@@ -21,7 +21,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param = ParametersAntennaImt()
 
         self.param.adjacent_antenna_model = "SINGLE_ELEMENT"
-        self.param.normalization = False
+        self.param.bs_normalization = False
         self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
         self.param.bs_minimum_array_gain = -200
@@ -39,6 +39,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.param.bs_multiplication_factor = 12
 
         self.param.ue_element_pattern = "M2101"
+        self.param.ue_normalization = False
         self.param.ue_normalization_file = None
         self.param.ue_minimum_array_gain = -200
 
