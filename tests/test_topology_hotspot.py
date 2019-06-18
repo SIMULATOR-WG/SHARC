@@ -30,29 +30,65 @@ class TopologyHotspotTest(unittest.TestCase):
         
         
     def test_overlapping_hotspots(self):
-        x = np.array([0, 200, 300])
-        y = np.array([0,   0,   0])
-        azimuth = np.array([0, -180, -180])
-        radius = np.array([100, 100, 100])
-        self.assertFalse(self.topology.overlapping_hotspots(x, y, azimuth, radius))
+        candidate_x = np.array([300])
+        candidate_y = np.array([0])
+        candidate_azimuth = np.array([-180])
+        set_x = np.array([0, 200])
+        set_y = np.array([0,   0])
+        set_azimuth = np.array([0, -180])
+        radius = 100
+        self.assertFalse(self.topology.overlapping_hotspots(candidate_x, 
+                                                            candidate_y, 
+                                                            candidate_azimuth, 
+                                                            set_x, 
+                                                            set_y, 
+                                                            set_azimuth,
+                                                            radius))
         
-        x = np.array([0, 0, 0])
-        y = np.array([0, 150, 400])
-        azimuth = np.array([90, 270, 270])
-        radius = np.array([100, 100, 100])
-        self.assertTrue(self.topology.overlapping_hotspots(x, y, azimuth, radius))        
+        candidate_x = np.array([0])
+        candidate_y = np.array([0])
+        candidate_azimuth = np.array([0])
+        set_x = np.array([0, 0])
+        set_y = np.array([150, 400])
+        set_azimuth = np.array([270, 270])
+        radius = 100
+        self.assertTrue(self.topology.overlapping_hotspots(candidate_x, 
+                                                           candidate_y, 
+                                                           candidate_azimuth, 
+                                                           set_x, 
+                                                           set_y, 
+                                                           set_azimuth,
+                                                           radius))
                 
-        x = np.array([ 0, -1, 101])
-        y = np.array([ 0,  0,   0])
-        azimuth = np.array([0, 180, 0])
-        radius = np.array([100, 100, 100])
-        self.assertFalse(self.topology.overlapping_hotspots(x, y, azimuth, radius))       
+        candidate_x = np.array([0])
+        candidate_y = np.array([0])
+        candidate_azimuth = np.array([0])
+        set_x = np.array([ -1, 101])
+        set_y = np.array([  0,   0])
+        set_azimuth = np.array([180, 0])
+        radius = 100
+        self.assertFalse(self.topology.overlapping_hotspots(candidate_x, 
+                                                            candidate_y, 
+                                                            candidate_azimuth, 
+                                                            set_x, 
+                                                            set_y, 
+                                                            set_azimuth,
+                                                            radius))
         
-        x = np.array([ 1, 0])
-        y = np.array([ 0, 1])
-        azimuth = np.array([0, 90])
-        radius = np.array([100, 100])
-        self.assertTrue(self.topology.overlapping_hotspots(x, y, azimuth, radius))         
+        candidate_x = np.array([1])
+        candidate_y = np.array([0])
+        candidate_azimuth = np.array([0])
+        set_x = np.array([ 0])
+        set_y = np.array([ 1])
+        set_azimuth = np.array([90])
+        radius = 100
+        self.assertTrue(self.topology.overlapping_hotspots(candidate_x, 
+                                                           candidate_y, 
+                                                           candidate_azimuth, 
+                                                           set_x, 
+                                                           set_y, 
+                                                           set_azimuth,
+                                                           radius))
         
     
         

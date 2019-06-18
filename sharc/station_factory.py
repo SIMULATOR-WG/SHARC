@@ -29,6 +29,9 @@ from sharc.antenna.antenna_f699 import AntennaF699
 from sharc.antenna.antenna_f1891 import AntennaF1891
 from sharc.antenna.antenna_m1466 import AntennaM1466
 from sharc.antenna.antenna_rs1813 import AntennaRS1813
+from sharc.antenna.antenna_rs1861_9a import AntennaRS1861_9A
+from sharc.antenna.antenna_rs1861_9b import AntennaRS1861_9B
+from sharc.antenna.antenna_rs1861_9c import AntennaRS1861_9C
 from sharc.antenna.antenna_s465 import AntennaS465
 from sharc.antenna.antenna_modified_s465 import AntennaModifiedS465
 from sharc.antenna.antenna_s580 import AntennaS580
@@ -698,6 +701,12 @@ class StationFactory(object):
             eess_passive_sensor.antenna = np.array([AntennaOmni(param.antenna_gain)])
         elif param.antenna_pattern == "ITU-R RS.1813":
             eess_passive_sensor.antenna = np.array([AntennaRS1813(param)])
+        elif param.antenna_pattern == "ITU-R RS.1861 9a":
+            eess_passive_sensor.antenna = np.array([AntennaRS1861_9A(param)])
+        elif param.antenna_pattern == "ITU-R RS.1861 9b":
+            eess_passive_sensor.antenna = np.array([AntennaRS1861_9B(param)])
+        elif param.antenna_pattern == "ITU-R RS.1861 9c":
+            eess_passive_sensor.antenna = np.array([AntennaRS1861_9C()])
         else:
             sys.stderr.write("ERROR\nInvalid EESS PASSIVE antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
