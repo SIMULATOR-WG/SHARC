@@ -15,14 +15,16 @@ from sharc.propagation.propagation_umi import PropagationUMi
 class PropagationUMiTest(unittest.TestCase):
 
     def setUp(self):
-        self.umi = PropagationUMi(np.random.RandomState())
+        los_adjustment_factor = 18
+        self.umi = PropagationUMi(np.random.RandomState(), los_adjustment_factor)
 
     def test_los_probability(self):
         distance_2D = np.array([[10, 15, 40],
                                 [17, 60, 80]])
         los_probability = np.array([[1, 1,  0.631],
                                     [1, 0.432, 0.308]])
-        npt.assert_allclose(self.umi.get_los_probability(distance_2D), 
+        npt.assert_allclose(self.umi.get_los_probability(distance_2D,
+                                                         self.umi.los_adjustment_factor), 
                             los_probability,
                             atol=1e-2)
 
@@ -82,8 +84,8 @@ class PropagationUMiTest(unittest.TestCase):
         distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
         frequency = 30000*np.ones(distance_2D.shape)
         shadowing_std = 0
-        loss = np.array([[128.841, 138.727, 144.562, 148.645],
-                         [152.969, 155.453, 157.509, 159.252]])
+        loss = np.array([[128.84,  138.72,  144.56,  148.64],
+                         [152.96,  155.45,  157.50,  159.25]])
         npt.assert_allclose(self.umi.get_loss_nlos(distance_2D, distance_3D, frequency,
                                                   h_bs, h_ue, h_e, shadowing_std),
                             loss,
@@ -98,8 +100,8 @@ class PropagationUMiTest(unittest.TestCase):
         distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
         frequency = 300*np.ones(distance_2D.shape)
         shadowing_std = 0
-        loss = np.array([[120.968, 131.290, 145.036, 141.315],
-                         [137.805, 148.131, 150.194, 151.941]])
+        loss = np.array([[ 120.96 ,  131.29,  145.03,  141.31],
+                         [ 137.80 ,  148.13 ,  150.19,  151.94]])
         npt.assert_allclose(self.umi.get_loss_nlos(distance_2D, distance_3D, frequency,
                                                   h_bs, h_ue, h_e, shadowing_std),
                             loss,

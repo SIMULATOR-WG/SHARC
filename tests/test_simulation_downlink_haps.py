@@ -22,13 +22,13 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param = Parameters()
 
         self.param.general.imt_link = "DOWNLINK"
+        self.param.general.seed = 101
         self.param.general.enable_cochannel = True
         self.param.general.enable_adjacent_channel = False
         self.param.general.overwrite_output = True
 
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.wrap_around = False
-        self.param.imt.num_macrocell_sites = 19
         self.param.imt.num_clusters = 2
         self.param.imt.intersite_distance = 150
         self.param.imt.minimum_separation_distance_bs_ue = 10
@@ -36,7 +36,8 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.imt.frequency = 10000
         self.param.imt.bandwidth = 100
         self.param.imt.rb_bandwidth = 0.180
-        self.param.imt.spectral_mask = "ITU 265-E"
+        self.param.imt.spectral_mask = "IMT-2020"
+        self.param.imt.spurious_emissions = -13
         self.param.imt.guard_band_ratio = 0.1
         self.param.imt.ho_margin = 3
         self.param.imt.bs_load_probability = 1
@@ -76,49 +77,37 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
 
+        self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.antenna_imt.normalization = False
         self.param.antenna_imt.bs_normalization_file = None
         self.param.antenna_imt.bs_element_pattern = "M2101"
-        self.param.antenna_imt.bs_tx_element_max_g = 10
-        self.param.antenna_imt.bs_tx_element_phi_3db = 80
-        self.param.antenna_imt.bs_tx_element_theta_3db = 80
-        self.param.antenna_imt.bs_tx_element_am = 25
-        self.param.antenna_imt.bs_tx_element_sla_v = 25
-        self.param.antenna_imt.bs_tx_n_rows = 16
-        self.param.antenna_imt.bs_tx_n_columns = 16
-        self.param.antenna_imt.bs_tx_element_horiz_spacing = 1
-        self.param.antenna_imt.bs_tx_element_vert_spacing = 1
-        self.param.antenna_imt.bs_rx_element_max_g = 5
-        self.param.antenna_imt.bs_rx_element_phi_deg_3db = 65
-        self.param.antenna_imt.bs_rx_element_theta_deg_3db = 65
-        self.param.antenna_imt.bs_rx_element_am = 30
-        self.param.antenna_imt.bs_rx_element_sla_v = 30
-        self.param.antenna_imt.bs_rx_n_rows = 2
-        self.param.antenna_imt.bs_rx_n_columns = 2
-        self.param.antenna_imt.bs_rx_element_horiz_spacing = 0.5
-        self.param.antenna_imt.bs_rx_element_vert_spacing = 0.5
-        self.param.antenna_imt.bs_downtilt_deg = 10
+        self.param.antenna_imt.bs_minimum_array_gain = -200
+        self.param.antenna_imt.bs_element_max_g = 10
+        self.param.antenna_imt.bs_element_phi_3db = 80
+        self.param.antenna_imt.bs_element_theta_3db = 80
+        self.param.antenna_imt.bs_element_am = 25
+        self.param.antenna_imt.bs_element_sla_v = 25
+        self.param.antenna_imt.bs_n_rows = 16
+        self.param.antenna_imt.bs_n_columns = 16
+        self.param.antenna_imt.bs_element_horiz_spacing = 1
+        self.param.antenna_imt.bs_element_vert_spacing = 1
+        self.param.antenna_imt.bs_multiplication_factor = 12
+        self.param.antenna_imt.bs_downtilt = 10        
+        
         self.param.antenna_imt.ue_normalization_file = None
         self.param.antenna_imt.ue_element_pattern = "M2101"
-        self.param.antenna_imt.ue_tx_element_max_g = 5
-        self.param.antenna_imt.ue_tx_element_phi_deg_3db = 65
-        self.param.antenna_imt.ue_tx_element_theta_deg_3db = 65
-        self.param.antenna_imt.ue_tx_element_am = 30
-        self.param.antenna_imt.ue_tx_element_sla_v = 30
-        self.param.antenna_imt.ue_tx_n_rows = 2
-        self.param.antenna_imt.ue_tx_n_columns = 1
-        self.param.antenna_imt.ue_tx_element_horiz_spacing = 0.5
-        self.param.antenna_imt.ue_tx_element_vert_spacing = 0.5
-        self.param.antenna_imt.ue_rx_element_max_g = 10
-        self.param.antenna_imt.ue_rx_element_phi_3db = 90
-        self.param.antenna_imt.ue_rx_element_theta_3db = 90
-        self.param.antenna_imt.ue_rx_element_am = 25
-        self.param.antenna_imt.ue_rx_element_sla_v = 25
-        self.param.antenna_imt.ue_rx_n_rows = 16
-        self.param.antenna_imt.ue_rx_n_columns = 16
-        self.param.antenna_imt.ue_rx_element_horiz_spacing = 1
-        self.param.antenna_imt.ue_rx_element_vert_spacing = 1
-
+        self.param.antenna_imt.ue_minimum_array_gain = -200
+        self.param.antenna_imt.ue_element_max_g = 5
+        self.param.antenna_imt.ue_element_phi_3db = 65
+        self.param.antenna_imt.ue_element_theta_3db = 65
+        self.param.antenna_imt.ue_element_am = 30
+        self.param.antenna_imt.ue_element_sla_v = 30
+        self.param.antenna_imt.ue_n_rows = 2
+        self.param.antenna_imt.ue_n_columns = 1
+        self.param.antenna_imt.ue_element_horiz_spacing = 0.5
+        self.param.antenna_imt.ue_element_vert_spacing = 0.5
+        self.param.antenna_imt.ue_multiplication_factor = 12
+        
         self.param.haps.frequency = 10000
         self.param.haps.bandwidth = 200
         self.param.haps.altitude = 20000
@@ -126,7 +115,6 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.haps.elevation = 270
         self.param.haps.azimuth = 0
         self.param.haps.eirp_density = 4.4
-        self.param.haps.inr_scaling = 1
         self.param.haps.antenna_gain = 28
         self.param.haps.tx_power_density = self.param.haps.eirp_density - self.param.haps.antenna_gain - 60
         self.param.haps.antenna_pattern = "OMNI"
@@ -215,14 +203,14 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.simulation.calculate_sinr_ext()
 
         # check coupling loss between FSS_ES and IMT_UE
-        coupling_loss_imt_system = np.array([138.47-28-10,  138.47-28-11,  138.47-28-22,  138.47-28-23])
+        coupling_loss_imt_system = np.array([148.47-28-10,  148.47-28-11,  148.47-28-22,  148.47-28-23])
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             coupling_loss_imt_system,
                             atol=1e-2)
 
         system_tx_power = (4.4 - 28 - 60) + 10*math.log10(bandwidth_per_ue*1e6) + 30
 
-        ext_interference = system_tx_power - coupling_loss_imt_system - 3 - 4
+        ext_interference = system_tx_power - coupling_loss_imt_system
         npt.assert_allclose(self.simulation.ue.ext_interference,
                             ext_interference,
                             atol=1e-2)

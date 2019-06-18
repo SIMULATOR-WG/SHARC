@@ -18,10 +18,9 @@ class AntennaElementImtF1336(object):
     Attributes
     ----------
         g_max (float): maximum gain of element
+        downtilt_rad (float): mechanical downtilt in radians
         theta_3db (float): vertical 3dB beamwidth of single element [degrees]
         phi_3db (float): horizontal 3dB beamwidth of single element [degrees]
-        am (float): front-to-back ratio
-        sla_v (float): element vertical sidelobe attenuation
     """
 
     def __init__(self,par: AntennaPar):
@@ -35,16 +34,16 @@ class AntennaElementImtF1336(object):
         self.param = par
 
         self.g_max = par.element_max_g
-        self.downtilt_rad = par.downtilt_deg / 180 * np.pi
-        self.phi_deg_3db = par.element_phi_deg_3db
-        if par.element_theta_deg_3db > 0:
-            self.theta_deg_3db = par.element_theta_deg_3db
+        self.downtilt_rad = par.downtilt / 180 * np.pi
+        self.phi_3db = par.element_phi_3db
+        if par.element_theta_3db > 0:
+            self.theta_3db = par.element_theta_3db
         else:
-            if self.phi_deg_3db > 120.:
+            if self.phi_3db > 120.:
                 sys.stderr.write("ERROR\nvertical beamwidth must be givem if horizontal beamwidth > 120 degrees")
                 sys.exit(1)
             # calculate based on F1336
-            self.theta_deg_3db = (31000 * 10**(-.1 * self.g_max))/self.phi_deg_3db
+            self.theta_3db = (31000 * 10**(-.1 * self.g_max))/self.phi_3db
 
         # antenna paremeters, according to ITU-R M2292
         self.k_a = .7
@@ -52,12 +51,12 @@ class AntennaElementImtF1336(object):
         self.k_h = .7
         self.lambda_k_h = 3 * (1-.5**(-self.k_h))
         self.k_v = .3
-        self.incline_factor = np.log10(((180/self.theta_deg_3db)**1.5 * (4**-1.5+self.k_v))/
-                                       (1 + 8 * self.k_p)) / np.log10(22.5 / self.theta_deg_3db)
+        self.incline_factor = np.log10(((180/self.theta_3db)**1.5 * (4**-1.5+self.k_v))/
+                                       (1 + 8 * self.k_p)) / np.log10(22.5 / self.theta_3db)
         self.x_k = np.sqrt(1 - .36 * self.k_v)
         self.lambda_k_v = 12 - self.incline_factor * np.log10(4) - 10 * np.log10(4**-1.5 + self.k_v)
 
-        self.g_hr_180 = -12. + 10 * np.log10(1 + 8 * self.k_a) - 15 * np.log10(180/self.theta_deg_3db)
+        self.g_hr_180 = -12. + 10 * np.log10(1 + 8 * self.k_a) - 15 * np.log10(180/self.theta_3db)
         self.g_hr_0 = 0
 
     def horizontal_pattern(self, phi: np.array) -> {np.array, float}:
@@ -72,7 +71,7 @@ class AntennaElementImtF1336(object):
         -------
             a_h (np.array): horizontal radiation pattern gain value
         """
-        x_h = abs(phi)/self.phi_deg_3db
+        x_h = abs(phi)/self.phi_3db
         if x_h < 0.5:
             gain = -12 * x_h ** 2
         else:
@@ -93,13 +92,13 @@ class AntennaElementImtF1336(object):
         -------
             a_v (np.array): vertical radiation pattern gain value
         """
-        x_v = abs(theta)/self.theta_deg_3db
+        x_v = abs(theta)/self.theta_3db
 
         if x_v < self.x_k:
             gain = -12 * x_v ** 2
         elif x_v < 4:
             gain = -12 + 10*np.log10(x_v**-1.5 + self.k_v)
-        elif x_v < 90 / self.theta_deg_3db:
+        elif x_v < 90 / self.theta_3db:
             gain = - self.lambda_k_v - self.incline_factor * np.log10(x_v)
         else:
             gain = self.g_hr_180
@@ -153,11 +152,11 @@ if __name__ == '__main__':
     param = ParametersAntennaImt()
 
     param.element_max_g = 15
-    param.element_phi_deg_3db = 65
-    param.element_theta_deg_3db = 0
+    param.element_phi_3db = 65
+    param.element_theta_3db = 0
 
     # 0 degrees tilt
-    param.downtilt_deg = 0
+    param.downtilt = 0
 
     antenna = AntennaElementImtF1336( param )
 

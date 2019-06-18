@@ -12,6 +12,7 @@ import numpy.testing as npt
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 from sharc.support.named_tuples import AntennaPar
+from sharc.support.enumerations import StationType
 
 class AntennaBeamformingImtTest(unittest.TestCase):
 
@@ -19,58 +20,43 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         #Array parameters
         self.param = ParametersAntennaImt()
 
+        self.param.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.normalization = False
         self.param.bs_normalization_file = None
         self.param.bs_element_pattern = "M2101"
-        self.param.bs_downtilt_deg = 0
+        self.param.bs_minimum_array_gain = -200
+        self.param.bs_downtilt = 0
 
-        self.param.bs_tx_element_max_g    = 5
-        self.param.bs_tx_element_phi_deg_3db  = 80
-        self.param.bs_tx_element_theta_deg_3db = 60
-        self.param.bs_tx_element_am       = 30
-        self.param.bs_tx_element_sla_v    = 30
-        self.param.bs_tx_n_rows           = 16
-        self.param.bs_tx_n_columns        = 16
-        self.param.bs_tx_element_horiz_spacing = 1
-        self.param.bs_tx_element_vert_spacing = 1
-
-        self.param.bs_rx_element_max_g    = 5
-        self.param.bs_rx_element_phi_deg_3db  = 80
-        self.param.bs_rx_element_theta_deg_3db = 60
-        self.param.bs_rx_element_am       = 30
-        self.param.bs_rx_element_sla_v    = 30
-        self.param.bs_rx_n_rows           = 16
-        self.param.bs_rx_n_columns        = 16
-        self.param.bs_rx_element_horiz_spacing = 1
-        self.param.bs_rx_element_vert_spacing = 1
+        self.param.bs_element_max_g    = 5
+        self.param.bs_element_phi_3db  = 80
+        self.param.bs_element_theta_3db = 60
+        self.param.bs_element_am       = 30
+        self.param.bs_element_sla_v    = 30
+        self.param.bs_n_rows           = 16
+        self.param.bs_n_columns        = 16
+        self.param.bs_element_horiz_spacing = 1
+        self.param.bs_element_vert_spacing = 1
+        self.param.bs_multiplication_factor = 12
 
         self.param.ue_element_pattern = "M2101"
         self.param.ue_normalization_file = None
+        self.param.ue_minimum_array_gain = -200
 
-        self.param.ue_tx_element_max_g    = 10
-        self.param.ue_tx_element_phi_deg_3db  = 75
-        self.param.ue_tx_element_theta_deg_3db = 65
-        self.param.ue_tx_element_am       = 25
-        self.param.ue_tx_element_sla_v    = 35
-        self.param.ue_tx_n_rows           = 2
-        self.param.ue_tx_n_columns        = 2
-        self.param.ue_tx_element_horiz_spacing = 0.5
-        self.param.ue_tx_element_vert_spacing = 0.5
-
-        self.param.ue_rx_element_max_g    = 10
-        self.param.ue_rx_element_phi_deg_3db  = 75
-        self.param.ue_rx_element_theta_deg_3db = 65
-        self.param.ue_rx_element_am       = 25
-        self.param.ue_rx_element_sla_v    = 35
-        self.param.ue_rx_n_rows           = 2
-        self.param.ue_rx_n_columns        = 2
-        self.param.ue_rx_element_horiz_spacing = 0.5
-        self.param.ue_rx_element_vert_spacing = 0.5
+        self.param.ue_element_max_g    = 10
+        self.param.ue_element_phi_3db  = 75
+        self.param.ue_element_theta_3db = 65
+        self.param.ue_element_am       = 25
+        self.param.ue_element_sla_v    = 35
+        self.param.ue_n_rows           = 2
+        self.param.ue_n_columns        = 2
+        self.param.ue_element_horiz_spacing = 0.5
+        self.param.ue_element_vert_spacing = 0.5
+        self.param.ue_multiplication_factor = 12
 
         # Create antenna objects
-        par = self.param.get_antenna_parameters("BS","RX")
+        par = self.param.get_antenna_parameters(StationType.IMT_BS)
         self.antenna1 = AntennaBeamformingImt(par,300,-10)
-        par = self.param.get_antenna_parameters("UE","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_UE)
         self.antenna2 = AntennaBeamformingImt(par,-33.21,-5.31)
 
     def test_azimuth(self):
@@ -86,12 +72,12 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         self.assertEqual(self.antenna2.element.g_max,10)
 
     def test_phi_3db(self):
-        self.assertEqual(self.antenna1.element.phi_deg_3db,80)
-        self.assertEqual(self.antenna2.element.phi_deg_3db,75)
+        self.assertEqual(self.antenna1.element.phi_3db,80)
+        self.assertEqual(self.antenna2.element.phi_3db,75)
 
     def test_theta_3db(self):
-        self.assertEqual(self.antenna1.element.theta_deg_3db,60)
-        self.assertEqual(self.antenna2.element.theta_deg_3db,65)
+        self.assertEqual(self.antenna1.element.theta_3db,60)
+        self.assertEqual(self.antenna2.element.theta_3db,65)
 
     def test_am(self):
         self.assertEqual(self.antenna1.element.am,30)
@@ -231,7 +217,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
     def test_add_beam(self):
         # Error margin and antenna object
         eps = 1e-5
-        par = self.param.get_antenna_parameters("UE","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_UE)
         self.antenna2 = AntennaBeamformingImt(par,0,0)
 
         # Add first beam
@@ -282,7 +268,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
     def test_beam_gain(self):
         # Error margin and antenna
         eps = 1e-4
-        par = self.param.get_antenna_parameters("UE","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_UE)
         self.antenna2 = AntennaBeamformingImt(par,0,0)
 
         # Test 1
@@ -314,9 +300,9 @@ class AntennaBeamformingImtTest(unittest.TestCase):
     def test_calculate_gain(self):
         # Error margin and antenna
         eps = 1e-4
-        par = self.param.get_antenna_parameters("BS","RX")
+        par = self.param.get_antenna_parameters(StationType.IMT_BS)
         self.antenna1 = AntennaBeamformingImt(par,0,0)
-        par = self.param.get_antenna_parameters("UE","TX")
+        par = self.param.get_antenna_parameters(StationType.IMT_UE)
         self.antenna2 = AntennaBeamformingImt(par,0,0)
 
         # Test 1
@@ -345,6 +331,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
         
     def test_normalization(self):
         # Create dummy normalization data
+        adjacent_antenna_model = "SINGLE_ELEMENT"
         normalization = True
         norm_data = {'norm_file': 'dummy_file.npz',
                      'resolution': 1,
@@ -357,28 +344,33 @@ class AntennaBeamformingImtTest(unittest.TestCase):
                      'parameters': None}
         element_pattern = "M2101"
         element_max_g = 5
-        element_phi_deg_3db = 65
-        element_theta_deg_3db = 65
+        element_phi_3db = 65
+        element_theta_3db = 65
         element_am = 30
         element_sla_v = 30
         n_rows = 8
         n_columns = 8
         horiz_spacing = 0.5
         vert_spacing = 0.5
-        down_tilt = 0
-        par = AntennaPar(normalization,
+        minimum_array_gain = -200
+        multiplication_factor = 12
+        downtilt = 0
+        par = AntennaPar(adjacent_antenna_model,
+                         normalization,
                          norm_data,
                          element_pattern,
                          element_max_g,
-                         element_phi_deg_3db,
-                         element_theta_deg_3db,
+                         element_phi_3db,
+                         element_theta_3db,
                          element_am,
                          element_sla_v,
                          n_rows,
                          n_columns,
                          horiz_spacing,
                          vert_spacing,
-                         down_tilt)
+                         multiplication_factor,
+                         minimum_array_gain,
+                         downtilt)
         
         
         # Create antenna objects
@@ -415,7 +407,7 @@ class AntennaBeamformingImtTest(unittest.TestCase):
     def test_to_local_coord(self):
         # Test 1
         # Create antenna object
-        par = self.param.get_antenna_parameters("BS","RX")
+        par = self.param.get_antenna_parameters(StationType.IMT_BS)
         azi = 0.0
         ele = 90.0
         self.antenna3 = AntennaBeamformingImt(par,azi,ele)

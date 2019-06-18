@@ -97,10 +97,12 @@ if __name__ == '__main__':
     h_e = np.zeros(distance_2D.shape)
     distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
 
-    uma = PropagationUMa()
-    umi = PropagationUMi()
-    abg = PropagationABG()
-    freespace = PropagationFreeSpace()
+    random_number_gen = np.random.RandomState(101)
+    
+    uma = PropagationUMa(random_number_gen)
+    umi = PropagationUMi(random_number_gen)
+    abg = PropagationABG(random_number_gen)
+    freespace = PropagationFreeSpace(random_number_gen)
 
     uma_los = uma.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     uma_nlos = uma.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)

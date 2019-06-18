@@ -12,12 +12,17 @@ import numpy as np
 
 class SpectralMask3Gpp(SpectralMask):
 
-    def __init__(self,sta_type: StationType, freq_mhz: float, band_mhz: float, scenario = "OUTDOOR"):
+    def __init__(self,
+                 sta_type: StationType, 
+                 freq_mhz: float, 
+                 band_mhz: float, 
+                 spurious_emissions: float,
+                 scenario = "OUTDOOR"):
         """
         implements spectral mask from 3GPP 36.104 Table 6.6.3.1-6
         """
-        # Spurious domain limits [dDm/MHz]
-        self.spurious_limits = -13
+        # Spurious domain limits [dBm/MHz]
+        self.spurious_limits = spurious_emissions
         # Mask delta f breaking limits [MHz]
         self.delta_f_lim = np.arange(0,5.1,.1)
         self.delta_f_lim = np.append(self.delta_f_lim, 10)

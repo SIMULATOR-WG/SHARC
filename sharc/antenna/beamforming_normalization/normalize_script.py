@@ -25,7 +25,8 @@ Variables:
     norm (BeamformingNormalizer): object that calculates the normalization.
     param_list (list): list of antenna parameters to which calculate the
         correction factors. New parameters are added as:
-            AntennaPar(normalization,
+            AntennaPar(adjacent_antenna_model,
+                       normalization,
                        norm_data,
                        element_pattern,
                        element_max_g,
@@ -37,6 +38,7 @@ Variables:
                        n_columns,
                        element_horiz_spacing,
                        element_vert_spacing,
+                       minimum_array_gain,
                        downtilt_deg)
             normalization parameter must be set to False, otherwise script will
             try to normalize an already normalized antenna.
@@ -64,25 +66,64 @@ following keys:
         element correction factor
     parameters (AntennaPar): antenna parameters used in the normalization
 """
+
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
 from sharc.support.named_tuples import AntennaPar
 from sharc.antenna.beamforming_normalization.beamforming_normalizer import BeamformingNormalizer
 
-###############################################################################
-## List of antenna parameters to which calculate the normalization factors.
-param_list = [AntennaPar(False,None,"M2101",5,90,90,25,25,8,16,0.5,0.5,0)]
-file_names = ['bs_indoor_norm.npz']
-###############################################################################
-## Setup
-# General parameters
-resolution = 2
-tolerance = 1e-2
+if __name__ == "__main__":
 
-# Create object
-norm = BeamformingNormalizer(resolution,tolerance)
-###############################################################################
-## Normalize and save
-for par, file in zip(param_list,file_names):
-    s = 'Generating ' + file
-    print(s)
-
-    norm.generate_correction_matrix(par,file)
+    ###########################################################################
+    ## List of antenna parameters to which calculate the normalization factors.
+    adjacent_antenna_model = "" # not needed here
+    normalization = False       # not needed here
+    normalization_data = None   # not needed here
+    element_pattern = "M2101"
+    element_max_g = 5
+    element_phi_3db = 65
+    element_theta_3db = 65
+    element_am = 30
+    element_sla_v = 30
+    n_rows = 8
+    n_columns = 8
+    element_horiz_spacing = 0.5
+    element_vert_spacing = 0.5
+    multiplication_factor = 12
+    minimum_array_gain = -200
+    downtilt = 0
+        
+    file_names = ["bs_norm_8x8_050.npz"]
+    param_list = [AntennaPar(adjacent_antenna_model,
+                             normalization,
+                             normalization_data,
+                             element_pattern,
+                             element_max_g,
+                             element_phi_3db,
+                             element_theta_3db,
+                             element_am,
+                             element_sla_v,
+                             n_rows,
+                             n_columns,
+                             element_horiz_spacing,
+                             element_vert_spacing,
+                             multiplication_factor,
+                             minimum_array_gain,
+                             downtilt)]
+    ###########################################################################
+    ## Setup
+    # General parameters
+    resolution = 5
+    tolerance = 1e-2
+    
+    # Create object
+    norm = BeamformingNormalizer(resolution, tolerance)
+    ###########################################################################
+    ## Normalize and save
+    for par, file in zip(param_list, file_names):
+        s = 'Generating ' + file
+        print(s)
+    
+        norm.generate_correction_matrix(par,file)

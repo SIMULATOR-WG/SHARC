@@ -14,7 +14,7 @@ class ReferenceAtmosphere:
     """
     def __init__(self):
         # Table C.1 of ITU-R P619 - Constants for the reference dry atmosphere
-        self.ref_atmosphere_altitude_km = [-math.inf, 11, 20, 32, 47, 51, 71]
+        self.ref_atmosphere_altitude_km = [-float('inf'), 11, 20, 32, 47, 51, 71]
         self.ref_atmosphere_temp_grad = [-6.5, 0, 1., 2.8, 0, -2.8, -2]
         self.ref_atmosphere_temperature = [288.15, 216.65, 216.65, 228.65, 270.65, 270.65, 214.65]
         self.ref_atmosphere_pressure = [1013.25, 226.323, 54.750, 8.68, 1.109, 0.669, 0.04]

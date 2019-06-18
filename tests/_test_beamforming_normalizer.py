@@ -21,37 +21,44 @@ class BeamformingNormalizerTest(unittest.TestCase):
         resolution = 30
         tolerance = 1e-2
         self.norm_1 = BeamformingNormalizer(resolution,tolerance)
+        adjacent_antenna_model = "SINGLE_ELEMENT"
         norm = False
         norm_file = None
         element_pattern = "FIXED"
         element_max_g = 0
-        element_phi_deg_3db = 65
-        element_theta_deg_3db = 65
+        element_phi_3db = 65
+        element_theta_3db = 65
         element_am = 30
         element_sla_v = 30
         n_rows = 8
         n_columns = 8
         horiz_spacing = 0.5
         vert_spacing = 0.5
-        down_tilt = 0
-        self.par_1 = AntennaPar(norm,
+        multiplication_factor = 12
+        minimum_array_gain = -200
+        downtilt = 0
+        self.par_1 = AntennaPar(adjacent_antenna_model,
+                                norm,
                                 norm_file,
                                 element_pattern,
                                 element_max_g,
-                                element_phi_deg_3db,
-                                element_theta_deg_3db,
+                                element_phi_3db,
+                                element_theta_3db,
                                 element_am,
                                 element_sla_v,
                                 n_rows,
                                 n_columns,
                                 horiz_spacing,
                                 vert_spacing,
-                                down_tilt)
+                                multiplication_factor,
+                                minimum_array_gain,
+                                downtilt)
         
         # Test 2: UE configuration
         resolution = 5
         tolerance = 1e-2
         self.norm_2 = BeamformingNormalizer(resolution,tolerance)
+        adjacent_antenna_model = "SINGLE_ELEMENT"
         norm = False
         norm_file = None
         element_pattern = "M2101"
@@ -64,8 +71,11 @@ class BeamformingNormalizerTest(unittest.TestCase):
         n_columns = 4
         horiz_spacing = 0.5
         vert_spacing = 0.5
-        down_tilt = 0
-        self.par_2 = AntennaPar(norm,
+        multiplication_factor = 12
+        minimum_array_gain = -200
+        downtilt = 0
+        self.par_2 = AntennaPar(adjacent_antenna_model,
+                                norm,
                                 norm_file,
                                 element_pattern,
                                 element_max_g,
@@ -77,12 +87,15 @@ class BeamformingNormalizerTest(unittest.TestCase):
                                 n_columns,
                                 horiz_spacing,
                                 vert_spacing,
-                                down_tilt)
+                                multiplication_factor,
+                                minimum_array_gain,
+                                downtilt)
         
         # Test 3: BS configuration
         resolution = 180
         tolerance = 5e-2
         self.norm_3 = BeamformingNormalizer(resolution,tolerance)
+        adjacent_antenna_model = "SINGLE_ELEMENT"
         norm = False
         norm_file = None
         element_pattern = "M2101"
@@ -95,8 +108,11 @@ class BeamformingNormalizerTest(unittest.TestCase):
         n_columns = 8
         horiz_spacing = 0.5
         vert_spacing = 0.5
-        down_tilt = 0
-        self.par_3 = AntennaPar(norm,
+        multiplication_factor = 12
+        minimum_array_gain = -200
+        downtilt = 0
+        self.par_3 = AntennaPar(adjacent_antenna_model,
+                                norm,
                                 norm_file,
                                 element_pattern,
                                 element_max_g,
@@ -108,7 +124,9 @@ class BeamformingNormalizerTest(unittest.TestCase):
                                 n_columns,
                                 horiz_spacing,
                                 vert_spacing,
-                                down_tilt)
+                                multiplication_factor,
+                                minimum_array_gain,
+                                downtilt)
     
     def test_construction(self):
         # Test 1
@@ -171,7 +189,7 @@ class BeamformingNormalizerTest(unittest.TestCase):
     def test_generate_correction_matrix(self):
         # Test 3.1: BS element pattern
         file_name = "test_2.npz"
-        self.norm_3.generate_correction_matrix(self.par_3,file_name)
+        self.norm_3.generate_correction_matrix(self.par_3, file_name, True)
         data = np.load(file_name) 
         self.assertAlmostEqual(data['correction_factor_adj_channel'],
                                4.8,delta = 1e-1)

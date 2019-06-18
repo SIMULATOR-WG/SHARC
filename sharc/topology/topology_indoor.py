@@ -94,7 +94,6 @@ class TopologyIndoor(Topology):
             self.num_base_stations = len(self.x)        
 
             self.azimuth = np.zeros(self.num_base_stations)
-            self.elevation = -90*np.ones(self.num_base_stations)
             self.indoor = np.ones(self.num_base_stations, dtype = bool)
             
     def reset(self):
@@ -102,7 +101,6 @@ class TopologyIndoor(Topology):
         self.y = np.empty(0)
         self.height = np.empty(0)
         self.azimuth = np.empty(0)
-        self.elevation = np.empty(0)
         self.indoor = np.empty(0)
         self.num_base_stations = -1
         self.static_base_stations = False

@@ -67,7 +67,10 @@ class BeamformingNormalizer(object):
                                         self.theta_max_deg,res_deg)
         self.antenna = None
 
-    def generate_correction_matrix(self, par: AntennaPar, file_name: str):
+    def generate_correction_matrix(self, 
+                                   par: AntennaPar, 
+                                   file_name: str,
+                                   testing = False):
         """
         Generates the correction factor matrix and saves it in a file
 
@@ -88,10 +91,10 @@ class BeamformingNormalizer(object):
 
         # Loop throug all the possible beams
         for phi_idx, phi in enumerate(self.phi_vals_deg):
-            print('\n' + str(100*phi_idx/len(self.phi_vals_deg)) + '%')
+            if not testing: print('\n' + str(100*phi_idx/len(self.phi_vals_deg)) + '%')
             for theta_idx, theta in enumerate(self.theta_vals_deg):
                 s = '\tphi = ' + str(phi) + ', theta = ' + str(theta)
-                print(s)
+                if not testing: print(s)
                 stdout.flush()
                 correction_factor_co[phi_idx,theta_idx], error_co[phi_idx,theta_idx] = self.calculate_correction_factor(phi,theta,True)
 
@@ -202,6 +205,7 @@ if __name__ == '__main__':
     norm = BeamformingNormalizer(resolution,tolerance)
 
     # Antenna parameters
+    adjacent_antenna_model = "SINGLE_ELEMENT"
     normalization = False
     norm_file = None
     element_pattern = "M2101"
@@ -214,6 +218,7 @@ if __name__ == '__main__':
     n_columns = 8
     horiz_spacing = 0.5
     vert_spacing = 0.5
+    minimum_array_gain = -200
     down_tilt = 0
     par = AntennaPar(normalization,
                      norm_file,

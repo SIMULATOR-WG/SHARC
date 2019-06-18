@@ -11,11 +11,18 @@ import numpy as np
 
 class PropagationUMi(Propagation):
     """
-    Implements the Urban Micro path loss model (Street Canyon) with LOS probability according
-    to 3GPP TR 38.900 v14.2.0.
+    Implements the Urban Micro path loss model (Street Canyon) with LOS 
+    probability according to 3GPP TR 38.900 v14.2.0.
     TODO: calculate the effective environment height for the generic case
     """
 
+    def __init__(self, 
+                 random_number_gen: np.random.RandomState,
+                 los_adjustment_factor: float):
+        super().__init__(random_number_gen)
+        self.los_adjustment_factor = los_adjustment_factor
+    
+    
     def get_loss(self, *args, **kwargs) -> np.array:
         """
         Calculates path loss for LOS and NLOS cases with respective shadowing
@@ -45,12 +52,13 @@ class PropagationUMi(Propagation):
 
         if std:
             shadowing_los = 4
-            shadowing_nlos = 7.82
+            shadowing_nlos = 7.82    # option 1 for UMi NLOS
+            #shadowing_nlos = 8.2    # option 2 for UMi NLOS
         else:
             shadowing_los = 0
             shadowing_nlos = 0
 
-        los_probability = self.get_los_probability(d_2D)
+        los_probability = self.get_los_probability(d_2D, self.los_adjustment_factor)
         los_condition = self.get_los_condition(los_probability)
 
         i_los = np.where(los_condition == True)[:2]
@@ -127,15 +135,17 @@ class PropagationUMi(Propagation):
                           equipments [m]
             frequency : center frequency [MHz]
             h_bs : array of base stations antenna heights [m]
-            h_ue : array of user equipments antenna heights [m]        """
+            h_ue : array of user equipments antenna heights [m]
+        """
+        # option 1 for UMi NLOS
         loss_nlos = -37.55 + 35.3*np.log10(distance_3D) + 21.3*np.log10(frequency) \
                         - 0.3*(h_ue - 1.5)
 
-        idl = np.where(distance_2D < 5000)
-        if len(idl[0]):
-            loss_los = self.get_loss_los(distance_2D, distance_3D,
-                 frequency, h_bs, h_ue, h_e, 0)
-            loss_nlos[idl] = np.maximum(loss_los[idl], loss_nlos[idl])
+        loss_los = self.get_loss_los(distance_2D, distance_3D, frequency, h_bs, h_ue, h_e, 0)
+        loss_nlos = np.maximum(loss_los, loss_nlos)
+        
+        # option 2 for UMi NLOS
+        #loss_nlos = 31.9*np.log10(distance_3D) + 20*np.log10(frequency*1e-3) + 32.4
 
         if shadowing_std:
             shadowing = self.random_number_gen.normal(0, shadowing_std, distance_3D.shape)
@@ -187,7 +197,9 @@ class PropagationUMi(Propagation):
         return los_condition
 
 
-    def get_los_probability(self, distance_2D: np.array) -> np.array:
+    def get_los_probability(self, 
+                            distance_2D: np.array,
+                            los_adjustment_factor: float) -> np.array:
         """
         Returns the line-of-sight (LOS) probability
 
@@ -195,7 +207,8 @@ class PropagationUMi(Propagation):
         ----------
             distance_2D : Two-dimensional array with 2D distance values from
                           base station to user terminal [m]
-            h_ue : antenna height of user terminal [m]
+            los_adjustment_factor : adjustment factor to increase/decrease the 
+                          LOS probability. Original value is 18 as per 3GPP
 
         Returns
         -------
@@ -203,8 +216,8 @@ class PropagationUMi(Propagation):
         """
 
         p_los = np.ones(distance_2D.shape)
-        idl = np.where(distance_2D > 18)
-        p_los[idl] = (18/distance_2D[idl] + np.exp(-distance_2D[idl]/36)*(1-18/distance_2D[idl]))
+        idl = np.where(distance_2D > los_adjustment_factor)
+        p_los[idl] = (los_adjustment_factor/distance_2D[idl] + np.exp(-distance_2D[idl]/36)*(1-los_adjustment_factor/distance_2D[idl]))
 
         return p_los
 
@@ -216,28 +229,33 @@ if __name__ == '__main__':
 
     ###########################################################################
     # Print LOS probability
-    distance_2D = np.column_stack((np.linspace(1, 1000, num=1000)[:,np.newaxis],
-                                   np.linspace(1, 1000, num=1000)[:,np.newaxis],
-                                   np.linspace(1, 1000, num=1000)[:,np.newaxis]))
     #h_ue = np.array([1.5, 17, 23])
-    umi = PropagationUMi()
+    distance_2D = np.linspace(1, 1000, num=1000)[:,np.newaxis]
+    umi = PropagationUMi(np.random.RandomState(101), 18)
 
     los_probability = np.empty(distance_2D.shape)
     name = list()
+    
+    los_adjustment_factor = 18
+    los_probability_18 = umi.get_los_probability(distance_2D, los_adjustment_factor)
 
-    los_probability = umi.get_los_probability(distance_2D)
+    los_adjustment_factor = 29
+    los_probability_29 = umi.get_los_probability(distance_2D, los_adjustment_factor)
 
-    fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
+    fig = plt.figure(figsize=(6,5), facecolor='w', edgecolor='k')
     ax = fig.gca()
     ax.set_prop_cycle( cycler('color', ['r', 'g', 'b', 'y']) )
 
-    ax.loglog(distance_2D, los_probability)
+    ax.loglog(distance_2D, 100*los_probability_18, label = r"$\alpha = 18$")
+    ax.loglog(distance_2D, 100*los_probability_29, label = r"$\alpha = 29$")
 
     plt.title("UMi - LOS probability")
-    plt.xlabel("distance [m]")
-    plt.ylabel("probability")
-    plt.xlim((0, distance_2D[-1,0]))
-    plt.ylim((0, 1.1))
+    plt.xlabel("distance between BS and UE [m]")
+    plt.ylabel("probability [%]")
+    ax.legend(loc = "lower left")
+    ax.grid(True, which = "both", color="grey", linestyle='-', linewidth=0.2)    
+    plt.xlim((10, 300))
+    plt.ylim((10, 102))
     plt.tight_layout()
     plt.grid()
 
@@ -246,15 +264,15 @@ if __name__ == '__main__':
     from propagation_free_space import PropagationFreeSpace
     shadowing_std = 0
     distance_2D = np.linspace(1, 1000, num=1000)[:,np.newaxis]
-    freq = 27000*np.ones(distance_2D.shape)
-    h_bs = 25*np.ones(len(distance_2D[:,0]))
+    freq = 24350*np.ones(distance_2D.shape)
+    h_bs = 6*np.ones(len(distance_2D[:,0]))
     h_ue = 1.5*np.ones(len(distance_2D[0,:]))
-    h_e = np.zeros(distance_2D.shape)
+    h_e = np.ones(distance_2D.shape)
     distance_3D = np.sqrt(distance_2D**2 + (h_bs[:,np.newaxis] - h_ue)**2)
 
     loss_los = umi.get_loss_los(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
     loss_nlos = umi.get_loss_nlos(distance_2D, distance_3D, freq, h_bs, h_ue, h_e, shadowing_std)
-    loss_fs = PropagationFreeSpace().get_loss(distance_2D=distance_2D, frequency=freq)
+    loss_fs = PropagationFreeSpace(np.random.RandomState(101)).get_loss(distance_2D=distance_2D, frequency=freq)
 
     fig = plt.figure(figsize=(8,6), facecolor='w', edgecolor='k')
     ax = fig.gca()

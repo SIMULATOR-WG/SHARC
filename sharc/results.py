@@ -54,7 +54,6 @@ class Results(object):
         self.system_inr = list()
         self.system_pfd = list()
         self.system_rx_interf = list()
-        self.system_inr_scaled = list()
 
         if not overwrite_output:
             today = datetime.date.today()
@@ -361,18 +360,6 @@ class Results(object):
             file_name = title
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
-        if len(self.system_inr_scaled) > 0:
-            values, base = np.histogram(self.system_inr_scaled, bins=n_bins)
-            cumulative = np.cumsum(values)
-            x = base[:-1]
-            y = cumulative / cumulative[-1]
-            title = "[SYS] CDF of scaled system INR"
-            x_label = "INR [dB]"
-            y_label = "Probability of INR < $X$"
-            file_name = title
-            x_limits = (-80, -20)
-            y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.system_inr) > 0:
             values, base = np.histogram(self.system_inr, bins=n_bins)
             cumulative = np.cumsum(values)

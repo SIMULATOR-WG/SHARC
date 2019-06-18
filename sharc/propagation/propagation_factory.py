@@ -33,9 +33,7 @@ class PropagationFactory(object):
         elif channel_model == "UMa":
             return PropagationUMa(random_number_gen)
         elif channel_model == "UMi":
-            return PropagationUMi(random_number_gen)
-        elif channel_model == "CI":
-            return PropagationCloseIn(random_number_gen)
+            return PropagationUMi(random_number_gen, param.imt.los_adjustment_factor)
         elif channel_model == "SatelliteSimple":
             return PropagationSatSimple(random_number_gen)
         elif channel_model == "TerrestrialSimple":

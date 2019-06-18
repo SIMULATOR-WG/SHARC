@@ -22,13 +22,13 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param = Parameters()
 
         self.param.general.imt_link = "DOWNLINK"
+        self.param.general.seed = 101
         self.param.general.enable_cochannel = True
         self.param.general.enable_adjacent_channel = False
         self.param.general.overwrite_output = True
 
         self.param.imt.topology = "SINGLE_BS"
         self.param.imt.wrap_around = False
-        self.param.imt.num_macrocell_sites = 19
         self.param.imt.num_clusters = 2
         self.param.imt.intersite_distance = 150
         self.param.imt.minimum_separation_distance_bs_ue = 10
@@ -36,7 +36,8 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.imt.frequency = 10000
         self.param.imt.bandwidth = 100
         self.param.imt.rb_bandwidth = 0.180
-        self.param.imt.spectral_mask = "ITU 265-E"
+        self.param.imt.spectral_mask = "IMT-2020"
+        self.param.imt.spurious_emissions = -13
         self.param.imt.guard_band_ratio = 0.1
         self.param.imt.ho_margin = 3
         self.param.imt.bs_load_probability = 1
@@ -75,48 +76,36 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
 
+        self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.antenna_imt.normalization = False
         self.param.antenna_imt.bs_element_pattern = "M2101"
         self.param.antenna_imt.bs_normalization_file = None
-        self.param.antenna_imt.bs_tx_element_max_g = 10
-        self.param.antenna_imt.bs_tx_element_phi_3db = 80
-        self.param.antenna_imt.bs_tx_element_theta_3db = 80
-        self.param.antenna_imt.bs_tx_element_am = 25
-        self.param.antenna_imt.bs_tx_element_sla_v = 25
-        self.param.antenna_imt.bs_tx_n_rows = 16
-        self.param.antenna_imt.bs_tx_n_columns = 16
-        self.param.antenna_imt.bs_tx_element_horiz_spacing = 1
-        self.param.antenna_imt.bs_tx_element_vert_spacing = 1
-        self.param.antenna_imt.bs_rx_element_max_g = 5
-        self.param.antenna_imt.bs_rx_element_phi_deg_3db = 65
-        self.param.antenna_imt.bs_rx_element_theta_deg_3db = 65
-        self.param.antenna_imt.bs_rx_element_am = 30
-        self.param.antenna_imt.bs_rx_element_sla_v = 30
-        self.param.antenna_imt.bs_rx_n_rows = 2
-        self.param.antenna_imt.bs_rx_n_columns = 2
-        self.param.antenna_imt.bs_downtilt_deg = 10
-        self.param.antenna_imt.bs_rx_element_horiz_spacing = 0.5
-        self.param.antenna_imt.bs_rx_element_vert_spacing = 0.5
+        self.param.antenna_imt.bs_minimum_array_gain = -200
+        self.param.antenna_imt.bs_element_max_g = 10
+        self.param.antenna_imt.bs_element_phi_3db = 80
+        self.param.antenna_imt.bs_element_theta_3db = 80
+        self.param.antenna_imt.bs_element_am = 25
+        self.param.antenna_imt.bs_element_sla_v = 25
+        self.param.antenna_imt.bs_n_rows = 16
+        self.param.antenna_imt.bs_n_columns = 16
+        self.param.antenna_imt.bs_element_horiz_spacing = 1
+        self.param.antenna_imt.bs_element_vert_spacing = 1
+        self.param.antenna_imt.bs_multiplication_factor = 12
+        self.param.antenna_imt.bs_downtilt = 10
+        
         self.param.antenna_imt.ue_element_pattern = "M2101"
         self.param.antenna_imt.ue_normalization_file = None
-        self.param.antenna_imt.ue_tx_element_max_g = 5
-        self.param.antenna_imt.ue_tx_element_phi_deg_3db = 65
-        self.param.antenna_imt.ue_tx_element_theta_deg_3db = 65
-        self.param.antenna_imt.ue_tx_element_am = 30
-        self.param.antenna_imt.ue_tx_element_sla_v = 30
-        self.param.antenna_imt.ue_tx_n_rows = 2
-        self.param.antenna_imt.ue_tx_n_columns = 1
-        self.param.antenna_imt.ue_tx_element_horiz_spacing = 0.5
-        self.param.antenna_imt.ue_tx_element_vert_spacing = 0.5
-        self.param.antenna_imt.ue_rx_element_max_g = 10
-        self.param.antenna_imt.ue_rx_element_phi_3db = 90
-        self.param.antenna_imt.ue_rx_element_theta_3db = 90
-        self.param.antenna_imt.ue_rx_element_am = 25
-        self.param.antenna_imt.ue_rx_element_sla_v = 25
-        self.param.antenna_imt.ue_rx_n_rows = 16
-        self.param.antenna_imt.ue_rx_n_columns = 16
-        self.param.antenna_imt.ue_rx_element_horiz_spacing = 1
-        self.param.antenna_imt.ue_rx_element_vert_spacing = 1
+        self.param.antenna_imt.ue_minimum_array_gain = -200
+        self.param.antenna_imt.ue_element_max_g = 5
+        self.param.antenna_imt.ue_element_phi_3db = 65
+        self.param.antenna_imt.ue_element_theta_3db = 65
+        self.param.antenna_imt.ue_element_am = 30
+        self.param.antenna_imt.ue_element_sla_v = 30
+        self.param.antenna_imt.ue_n_rows = 2
+        self.param.antenna_imt.ue_n_columns = 1
+        self.param.antenna_imt.ue_element_horiz_spacing = 0.5
+        self.param.antenna_imt.ue_element_vert_spacing = 0.5
+        self.param.antenna_imt.ue_multiplication_factor = 12
 
         self.param.fss_ss.frequency = 10000
         self.param.fss_ss.bandwidth = 100
@@ -233,15 +222,14 @@ class SimulationDownlinkTest(unittest.TestCase):
                                   [97.55,  94.72,  91.53,  81.99]])
         bs_antenna_gains = np.array([[ 1,  1,  1,  1], [ 2,  2,  2,  2]])
         ue_antenna_gains = np.array([[ 10,  11,  22,  23], [ 10,  11,  22,  23]])
-        coupling_loss_imt = path_loss_imt - bs_antenna_gains - ue_antenna_gains
+        coupling_loss_imt = path_loss_imt - bs_antenna_gains - ue_antenna_gains \
+                            + self.param.imt.bs_ohmic_loss \
+                            + self.param.imt.ue_ohmic_loss \
+                            + self.param.imt.ue_body_loss
 
         npt.assert_allclose(self.simulation.coupling_loss_imt,
                             coupling_loss_imt,
                             atol=1e-2)
-#        npt.assert_allclose(self.simulation.coupling_loss_imt,
-#                            np.array([[78.47-1-10,  89.35-1-11,  93.27-1-22,  97.05-1-23],
-#                                      [97.55-2-10,  94.72-2-11,  91.53-2-22,  81.99-2-23]]),
-#                            atol=1e-2)
 
         # test scheduler and bandwidth allocation
         self.simulation.scheduler()
@@ -259,19 +247,12 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.calculate_sinr()
 
         # check UE received power
-        ohmic_loss = 3
-        body_loss = 4
-        rx_power = tx_power - ohmic_loss \
-                    - np.concatenate((coupling_loss_imt[0][:2], coupling_loss_imt[1][2:])) \
-                    - body_loss - ohmic_loss
-        # rx_power = np.array([tx_power-3-(78.47-1-10)-4-3, tx_power-3-(89.35-1-11)-4-3, tx_power-3-(91.53-2-22)-4-3, tx_power-3-(81.99-2-23)-4-3])
+
+        rx_power = tx_power - np.concatenate((coupling_loss_imt[0][:2], coupling_loss_imt[1][2:])) 
         npt.assert_allclose(self.simulation.ue.rx_power, rx_power, atol=1e-2)
 
         # check UE received interference
-        rx_interference = tx_power - ohmic_loss \
-                            - np.concatenate((coupling_loss_imt[1][:2], coupling_loss_imt[0][2:])) \
-                            - body_loss - ohmic_loss        
-        # rx_interference = np.array([tx_power-3-(97.55-2-10)-4-3,  tx_power-3-(94.72-2-11)-4-3, tx_power-3-(93.27-1-22)-4-3, tx_power-3-(97.05-1-23)-4-3])
+        rx_interference = tx_power - np.concatenate((coupling_loss_imt[1][:2], coupling_loss_imt[0][2:]))     
         npt.assert_allclose(self.simulation.ue.rx_interference, rx_interference, atol=1e-2)
 
         # check UE thermal noise
@@ -304,14 +285,15 @@ class SimulationDownlinkTest(unittest.TestCase):
         bs_antenna_gain = np.array([1, 2])
         coupling_loss_imt_system = path_loss_imt_system - sat_antenna_gain \
                                     - np.array([bs_antenna_gain[0], bs_antenna_gain[0], bs_antenna_gain[1], bs_antenna_gain[1]]) \
-                                    + polarization_loss
+                                    + polarization_loss \
+                                    + self.param.imt.bs_ohmic_loss
+                                    
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             coupling_loss_imt_system,
                             atol=1e-2)
 
         # check interference generated by BS to FSS space station
-        ohmic_loss = 3
-        interference = tx_power - ohmic_loss - coupling_loss_imt_system
+        interference = tx_power - coupling_loss_imt_system
         rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
@@ -407,14 +389,14 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.calculate_sinr_ext()
 
         # check coupling loss between FSS_ES and IMT_UE
-        coupling_loss_imt_system = np.array([118.55-50-10,  118.76-50-11,  118.93-50-22,  119.17-50-23])
+        coupling_loss_imt_system = np.array([128.55-50-10,  128.76-50-11,  128.93-50-22,  129.17-50-23])
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             coupling_loss_imt_system,
                             atol=1e-2)
 
         # check interference from FSS_ES to IMT_UE
         system_tx_power = -60 + 10*math.log10(bandwidth_per_ue*1e6) + 30
-        ext_interference = system_tx_power - coupling_loss_imt_system - 3 - 4
+        ext_interference = system_tx_power - coupling_loss_imt_system
         npt.assert_allclose(self.simulation.ue.ext_interference,
                             ext_interference,
                             atol=1e-2)
@@ -434,15 +416,12 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.calculate_external_interference()
 
         # check coupling loss from IMT_BS to FSS_ES
-        polarization_loss = 3.
-        feeder_loss = 3
-
-        coupling_loss_imt_system = np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]) + polarization_loss
+        coupling_loss_imt_system = np.array([124.47-50-1,  124.47-50-1,  125.29-50-2,  125.29-50-2]) 
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             coupling_loss_imt_system,
                             atol=1e-2)
 
-        interference = tx_power - feeder_loss - coupling_loss_imt_system
+        interference = tx_power - coupling_loss_imt_system
         rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,
                                rx_interference,
@@ -529,13 +508,13 @@ class SimulationDownlinkTest(unittest.TestCase):
 
         self.simulation.calculate_external_interference()
 
-        polarization_loss = 0.
+        polarization_loss = 3
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]) + polarization_loss,
                             atol=1e-2)
 
         # Test RAS interference
-        interference = self.param.imt.bs_conducted_power - 10*np.log10(self.param.imt.ue_k) - self.param.imt.bs_ohmic_loss \
+        interference = self.param.imt.bs_conducted_power - 10*np.log10(self.param.imt.ue_k) \
                        - np.array([118.47-50-1,  118.47-50-1,  119.29-50-2,  119.29-50-2]) - polarization_loss
         rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
         self.assertAlmostEqual(self.simulation.system.rx_interference,
