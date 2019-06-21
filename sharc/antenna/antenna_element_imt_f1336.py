@@ -157,7 +157,7 @@ if __name__ == '__main__':
 
     param = ParametersAntennaImt()
 
-    param.element_max_g = 15
+    param.element_max_g = 18
     param.element_phi_3db = 65
     param.element_theta_3db = 0
 
