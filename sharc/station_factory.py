@@ -489,19 +489,15 @@ class StationFactory(object):
         elif param.location.upper() == "UNIFORM_DIST":
             # FSS ES is randomly (uniform) created inside a circle of radius
             # equal to param.max_dist_to_bs
+            if param.min_dist_to_bs < 0:
+                sys.stderr.write("ERROR\nInvalid minimum distance from FSS ES to BS: {}".format(param.min_dist_to_bs))
+                sys.exit(1)                    
             while(True):
-                if param.min_dist_to_bs > 0:
-                    dist_x = random_number_gen.uniform(0, param.max_dist_to_bs)
-                    dist_y = random_number_gen.uniform(0, param.max_dist_to_bs)
-                    radius = np.sqrt(dist_x**2 + dist_y**2)
-                    if (radius > param.min_dist_to_bs) & (radius < param.max_dist_to_bs):
-                        break
-                else:
-                    dist_x = random_number_gen.uniform(param.min_dist_to_bs, param.max_dist_to_bs)
-                    dist_y = random_number_gen.uniform(param.min_dist_to_bs, param.max_dist_to_bs)
-                    radius = np.sqrt(dist_x**2 + dist_y**2)
-                    if radius < param.max_dist_to_bs:
-                        break
+                dist_x = random_number_gen.uniform(-param.max_dist_to_bs, param.max_dist_to_bs)
+                dist_y = random_number_gen.uniform(-param.max_dist_to_bs, param.max_dist_to_bs)
+                radius = np.sqrt(dist_x**2 + dist_y**2)
+                if (radius > param.min_dist_to_bs) & (radius < param.max_dist_to_bs):
+                    break
             fss_earth_station.x[0] = dist_x
             fss_earth_station.y[0] = dist_y
         else:
