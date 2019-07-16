@@ -12,6 +12,7 @@ import numpy as np
 import math
 import sys
 import matplotlib.pyplot as plt
+from matplotlib.patches import Wedge
 
 from sharc.support.enumerations import StationType
 from sharc.topology.topology_factory import TopologyFactory
@@ -520,6 +521,9 @@ class Simulation(ABC, Observable):
         # Plot user equipments
         ax.scatter(self.ue.x, self.ue.y, color='r', edgecolor="w", linewidth=0.5, label="UE")
 
+#        wedge = Wedge((0, 0), 300, 0, 360, 290, color='b', alpha=0.2, fill=True)
+#        ax.add_artist(wedge)
+        
         # Plot UE's azimuth
         d = 0.1 * self.topology.cell_radius
         for i in range(len(self.ue.x)):

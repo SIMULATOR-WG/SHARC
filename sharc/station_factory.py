@@ -21,7 +21,7 @@ from sharc.parameters.parameters_haps import ParametersHaps
 from sharc.parameters.parameters_rns import ParametersRns
 from sharc.parameters.parameters_ras import ParametersRas
 from sharc.station_manager import StationManager
-from sharc.spectral_mask_imt import SpectralMaskImt
+from sharc.mask.spectral_mask_imt import SpectralMaskImt
 from sharc.antenna.antenna import Antenna
 from sharc.antenna.antenna_fss_ss import AntennaFssSs
 from sharc.antenna.antenna_omni import AntennaOmni
@@ -42,7 +42,7 @@ from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
-from sharc.spectral_mask_3gpp import SpectralMask3Gpp
+from sharc.mask.spectral_mask_3gpp import SpectralMask3Gpp
 
 
 class StationFactory(object):
@@ -97,7 +97,7 @@ class StationFactory(object):
                                                               param.bandwidth,
                                                               param.spurious_emissions,
                                                               scenario = param.topology)
-        elif param.spectral_mask == "3GPP 36.104":
+        elif param.spectral_mask == "3GPP E-UTRA":
             imt_base_stations.spectral_mask = SpectralMask3Gpp(StationType.IMT_BS,
                                                                param.frequency,
                                                                param.bandwidth,
@@ -247,7 +247,7 @@ class StationFactory(object):
                                                    param.spurious_emissions,
                                                    scenario = "OUTDOOR")
 
-        elif param.spectral_mask == "3GPP 36.104":
+        elif param.spectral_mask == "3GPP E-UTRA":
             imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,
                                                     param.frequency,
                                                     param.bandwidth,
@@ -372,7 +372,7 @@ class StationFactory(object):
                                                    param.spurious_emissions,
                                                    scenario = "INDOOR")
 
-        elif param.spectral_mask == "3GPP 36.104":
+        elif param.spectral_mask == "3GPP E-UTRA":
             imt_ue.spectral_mask = SpectralMask3Gpp(StationType.IMT_UE,
                                                     param.frequency,
                                                     param.bandwidth,
@@ -487,10 +487,19 @@ class StationFactory(object):
             fss_earth_station.x = np.array(x)
             fss_earth_station.y = np.array(y)
         elif param.location.upper() == "UNIFORM_DIST":
-            dist = random_number_gen.uniform( param.min_dist_to_bs, param.max_dist_to_bs)
-            angle = random_number_gen.uniform(-np.pi, np.pi)
-            fss_earth_station.x[0] = np.array(dist * np.cos(angle))
-            fss_earth_station.y[0] = np.array(dist * np.sin(angle))
+            # FSS ES is randomly (uniform) created inside a circle of radius
+            # equal to param.max_dist_to_bs
+            if param.min_dist_to_bs < 0:
+                sys.stderr.write("ERROR\nInvalid minimum distance from FSS ES to BS: {}".format(param.min_dist_to_bs))
+                sys.exit(1)                    
+            while(True):
+                dist_x = random_number_gen.uniform(-param.max_dist_to_bs, param.max_dist_to_bs)
+                dist_y = random_number_gen.uniform(-param.max_dist_to_bs, param.max_dist_to_bs)
+                radius = np.sqrt(dist_x**2 + dist_y**2)
+                if (radius > param.min_dist_to_bs) & (radius < param.max_dist_to_bs):
+                    break
+            fss_earth_station.x[0] = dist_x
+            fss_earth_station.y[0] = dist_y
         else:
             sys.stderr.write("ERROR\nFSS-ES location type {} not supported".format(param.location))
             sys.exit(1)

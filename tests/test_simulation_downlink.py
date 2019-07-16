@@ -77,7 +77,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
 
         self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
-        self.param.antenna_imt.normalization = False
+        self.param.antenna_imt.bs_normalization = False
         self.param.antenna_imt.bs_element_pattern = "M2101"
         self.param.antenna_imt.bs_normalization_file = None
         self.param.antenna_imt.bs_minimum_array_gain = -200
@@ -94,6 +94,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.antenna_imt.bs_downtilt = 10
         
         self.param.antenna_imt.ue_element_pattern = "M2101"
+        self.param.antenna_imt.ue_normalization = False
         self.param.antenna_imt.ue_normalization_file = None
         self.param.antenna_imt.ue_minimum_array_gain = -200
         self.param.antenna_imt.ue_element_max_g = 5

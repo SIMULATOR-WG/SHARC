@@ -23,7 +23,7 @@ class AntennaImtTest(unittest.TestCase):
         self.param.ue_element_pattern = "M2101"
         self.param.bs_minimum_array_gain = -200
         self.param.ue_minimum_array_gain = -200
-        self.param.normalization = False
+        self.param.bs_normalization = False
         self.param.bs_downtilt = 0
 
         self.param.bs_normalization_file = None
@@ -39,6 +39,7 @@ class AntennaImtTest(unittest.TestCase):
         self.param.bs_multiplication_factor = 12
 
         self.param.ue_normalization_file = None
+        self.param.ue_normalization = False
         self.param.ue_element_max_g    = 10
         self.param.ue_element_phi_3db  = 75
         self.param.ue_element_theta_3db = 65
