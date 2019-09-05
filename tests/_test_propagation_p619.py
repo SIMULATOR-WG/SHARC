@@ -17,10 +17,11 @@ class DummyParams():
         self.surf_water_vapour_density = 0
         self.EARTH_RADIUS = 6371000
 
+
 class TestPropagationP619(unittest.TestCase):
 
     def setUp(self):
-        self.p619 = PropagationP619()
+        self.p619 = PropagationP619(np.random.RandomState())
 
     def test_atmospheric_gasses_loss (self):
         # compare with benchmark from ITU-R P-619 Fig. 3

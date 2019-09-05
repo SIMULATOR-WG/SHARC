@@ -14,7 +14,7 @@ from sharc.propagation.propagation_building_entry_loss import PropagationBuildin
 class TestPropagationBuildingEntryLoss(unittest.TestCase):
 
     def setUp(self):
-        self.building_entry_loss = PropagationBuildingEntryLoss()
+        self.building_entry_loss = PropagationBuildingEntryLoss(np.random.RandomState())
 
     def test_building_entry_loss(self):
         # compare with benchmark from ITU-R P-2109-0 Fig. 1
@@ -35,7 +35,7 @@ class TestPropagationBuildingEntryLoss(unittest.TestCase):
         loss_upper = [40, 35, 30, 31, 35, 43, 57]
 
         loss = self.building_entry_loss.get_loss(f_GHz_vec * 1000, 0, prob=.5, test=True,
-                                                 building_class="thermally-efficient")
+                                                 building_class="THERMALLY_EFFICIENT")
         npt.assert_array_less(loss_lower, loss)
         npt.assert_array_less(loss, loss_upper)
 

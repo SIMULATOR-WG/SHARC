@@ -18,10 +18,10 @@ class PropagationTerSimple(Propagation):
     basic free space and additional clutter losses
     """
 
-    def __init__(self):
-        super().__init__()
-        self.clutter = PropagationClutterLoss()
-        self.free_space = PropagationFreeSpace()
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
+        self.clutter = PropagationClutterLoss(np.random.RandomState(101))
+        self.free_space = PropagationFreeSpace(np.random.RandomState(101))
         self.building_loss = 20
 
 
@@ -49,7 +49,6 @@ class PropagationTerSimple(Propagation):
         loss = free_space_loss + building_loss + clutter_loss
         loss = np.repeat(loss, number_of_sectors, 1)
 
-
         return loss
 
 
@@ -65,8 +64,8 @@ if __name__ == '__main__':
     indoor_stations = np.zeros(d.shape, dtype = bool)
     loc_percentage = 0.5
 
-    free_space = PropagationFreeSpace()
-    ter_simple = PropagationTerSimple()
+    free_space = PropagationFreeSpace(np.random.RandomState(101))
+    ter_simple = PropagationTerSimple(np.random.RandomState(101))
 
     loss_ter = ter_simple.get_loss(distance_2D = d,
                                   frequency = freq,

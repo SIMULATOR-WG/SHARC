@@ -16,6 +16,7 @@ from sharc.propagation.atmosphere import ReferenceAtmosphere
 from sharc.support.enumerations import StationType
 from sharc.propagation.scintillation import Scintillation
 
+
 class PropagationP619(Propagation):
     """
     Implements the earth-to-space channel model from ITU-R P.619
@@ -24,21 +25,23 @@ class PropagationP619(Propagation):
         get_loss: Calculates path loss for earth-space link
     """
 
-    def __init__(self):
-        super().__init__()
-        self.clutter = PropagationClutterLoss()
-        self.free_space = PropagationFreeSpace()
-        self.building_entry = PropagationBuildingEntryLoss()
-        self.scintillation = Scintillation()
+    def __init__(self, random_number_gen: np.random.RandomState):
+        super().__init__(random_number_gen)
+
+        self.clutter = PropagationClutterLoss(self.random_number_gen)
+        self.free_space = PropagationFreeSpace(self.random_number_gen)
+        self.building_entry = PropagationBuildingEntryLoss(self.random_number_gen)
+        self.scintillation = Scintillation(self.random_number_gen)
         self.atmosphere = ReferenceAtmosphere()
 
-        self.depolarization_loss = 1.5
-        self.polarization_mismatch_loss = 3.
+        self.depolarization_loss = 0 # 1.5
+        self.polarization_mismatch_loss = 0 # 3
         self.elevation_has_atmospheric_loss = []
         self.freq_has_atmospheric_loss = []
         self.surf_water_dens_has_atmospheric_loss = []
         self.atmospheric_loss = []
         self.elevation_delta = .01
+
 
     def _get_atmospheric_gasses_loss(self, *args, **kwargs) -> float:
         """
@@ -68,7 +71,7 @@ class PropagationP619(Propagation):
         if not surf_water_vapour_density:
             dummy, dummy, surf_water_vapour_density = \
                 self.atmosphere.get_reference_atmosphere_p835(sat_params.imt_lat_deg,
-                                                               0, season="summer")
+                                                               0, season = sat_params.season)
 
         # first, check if atmospheric loss was already calculated
         if len(self.elevation_has_atmospheric_loss):
@@ -246,7 +249,8 @@ if __name__ == '__main__':
 
     sat_params = params.fss_ss
 
-    propagation = PropagationP619()
+    random_number_gen = np.random.RandomState(101)
+    propagation = PropagationP619(random_number_gen)
 
     ##########################
     # Plot atmospheric loss

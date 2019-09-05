@@ -10,11 +10,11 @@ import numpy as np
 import numpy.testing as npt
 from sharc.propagation.scintillation import Scintillation
 
+
 class TestScintillation(unittest.TestCase):
 
     def setUp(self):
-        self.scintillation = Scintillation()
-
+        self.scintillation = Scintillation(np.random.RandomState())
 
     def test_tropo_scintillation_attenuation(self):
         # compare with benchmark from ITU-R P-619 Fig. 8

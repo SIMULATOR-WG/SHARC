@@ -121,14 +121,6 @@ class TopologyMacrocellTest(unittest.TestCase):
         npt.assert_allclose(topology.y, y_ref, atol=1e-2)
         npt.assert_allclose(topology.azimuth, az_ref, atol=1e-2)      
 
-
-    def test_elevation(self):
-        intersite_distance = 500
-        num_clusters = 1
-        topology = TopologyMacrocell(intersite_distance, num_clusters)
-        topology.calculate_coordinates()
-        npt.assert_equal(topology.elevation, -10*np.ones(3*19))
-        
         
 if __name__ == '__main__':
     unittest.main()

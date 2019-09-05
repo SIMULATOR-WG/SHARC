@@ -94,8 +94,8 @@ class View(tkinter.Tk, Observer):
         """
         This method is called when start button is clicked
         """
-        default_file = os.path.join(os.getcwd(), "parameters", "parameters.ini")
-        default_dir = os.path.join(os.getcwd(), "parameters")
+        default_file = os.path.join(os.getcwd(), "input", "parameters.ini")
+        default_dir = os.path.join(os.getcwd(), "input")
         param_file = tkinter.filedialog.askopenfilename(title = "Select parameters file",
                                                               initialdir = default_dir,
                                                               initialfile = default_file,

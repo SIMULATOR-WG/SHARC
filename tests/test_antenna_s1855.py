@@ -14,7 +14,7 @@ from sharc.antenna.antenna_s1855 import AntennaS1855
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 
 class AntennaS1855Test(unittest.TestCase):
-    
+
     def setUp(self):
         #Earth Station Antenna parameters
         params = ParametersFssEs()
@@ -23,23 +23,18 @@ class AntennaS1855Test(unittest.TestCase):
         params.antenna_gain = 62
         params.azimuth = 0
         params.elevation = 0
-        
+
         # Create antenna FSS Earth Station objects
         self.antenna = AntennaS1855(params)
-                
-    def test_get_gain(self):  
-        # phi = 7 
-        # phi = 8 with second part of equation
-        # phi = 15, the third part of the equation
-        # phi = 15, the third part of the equation
-        phi = np.array([7, 8, 15, 100])
-        theta = np.array([90, 45, 45, 45])
-        expected_result = np.array([ 0, 0, 0, 0 ])
-        #expected_result = np.array([[10.872549, 9.372549, 9.372549, 9.372549], [9.53636364, 8.71818182, 8.71818182, 8.71818182], [2.5977185236079663, 2.5977185236079663, 2.5977185236079663, 2.5977185236079663], [-10.00, -10.00, -10.00, -10.00]])
-        gain = self.antenna.calculate_gain(phi_vec = phi, theta_vec = theta)
-        #npt.assert_array_almost_equal(gain, expected_result)
 
-    
-        
+    def test_get_gain(self):
+
+        off_axis_angle = np.array([7, 8, 15, 100])
+        theta = np.array([90, 45, 45, 45])
+        expected_result = np.array([ 10.87, 8.71, 2.59, -10 ])
+        gain = self.antenna.calculate_gain(off_axis_angle_vec = off_axis_angle, 
+                                           theta_vec = theta)
+        npt.assert_allclose(gain, expected_result, atol=1e-2)
+
 if __name__ == '__main__':
     unittest.main()

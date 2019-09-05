@@ -9,10 +9,13 @@ from sharc.plot import Plot
 
 import numpy as np
 import os
+import datetime
+
+from shutil import copy
 
 class Results(object):
-    
-    def __init__(self):
+
+    def __init__(self, parameters_filename: str, overwrite_output: bool):
         self.imt_ul_tx_power_density = list()
         self.imt_ul_tx_power = list()
         self.imt_ul_sinr_ext = list()
@@ -26,9 +29,12 @@ class Results(object):
         self.imt_coupling_loss = list()
         self.imt_bs_antenna_gain = list()
         self.imt_ue_antenna_gain = list()
-        
+
         self.system_imt_antenna_gain = list()
         self.imt_system_antenna_gain = list()
+        self.imt_system_path_loss = list()
+        self.imt_system_build_entry_loss = list()
+        self.imt_system_diffraction_loss = list()
 
         self.imt_dl_tx_power_density = list()
         self.imt_dl_tx_power = list()
@@ -38,7 +44,7 @@ class Results(object):
         self.imt_dl_inr = list()
         self.imt_dl_tput_ext = list()
         self.imt_dl_tput = list()
-        
+
         self.system_ul_coupling_loss = list()
         self.system_ul_interf_power = list()
 
@@ -46,10 +52,30 @@ class Results(object):
         self.system_dl_interf_power = list()
 
         self.system_inr = list()
-        self.system_inr_scaled = list()
-        self.output_directory = "output"
+        self.system_pfd = list()
+        self.system_rx_interf = list()
 
+        if not overwrite_output:
+            today = datetime.date.today()
+
+            results_number = 1
+            results_dir_head = 'output_' + today.isoformat() + '_' + "{:02n}"
+            self.create_dir(results_number,results_dir_head)
+            copy(parameters_filename, self.output_directory)
+        else:
+            self.output_directory = 'output'
+
+    def create_dir(self,results_number,dir_head):
         
+        dir_head_complete = dir_head.format(results_number)
+        
+        try:
+            os.makedirs(dir_head_complete)
+            self.output_directory = dir_head_complete
+        except FileExistsError as e:
+            self.create_dir(results_number + 1, dir_head)
+
+
     def generate_plot_list(self, n_bins):
         self.plot_list = list()
         if len(self.system_imt_antenna_gain) > 0:
@@ -63,7 +89,7 @@ class Results(object):
             file_name = title
             #x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_system_antenna_gain) > 0:
             values, base = np.histogram(self.imt_system_antenna_gain, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -75,7 +101,43 @@ class Results(object):
             file_name = title
             #x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_system_path_loss) > 0:
+            values, base = np.histogram(self.imt_system_path_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Path Loss [dB]"
+            y_label = "Probability of path loss < $X$"
+            title = "[SYS] CDF of IMT to system path loss"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_system_build_entry_loss) > 0:
+            values, base = np.histogram(self.imt_system_build_entry_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Building entry loss [dB]"
+            y_label = "Probability of loss < $X$"
+            title = "[SYS] CDF of IMT to system building entry loss"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
+        if len(self.imt_system_diffraction_loss) > 0:
+            values, base = np.histogram(self.imt_system_diffraction_loss, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            x_label = "Building entry loss [dB]"
+            y_label = "Probability of loss < $X$"
+            title = "[SYS] CDF of IMT to system diffraction loss"
+            file_name = title
+            #x_limits = (0, 25)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_bs_antenna_gain) > 0:
             values, base = np.histogram(self.imt_bs_antenna_gain, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -87,7 +149,7 @@ class Results(object):
             file_name = title
             x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ue_antenna_gain) > 0:
             values, base = np.histogram(self.imt_ue_antenna_gain, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -99,7 +161,7 @@ class Results(object):
             file_name = title
             x_limits = (0, 25)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))        
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_ul_tx_power_density) > 0:
             values, base = np.histogram(self.imt_ul_tx_power_density, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -181,7 +243,7 @@ class Results(object):
             y_label = "Probability of UL throughput < $X$"
             file_name = title
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_ul_tput) > 0:
             values, base = np.histogram(self.imt_ul_tput, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -202,7 +264,7 @@ class Results(object):
             x_label = "Path loss [dB]"
             y_label = "Probability of path loss < $X$"
             file_name = title
-            x_limits = (60, 160)
+            x_limits = (40, 150)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_coupling_loss) > 0:
@@ -214,7 +276,7 @@ class Results(object):
             x_label = "Coupling loss [dB]"
             y_label = "Probability of coupling loss < $X$"
             file_name = title
-            x_limits = (60, 160)
+            x_limits = (30, 120)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
         if len(self.imt_dl_tx_power) > 0:
@@ -298,18 +360,6 @@ class Results(object):
             file_name = title
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
-        if len(self.system_inr_scaled) > 0:
-            values, base = np.histogram(self.system_inr_scaled, bins=n_bins)
-            cumulative = np.cumsum(values)
-            x = base[:-1]
-            y = cumulative / cumulative[-1]
-            title = "[SYS] CDF of scaled system INR"
-            x_label = "INR [dB]"
-            y_label = "Probability of INR < $X$"
-            file_name = title
-            x_limits = (-80, -20)
-            y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
         if len(self.system_inr) > 0:
             values, base = np.histogram(self.system_inr, bins=n_bins)
             cumulative = np.cumsum(values)
@@ -319,9 +369,9 @@ class Results(object):
             x_label = "INR [dB]"
             y_label = "Probability of INR < $X$"
             file_name = title
-            x_limits = (-80, -20)
+            x_limits = (-80, 30)
             y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))            
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
             ###################################################################
             # now we plot INR samples
             x = np.arange(len(self.system_inr))
@@ -330,20 +380,55 @@ class Results(object):
             x_label = "Number of samples"
             y_label = "INR [dB]"
             file_name = title
-            #x_limits = (0, 800)
-            #y_limits = (0, 1)
-            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))            
-            
+            x_limits = (0, 800)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name))
+        if len(self.system_pfd) > 0:
+            values, base = np.histogram(self.system_pfd, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of system PFD"
+            x_label = "PFD [dBm/m^2]"
+            y_label = "Probability of INR < $X$"
+            file_name = title
+#            x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.system_ul_interf_power) > 0:
+            values, base = np.histogram(self.system_ul_interf_power, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of system interference power from IMT UL"
+            x_label = "Interference Power [dBm]"
+            y_label = "Probability of Power < $X$"
+            file_name = title
+            #x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+        if len(self.system_dl_interf_power) > 0:
+            values, base = np.histogram(self.system_dl_interf_power, bins=n_bins)
+            cumulative = np.cumsum(values)
+            x = base[:-1]
+            y = cumulative / cumulative[-1]
+            title = "[SYS] CDF of system interference power from IMT DL"
+            x_label = "Interference Power [dBm]"
+            y_label = "Probability of Power < $X$"
+            file_name = title
+            #x_limits = (-80, -20)
+            y_limits = (0, 1)
+            self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
+
     def write_files(self, snapshot_number: int):
         n_bins = 200
         file_extension = ".txt"
         header_text = "Results collected after " + str(snapshot_number) + " snapshots."
         self.generate_plot_list(n_bins)
-            
+
         for plot in self.plot_list:
-            np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension), 
-                       np.transpose([plot.x, plot.y]), 
-                       fmt="%.5f", delimiter="\t", header=header_text, 
+            np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension),
+                       np.transpose([plot.x, plot.y]),
+                       fmt="%.5f", delimiter="\t", header=header_text,
                        newline=os.linesep)
 
-      
