@@ -102,7 +102,7 @@ class StationFactory(object):
                                                                param.frequency,
                                                                param.bandwidth,
                                                                param.spurious_emissions)
-            
+
         if param.topology == 'MACROCELL' or param.topology == 'HOTSPOT':
             imt_base_stations.intesite_dist = param.intersite_distance
 
@@ -151,7 +151,8 @@ class StationFactory(object):
                 sys.exit(1)
 
             [ue_x, ue_y, theta, distance] = StationFactory.get_random_position(num_ue, topology, random_number_gen,
-                                                                               param.minimum_separation_distance_bs_ue )
+                                                                               param.minimum_separation_distance_bs_ue,
+                                                                               deterministic_cell=True)
             psi = np.degrees(np.arctan((param.bs_height - param.ue_height) / distance))
 
             imt_ue.azimuth = (azimuth + theta + np.pi/2)
@@ -254,7 +255,7 @@ class StationFactory(object):
                                                     param.spurious_emissions)
 
         imt_ue.spectral_mask.set_mask()
-        
+
         if param.topology == 'MACROCELL' or param.topology == 'HOTSPOT':
             imt_ue.intersite_dist = param.intersite_distance
 
@@ -304,7 +305,7 @@ class StationFactory(object):
             else:
                 x_min = topology.x[bs] - topology.cell_radius
                 x_max = topology.x[bs] + topology.cell_radius
-            
+
             # First floor
             if bs < topology.total_bs_level:
                 y_min = topology.y[bs] - topology.b_d/2 - delta_y
@@ -313,7 +314,7 @@ class StationFactory(object):
             else:
                 y_min = topology.y[bs] - topology.b_d/2
                 y_max = topology.y[bs] + topology.b_d/2
-                
+
             x = (x_max - x_min)*random_number_gen.random_sample(num_ue_per_bs) + x_min
             y = (y_max - y_min)*random_number_gen.random_sample(num_ue_per_bs) + y_min
             z = [topology.height[bs] - topology.b_h + param.ue_height for k in range(num_ue_per_bs)]
@@ -491,7 +492,7 @@ class StationFactory(object):
             # equal to param.max_dist_to_bs
             if param.min_dist_to_bs < 0:
                 sys.stderr.write("ERROR\nInvalid minimum distance from FSS ES to BS: {}".format(param.min_dist_to_bs))
-                sys.exit(1)                    
+                sys.exit(1)
             while(True):
                 dist_x = random_number_gen.uniform(-param.max_dist_to_bs, param.max_dist_to_bs)
                 dist_y = random_number_gen.uniform(-param.max_dist_to_bs, param.max_dist_to_bs)
@@ -690,7 +691,7 @@ class StationFactory(object):
         distance = param.EARTH_RADIUS * \
                     math.sin(math.radians(incidence_angle - param.nadir_angle)) / \
                     math.sin(math.radians(param.nadir_angle))
-        
+
         # Elevation at ground (centre of the footprint)
         theta_grd_elev = 90 - incidence_angle
 
@@ -700,7 +701,7 @@ class StationFactory(object):
 
         # Elevation and azimuth at sensor wrt centre of the footprint
         # It is assumed the sensor is at y-axis, hence azimuth is 270 deg
-        eess_passive_sensor.azimuth = 270 
+        eess_passive_sensor.azimuth = 270
         eess_passive_sensor.elevation = -theta_grd_elev
 
         eess_passive_sensor.active = np.array([True])
@@ -721,7 +722,7 @@ class StationFactory(object):
             sys.exit(1)
 
         eess_passive_sensor.bandwidth = param.bandwidth
-        # Noise temperature is not an input parameter for EESS passive. 
+        # Noise temperature is not an input parameter for EESS passive.
         # It is included here to calculate the useless I/N values
         eess_passive_sensor.noise_temperature = 250
         eess_passive_sensor.thermal_noise = -500
@@ -734,7 +735,8 @@ class StationFactory(object):
     @staticmethod
     def get_random_position( num_stas: int, topology: Topology,
                              random_number_gen: np.random.RandomState,
-                             min_dist_to_bs = 0, central_cell = False ):
+                             min_dist_to_bs = 0, central_cell = False,
+                             deterministic_cell = False):
         hexagon_radius = topology.intersite_distance / 3
 
         min_dist_ok = False
@@ -766,6 +768,10 @@ class StationFactory(object):
             central_cell_indices = np.where((topology.x == 0) & (topology.y == 0))
             cell = central_cell_indices[0][random_number_gen.random_integers(0, len(central_cell_indices[0]) - 1,
                                                                              num_stas)]
+        elif deterministic_cell:
+            num_bs = topology.num_base_stations
+            stas_per_cell = num_stas / num_bs
+            cell = np.repeat(np.arange(num_bs, dtype=int), stas_per_cell)
         else:
             num_bs = topology.num_base_stations
             cell = random_number_gen.random_integers(0, num_bs - 1, num_stas)
@@ -800,14 +806,20 @@ if __name__ == '__main__':
 
     class ParamsAux(object):
         def __init__(self):
+            self.spectral_mask = 'IMT-2020'
+            self.frequency = 10000
+            self.topology = 'MACROCELL'
             self.ue_distribution_type = "UNIFORM"
             self.bs_height = 30
             self.ue_height = 3
             self.ue_indoor_percent = 0
             self.ue_k = 3
-            self.ue_k_m = 20
+            self.ue_k_m = 1
             self.bandwidth  = np.random.rand()
             self.ue_noise_figure = np.random.rand()
+            self.minimum_separation_distance_bs_ue = 10
+            self.spurious_emissions = -30
+            self.intersite_distance = 1000
 
     params = ParamsAux()
 
@@ -815,29 +827,38 @@ if __name__ == '__main__':
 
     ant_param.adjacent_antenna_model = "SINGLE_ELEMENT"
     ant_param.bs_element_pattern = "F1336"
-    ant_param.bs_tx_element_max_g = 5
-    ant_param.bs_tx_element_phi_deg_3db = 65
-    ant_param.bs_tx_element_theta_deg_3db = 65
-    ant_param.bs_tx_element_am = 30
-    ant_param.bs_tx_element_sla_v = 30
-    ant_param.bs_tx_n_rows = 8
-    ant_param.bs_tx_n_columns = 8
-    ant_param.bs_tx_element_horiz_spacing = 0.5
-    ant_param.bs_tx_element_vert_spacing = 0.5
+    ant_param.bs_element_max_g = 5
+    ant_param.bs_element_phi_3db = 65
+    ant_param.bs_element_theta_3db = 65
+    ant_param.bs_element_am = 30
+    ant_param.bs_element_sla_v = 30
+    ant_param.bs_n_rows = 8
+    ant_param.bs_n_columns = 8
+    ant_param.bs_element_horiz_spacing = 0.5
+    ant_param.bs_element_vert_spacing = 0.5
     ant_param.bs_downtilt_deg = 10
+    ant_param.bs_multiplication_factor = 12
+    ant_param.bs_minimum_array_gain = -200
 
     ant_param.ue_element_pattern = "FIXED"
-    ant_param.ue_tx_element_max_g = 5
-    ant_param.ue_tx_element_phi_deg_3db = 90
-    ant_param.ue_tx_element_theta_deg_3db = 90
-    ant_param.ue_tx_element_am = 25
-    ant_param.ue_tx_element_sla_v = 25
-    ant_param.ue_tx_n_rows = 4
-    ant_param.ue_tx_n_columns = 4
-    ant_param.ue_tx_element_horiz_spacing = 0.5
-    ant_param.ue_tx_element_vert_spacing = 0.5
+    ant_param.ue_element_max_g = 5
+    ant_param.ue_element_phi_3db = 90
+    ant_param.ue_element_theta_3db = 90
+    ant_param.ue_element_am = 25
+    ant_param.ue_element_sla_v = 25
+    ant_param.ue_n_rows = 4
+    ant_param.ue_n_columns = 4
+    ant_param.ue_element_horiz_spacing = 0.5
+    ant_param.ue_element_vert_spacing = 0.5
+    ant_param.ue_multiplication_factor = 12
+    ant_param.ue_minimum_array_gain = -200
 
-    imt_ue = factory.generate_imt_ue(params, ant_param, topology)
+    ant_param.ue_normalization = False
+    ant_param.bs_normalization = False
+
+    rnd = np.random.RandomState(1)
+
+    imt_ue = factory.generate_imt_ue(params, ant_param, topology, rnd)
 
     fig = plt.figure(figsize=(8, 8), facecolor='w', edgecolor='k')  # create a figure object
     ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
@@ -849,7 +870,7 @@ if __name__ == '__main__':
     plt.xlabel("x-coordinate [m]")
     plt.ylabel("y-coordinate [m]")
 
-    plt.plot(imt_ue.x, imt_ue.y, "*")
+    plt.plot(imt_ue.x, imt_ue.y, "r.")
 
     plt.tight_layout()
     plt.show()
