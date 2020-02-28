@@ -41,6 +41,9 @@ class TopologyMacrocell(Topology):
         super().__init__(intersite_distance, cell_radius)
         self.num_clusters = num_clusters
 
+        self.site_x = np.empty(0)
+        self.site_y = np.empty(0)
+
     def calculate_coordinates(self, random_number_gen=np.random.RandomState()):
         """
         Calculates the coordinates of the stations according to the inter-site
@@ -78,9 +81,9 @@ class TopologyMacrocell(Topology):
 
             # In the end, we have to update the number of base stations
             self.num_base_stations = len(self.x)
-            
+
             self.indoor = np.zeros(self.num_base_stations, dtype = bool)
-                
+
     def plot(self, ax: matplotlib.axes.Axes):
         # create the hexagons
         r = self.intersite_distance/3
