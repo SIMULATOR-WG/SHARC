@@ -42,8 +42,10 @@ class PropagationFactory(object):
             return PropagationP619(random_number_gen)
         elif channel_model == "P452":
             return PropagationClearAir(random_number_gen)
-        elif channel_model == "TVRO":
-            return PropagationTvro(random_number_gen)
+        elif channel_model == "TVRO-URBAN":
+            return PropagationTvro(random_number_gen, "URBAN")
+        elif channel_model == "TVRO-SUBURBAN":
+            return PropagationTvro(random_number_gen, "SUBURBAN")
         elif channel_model == "HDFSS":
             return PropagationHDFSS(param.fss_es,random_number_gen)
         elif channel_model == "INDOOR":
