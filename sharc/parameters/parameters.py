@@ -268,6 +268,21 @@ class Parameters(object):
             self.fs.BOLTZMANN_CONSTANT      = config.getfloat("FS", "BOLTZMANN_CONSTANT")
             self.fs.EARTH_RADIUS            = config.getfloat("FS", "EARTH_RADIUS")
 
+            # P452 parameters
+            self.fs.atmospheric_pressure = config.getfloat("FS", "atmospheric_pressure")
+            self.fs.air_temperature = config.getfloat("FS", "air_temperature")
+            self.fs.N0 = config.getfloat("FS", "N0")
+            self.fs.delta_N = config.getfloat("FS", "delta_N")
+            self.fs.percentage_p = config.get("FS", "percentage_p")
+            self.fs.Dct = config.getfloat("FS", "Dct")
+            self.fs.Dcr = config.getfloat("FS", "Dcr")
+            self.fs.Hte = config.getfloat("FS", "Hte")
+            self.fs.Hre = config.getfloat("FS", "Hre")
+            self.fs.tx_lat = config.getfloat("FS", "tx_lat")
+            self.fs.rx_lat = config.getfloat("FS", "rx_lat")
+            self.fs.polarization = config.get("FS", "polarization")
+            self.fs.clutter_loss = config.getboolean("FS", "clutter_loss")
+
         #######################################################################
         # HAPS (airbone) station
         #######################################################################

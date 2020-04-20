@@ -49,7 +49,7 @@ class Simulation(ABC, Observable):
         else:
             sys.stderr.write("ERROR\nInvalid system: " + self.parameters.general.system)
             sys.exit(1)
-            
+
         self.wrap_around_enabled = self.parameters.imt.wrap_around and \
                                   (self.parameters.imt.topology == 'MACROCELL' \
                                    or self.parameters.imt.topology == 'HOTSPOT') and \
@@ -161,7 +161,7 @@ class Simulation(ABC, Observable):
         self.num_rb_per_ue = math.trunc(self.num_rb_per_bs/self.parameters.imt.ue_k)
 
         self.results = Results(self.parameters_filename, self.parameters.general.overwrite_output)
-        
+
         if self.parameters.general.system == 'RAS':
             self.polarization_loss = 0.0
         else:
@@ -194,7 +194,8 @@ class Simulation(ABC, Observable):
              self.parameters.imt.topology == "INDOOR":
             elevation_angles = np.transpose(station_b.get_elevation(station_a))
         elif station_a.station_type is StationType.FSS_ES or \
-            station_a.station_type is StationType.RAS:
+            station_a.station_type is StationType.RAS or \
+            station_a.station_type is StationType.FS:
             elevation_angles = station_b.get_elevation(station_a)
         else:
             elevation_angles = None
@@ -210,7 +211,7 @@ class Simulation(ABC, Observable):
             # num_station_a x num_station_b
             d_2D = station_a.get_distance_to(station_b)
             d_3D = station_a.get_3d_distance_to(station_b)
-            
+
             if self.parameters.imt.interfered_with:
                 freq = self.param_system.frequency
             else:
@@ -231,7 +232,7 @@ class Simulation(ABC, Observable):
                 sectors_in_node = self.parameters.imt.ue_k
                 additional_loss = self.parameters.imt.bs_ohmic_loss \
                                     + self.polarization_loss
-                
+
             if self.parameters.imt.interfered_with:
                 earth_to_space = False
                 single_entry = True
@@ -275,7 +276,7 @@ class Simulation(ABC, Observable):
             d_2D = self.bs_to_ue_d_2D
             d_3D = self.bs_to_ue_d_3D
             freq = self.parameters.imt.frequency
-            
+
             path_loss = propagation.get_loss(distance_3D=d_3D,
                                              distance_2D=d_2D,
                                              frequency=self.parameters.imt.frequency*np.ones(d_2D.shape),
@@ -523,7 +524,7 @@ class Simulation(ABC, Observable):
 
 #        wedge = Wedge((0, 0), 300, 0, 360, 290, color='b', alpha=0.2, fill=True)
 #        ax.add_artist(wedge)
-        
+
         # Plot UE's azimuth
         d = 0.1 * self.topology.cell_radius
         for i in range(len(self.ue.x)):
@@ -555,7 +556,7 @@ class Simulation(ABC, Observable):
             plt.legend(loc="upper left", scatterpoints=1)
             plt.tight_layout()
             plt.show()
-        
+
 #        sys.exit(0)
 
     @abstractmethod
