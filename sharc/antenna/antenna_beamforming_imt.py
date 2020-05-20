@@ -79,9 +79,9 @@ class AntennaBeamformingImt(Antenna):
         self.n_cols = par.n_columns
         self.dh = par.element_horiz_spacing
         self.dv = par.element_vert_spacing
-        
+
         self.adjacent_antenna_model = par.adjacent_antenna_model
-        
+
         # Beamforming normalization
         self.normalize = par.normalization
         self.co_correction_factor_list = []
@@ -107,7 +107,7 @@ class AntennaBeamformingImt(Antenna):
         phi, theta = self.to_local_coord(phi_etilt, theta_etilt)
         self.beams_list.append((np.asscalar(phi), np.asscalar(theta-90)))
         self.w_vec_list.append(self._weight_vector(phi, theta-90))
-        
+
         if self.normalize:
             lin = int(phi/self.resolution)
             col = int(theta/self.resolution)
@@ -138,14 +138,14 @@ class AntennaBeamformingImt(Antenna):
         """
         phi_vec = np.asarray(kwargs["phi_vec"])
         theta_vec = np.asarray(kwargs["theta_vec"])
-        
+
         # Check if antenna gain has to be calculated on the co-channel or
         # on the adjacent channel
-        if("co_channel" in kwargs.keys()): 
+        if("co_channel" in kwargs.keys()):
             co_channel = kwargs["co_channel"]
-        else: 
+        else:
             co_channel = True
-            
+
         # If gain has to be calculated on the adjacent channel, then check whether
         # to use beamforming or single element pattern.
         # Both options are explicitly written in order to improve readability
@@ -156,13 +156,13 @@ class AntennaBeamformingImt(Antenna):
                 co_channel = True
             else:
                 sys.stderr.write("ERROR\nInvalid antenna pattern for adjacent channel calculations: " + self.adjacent_antenna_model)
-                sys.exit(1)                
-            
-        if("beams_l" in kwargs.keys()): 
+                sys.exit(1)
+
+        if("beams_l" in kwargs.keys()):
             beams_l = np.asarray(kwargs["beams_l"],dtype=int)
             correction_factor = self.co_correction_factor_list
             correction_factor_idx = beams_l
-        else: 
+        else:
             beams_l = -1*np.ones_like(phi_vec)
             if co_channel:
                 if self.normalize:
@@ -180,7 +180,7 @@ class AntennaBeamformingImt(Antenna):
         n_direct = len(lo_theta_vec)
 
         gains = np.zeros(n_direct)
-        
+
         if(co_channel):
             for g in range(n_direct):
                 gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g],
@@ -193,7 +193,7 @@ class AntennaBeamformingImt(Antenna):
                      + self.adj_correction_factor
 
         gains = np.maximum(gains, self.minimum_array_gain)
-                     
+
         return gains
 
     def reset_beams(self):
@@ -289,23 +289,23 @@ class AntennaBeamformingImt(Antenna):
         return gain
 
     def to_local_coord(self,phi: float, theta: float) -> tuple:
-        
+
         phi_rad = np.ravel(np.array([np.deg2rad(phi)]))
         theta_rad = np.ravel(np.array([np.deg2rad(theta)]))
-        
+
         points = np.matrix([np.sin(theta_rad)*np.cos(phi_rad),
                            np.sin(theta_rad)*np.sin(phi_rad),
                            np.cos(theta_rad)])
-    
+
         rotated_points = self.rotation_mtx*points
-        
+
         lo_phi = np.ravel(np.asarray(np.rad2deg(np.arctan2(rotated_points[1],rotated_points[0]))))
         lo_theta = np.ravel(np.asarray(np.rad2deg(np.arccos(rotated_points[2]))))
 
         return lo_phi, lo_theta
-    
+
     def _calculate_rotation_matrix(self):
-        
+
         alpha = np.deg2rad(self.azimuth)
         beta = np.deg2rad(self.elevation)
 
@@ -326,8 +326,8 @@ class PlotAntennaPattern(object):
         self.figs_dir = figs_dir
 
     def plot_element_pattern(self,
-                             antenna: AntennaBeamformingImt, 
-                             sta_type: str, 
+                             antenna: AntennaBeamformingImt,
+                             sta_type: str,
                              plot_type: str):
 
         phi_escan = 0
@@ -408,13 +408,15 @@ if __name__ == '__main__':
     figs_dir = "figs/"
 
     param = ParametersAntennaImt()
+    param.bs_normalization = False
+    param.ue_normalization = False
+
     param.adjacent_antenna_model = "SINGLE_ELEMENT"
-    param.normalization = False
     param.bs_normalization_file = 'beamforming_normalization\\bs_indoor_norm.npz'
     param.ue_normalization_file = 'beamforming_normalization\\ue_norm.npz'
     param.bs_minimum_array_gain = -200
     param.ue_minimum_array_gain = -200
-    
+
     param.bs_element_pattern = "M2101"
     param.bs_element_max_g    = 5
     param.bs_element_phi_3db  = 65
@@ -446,9 +448,7 @@ if __name__ == '__main__':
     par = param.get_antenna_parameters(StationType.IMT_BS)
     bs_array = AntennaBeamformingImt(par,0,0)
     f = plot.plot_element_pattern(bs_array, "BS","ELEMENT")
-    #f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
     f = plot.plot_element_pattern(bs_array, "TX", "ARRAY")
-    #f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
 
     # Plot UE TX radiation patterns
     par = param.get_antenna_parameters(StationType.IMT_UE)
