@@ -429,6 +429,6 @@ class Results(object):
         for plot in self.plot_list:
             np.savetxt(os.path.join(self.output_directory, plot.file_name + file_extension),
                        np.transpose([plot.x, plot.y]),
-                       fmt="%.5f", delimiter="\t", header=header_text,
-                       newline=os.linesep)
+                       fmt="%.5f", delimiter="\t", header=header_text)#,
+                       #newline=os.linesep)
 

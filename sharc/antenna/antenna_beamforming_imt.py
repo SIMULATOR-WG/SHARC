@@ -409,7 +409,8 @@ if __name__ == '__main__':
 
     param = ParametersAntennaImt()
     param.adjacent_antenna_model = "SINGLE_ELEMENT"
-    param.normalization = False
+    param.bs_normalization = False
+    param.ue_normalization = False
     param.bs_normalization_file = 'beamforming_normalization\\bs_indoor_norm.npz'
     param.ue_normalization_file = 'beamforming_normalization\\ue_norm.npz'
     param.bs_minimum_array_gain = -200
