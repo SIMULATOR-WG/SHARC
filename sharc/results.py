@@ -66,9 +66,9 @@ class Results(object):
             self.output_directory = 'output'
 
     def create_dir(self,results_number,dir_head):
-        
+
         dir_head_complete = dir_head.format(results_number)
-        
+
         try:
             os.makedirs(dir_head_complete)
             self.output_directory = dir_head_complete
@@ -335,7 +335,7 @@ class Results(object):
             x_label = "$I/N$ [dB]"
             y_label = "Probability of $I/N$ < $X$"
             file_name = title
-            #x_limits = (-15, 20)
+#            x_limits = (-15, 20)
             y_limits = (0, 1)
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, y_lim=y_limits))
         if len(self.imt_dl_tput_ext) > 0:

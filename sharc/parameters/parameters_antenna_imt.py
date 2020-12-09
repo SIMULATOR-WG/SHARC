@@ -57,7 +57,7 @@ class ParametersAntennaImt(object):
                 self.ue_normalization_data = data_dict
                 data.close()
             else:
-                self.ue_normalization_data = None            
+                self.ue_normalization_data = None
             tpl = AntennaPar(self.adjacent_antenna_model,
                              self.ue_normalization,
                              self.ue_normalization_data,

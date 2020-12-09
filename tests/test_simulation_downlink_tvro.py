@@ -91,7 +91,7 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
         self.param.antenna_imt.bs_element_vert_spacing = 1
         self.param.antenna_imt.bs_multiplication_factor = 12
         self.param.antenna_imt.bs_downtilt = 10
-        
+
         self.param.antenna_imt.ue_element_pattern = "FIXED"
         self.param.antenna_imt.ue_normalization = False
         self.param.antenna_imt.ue_normalization_file = None
@@ -111,7 +111,7 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
         self.param.fss_es.x = 100
         self.param.fss_es.y = 0
         self.param.fss_es.min_dist_to_bs = 10
-        self.param.fss_es.max_dist_to_bs = 600        
+        self.param.fss_es.max_dist_to_bs = 600
         self.param.fss_es.height = 6
         self.param.fss_es.elevation_min = 49.8
         self.param.fss_es.elevation_max = 49.8
@@ -137,10 +137,10 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
         self.simulation = SimulationDownlink(self.param, "")
         self.simulation.initialize()
         random_number_gen = np.random.RandomState(self.param.general.seed)
-        
+
         self.assertTrue(self.simulation.co_channel)
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
@@ -148,7 +148,7 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
         self.simulation.bs.y = np.array([0, 0])
         self.simulation.bs.azimuth = np.array([0, 180])
         self.simulation.bs.elevation = np.array([-10, -10])
-        
+
         self.simulation.ue = StationFactory.generate_imt_ue(self.param.imt,
                                                             self.param.antenna_imt,
                                                             self.simulation.topology,
@@ -161,7 +161,7 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
         self.simulation.select_ue(random_number_gen)
         self.simulation.link = {0:[0,1], 1:[2,3]}
         self.assertEqual(self.simulation.link, {0: [0,1], 1: [2,3]})
-        
+
         self.simulation.propagation_imt = PropagationFactory.create_propagation(self.param.imt.channel_model,
                                                                                 self.param, random_number_gen)
         self.simulation.propagation_system = PropagationFactory.create_propagation(self.param.fss_es.channel_model,
@@ -173,7 +173,7 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
                                                                                     self.simulation.propagation_imt)
         path_loss_imt = np.array([[73.09,  79.11,  90.40,  93.09],
                                   [90.78,  91.85,  69.57,  83.55]])
-        bs_antenna_gains = np.array([[ 3.04,   7.30,  -6.45,  -6.45], 
+        bs_antenna_gains = np.array([[ 3.04,   7.30,  -6.45,  -6.45],
                                      [ -6.45,  -6.45,   1.63,  17.95]])
         ue_antenna_gains = np.array([[ -4,  -4,  -4,  -4], [ -4,  -4,  -4,  -4]])
         coupling_loss_imt = path_loss_imt - bs_antenna_gains - ue_antenna_gains \
@@ -188,7 +188,7 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
         self.simulation.scheduler()
         bandwidth_per_ue = math.trunc((1 - 0.1)*20/2)
         npt.assert_allclose(self.simulation.ue.bandwidth, bandwidth_per_ue*np.ones(4), atol=1e-2)
-        
+
         # there is no power control, so BS's will transmit at maximum power
         self.simulation.power_control()
         tx_power = 46 - 10*np.log10(2)
@@ -197,13 +197,13 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
 
         # test method that calculates SINR
         self.simulation.calculate_sinr()
-        
+
         # check UE received power
-        rx_power = tx_power - np.concatenate((coupling_loss_imt[0][:2], coupling_loss_imt[1][2:])) 
+        rx_power = tx_power - np.concatenate((coupling_loss_imt[0][:2], coupling_loss_imt[1][2:]))
         npt.assert_allclose(self.simulation.ue.rx_power, rx_power, atol=1e-1)
 
         # check UE received interference
-        rx_interference = tx_power - np.concatenate((coupling_loss_imt[1][:2], coupling_loss_imt[0][2:]))     
+        rx_interference = tx_power - np.concatenate((coupling_loss_imt[1][:2], coupling_loss_imt[0][2:]))
         npt.assert_allclose(self.simulation.ue.rx_interference, rx_interference, atol=1e-1)
 
         # check UE thermal noise
@@ -224,12 +224,12 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
         self.simulation.system = StationFactory.generate_fss_earth_station(self.param.fss_es, random_number_gen)
         self.simulation.system.x = np.array([600])
         self.simulation.system.y = np.array([0])
-        
+
         # test the method that calculates interference from IMT UE to FSS space station
-        self.simulation.calculate_external_interference()        
-        
+        self.simulation.calculate_external_interference()
+
         # check coupling loss from IMT_BS to FSS_ES
-        # 4 values because we have 2 BS * 2 beams for each base station. 
+        # 4 values because we have 2 BS * 2 beams for each base station.
         path_loss_imt_system = np.array([99.11,   99.11,  101.61,  101.61])
         polarization_loss = 3
         tvro_antenna_gain = np.array([ 0,  0,  0,  0])
@@ -238,11 +238,11 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
                                     - bs_antenna_gain \
                                     + polarization_loss \
                                     + self.param.imt.bs_ohmic_loss
-                                    
+
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             coupling_loss_imt_system,
                             atol=1e-1)
-        
+
         # check blocking signal
         interference = tx_power - coupling_loss_imt_system
         rx_interference = 10*math.log10(np.sum(np.power(10, 0.1*interference)))
@@ -253,4 +253,4 @@ class SimulationDownlinkTvroTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()        
+    unittest.main()

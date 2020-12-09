@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb 14 12:51:22 2017
+@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 
 @author: edgar
 """
@@ -11,6 +12,7 @@ import matplotlib.axes
 
 import math
 import numpy as np
+
 
 class TopologyMacrocell(Topology):
     """
@@ -23,23 +25,23 @@ class TopologyMacrocell(Topology):
 
     ALLOWED_NUM_CLUSTERS = [1, 7]
 
-    def __init__(self, intersite_distance: float, num_clusters: int):
+    def __init__(self, intersite_distance_macrocell: float, num_clusters_macrocell: int):
         """
         Constructor method that sets the parameters and already calls the
         calculation methods.
 
         Parameters
         ----------
-            intersite_distance : Distance between two sites
-            num_clusters : Number of clusters, should be 1 or 7
+            intersite_distance_macrocell : Distance between two sites
+            num_clusters_macrocell : Number of clusters, should be 1 or 7
         """
-        if num_clusters not in TopologyMacrocell.ALLOWED_NUM_CLUSTERS:
-            error_message = "invalid number of clusters ({})".format(num_clusters)
+        if num_clusters_macrocell not in TopologyMacrocell.ALLOWED_NUM_CLUSTERS:
+            error_message = "invalid number of clusters ({})".format(num_clusters_macrocell)
             raise ValueError(error_message)
 
-        cell_radius = intersite_distance*2/3
-        super().__init__(intersite_distance, cell_radius)
-        self.num_clusters = num_clusters
+        cell_radius = intersite_distance_macrocell * 2 / 3
+        super().__init__(intersite_distance_macrocell, cell_radius)
+        self.num_clusters = num_clusters_macrocell
 
         self.site_x = np.empty(0)
         self.site_y = np.empty(0)
@@ -59,11 +61,11 @@ class TopologyMacrocell(Topology):
 
             # these are the coordinates of the central cluster
             x_central = np.array([0, d, d/2, -d/2, -d, -d/2,
-                             d/2, 2*d, 3*d/2, d, 0, -d,
-                             -3*d/2, -2*d, -3*d/2, -d, 0, d, 3*d/2])
+                                  d/2, 2*d, 3*d/2, d, 0, -d,
+                                  -3*d/2, -2*d, -3*d/2, -d, 0, d, 3*d/2])
             y_central = np.array([0, 0, 3*h, 3*h, 0, -3*h,
-                             -3*h, 0, 3*h, 6*h, 6*h, 6*h,
-                             3*h, 0, -3*h, -6*h, -6*h, -6*h, -3*h])
+                                  -3*h, 0, 3*h, 6*h, 6*h, 6*h,
+                                  3*h, 0, -3*h, -6*h, -6*h, -6*h, -3*h])
             self.x = np.copy(x_central)
             self.y = np.copy(y_central)
 
@@ -82,22 +84,22 @@ class TopologyMacrocell(Topology):
             # In the end, we have to update the number of base stations
             self.num_base_stations = len(self.x)
 
-            self.indoor = np.zeros(self.num_base_stations, dtype = bool)
+            self.indoor = np.zeros(self.num_base_stations, dtype=bool)
 
-    def plot(self, ax: matplotlib.axes.Axes):
+    def plot(self, axis: matplotlib.axes.Axes):
         # create the hexagons
         r = self.intersite_distance/3
         for x, y, az in zip(self.x, self.y, self.azimuth):
-            se = list([[x,y]])
+            se = list([[x, y]])
             angle = int(az - 60)
             for a in range(6):
                 se.extend([[se[-1][0] + r*math.cos(math.radians(angle)), se[-1][1] + r*math.sin(math.radians(angle))]])
                 angle += 60
             sector = plt.Polygon(se, fill=None, edgecolor='k')
-            ax.add_patch(sector)
+            axis.add_patch(sector)
 
         # macro cell base stations
-        ax.scatter(self.x, self.y, color='k', edgecolor="k", linewidth=4, label="Macro cell")
+        axis.scatter(self.x, self.y, color='k', edgecolor="k", linewidth=4, label="Macro cell")
 
 
 if __name__ == '__main__':
@@ -106,7 +108,7 @@ if __name__ == '__main__':
     topology = TopologyMacrocell(intersite_distance, num_clusters)
     topology.calculate_coordinates()
 
-    fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')  # create a figure object
+    fig = plt.figure(figsize=(8, 8), facecolor='w', edgecolor='k')  # create a figure object
     ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
 
     topology.plot(ax)
@@ -117,5 +119,3 @@ if __name__ == '__main__':
     plt.ylabel("y-coordinate [m]")
     plt.tight_layout()
     plt.show()
-
-

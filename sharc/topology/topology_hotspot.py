@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue May 16 16:59:40 2017
+@modified: Luciano Camilo Tue Dec 03 15:04:25 2020
 
 @author: edgar
 """
@@ -56,7 +57,7 @@ class TopologyHotspot(Topology):
         y = np.empty(0)
         azimuth = np.empty(0)
         for cell_x, cell_y, cell_azimuth in zip(self.macrocell.x, self.macrocell.y, self.macrocell.azimuth):
-            #print("base station #{}".format(i))
+            # print("base station #{}".format(i))
             i += 1
             # find the center coordinates of the sector (hexagon)
             macro_cell_x = cell_x + self.macrocell.intersite_distance/3*math.cos(math.radians(cell_azimuth))
@@ -68,10 +69,10 @@ class TopologyHotspot(Topology):
             hotspot_x = np.array(0)
             hotspot_y = np.array(0)
             hotspot_azimuth = np.array(0)
-            
+
             for hs in range(self.param.num_hotspots_per_cell):
                 num_attempts = 0
-                while(True):
+                while True:
                     # create one hotspot
                     hotspot_radius = r*random_number_gen.rand(1)
                     hotspot_angle = 2*np.pi*random_number_gen.rand(1)
@@ -105,22 +106,22 @@ class TopologyHotspot(Topology):
                             break
                         else:
                             num_attempts = num_attempts + 1
-                            
+
                         if num_attempts > TopologyHotspot.MAX_NUM_LOOPS:
-                            sys.stderr.write("ERROR\nInfinite loop while creating hotspots.\nTry less hotspots per cell or greater macro cell intersite distance.\n")
+                            sys.stderr.write("ERROR\nInfinite loop while creating hotspots.\nTry less hotspots per cell"
+                                             " or greater macro cell intersite distance.\n")
                             sys.exit(1)
-                #if num_attempts > 1: print("number of attempts: {}".format(num_attempts))
+                # if num_attempts > 1: print("number of attempts: {}".format(num_attempts))
             x = np.concatenate([x, hotspot_x])
             y = np.concatenate([y, hotspot_y])
-            azimuth = np.concatenate([azimuth, hotspot_azimuth])            
-            
+            azimuth = np.concatenate([azimuth, hotspot_azimuth])
+
         self.x = x
         self.y = y
         self.azimuth = azimuth
         # In the end, we have to update the number of base stations
         self.num_base_stations = len(self.x)
-        self.indoor = np.zeros(self.num_base_stations, dtype = bool)
-
+        self.indoor = np.zeros(self.num_base_stations, dtype=bool)
 
     def overlapping_hotspots(self,
                              candidate_x: np.array,
@@ -128,7 +129,7 @@ class TopologyHotspot(Topology):
                              candidate_azimuth: np.array,
                              set_x: np.array,
                              set_y: np.array,
-                             set_azimuth: np.array,                             
+                             set_azimuth: np.array,
                              radius: float) -> bool:
         """
         Evaluates the spatial relationships among hotspots and checks whether
@@ -142,7 +143,7 @@ class TopologyHotspot(Topology):
             candidate_azimuth: horizontal angle of the candidate hotspot (orientation)
             set_x: x-coordinates of the set of hotspots
             set_y: y-coordinates of the set of hotspots
-            set_azimuth: horizontal angle of the set of hotspots (orientation)            
+            set_azimuth: horizontal angle of the set of hotspots (orientation)
             radius: radius of all hotspots
 
         Returns
@@ -157,7 +158,7 @@ class TopologyHotspot(Topology):
             set_points = list()
             set_points.append((x, y))
             for a in range(len(azimuth_values)):
-                set_points.append((x + radius*math.cos(np.radians(azimuth + azimuth_values[a])), 
+                set_points.append((x + radius*math.cos(np.radians(azimuth + azimuth_values[a])),
                                    y + radius*math.sin(np.radians(azimuth + azimuth_values[a]))))
             set_polygons.append(Polygon(set_points))
 
@@ -165,12 +166,12 @@ class TopologyHotspot(Topology):
         points = list()
         points.append((candidate_x, candidate_y))
         for a in range(len(azimuth_values)):
-            points.append((candidate_x + radius*math.cos(np.radians(candidate_azimuth + azimuth_values[a])), 
+            points.append((candidate_x + radius*math.cos(np.radians(candidate_azimuth + azimuth_values[a])),
                            candidate_y + radius*math.sin(np.radians(candidate_azimuth + azimuth_values[a]))))
         polygon = Polygon(points)
-            
-        # Check if there is overlapping between the candidate hotspot and 
-        # any of the hotspots of the set. In other words, check if any polygons 
+
+        # Check if there is overlapping between the candidate hotspot and
+        # any of the hotspots of the set. In other words, check if any polygons
         # intersect
         for p in range(len(set_polygons)):
             overlapping = polygon.intersects(set_polygons[p])
@@ -181,7 +182,6 @@ class TopologyHotspot(Topology):
 
         # If this point is reached, then there is no intersection between polygons
         return False
-
 
     def validade_min_dist_bs_hotspot(self,
                                      hotspot_x: np.array,
@@ -210,20 +210,18 @@ class TopologyHotspot(Topology):
         occ = np.where(distance < min_dist_bs_hotspot)[0]
         return len(occ) == 0
 
-
-    def plot(self, ax: matplotlib.axes.Axes):
+    def plot(self, axis: matplotlib.axes.Axes):
         # plot macrocells
-        self.macrocell.plot(ax)
+        self.macrocell.plot(axis)
 
         # plot hotspots
         plt.scatter(self.x, self.y, color='g', edgecolor="w", linewidth=0.5, label="Hotspot")
 
         # plot hotspots coverage area
         for x, y, a in zip(self.x, self.y, self.azimuth):
-            pa = patches.Wedge( (x, y), self.cell_radius, a-60, a+60, fill=False,
-                               edgecolor="green", linestyle='solid' )
-            ax.add_patch(pa)
-
+            pa = patches.Wedge((x, y), self.cell_radius, a-60, a+60, fill=False,
+                               edgecolor="green", linestyle='solid')
+            axis.add_patch(pa)
 
 
 if __name__ == '__main__':
@@ -239,7 +237,7 @@ if __name__ == '__main__':
     topology = TopologyHotspot(param, intersite_distance, num_clusters)
     topology.calculate_coordinates()
 
-    fig = plt.figure(figsize=(8,8), facecolor='w', edgecolor='k')  # create a figure object
+    fig = plt.figure(figsize=(8, 8), facecolor='w', edgecolor='k')  # create a figure object
     ax = fig.add_subplot(1, 1, 1)  # create an axes object in the figure
 
     topology.plot(ax)

@@ -16,10 +16,10 @@ class SpectralMask(ABC):
 
     def power_calc(self,center_f: float, band: float):
         """
-        Calculates out-of-band power in the given band. It does that by 
+        Calculates out-of-band power in the given band. It does that by
         dividing the band into the rectangular sections defined by the spectral
         mask and adding up the area of all the rectangles.
-        
+
         Parameters:
             center_f (float): center frequency of band in which out-of-band
                 power is to be calculated
@@ -37,7 +37,7 @@ class SpectralMask(ABC):
         # which are contained within the band
         inc_df = np.where(np.logical_and(self.freq_lim > df_min,
                                          self.freq_lim < df_max))[0]
-        
+
         # If no break limits are within band: the band does not need to be
         # divided into rectangles
         if len(inc_df) == 0:
@@ -52,7 +52,7 @@ class SpectralMask(ABC):
             if pwr_lvl != self.p_tx: power_oob += band*np.power(10,(pwr_lvl/10))
         # If one or more break limitas are within band
         else:
-            
+
             # Lower and upper power emission levels
             pwr_lvl_1 = self.mask_dbm[inc_df[0]]
             pwr_lvl_2 = self.mask_dbm[inc_df[-1] + 1]

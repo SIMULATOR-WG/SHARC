@@ -242,12 +242,13 @@ if __name__ == '__main__':
 
     propagation_path = os.getcwd()
     sharc_path = os.path.dirname(propagation_path)
-    param_file = os.path.join(sharc_path, "parameters", "parameters.ini")
+    param_file = os.path.join(sharc_path, "input", "parameters.ini")
 
     params.set_file_name(param_file)
     params.read_params()
 
-    sat_params = params.fss_ss
+    #sat_params = params.fss_ss
+    sat_params = params.imt
 
     random_number_gen = np.random.RandomState(101)
     propagation = PropagationP619(random_number_gen)
@@ -255,32 +256,43 @@ if __name__ == '__main__':
     ##########################
     # Plot atmospheric loss
     # compare with benchmark from ITU-R P-619 Fig. 3
-    frequency_MHz = 30000.
-    sat_params.imt_altitude = 1000
+    frequency_MHz = 2150.
+    sat_params.imt_altitude = 15
+    #frequency_MHz = 2150.
+    #sat_params.imt_altitude = 20000
 
-    apparent_elevation = range(-1, 90, 2)
+    #apparent_elevation = range(-1, 90, 2)
+    apparent_elevation = range(-1, 90, 30)
 
-    loss_2_5 = np.zeros(len(apparent_elevation))
-    loss_12_5 = np.zeros(len(apparent_elevation))
+    #loss_2_5 = np.zeros(len(apparent_elevation))
+    loss_7_5 = np.zeros(len(apparent_elevation))
+    #loss_12_5 = np.zeros(len(apparent_elevation))
 
     print("Plotting atmospheric loss:")
     for index in range(len(apparent_elevation)):
         print("\tApparent Elevation: {} degrees".format(apparent_elevation[index]))
 
-        surf_water_vapour_density = 2.5
-        loss_2_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz=frequency_MHz,
+        #surf_water_vapour_density = 2.5
+        #loss_2_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz=frequency_MHz,
+        #                                                           apparent_elevation=apparent_elevation[index],
+        #                                                           sat_params=sat_params,
+        #                                                           surf_water_vapour_density=surf_water_vapour_density)
+        surf_water_vapour_density = 7.5
+        loss_7_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz=frequency_MHz,
                                                                    apparent_elevation=apparent_elevation[index],
                                                                    sat_params=sat_params,
                                                                    surf_water_vapour_density=surf_water_vapour_density)
-        surf_water_vapour_density = 12.5
-        loss_12_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz=frequency_MHz,
-                                                                    apparent_elevation=apparent_elevation[index],
-                                                                    sat_params=sat_params,
-                                                                    surf_water_vapour_density=surf_water_vapour_density)
+
+        #surf_water_vapour_density = 12.5
+        #loss_12_5[index] = propagation._get_atmospheric_gasses_loss(frequency_MHz=frequency_MHz,
+        #                                                            apparent_elevation=apparent_elevation[index],
+        #                                                            sat_params=sat_params,
+        #                                                            surf_water_vapour_density=surf_water_vapour_density)
 
     plt.figure()
-    plt.semilogy(apparent_elevation, loss_2_5, label='2.5 g/m^3')
-    plt.semilogy(apparent_elevation, loss_12_5, label='12.5 g/m^3')
+    #plt.semilogy(apparent_elevation, loss_2_5, label='2.5 g/m^3')
+    plt.semilogy(apparent_elevation, loss_7_5, label='7.5 g/m^3')
+    #plt.semilogy(apparent_elevation, loss_12_5, label='12.5 g/m^3')
 
     plt.grid(True)
 
@@ -290,7 +302,7 @@ if __name__ == '__main__':
     plt.title("Atmospheric Gasses Attenuation")
     plt.legend()
 
-    altitude_vec = np.arange(0, 6.1, .5) * 1000
+    altitude_vec = np.arange(0, 30, .5) * 1000
     elevation_vec = np.array([0, .5, 1, 2, 3, 5])
     attenuation = np.empty([len(altitude_vec), len(elevation_vec)])
 

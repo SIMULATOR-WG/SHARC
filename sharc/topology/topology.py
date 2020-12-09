@@ -16,6 +16,7 @@ class Topology(object):
     def __init__(self,
                  intersite_distance: float,
                  cell_radius: float):
+        self.elevation = None
         self.intersite_distance = intersite_distance
         self.cell_radius = cell_radius
 

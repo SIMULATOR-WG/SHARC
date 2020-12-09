@@ -67,7 +67,7 @@ if __name__ == '__main__':
     par = ParametersRas();
     par.diameter = 1
     par.antenna_efficiency = 1
-    par.frequency = 43000
+    par.frequency = 2690
     par.SPEED_OF_LIGHT = 3e8
 
     antenna1 = AntennaSA509(par)

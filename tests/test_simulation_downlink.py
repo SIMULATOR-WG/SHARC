@@ -92,7 +92,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.param.antenna_imt.bs_element_vert_spacing = 1
         self.param.antenna_imt.bs_multiplication_factor = 12
         self.param.antenna_imt.bs_downtilt = 10
-        
+
         self.param.antenna_imt.ue_element_pattern = "M2101"
         self.param.antenna_imt.ue_normalization = False
         self.param.antenna_imt.ue_normalization_file = None
@@ -185,7 +185,7 @@ class SimulationDownlinkTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
@@ -249,11 +249,11 @@ class SimulationDownlinkTest(unittest.TestCase):
 
         # check UE received power
 
-        rx_power = tx_power - np.concatenate((coupling_loss_imt[0][:2], coupling_loss_imt[1][2:])) 
+        rx_power = tx_power - np.concatenate((coupling_loss_imt[0][:2], coupling_loss_imt[1][2:]))
         npt.assert_allclose(self.simulation.ue.rx_power, rx_power, atol=1e-2)
 
         # check UE received interference
-        rx_interference = tx_power - np.concatenate((coupling_loss_imt[1][:2], coupling_loss_imt[0][2:]))     
+        rx_interference = tx_power - np.concatenate((coupling_loss_imt[1][:2], coupling_loss_imt[0][2:]))
         npt.assert_allclose(self.simulation.ue.rx_interference, rx_interference, atol=1e-2)
 
         # check UE thermal noise
@@ -279,7 +279,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.calculate_external_interference()
 
         # check coupling loss
-        # 4 values because we have 2 BS * 2 beams for each base station. 
+        # 4 values because we have 2 BS * 2 beams for each base station.
         path_loss_imt_system = 203.52
         polarization_loss = 3
         sat_antenna_gain = 51
@@ -288,7 +288,7 @@ class SimulationDownlinkTest(unittest.TestCase):
                                     - np.array([bs_antenna_gain[0], bs_antenna_gain[0], bs_antenna_gain[1], bs_antenna_gain[1]]) \
                                     + polarization_loss \
                                     + self.param.imt.bs_ohmic_loss
-                                    
+
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             coupling_loss_imt_system,
                             atol=1e-2)
@@ -326,7 +326,7 @@ class SimulationDownlinkTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
@@ -417,7 +417,7 @@ class SimulationDownlinkTest(unittest.TestCase):
         self.simulation.calculate_external_interference()
 
         # check coupling loss from IMT_BS to FSS_ES
-        coupling_loss_imt_system = np.array([124.47-50-1,  124.47-50-1,  125.29-50-2,  125.29-50-2]) 
+        coupling_loss_imt_system = np.array([124.47-50-1,  124.47-50-1,  125.29-50-2,  125.29-50-2])
         npt.assert_allclose(self.simulation.coupling_loss_imt_system,
                             coupling_loss_imt_system,
                             atol=1e-2)
@@ -452,7 +452,7 @@ class SimulationDownlinkTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)

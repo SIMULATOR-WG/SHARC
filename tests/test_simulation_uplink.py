@@ -77,7 +77,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.imt.shadowing = False
         self.param.imt.noise_temperature = 290
         self.param.imt.BOLTZMANN_CONSTANT = 1.38064852e-23
-        
+
         self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.antenna_imt.bs_normalization = False
         self.param.antenna_imt.bs_element_pattern = "M2101"
@@ -94,7 +94,7 @@ class SimulationUplinkTest(unittest.TestCase):
         self.param.antenna_imt.bs_element_vert_spacing = 1
         self.param.antenna_imt.bs_multiplication_factor = 12
         self.param.antenna_imt.bs_downtilt = 10
-        
+
         self.param.antenna_imt.ue_element_pattern = "M2101"
         self.param.antenna_imt.ue_normalization = False
         self.param.antenna_imt.ue_minimum_array_gain = -200
@@ -186,7 +186,7 @@ class SimulationUplinkTest(unittest.TestCase):
 
         self.assertTrue(self.simulation.co_channel)
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
@@ -335,7 +335,7 @@ class SimulationUplinkTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
@@ -519,7 +519,7 @@ class SimulationUplinkTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
@@ -618,7 +618,7 @@ class SimulationUplinkTest(unittest.TestCase):
         random_number_gen = np.random.RandomState(101)
 
         # Set scenario
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)

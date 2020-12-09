@@ -32,6 +32,9 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.param.imt.wrap_around = False
         self.param.imt.num_clusters = 2
         self.param.imt.intersite_distance = 150
+
+        self.param.imt.num_sectors = 3 ###########
+
         self.param.imt.minimum_separation_distance_bs_ue = 10
         self.param.imt.interfered_with = False
         self.param.imt.frequency = 10000
@@ -81,7 +84,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.param.antenna_imt.adjacent_antenna_model = "SINGLE_ELEMENT"
         self.param.antenna_imt.bs_normalization = False
         self.param.antenna_imt.ue_normalization = False
-        
+
         self.param.antenna_imt.bs_normalization_file = None
         self.param.antenna_imt.bs_element_pattern = "M2101"
         self.param.antenna_imt.bs_minimum_array_gain = -200
@@ -109,7 +112,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.param.antenna_imt.ue_n_columns = 1
         self.param.antenna_imt.ue_element_horiz_spacing = 0.5
         self.param.antenna_imt.ue_element_vert_spacing = 0.5
-        self.param.antenna_imt.ue_multiplication_factor = 12        
+        self.param.antenna_imt.ue_multiplication_factor = 12
 
         self.param.fss_ss.frequency = 5000
         self.param.fss_ss.bandwidth = 100
@@ -147,7 +150,7 @@ class SimulationAdjacentTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
@@ -209,7 +212,7 @@ class SimulationAdjacentTest(unittest.TestCase):
         self.simulation.calculate_external_interference()
 
         # check coupling loss
-        coupling_loss_imt_system_adj = np.array([209.52-51-1, 209.52-51-1, 209.52-51-2, 209.52-51-2]) 
+        coupling_loss_imt_system_adj = np.array([209.52-51-1, 209.52-51-1, 209.52-51-2, 209.52-51-2])
         npt.assert_allclose(self.simulation.coupling_loss_imt_system_adjacent,
                             coupling_loss_imt_system_adj,
                             atol=1e-2)
@@ -240,7 +243,7 @@ class SimulationAdjacentTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)

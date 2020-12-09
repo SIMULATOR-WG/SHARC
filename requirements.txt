@@ -1,0 +1,10 @@
+numpy~=1.19.3
+matplotlib~=3.3.2
+Pillow~=8.0.1
+setuptools~=50.3.2
+pandas~=1.1.4
+scipy~=1.5.3
+PyYAML~=5.3.1
+area~=1.1.1
+Shapely~=1.7.1
+cycler~=0.10.0

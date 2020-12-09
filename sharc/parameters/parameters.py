@@ -19,6 +19,7 @@ from sharc.parameters.parameters_fss_es import ParametersFssEs
 from sharc.parameters.parameters_haps import ParametersHaps
 from sharc.parameters.parameters_rns import ParametersRns
 from sharc.parameters.parameters_ras import ParametersRas
+from sharc.parameters.parameters_hibs import ParametersHibs
 
 
 class Parameters(object):
@@ -41,11 +42,10 @@ class Parameters(object):
         self.haps = ParametersHaps()
         self.rns = ParametersRns()
         self.ras = ParametersRas()
-
+        self.hibs = ParametersHibs()
 
     def set_file_name(self, file_name: str):
         self.file_name = file_name
-
 
     def read_params(self):
         config = configparser.ConfigParser()
@@ -61,7 +61,6 @@ class Parameters(object):
         self.general.enable_adjacent_channel = config.getboolean("GENERAL", "enable_adjacent_channel")
         self.general.seed            = config.getint("GENERAL", "seed")
         self.general.overwrite_output = config.getboolean("GENERAL", "overwrite_output")
-
 
         #######################################################################
         # IMT
@@ -110,10 +109,16 @@ class Parameters(object):
         self.imt.shadowing               = config.getboolean("IMT", "shadowing")
         self.imt.noise_temperature       = config.getfloat("IMT", "noise_temperature")
         self.imt.BOLTZMANN_CONSTANT      = config.getfloat("IMT", "BOLTZMANN_CONSTANT")
+        self.imt.imt_altitude            = config.getfloat("IMT", "imt_altitude")  #
+        self.imt.imt_lat_deg             = config.getfloat("IMT", "imt_lat_deg")  #
+        self.imt.season                  = config.get("IMT", "season")
+        self.imt.EARTH_RADIUS         = config.getfloat("IMT", "EARTH_RADIUS")
+
 
         #######################################################################
         # IMT ANTENNA
         #######################################################################
+        self.antenna_imt.bs_antenna_type            = config.get("IMT_ANTENNA", "bs_antenna_type")
         self.antenna_imt.adjacent_antenna_model     = config.get("IMT_ANTENNA", "adjacent_antenna_model")
         self.antenna_imt.bs_normalization           = config.getboolean("IMT_ANTENNA", "bs_normalization")
         self.antenna_imt.ue_normalization           = config.getboolean("IMT_ANTENNA", "ue_normalization")
@@ -121,7 +126,7 @@ class Parameters(object):
         self.antenna_imt.ue_normalization_file      = config.get("IMT_ANTENNA", "ue_normalization_file")
         self.antenna_imt.bs_element_pattern         = config.get("IMT_ANTENNA", "bs_element_pattern")
         self.antenna_imt.ue_element_pattern         = config.get("IMT_ANTENNA", "ue_element_pattern")
-        
+
         self.antenna_imt.bs_element_max_g           = config.getfloat("IMT_ANTENNA", "bs_element_max_g")
         self.antenna_imt.bs_element_phi_3db         = config.getfloat("IMT_ANTENNA", "bs_element_phi_3db")
         self.antenna_imt.bs_element_theta_3db       = config.getfloat("IMT_ANTENNA", "bs_element_theta_3db")
@@ -133,7 +138,7 @@ class Parameters(object):
         self.antenna_imt.bs_element_vert_spacing    = config.getfloat("IMT_ANTENNA", "bs_element_vert_spacing")
         self.antenna_imt.bs_multiplication_factor   = config.getfloat("IMT_ANTENNA", "bs_multiplication_factor")
         self.antenna_imt.bs_minimum_array_gain      = config.getfloat("IMT_ANTENNA", "bs_minimum_array_gain")
-        
+
         self.antenna_imt.ue_element_max_g           = config.getfloat("IMT_ANTENNA", "ue_element_max_g")
         self.antenna_imt.ue_element_phi_3db         = config.getfloat("IMT_ANTENNA", "ue_element_phi_3db")
         self.antenna_imt.ue_element_theta_3db       = config.getfloat("IMT_ANTENNA", "ue_element_theta_3db")
@@ -145,8 +150,24 @@ class Parameters(object):
         self.antenna_imt.ue_element_vert_spacing    = config.getfloat("IMT_ANTENNA", "ue_element_vert_spacing")
         self.antenna_imt.ue_multiplication_factor   = config.getfloat("IMT_ANTENNA", "ue_multiplication_factor")
         self.antenna_imt.ue_minimum_array_gain      = config.getfloat("IMT_ANTENNA", "ue_minimum_array_gain")
-
         self.antenna_imt.bs_downtilt            = config.getfloat("IMT_ANTENNA", "bs_downtilt")
+
+        #######################################################################
+        # HIBS
+        #######################################################################
+        self.hibs.num_sectors        = config.getint("HIBS", "num_sectors")
+        self.hibs.num_clusters       = config.getint("HIBS", "num_clusters")
+        self.hibs.bs_height          = config.getint("HIBS", "bs_height")
+        self.hibs.intersite_distance = config.getfloat("HIBS", "intersite_distance")
+        self.hibs.cell_radius        = config.getfloat("HIBS", "cell_radius")
+        self.hibs.azimuth3           = config.get ('HIBS', "azimuth3")
+        self.hibs.azimuth7           = config.get ('HIBS', "azimuth7")
+        self.hibs.azimuth19          = config.get ('HIBS', "azimuth19")
+        self.hibs.elevation3         = config.get ('HIBS', "elevation3")
+        self.hibs.elevation7         = config.get ('HIBS', "elevation7")
+        self.hibs.elevation19        = config.get ('HIBS', "elevation19")
+        self.hibs.bs_conducted_power = config.getfloat ('HIBS', 'bs_conducted_power')
+        self.hibs.bs_backoff_power   = config.getfloat ('HIBS', 'bs_backoff_power')
 
         #######################################################################
         # HOTSPOT
@@ -232,7 +253,7 @@ class Parameters(object):
         self.fss_es.rx_lat = config.getfloat("FSS_ES", "rx_lat")
         self.fss_es.polarization = config.get("FSS_ES", "polarization")
         self.fss_es.clutter_loss = config.getboolean("FSS_ES", "clutter_loss")
-        
+
         # HDFSS propagation parameters
         self.fss_es.es_position = config.get("FSS_ES", "es_position")
         self.fss_es.shadow_enabled = config.getboolean("FSS_ES", "shadow_enabled")

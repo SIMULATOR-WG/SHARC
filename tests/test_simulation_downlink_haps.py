@@ -92,8 +92,8 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.antenna_imt.bs_element_horiz_spacing = 1
         self.param.antenna_imt.bs_element_vert_spacing = 1
         self.param.antenna_imt.bs_multiplication_factor = 12
-        self.param.antenna_imt.bs_downtilt = 10        
-        
+        self.param.antenna_imt.bs_downtilt = 10
+
         self.param.antenna_imt.ue_normalization_file = None
         self.param.antenna_imt.ue_normalization = False
         self.param.antenna_imt.ue_element_pattern = "M2101"
@@ -108,7 +108,7 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
         self.param.antenna_imt.ue_element_horiz_spacing = 0.5
         self.param.antenna_imt.ue_element_vert_spacing = 0.5
         self.param.antenna_imt.ue_multiplication_factor = 12
-        
+
         self.param.haps.frequency = 10000
         self.param.haps.bandwidth = 200
         self.param.haps.altitude = 20000
@@ -145,10 +145,12 @@ class SimulationDownlinkHapsTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState()
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
+
         self.simulation.bs.antenna = np.array([AntennaOmni(1), AntennaOmni(2)])
         self.simulation.bs.active = np.ones(2, dtype=bool)
 

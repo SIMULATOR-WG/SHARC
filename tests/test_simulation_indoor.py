@@ -145,12 +145,12 @@ class SimulationIndoorTest(unittest.TestCase):
 
         random_number_gen = np.random.RandomState(101)
 
-        self.simulation.bs = StationFactory.generate_imt_base_stations(self.param.imt,
+        self.simulation.bs = generate_imt_base_stations(self.param.imt,
                                                                        self.param.antenna_imt,
                                                                        self.simulation.topology,
                                                                        random_number_gen)
         self.assertTrue(np.all(self.simulation.bs.active))
-        
+
         self.simulation.system = StationFactory.generate_fss_earth_station(self.param.fss_es,
                                                                            random_number_gen)
 
@@ -158,20 +158,20 @@ class SimulationIndoorTest(unittest.TestCase):
                                                             self.param.antenna_imt,
                                                             self.simulation.topology,
                                                             random_number_gen)
-        
+
 #        print("Random position:")
 #        self.simulation.plot_scenario()
         self.simulation.ue.x = np.array([0.0, 45.0, 75.0,120.0])
         self.simulation.ue.y = np.array([0.0, 50.0,  0.0, 50.0])
 #        print("Forced position:")
 #        self.simulation.plot_scenario()
-        
+
         # Connect and select UEs
         self.simulation.connect_ue_to_bs()
         self.simulation.select_ue(random_number_gen)
         self.assertTrue(np.all(self.simulation.ue.active))
         self.assertDictEqual(self.simulation.link,{0:[0],1:[1],2:[2],3:[3]})
-        
+
         # Test BS-to-UE angles in the IMT coord system
         expected_azi = np.array([[-120.96,  39.80, -22.62,  13.39],
                                  [-150.95,  90.00, -39.81,  18.43],
@@ -187,7 +187,7 @@ class SimulationIndoorTest(unittest.TestCase):
         npt.assert_allclose(self.simulation.bs_to_ue_theta,
                             expected_ele,
                             atol=1e-2)
-        
+
         # Test BS-to-UE angles in the local coord system
         expected_loc = [(np.array([-86.57]),np.array([120.92])),
                         (np.array([ 86.57]),np.array([ 90.00])),
@@ -198,23 +198,23 @@ class SimulationIndoorTest(unittest.TestCase):
                          (-86.57, 0.00),
                          ( 86.57,-30.92)]
         for k in range(self.simulation.bs.num_stations):
-            
+
             self.assertEqual(self.simulation.bs.antenna[k].azimuth,0.0)
             self.assertEqual(self.simulation.bs.antenna[k].elevation,-90.0)
-            
+
             lo_angles = self.simulation.bs.antenna[k].to_local_coord(expected_azi[k,k],
                                                                   expected_ele[k,k])
             npt.assert_array_almost_equal(lo_angles,expected_loc[k],decimal=2)
             npt.assert_array_almost_equal(self.simulation.bs.antenna[k].beams_list[0],
                                           expected_beam[k],decimal=2)
-            
+
         # Test angle to ES in the IMT coord system
         phi_es, theta_es = self.simulation.bs.get_pointing_vector_to(self.simulation.system)
         expected_phi_es = np.array([[18.44],[23.96],[33.69],[53.13]])
         npt.assert_array_almost_equal(phi_es,expected_phi_es,decimal=2)
         expected_theta_es = np.array([[86.83],[85.94],[84.46],[82.03]])
         npt.assert_array_almost_equal(theta_es,expected_theta_es,decimal=2)
-        
+
         # Test angle to ES in the local coord system
         expected_es_loc = [(np.array([99.92]),np.array([18.70])),
                            (np.array([99.92]),np.array([24.28])),
@@ -224,7 +224,7 @@ class SimulationIndoorTest(unittest.TestCase):
             lo_angles = self.simulation.bs.antenna[k].to_local_coord(expected_phi_es[k],
                                                                      expected_theta_es[k])
             npt.assert_array_almost_equal(lo_angles,expected_es_loc[k],decimal=2)
-        
+
         # Test gain to ES
         calc_gain = self.simulation.calculate_gains(self.simulation.bs,
                                                self.simulation.system)
@@ -234,6 +234,6 @@ class SimulationIndoorTest(unittest.TestCase):
                                                                 expected_es_loc[k][1],
                                                                 beam)
             self.assertAlmostEqual(np.asscalar(calc_gain[k]),np.asscalar(exp_gain),places=1)
-            
+
 if __name__ == '__main__':
     unittest.main()

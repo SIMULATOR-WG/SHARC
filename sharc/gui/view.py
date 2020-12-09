@@ -10,6 +10,7 @@ from sharc.support.observer import Observer
 from sharc.support.enumerations import Action, State
 from sharc.gui.thread_safe_scrolled_text import ThreadSafeScrolledText
 from sharc.results import Results
+from PIL import ImageTk,Image
 
 import matplotlib.pyplot as plt
 
@@ -33,10 +34,13 @@ class View(tkinter.Tk, Observer):
         self.__results_queue = queue.Queue()
         self.__results = None
 
+
     def initialize(self):
         """
         Creates all the graphical components
         """
+        self.overrideredirect(False)
+
         self.title("SHARC simulator")
 
         self.__app_icon = tkinter.PhotoImage(file="img/app_icon.gif")
@@ -102,9 +106,9 @@ class View(tkinter.Tk, Observer):
                                                               filetypes = (("Simulation parameters", "*.ini"),
                                                                            ("All files", "*.*") ))
         if param_file:
-            self.__controller.action(action = Action.START_SIMULATION, 
+            self.__controller.action(action = Action.START_SIMULATION,
                                      param_file = param_file)
-            
+
 
     def __on_stop_button_click(self, *args):
         """
@@ -146,21 +150,21 @@ class View(tkinter.Tk, Observer):
     def __plot_results(self, results: Results):
         file_extension = ".png"
         transparent_figure = False
-        
+
         for plot in results.plot_list:
             plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')
-            plt.plot(plot.x, plot.y, color='#990000', linewidth=2)        
+            plt.plot(plot.x, plot.y, color='#990000', linewidth=2)
             plt.title(plot.title)
             plt.xlabel(plot.x_label)
             plt.ylabel(plot.y_label)
             if not plot.x_lim is None:
                 plt.xlim(plot.x_lim)
             if not plot.y_lim is None:
-                plt.ylim(plot.y_lim)                
+                plt.ylim(plot.y_lim)
             #plt.grid()
             plt.tight_layout()
-            plt.savefig(os.path.join("output", plot.file_name + file_extension), 
-                        transparent=transparent_figure)        
+            plt.savefig(os.path.join("output", plot.file_name + file_extension),
+                        transparent=transparent_figure)
 
         #plt.show()
         self.__popup("Plots successfully created! Check output directory.")

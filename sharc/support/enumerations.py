@@ -14,7 +14,7 @@ class Action( Enum ):
     START_SIMULATION = 1
     START_SIMULATION_SINGLE_THREAD = 2
     STOP_SIMULATION  = 3
-    
+
 class State( Enum ):
     """
     This is the graphical user interface state
@@ -24,7 +24,7 @@ class State( Enum ):
     FINISHED = 3
     STOPPED  = 4
     STOPPING = 5
-    
+
 class StationType(Enum):
     """
     Station types supported by simulator.
