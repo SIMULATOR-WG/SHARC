@@ -1,0 +1,39 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyGlobalUndefinedInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E127" />
+          <option value="E125" />
+          <option value="E129" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyRedeclarationInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="list.split" />
+          <option value="sharc.parameters.parameters_imt.ParametersImt.topology" />
+          <option value="sharc.parameters.parameters_imt.ParametersImt.ue_k" />
+          <option value="sharc.parameters.parameters_imt.ParametersImt.ue_k_m" />
+          <option value="sharc.parameters.parameters_imt.ParametersImt.*" />
+          <option value="sharc.topology.topology.Topology.*" />
+          <option value="sharc.parameters.parameters_fss_ss.ParametersFssSs.*" />
+          <option value="sharc.parameters.parameters_fss_es.ParametersFssEs.*" />
+          <option value="sharc.parameters.parameters_fs.ParametersFs.*" />
+          <option value="sharc.parameters.parameters_haps.ParametersHaps.*" />
+          <option value="sharc.parameters.parameters_rns.ParametersRns.*" />
+          <option value="sharc.parameters.parameters_ras.ParametersRas.*" />
+          <option value="sharc.parameters.parameters_eess_passive.ParametersEessPassive.*" />
+          <option value="list.*" />
+          <option value="sharc.parameters.parameters_hibs.ParametersHibs.*" />
+          <option value="sharc.parameters.parameters_antenna_imt.ParametersAntennaImt.*" />
+          <option value="numpy.core._multiarray_umath.ndarray.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

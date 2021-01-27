@@ -118,8 +118,8 @@ class Model(Observable):
                                   message="Snapshot #" + str(self.current_snapshot))
 
         self.simulation.snapshot(write_to_file=write_to_file,
-                                 snapshot_number=self.current_snapshot,
-                                 seed=self.secondary_seeds[self.current_snapshot - 1])
+                                  snapshot_number=self.current_snapshot,
+                                  seed=self.secondary_seeds[self.current_snapshot - 1])
 
     def is_finished(self) -> bool:
         """

@@ -48,7 +48,8 @@ class ParametersAntennaImt(object):
                              self.bs_element_vert_spacing,
                              self.bs_multiplication_factor,
                              self.bs_minimum_array_gain,
-                             self.bs_downtilt)
+                             self.bs_downtilt,
+                             self.bf_enable)
         elif sta_type is StationType.IMT_UE:
             if self.ue_normalization:
                 # Load data, save it in dict and close it
@@ -73,6 +74,7 @@ class ParametersAntennaImt(object):
                              self.ue_element_vert_spacing,
                              self.ue_multiplication_factor,
                              self.ue_minimum_array_gain,
+                             self.bf_enable,
                              0)
         else:
             sys.stderr.write("ERROR\nInvalid station type: " + sta_type)

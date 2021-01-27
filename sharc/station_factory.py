@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Mar 23 16:37:32 2017
-@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 
 @author: edgar
+@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 """
 
 import numpy as np
@@ -41,6 +41,7 @@ from sharc.antenna.antenna_s672 import AntennaS672
 from sharc.antenna.antenna_s1528 import AntennaS1528
 from sharc.antenna.antenna_s1855 import AntennaS1855
 from sharc.antenna.antenna_sa509 import AntennaSA509
+from sharc.antenna.antenna_omni_f1336 import AntennaOmniF1336
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
@@ -354,7 +355,6 @@ class StationFactory(object):
 
         # now we set the coordinates according to
         # ITU-R P619-1, Attachment A
-
         # calculate distances to the centre of the Earth
         dist_sat_centre_earth_km = (param.EARTH_RADIUS + param.altitude) / 1000
         dist_imt_centre_earth_km = (param.EARTH_RADIUS + param.imt_altitude) / 1000
@@ -487,12 +487,44 @@ class StationFactory(object):
         fs_station = StationManager(1)
         fs_station.station_type = StationType.FS
 
-        fs_station.x = np.array([param.x])
-        fs_station.y = np.array([param.y])
-        fs_station.height = np.array([param.height])
+        if (param.channel_model == "P619"):
+            # Coordinates according to ITU-R P619-1, Attachment A
+            # calculate distances to the centre of the Earth
+            dist_hibs_centre_earth_km = (param.EARTH_RADIUS + param.altitude) / 1000
+            dist_system_centre_earth_km = (param.EARTH_RADIUS + param.imt_altitude) / 1000
 
-        fs_station.azimuth = np.array([param.azimuth])
-        fs_station.elevation = np.array([param.elevation])
+            # calculate Cartesian coordinates of satellite, with origin at centre of the Earth
+            sat_lat_rad = param.hibs_lat_deg * np.pi / 180.
+            imt_long_diff_rad = param.imt_long_diff_deg * np.pi / 180.
+            x1 = dist_hibs_centre_earth_km * np.cos(sat_lat_rad) * np.cos(imt_long_diff_rad)
+            y1 = dist_hibs_centre_earth_km * np.cos(sat_lat_rad) * np.sin(imt_long_diff_rad)
+            z1 = dist_hibs_centre_earth_km * np.sin(sat_lat_rad)
+
+            # rotate axis and calculate coordinates with origin at System
+            sys_lat_rad = param.imt_lat_deg * np.pi / 180.
+            fs_station.x = np.array([x1 * np.sin(sys_lat_rad) - z1 * np.cos(sys_lat_rad)]) * 1000
+            fs_station.y = np.array([y1]) * 1000
+            z2 = np.array(
+                [(z1 * np.sin(sys_lat_rad) + x1 * np.cos(sys_lat_rad) - dist_system_centre_earth_km)]) * 1000
+            fs_station.height = param.altitude - z2
+        else:
+            fs_station.x = np.array([param.x])
+            fs_station.y = np.array([param.y])
+            fs_station.height = np.array([param.height])
+        if (param.distribution_enable == "ON"):
+            if (param.distribution_type == "UNIFORM"):
+                if (type(param.azimuth_distribution)) != list:
+                    aux_azimuth = param.azimuth_distribution.split(',')
+                    param.azimuth_distribution = [int(i) for i in aux_azimuth]
+                    aux_elevation = param.elevation_distribution.split(',')
+                    param.elevation_distribution = [int(i) for i in aux_elevation]
+                param.azimuth = np.random.uniform(param.azimuth_distribution[0], param.azimuth_distribution[1])
+                param.elevation = np.random.uniform(param.elevation_distribution[0], param.elevation_distribution[1])
+                fs_station.azimuth = np.array([param.azimuth])
+                fs_station.elevation = np.array([param.elevation])
+        else:
+            fs_station.azimuth = np.array([param.azimuth])
+            fs_station.elevation = np.array([param.elevation])
 
         fs_station.active = np.array([True])
         fs_station.tx_power = np.array([param.tx_power_density + 10 * math.log10(param.bandwidth * 1e6) + 30])
@@ -502,6 +534,8 @@ class StationFactory(object):
             fs_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
         elif param.antenna_pattern == "ITU-R F.699":
             fs_station.antenna = np.array([AntennaF699(param)])
+        elif param.antenna_pattern == "ITU-R F.1336":
+            fs_station.antenna = np.array([AntennaOmniF1336(param)])
         else:
             sys.stderr.write("ERROR\nInvalid FS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)
@@ -589,12 +623,44 @@ class StationFactory(object):
         ras_station = StationManager(1)
         ras_station.station_type = StationType.RAS
 
-        ras_station.x = np.array([param.x])
-        ras_station.y = np.array([param.y])
-        ras_station.height = np.array([param.height])
+        if (param.channel_model == "P619"):
+            # Coordinates according to  ITU-R P619-1, Attachment A
+            # calculate distances to the centre of the Earth
+            dist_hibs_centre_earth_km = (param.EARTH_RADIUS + param.altitude) / 1000
+            dist_system_centre_earth_km = (param.EARTH_RADIUS + param.imt_altitude) / 1000
 
-        ras_station.azimuth = np.array([param.azimuth])
-        ras_station.elevation = np.array([param.elevation])
+            # calculate Cartesian coordinates of satellite, with origin at centre of the Earth
+            sat_lat_rad = param.hibs_lat_deg * np.pi / 180.
+            imt_long_diff_rad = param.imt_long_diff_deg * np.pi / 180.
+            x1 = dist_hibs_centre_earth_km * np.cos(sat_lat_rad) * np.cos(imt_long_diff_rad)
+            y1 = dist_hibs_centre_earth_km * np.cos(sat_lat_rad) * np.sin(imt_long_diff_rad)
+            z1 = dist_hibs_centre_earth_km * np.sin(sat_lat_rad)
+
+            # rotate axis and calculate coordinates with origin at System
+            sys_lat_rad = param.imt_lat_deg * np.pi / 180.
+            ras_station.x = np.array([x1 * np.sin(sys_lat_rad) - z1 * np.cos(sys_lat_rad)]) * 1000
+            ras_station.y = np.array([y1]) * 1000
+            z2 = np.array([(z1 * np.sin(sys_lat_rad) + x1 * np.cos(sys_lat_rad) - dist_system_centre_earth_km)]) * 1000
+            ras_station.height = param.altitude - z2
+        else:
+            ras_station.x = np.array([param.x])
+            ras_station.y = np.array([param.y])
+            ras_station.height = np.array([param.height])
+
+        if (param.distribution_enable == "ON"):
+            if (param.distribution_type == "UNIFORM"):
+                if (type(param.azimuth_distribution)) != list:
+                    aux_azimuth = param.azimuth_distribution.split(',')
+                    param.azimuth_distribution = [int(i) for i in aux_azimuth]
+                    aux_elevation = param.elevation_distribution.split(',')
+                    param.elevation_distribution = [int(i) for i in aux_elevation]
+                param.azimuth = np.random.uniform(param.azimuth_distribution[0], param.azimuth_distribution[1])
+                param.elevation = np.random.uniform(param.elevation_distribution[0], param.elevation_distribution[1])
+                ras_station.azimuth = np.array([param.azimuth])
+                ras_station.elevation = np.array([param.elevation])
+        else:
+            ras_station.azimuth = np.array([param.azimuth])
+            ras_station.elevation = np.array([param.elevation])
 
         ras_station.active = np.array([True])
         ras_station.rx_interference = -500
@@ -670,7 +736,7 @@ class StationFactory(object):
     def get_random_position(num_stas: int, topology: Topology,
                             random_number_gen: np.random.RandomState,
                             min_dist_to_bs=0, central_cell=False,
-                            deterministic_cell=False):
+                            deterministic_cell=False, hibs=""):
         hexagon_radius = topology.intersite_distance / 3
 
         min_dist_ok = False
@@ -884,7 +950,7 @@ if __name__ == '__main__':
             self.cell_radius = 60000
             self.intersite_distance = self.cell_radius * np.sqrt(3)
             self.num_clusters = 1
-            self.num_sectors = 19
+            self.num_sectors = 7
             self.bs_height = 20000
             self.azimuth3 = '90,210,330'
             self.elevation3 = '-90,-90,-90'
@@ -937,6 +1003,7 @@ if __name__ == '__main__':
     ant_param.bs_normalization_data = ""
 
     ant_param.bs_antenna_type = "BEAMFORMING"
+    ant_param.bf_enable = "OFF"
     ant_param.bs_element_pattern = "M2101"
     #    ant_param.bs_element_pattern = "F1336"
     ant_param.bs_element_max_g = 8

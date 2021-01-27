@@ -3,11 +3,13 @@
 Created on Fri Apr 14 14:13:58 2017
 
 @author: Calil
+@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
 
 import numpy as np
 
 from sharc.support.named_tuples import AntennaPar
+
 
 class AntennaElementImtM2101(object):
     """
@@ -22,7 +24,7 @@ class AntennaElementImtM2101(object):
         sla_v (float): element vertical sidelobe attenuation
     """
 
-    def __init__(self,par: AntennaPar):
+    def __init__(self, par: AntennaPar):
         """
         Constructs an AntennaElementImt object.
 
@@ -39,7 +41,7 @@ class AntennaElementImtM2101(object):
         self.am = par.element_am
         self.sla_v = par.element_sla_v
 
-    def horizontal_pattern(self,phi: np.array) -> np.array:
+    def horizontal_pattern(self, phi: np.array) -> np.array:
         """
         Calculates the horizontal radiation pattern.
 
@@ -51,9 +53,9 @@ class AntennaElementImtM2101(object):
         -------
             a_h (np.array): horizontal radiation pattern gain value
         """
-        return -1.0*np.minimum(self.multiplication_factor*(phi/self.phi_3db)**2,self.am)
+        return -1.0*np.minimum(self.multiplication_factor*(phi/self.phi_3db)**2, self.am)
 
-    def vertical_pattern(self,theta: np.array) -> np.array:
+    def vertical_pattern(self, theta: np.array) -> np.array:
         """
         Calculates the vertical radiation pattern.
 
@@ -65,7 +67,7 @@ class AntennaElementImtM2101(object):
         -------
             a_v (np.array): vertical radiation pattern gain value
         """
-        return -1.0*np.minimum(self.multiplication_factor*((theta-90.0)/self.theta_3db)**2,self.sla_v)
+        return -1.0*np.minimum(self.multiplication_factor*((theta-90.0)/self.theta_3db)**2, self.sla_v)
 
     def element_pattern(self, phi: np.array, theta: np.array) -> np.array:
         """
@@ -80,8 +82,7 @@ class AntennaElementImtM2101(object):
         -------
             gain (np.array): element radiation pattern gain value [dBi]
         """
-        att = -1.0*(self.horizontal_pattern(phi) + \
-                    self.vertical_pattern(theta))
-        gain = self.g_max - np.minimum(att,self.am)
+        att = -1.0*(self.horizontal_pattern(phi) + self.vertical_pattern(theta))
+        gain = self.g_max - np.minimum(att, self.am)
 
         return gain

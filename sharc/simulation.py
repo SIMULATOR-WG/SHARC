@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jan 11 19:04:03 2017
-@modified: Luciano Camilo Tue Nov 27 10:20:25 2020
 
 @author: edgar
+@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
 
 from abc import ABC, abstractmethod
@@ -48,6 +48,12 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.ras
         else:
             sys.stderr.write("ERROR\nInvalid system: " + self.parameters.general.system)
+            sys.exit(1)
+
+        if (self.parameters.general.system == "FS" and self.parameters.fs.channel_model == "P619" and
+          self.parameters.imt.topology != "HIBS") or (self.parameters.general.system == "RAS" and
+          self.parameters.ras.channel_model == "P619" and self.parameters.imt.topology != "HIBS"):
+            sys.stderr.write("ERROR\nInvalid topology: " + self.parameters.imt.topology)
             sys.exit(1)
 
         self.wrap_around_enabled = self.parameters.imt.wrap_around and \
@@ -192,8 +198,9 @@ class Simulation(ABC, Observable):
             self.parameters.imt.topology == "INDOOR":
             elevation_angles = np.transpose(station_b.get_elevation(station_a))
         elif station_a.station_type is StationType.FSS_ES or \
-            station_a.station_type is StationType.RAS:
-            elevation_angles = station_b.get_elevation(station_a)
+            station_a.station_type is StationType.FS and self.parameters.imt.topology == "HIBS" or \
+            station_a.station_type is StationType.RAS and self.parameters.imt.topology == "HIBS":
+            elevation_angles = station_b.get_elevation_angle_hibs(station_a, self.param_system)
         else:
             elevation_angles = None
 
@@ -240,13 +247,27 @@ class Simulation(ABC, Observable):
             if station_a.station_type is StationType.EESS_PASSIVE or \
                 station_a.station_type is StationType.FSS_SS or \
                 station_a.station_type is StationType.HAPS or \
+                station_a.station_type is StationType.IMT_BS or\
                 station_a.station_type is StationType.RNS:
+
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                                  frequency=freq * np.ones(d_3D.shape),
                                                  indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
                                                  elevation=elevation_angles, sat_params=self.param_system,
                                                  earth_to_space=earth_to_space, earth_station_antenna_gain=gain_b,
-                                                 single_entry=single_entry, number_of_sectors=sectors_in_node)
+                                                 single_entry=single_entry, number_of_sectors=sectors_in_node,
+                                                 HIBS="OFF")
+
+            elif station_a.station_type is StationType.RAS and self.parameters.imt.topology == "HIBS" or \
+                 station_a.station_type is StationType.FS and self.parameters.imt.topology == "HIBS":
+                path_loss = propagation.get_loss(distance_3D=d_3D,
+                                                 frequency=freq * np.ones(d_3D.shape),
+                                                 indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
+                                                 elevation=elevation_angles, sat_params=self.param_system,
+                                                 earth_to_space=earth_to_space, earth_station_antenna_gain=gain_b,
+                                                 single_entry=single_entry, number_of_sectors=sectors_in_node,
+                                                 HIBS="System 1")
+
             else:
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                                  frequency=freq * np.ones(d_3D.shape),
@@ -296,9 +317,6 @@ class Simulation(ABC, Observable):
 
         # calculate coupling loss
         coupling_loss = np.squeeze(path_loss - gain_a - gain_b) + additional_loss
-        # print(coupling_loss)
-        # print(gain_a)
-        # print(gain_b)
         return coupling_loss
 
     def connect_ue_to_bs(self):
@@ -336,12 +354,17 @@ class Simulation(ABC, Observable):
             if self.bs.active[bs]:
                 self.ue.active[self.link[bs]] = np.ones(K, dtype=bool)
                 for ue in self.link[bs]:
-                    # add beam to BS antennas
-                    self.bs.antenna[bs].add_beam(self.bs_to_ue_phi[bs, ue],
-                                                 self.bs_to_ue_theta[bs, ue])
-                    # add beam to UE antennas
-                    self.ue.antenna[ue].add_beam(self.bs_to_ue_phi[bs, ue] - 180,
-                                                 180 - self.bs_to_ue_theta[bs, ue])
+                    if self.parameters.antenna_imt.bf_enable == "OFF":
+                        # add beam to BS antennas
+                        self.bs.antenna[bs].add_beam(0, 0)
+                        # add beam to UE antennas
+                        self.ue.antenna[ue].add_beam(0, 0)
+                    else:
+                        # add beam to BS antennas
+                        self.bs.antenna[bs].add_beam(self.bs_to_ue_phi[bs, ue], self.bs_to_ue_theta[bs, ue])
+                        # add beam to UE antennas
+                        self.ue.antenna[ue].add_beam(self.bs_to_ue_phi[bs, ue] - 180, 180 - self.bs_to_ue_theta[bs, ue])
+
                     # set beam resource block group
                     self.bs_to_ue_beam_rbs[ue] = len(self.bs.antenna[bs].beams_list) - 1
 

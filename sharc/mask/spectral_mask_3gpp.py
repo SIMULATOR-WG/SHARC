@@ -4,8 +4,7 @@ Created on Tue Dec  5 11:06:56 2017
 
 @author: Calil
 
-Modified on Tue Nov 24 17:00 2020
-@ Modified : Luciano Camilo
+@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
 
 from sharc.support.enumerations import StationType
@@ -15,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+
 class SpectralMask3Gpp(SpectralMask):
 
     def __init__(self,
@@ -22,7 +22,7 @@ class SpectralMask3Gpp(SpectralMask):
                  freq_mhz: float,
                  band_mhz: float,
                  spurious_emissions: float,
-                 scenario = "HIBS"):
+                 scenario="HIBS"):
         """
         Implements spectral emission mask from 3GPP 36.104 Table 6.6.3.1-6 for
         Wide Area BS operating with 5, 10, 15 or 20 MHz channel bandwidth.
@@ -46,7 +46,7 @@ class SpectralMask3Gpp(SpectralMask):
             sys.stderr.write(message)
             sys.exit(1)
 
-        if band_mhz not in [ 5, 10, 15, 20 ]:
+        if band_mhz not in [5, 10, 15, 20]:
             message = "ERROR\nInvalid bandwidth for 3GPP mask: " + band_mhz
             sys.stderr.write(message)
             sys.exit(1)
@@ -59,16 +59,15 @@ class SpectralMask3Gpp(SpectralMask):
         self.freq_mhz = freq_mhz
 
         delta_f_lim = self.get_frequency_limits(self.sta_type, self.band_mhz)
-        #delta_f_lim_flipped = np.flip(self.delta_f_lim,0)
+        # delta_f_lim_flipped = np.flip(self.delta_f_lim,0)
         delta_f_lim_flipped = delta_f_lim[::-1]
 
         self.freq_lim = np.concatenate(((self.freq_mhz - self.band_mhz/2) - delta_f_lim_flipped,
                                         (self.freq_mhz + self.band_mhz/2) + delta_f_lim))
 
-
     def get_frequency_limits(self,
-                             sta_type : StationType,
-                             bandwidth : float) -> np.array:
+                             sta_type: StationType,
+                             bandwidth: float) -> np.array:
         """
         Calculates the frequency limits of the spectrum emission masks. This
         implementation is valid only for bandwidths equal to 5, 10, 15 or 20 MHz.
@@ -90,27 +89,27 @@ class SpectralMask3Gpp(SpectralMask):
                 delta_f_lim = np.append(delta_f_lim, np.array([20, 25]))
         return delta_f_lim
 
-
-    def set_mask(self, power = 0):
+    def set_mask(self, power=0):
         emission_limits = self.get_emission_limits(self.sta_type,
                                                    self.band_mhz,
                                                    self.spurious_emissions)
+        # print(emission_limits)
         self.p_tx = power - 10 * np.log10(self.band_mhz)
         emission_limits_flipped = emission_limits[::-1]
         self.mask_dbm = np.concatenate((emission_limits_flipped,
                                         np.array([self.p_tx]),
                                         emission_limits))
 
-
     def get_emission_limits(self,
-                            sta_type : StationType,
-                            bandwidth : float,
-                            spurious_emissions : float) -> np.array:
+                            sta_type: StationType,
+                            bandwidth: float,
+                            spurious_emissions: float) -> np.array:
         if sta_type is StationType.IMT_BS:
             # emission limits in dBm/MHz
             emission_limits = 3 - 7 / 5 * (np.arange(.05, 5, .1) - .05)
             emission_limits = np.append(emission_limits, np.array([-4, spurious_emissions]))
-            #print(emission_limits)
+            # emission_limits = np.append(emission_limits, np.array([-4, -60]))
+            # print(emission_limits)
         else:
             if bandwidth == 5:
                 limit_r1 = np.array([-15])
@@ -128,28 +127,43 @@ class SpectralMask3Gpp(SpectralMask):
 if __name__ == '__main__':
     # Initialize variables
     sta_type = StationType.IMT_BS
-    p_tx = 43.02
-    freq = 2680
+    p_tx = 43
+    # freq = 2680
+    freq = 2670 # 5 MHz guard band RAS
     band = 20
 
     # Create mask
-    msk = SpectralMask3Gpp(sta_type,freq,band,-13)
+    msk = SpectralMask3Gpp(sta_type, freq, band, -13)
     msk.set_mask(p_tx)
 
     # Frequencies
-    freqs = np.linspace(-40,40,num=1000)+freq
+    freqs = np.linspace(-40, 40, num=1000)+freq
 
     # Mask values
     mask_val = np.ones_like(freqs)*msk.mask_dbm[0]
-    for k in range(len(msk.freq_lim)-1,-1,-1):
+    for k in range(len(msk.freq_lim)-1, -1, -1):
         mask_val[np.where(freqs < msk.freq_lim[k])] = msk.mask_dbm[k]
 
     # Plot
-    plt.plot(freqs,mask_val)
-    plt.xlim([freqs[0],freqs[-1]])
-    plt.title('3GPP 36.104 Spectral Mask')
+
+    rasx = np.linspace(2025, 2039, 50)
+    rasy = np.linspace(0, 0, 50)
+    rasx_ = np.linspace(2025, 2025, 50)
+    rasy_ = np.linspace(-13, 0, 50 )
+    rasx_1 = np.linspace(2039, 2039, 50)
+    rasy_1 = np.linspace(0, -13, 50)
+
+    # plt.plot(rasx_1, rasy_1, 'r--', linewidth=3, color = 'orange', label= ' FS (PP) Band ')
+    plt.plot(rasx_, rasy_, 'r--', linewidth=2, color='orange')
+    plt.plot(rasx, rasy, 'r--', linewidth=2, color='orange')
+    plt.plot(freqs, mask_val, 'r-', linewidth=1.5, color='black', label=' HIBS Spectral Mask ')
+    plt.legend(loc='upper right')
+    # plt.grid(which='minor', alpha=0.7)
+    # plt.grid(which='major', alpha=0.7)
+    # plt.grid(True, color='k', linestyle='--', linewidth=0.5)
+    plt.xlim([freqs[0], freqs[-1]])
+    # plt.title('3GPP 36.104 Spectral Mask')
     plt.xlabel("$\Delta$f [MHz]")
     plt.ylabel("Spectral Mask [dBc]")
-    plt.grid()
+    # plt.grid()
     plt.show()
-

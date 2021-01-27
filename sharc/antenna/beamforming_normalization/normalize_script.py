@@ -79,7 +79,7 @@ if __name__ == "__main__":
     ###########################################################################
     ## List of antenna parameters to which calculate the normalization factors.
     adjacent_antenna_model = "" # not needed here
-    normalization = False       # not needed here
+    normalization = False      # not needed here
     normalization_data = None   # not needed here
     element_pattern = "M2101"
     element_max_g = 5
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     multiplication_factor = 12
     minimum_array_gain = -200
     downtilt = 0
-        
+
     file_names = ["bs_norm_8x8_050.npz"]
     param_list = [AntennaPar(adjacent_antenna_model,
                              normalization,
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     # General parameters
     resolution = 5
     tolerance = 1e-2
-    
+
     # Create object
     norm = BeamformingNormalizer(resolution, tolerance)
     ###########################################################################
@@ -125,5 +125,5 @@ if __name__ == "__main__":
     for par, file in zip(param_list, file_names):
         s = 'Generating ' + file
         print(s)
-    
+
         norm.generate_correction_matrix(par,file)

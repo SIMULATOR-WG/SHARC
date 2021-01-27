@@ -30,3 +30,31 @@ class PropagationFreeSpace(Propagation):
             loss = np.repeat(loss, number_of_sectors, 1)
 
         return loss
+
+if __name__ == '__main__':
+    from matplotlib import pyplot as plt
+
+    distance= np.arange(15000 , 400000, step=1)
+    plt.figure(1)
+    a = PropagationFreeSpace.get_loss(self="self", distance_2D= 15000, distance_3D = 0, frequency = 2550, number_of_sectors = 1)
+    b = PropagationFreeSpace.get_loss(self="self", distance_2D= 20000, distance_3D = 0, frequency = 2550, number_of_sectors = 1)
+    print(a)
+    print(b)
+    a_min1 = 15
+    mass1 = 124.10
+    a_min2 = 20
+    mass2 = 126.60
+    plt.plot(a_min1, mass1, 'r.', label='15 km / 124.10 dB')
+    plt.plot(a_min2, mass2, 'o-', color = 'black', label='20 km / 126.10 dB')
+
+    i = np.arange(15000, 400000, step=1)
+    plt.legend(loc='upper right')
+    plt.semilogx(i/1000, PropagationFreeSpace.get_loss(self="self", distance_2D= distance, distance_3D = 0, frequency = 2550, number_of_sectors = 1), 'b-', label='Free Space Path Loss')
+    plt.grid(which='minor', alpha=0.2)
+    plt.grid(which='major', alpha=0.5)
+    plt.grid(True, color='b', linestyle='--', linewidth=0.2)
+    plt.title('Free space path loss - Comparison (2D Distance)')
+    plt.xlabel('Distância [km]')
+    plt.ylabel('Atenuação [dB]')
+    plt.legend()
+    plt.show()

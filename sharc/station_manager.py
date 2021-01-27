@@ -3,6 +3,7 @@
 Created on Fri Feb  3 15:29:48 2017
 
 @author: edgar
+@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 """
 
 import numpy as np
@@ -13,6 +14,7 @@ from sharc.station import Station
 from sharc.antenna.antenna import Antenna
 from sharc.mask.spectral_mask_imt import SpectralMaskImt
 from sharc.mask.spectral_mask_3gpp import SpectralMask3Gpp
+
 
 class StationManager(object):
     """
@@ -93,21 +95,19 @@ class StationManager(object):
     def get_distance_to(self, station) -> np.array:
         distance = np.empty([self.num_stations, station.num_stations])
         for i in range(self.num_stations):
-            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) +
-                           np.power(self.y[i] - station.y, 2))
+            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) + np.power(self.y[i] - station.y, 2))
         return distance
 
     def get_3d_distance_to(self, station) -> np.array:
         distance = np.empty([self.num_stations, station.num_stations])
         for i in range(self.num_stations):
-            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) +
-                           np.power(self.y[i] - station.y, 2) +
-                            np.power(self.height[i] - station.height, 2))
+            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) + np.power(self.y[i] - station.y, 2) +
+                                  np.power(self.height[i] - station.height, 2))
         return distance
 
     def get_dist_angles_wrap_around(self, station) -> np.array:
         """
-        Calcualtes distances and angles using the wrap around technique
+        Calculates distances and angles using the wrap around technique
         Parameters:
             station (StationManager): station to which calculate the distances
                 and angles
@@ -141,25 +141,25 @@ class StationManager(object):
 
         # Calculate 2D distance
         temp_distance = np.zeros_like(distance_2D)
-        for k,(x,y) in enumerate(zip(cluster_x,cluster_y)):
-            temp_distance = np.sqrt(np.power(x - self.x[:,np.newaxis], 2) +
-                                    np.power(y - self.y[:,np.newaxis], 2))
+        for k, (x, y) in enumerate(zip(cluster_x, cluster_y)):
+            temp_distance = np.sqrt(np.power(x - self.x[:, np.newaxis], 2) +
+                                    np.power(y - self.y[:, np.newaxis], 2))
             is_shorter = temp_distance < distance_2D
             distance_2D[is_shorter] = temp_distance[is_shorter]
             cluster_num[is_shorter] = k
 
         # Calculate 3D distance
         distance_3D = np.sqrt(np.power(distance_2D, 2) +
-                              np.power(station.height - self.height[:,np.newaxis], 2))
+                              np.power(station.height - self.height[:, np.newaxis], 2))
 
-        # Calcualte pointing vector
-        point_vec_x = cluster_x[cluster_num,np.arange(station.num_stations)] \
-                      - self.x[:,np.newaxis]
-        point_vec_y = cluster_y[cluster_num,np.arange(station.num_stations)] \
-                      - self.y[:,np.newaxis]
-        point_vec_z = station.height - self.height[:,np.newaxis]
+        # Calculate pointing vector
+        point_vec_x = cluster_x[cluster_num, np.arange(station.num_stations)] \
+                      - self.x[:, np.newaxis]
+        point_vec_y = cluster_y[cluster_num, np.arange(station.num_stations)] \
+                      - self.y[:, np.newaxis]
+        point_vec_z = station.height - self.height[:, np.newaxis]
 
-        phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
+        phi = np.array(np.rad2deg(np.arctan2(point_vec_y, point_vec_x)), ndmin=2)
         theta = np.rad2deg(np.arccos(point_vec_z/distance_3D))
 
         return distance_2D, distance_3D, phi, theta
@@ -178,25 +178,50 @@ class StationManager(object):
         elevation = np.empty([self.num_stations, station.num_stations])
 
         for i in range(self.num_stations):
-            distance = np.sqrt(np.power(self.x[i] - station.x, 2) +
-                           np.power(self.y[i] - station.y, 2))
+            distance = np.sqrt(np.power(self.x[i] - station.x, 2) + np.power(self.y[i] - station.y, 2))
             rel_z = station.height - self.height[i]
             elevation[i] = np.degrees(np.arctan2(rel_z, distance))
 
         return elevation
 
+    def get_elevation_angle_hibs(self, station, sat_params) -> dict:
+        free_space_angle = np.empty(self.num_stations)
+        angle = np.empty(self.num_stations)
+        for i in range(self.num_stations):
+
+            # calculate coordinates according to ITU-R P619-4
+            rel_x = station.x
+            rel_y = station.y
+            rel_z = self.height[i] - station.height
+            gts = np.sqrt(rel_x ** 2 + rel_y ** 2)
+            theta_0 = np.arctan2(rel_z, gts)  # free-space elevation angle
+            free_space_angle[i] = np.degrees(theta_0)
+
+            # calculate apparent elevation angle according to ITU-R P619, Attachment B
+
+            tau_fs1 = 1.728 + 0.5411 * theta_0 + 0.03723 * theta_0 ** 2
+            tau_fs2 = 0.1815 + 0.06272 * theta_0 + 0.01380 * theta_0 ** 2
+            tau_fs3 = 0.01727 + 0.008288 * theta_0
+
+            # change in elevation angle due to refraction
+            tau_fs_deg = 1 / (tau_fs1 + sat_params.altitude * tau_fs2 +
+                              sat_params.altitude ** 2 * tau_fs3)
+            tau_fs = tau_fs_deg / 180. * np.pi
+
+            angle[i] = np.degrees(theta_0 + tau_fs)
+
+        return {'free_space': free_space_angle, 'apparent': angle}
 
     def get_elevation_angle(self, station, sat_params) -> dict:
         free_space_angle = np.empty(self.num_stations)
         angle = np.empty(self.num_stations)
         for i in range(self.num_stations):
-            # calculate free-space elevation angle according to Attachment A
             rel_x = station.x - self.x[i]
             rel_y = station.y - self.y[i]
             rel_z = station.height - self.height[i]
 
             gts = np.sqrt(rel_x**2 + rel_y**2)
-            theta_0 = np.arctan2(rel_z, gts) # free-space elevation angle
+            theta_0 = np.arctan2(rel_z, gts)  # free-space elevation angle
             free_space_angle[i] = np.degrees(theta_0)
 
             ##
@@ -217,13 +242,13 @@ class StationManager(object):
 
     def get_pointing_vector_to(self, station) -> tuple:
 
-        point_vec_x = station.x- self.x[:,np.newaxis]
-        point_vec_y = station.y - self.y[:,np.newaxis]
-        point_vec_z = station.height - self.height[:,np.newaxis]
+        point_vec_x = station.x - self.x[:, np.newaxis]
+        point_vec_y = station.y - self.y[:, np.newaxis]
+        point_vec_z = station.height - self.height[:, np.newaxis]
 
         dist = self.get_3d_distance_to(station)
 
-        phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
+        phi = np.array(np.rad2deg(np.arctan2(point_vec_y, point_vec_x)), ndmin=2)
         theta = np.rad2deg(np.arccos(point_vec_z/dist))
 
         return phi, theta
@@ -238,8 +263,8 @@ class StationManager(object):
         a = 90 - self.elevation
         C = Az0 - Az
 
-        phi = np.arccos(np.cos(np.radians(a))*np.cos(np.radians(b)) \
-                        + np.sin(np.radians(a))*np.sin(np.radians(b))*np.cos(np.radians(C)))
+        phi = np.arccos(np.cos(np.radians(a))*np.cos(np.radians(b)) + np.sin(np.radians(a))*np.sin(np.radians(b))
+                        * np.cos(np.radians(C)))
         phi_deg = np.degrees(phi)
 
         return phi_deg

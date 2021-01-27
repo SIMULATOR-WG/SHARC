@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jan 11 19:06:41 2017
-@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 
 @author: edgar
+@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 """
 
 import numpy as np
@@ -51,7 +51,7 @@ class SimulationDownlink(Simulation):
                                                  self.parameters.antenna_imt,
                                                  self.topology, random_number_gen)
 
-        # self.plot_scenario()
+        #self.plot_scenario()
 
         self.connect_ue_to_bs()
         self.select_ue(random_number_gen)
@@ -340,10 +340,6 @@ class SimulationDownlink(Simulation):
 
             self.results.imt_dl_sinr.extend(self.ue.sinr[ue].tolist())
             self.results.imt_dl_snr.extend(self.ue.snr[ue].tolist())
-
-       # if self.system.station_type is StationType.RAS:
-       #     self.results.system_pfd.extend([self.system.pfd])                     ####
-       #     self.results.system_inr.extend(self.system.inr.tolist())              ####
 
         if write_to_file:
             self.results.write_files(snapshot_number)

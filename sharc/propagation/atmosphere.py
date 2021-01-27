@@ -395,12 +395,15 @@ if __name__ == '__main__':
 
     propagation_path = os.getcwd()
     sharc_path = os.path.dirname(propagation_path)
-    param_file = os.path.join(sharc_path, "parameters", "parameters.ini")
+    #param_file = os.path.join(sharc_path, "parameters", "parameters.ini")
+    param_file = os.path.join(sharc_path, "input", "parameters_RAS.ini")
+
 
     params.set_file_name(param_file)
     params.read_params()
 
-    sat_params = params.fss_ss
+    #sat_params = params.fss_ss
+    sat_params = params.ras
 
     atmosphere = ReferenceAtmosphere()
 
@@ -413,20 +416,27 @@ if __name__ == '__main__':
     vapour_pressure_hPa = vapour_density * temperature / 216.7
 
     # generate plot
-    f_GHz_vec = range(1, 1000)
+    #f_GHz_vec = range(1, 1000)
+    #f_GHz_vec = range(1, 4)
+    f_GHz_vec = np.linspace(1, 4,1000)
     specific_att = np.zeros(len(f_GHz_vec))
 
     print("Plotting specific attenuation:")
-
+    atenuacao = atmosphere.get_reference_atmosphere_p835(0, 0, 'summer')
+    print(atenuacao)
     for index in range(len(f_GHz_vec)):
         specific_att[index] = atmosphere._get_specific_attenuation(pressure_hPa,
                                                                    vapour_pressure_hPa,
                                                                    temperature,
                                                                    float(f_GHz_vec[index]) * 1000)
+
     plt.figure()
     plt.semilogy(f_GHz_vec, specific_att)
     plt.xlabel('frequency(GHz)')
-    plt.xlabel('Specific attenuation (dB/km)')
+    plt.ylabel('Specific attenuation (dB/km)')
     plt.title("Atmospheric Specific Attenuation")
+    plt.grid(which='minor', alpha=0.7)
+    plt.grid(which='major', alpha=0.7)
+    plt.grid(True, color='k', linestyle='--', linewidth=0.5)
 
     plt.show()

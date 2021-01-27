@@ -3,12 +3,14 @@
 Created on Thu Nov 16 17:34:11 2017
 
 @author: Calil
+@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
 
 from sharc.antenna.antenna import Antenna
 from sharc.parameters.parameters_ras import ParametersRas
 
 import numpy as np
+
 
 class AntennaSA509(Antenna):
     """
@@ -27,8 +29,7 @@ class AntennaSA509(Antenna):
         self.effective_area = self.efficiency*(np.pi*self.diameter**2)/4
 
         # Diagram parameters
-        self.g_0 = 10*np.log10(self.efficiency*\
-                               (np.pi*self.diameter/self.wavelength)**2)
+        self.g_0 = 10*np.log10(self.efficiency*(np.pi*self.diameter/self.wavelength)**2)
         self.phi_0 = 20*np.sqrt(3)/(self.diameter/self.wavelength)
 
         # Limit parameters
@@ -61,10 +62,11 @@ class AntennaSA509(Antenna):
 
         return gain
 
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    par = ParametersRas();
+    par = ParametersRas()
     par.diameter = 1
     par.antenna_efficiency = 1
     par.frequency = 2690
@@ -76,16 +78,16 @@ if __name__ == '__main__':
     par.diameter = 10
     antenna10 = AntennaSA509(par)
 
-    phi = np.linspace(0.1, 180, num = 100000)
-    gain1  = antenna1.calculate_gain(off_axis_angle_vec = phi)
-    gain7  = antenna7.calculate_gain(off_axis_angle_vec = phi)
-    gain10  = antenna10.calculate_gain(off_axis_angle_vec = phi)
+    phi = np.linspace(0.1, 180, num=100000)
+    gain1 = antenna1.calculate_gain(off_axis_angle_vec=phi)
+    gain7 = antenna7.calculate_gain(off_axis_angle_vec=phi)
+    gain10 = antenna10.calculate_gain(off_axis_angle_vec=phi)
 
-    fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
+    fig = plt.figure(figsize=(8, 7), facecolor='w', edgecolor='k')  # create a figure object
 
-    plt.semilogx(phi, gain1, "-b", label = "$f = 43$ $GHz,$ $D = 1$ $m$")
-    plt.semilogx(phi, gain7, "-r", label = "$f = 43$ $GHz,$ $D = 7$ $m$")
-    plt.semilogx(phi, gain10, "-k", label = "$f = 43$ $GHz,$ $D = 10$ $m$")
+    plt.semilogx(phi, gain1, "-b", label="$f = 43$ $GHz,$ $D = 1$ $m$")
+    plt.semilogx(phi, gain7, "-r", label="$f = 43$ $GHz,$ $D = 7$ $m$")
+    plt.semilogx(phi, gain10, "-k", label="$f = 43$ $GHz,$ $D = 10$ $m$")
 
     plt.title("ITU-R SA.509-3 antenna radiation pattern")
     plt.xlabel("Off-axis angle $\phi$ [deg]")
@@ -95,4 +97,3 @@ if __name__ == '__main__':
 
     plt.grid()
     plt.show()
-

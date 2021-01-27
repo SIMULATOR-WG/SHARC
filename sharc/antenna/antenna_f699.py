@@ -3,6 +3,7 @@
 Created on Tue Aug 29 16:18:45 2017
 
 @author: edgar
+@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
 
 from sharc.antenna.antenna import Antenna
@@ -10,6 +11,7 @@ from sharc.parameters.parameters_fs import ParametersFs
 
 import numpy as np
 import math
+
 
 class AntennaF699(Antenna):
     """
@@ -21,7 +23,7 @@ class AntennaF699(Antenna):
     def __init__(self, param: ParametersFs):
         super().__init__()
         self.peak_gain = param.antenna_gain
-        lmbda = 3e8 / ( param.frequency * 1e6 )
+        lmbda = 3e8 / (param.frequency * 1e6)
         self.d_lmbda = param.diameter / lmbda
 
         self.g_l = 2 + 15 * math.log10(self.d_lmbda)
@@ -101,45 +103,44 @@ class AntennaF699(Antenna):
         return gain
 
 
-
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    phi = np.linspace(0.1, 180, num = 100000)
+    phi = np.linspace(0.1, 180, num=100000)
 
     # initialize antenna parameters
     param_gt = ParametersFs()
     param_gt.antenna_pattern = "ITU-R F.699"
-    param_gt.frequency = 10700
-    param_gt.antenna_gain = 49.8
-    param_gt.diameter = 3
+    param_gt.frequency = 1725
+    param_gt.antenna_gain = 33
+    param_gt.diameter = 3.2
     antenna_gt = AntennaF699(param_gt)
 
-    gain_gt = antenna_gt.calculate_gain(off_axis_angle_vec = phi)
+    gain_gt = antenna_gt.calculate_gain(off_axis_angle_vec=phi)
 
     param_lt = ParametersFs()
     param_lt.antenna_pattern = "ITU-R F.699"
-    param_lt.frequency = 27500
-    param_lt.antenna_gain = 36.9
-    param_lt.diameter = 0.3
+    param_lt.frequency = 2032
+    param_lt.antenna_gain = 35
+    param_lt.diameter = 4
     antenna_lt = AntennaF699(param_lt)
-    gain_lt = antenna_lt.calculate_gain(off_axis_angle_vec = phi)
+    gain_lt = antenna_lt.calculate_gain(off_axis_angle_vec=phi)
 
-    fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
+    fig = plt.figure(figsize=(8, 7), facecolor='w', edgecolor='k')  # create a figure object
 
-    plt.semilogx(phi, gain_gt, "-b", label = "$f = 10.7$ $GHz,$ $D = 3$ $m$")
-    plt.semilogx(phi, gain_lt, "-r", label = "$f = 27.5$ $GHz,$ $D = 0.3$ $m$")
+    # plt.semilogx(phi, gain_gt, "-b", label = "$f = 10.7$ $GHz,$ $D = 3$ $m$")
+    plt.semilogx(phi, gain_lt, "-r", label="$f = 2032$ $MHz,$ $D = 4$ $m$")
 
-    plt.title("ITU-R F.699 antenna radiation pattern")
+    # plt.title("ITU-R F.699 antenna radiation pattern")
     plt.xlabel("Off-axis angle $\phi$ [deg]")
     plt.ylabel("Gain relative to $G_m$ [dB]")
     plt.legend(loc="lower left")
     plt.xlim((phi[0], phi[-1]))
     plt.ylim((-20, 50))
 
-    #ax = plt.gca()
-    #ax.set_yticks([-30, -20, -10, 0])
-    #ax.set_xticks(np.linspace(1, 9, 9).tolist() + np.linspace(10, 100, 10).tolist())
+    # ax = plt.gca()
+    # ax.set_yticks([-30, -20, -10, 0])
+    # ax.set_xticks(np.linspace(1, 9, 9).tolist() + np.linspace(10, 100, 10).tolist())
 
     plt.grid()
     plt.show()

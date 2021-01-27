@@ -247,7 +247,7 @@ if __name__ == '__main__':
     cell_radius = 100000
     intersite_distance = cell_radius * np.sqrt(3)
     num_clusters = 1
-    num_sectors = 1
+    num_sectors = 19
     bs_height = 20000
     azimuth3 = '60,180,300'
     elevation3 = '-90,-90,-90'

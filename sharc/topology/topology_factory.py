@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Mar 23 16:41:25 2017
-@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 
 @author: edgar
+@modified: Luciano Camilo Tue Nov 17 09:26:25 2020
 """
 import sys
 

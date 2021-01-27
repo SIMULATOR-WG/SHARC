@@ -3,6 +3,7 @@
 Created on Thu Mar 23 08:47:46 2017
 
 @author: edgar
+@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
 
 from sharc.plot import Plot
@@ -421,7 +422,8 @@ class Results(object):
             self.plot_list.append(Plot(x, y, x_label, y_label, title, file_name, x_lim=x_limits, y_lim=y_limits))
 
     def write_files(self, snapshot_number: int):
-        n_bins = 200
+        n_bins = 500
+        #n_bins='fd'
         file_extension = ".txt"
         header_text = "Results collected after " + str(snapshot_number) + " snapshots."
         self.generate_plot_list(n_bins)

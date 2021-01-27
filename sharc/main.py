@@ -3,10 +3,14 @@
 Created on Mon Dec 26 17:05:49 2016
 
 @author: edgar
+@modified: Luciano Camilo Wed Jan 27 11:52:23 2021
+
+SHARC - Version 2.1.00
 """
 
 import sys
 import os
+
 from sharc.model import Model
 from sharc.gui.view import View
 from sharc.controller import Controller

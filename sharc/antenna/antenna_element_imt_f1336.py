@@ -73,7 +73,7 @@ class AntennaElementImtF1336(object):
             phi_a = np.array([phi])
         else:
             phi_a = phi
-        
+
         x_h = np.abs(phi_a)/self.phi_3db
         gain = np.zeros(np.size(phi_a))
 
@@ -82,12 +82,12 @@ class AntennaElementImtF1336(object):
 
         i1 = np.where(x_h >= 0.5)[0]
         gain[i1] = -12 * np.power(x_h[i1], 2 - self.k_h) - self.lambda_k_h
-        
+
         gain = np.maximum(gain, self.g_hr_180)
-        
+
         if type(phi) is not np.ndarray:
             gain = gain[0]
-        
+
         return gain
 
     def vertical_pattern(self, theta: np.array) -> np.array:
@@ -102,26 +102,26 @@ class AntennaElementImtF1336(object):
         -------
             a_v (np.array): vertical radiation pattern gain value
         """
-        # This correction is needed because the simulator calculates theta 
+        # This correction is needed because the simulator calculates theta
         # with respect to z-axis and equations of F.1336 assume that theta is
         # calculated with respect to the direction of maximum gain
         if type(theta) is np.ndarray:
             theta_a = theta - 90
         else:
             theta_a = np.array([theta]) - 90
-        
+
         x_v = np.abs(theta_a)/self.theta_3db
         gain = np.zeros(np.size(theta_a))
 
         i0 = np.where(x_v < self.x_k)[0]
         gain[i0] = -12 * np.power(x_v[i0], 2)
-            
+
         i1 = np.where((x_v >= self.x_k) & (x_v < 4))[0]
         gain[i1] = -12 + 10*np.log10(np.power(x_v[i1], -1.5) + self.k_v)
-            
+
         i2 = np.where((x_v >= 4) & (x_v < 90 / self.theta_3db))[0]
         gain[i2] = - self.lambda_k_v - self.incline_factor * np.log10(x_v[i2])
-            
+
         i3 = np.where(x_v >= (90 / self.theta_3db))[0]
         gain[i3] = self.g_hr_180
 
@@ -157,8 +157,8 @@ if __name__ == '__main__':
 
     param = ParametersAntennaImt()
 
-    param.element_max_g = 18
-    param.element_phi_3db = 65
+    param.element_max_g = 13
+    param.element_phi_3db = 90
     param.element_theta_3db = 0
 
     antenna = AntennaElementImtF1336( param )
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     pattern_hor_30deg = antenna.element_pattern(phi_vec, 30)
     pattern_hor_60deg = antenna.element_pattern(phi_vec, 60)
     pattern_hor_90deg = antenna.element_pattern(phi_vec, 90)
-    
+
     pattern_ver_0deg = antenna.element_pattern(0, theta_vec)
     pattern_ver_30deg = antenna.element_pattern(30, theta_vec)
     pattern_ver_60deg = antenna.element_pattern(60, theta_vec)
