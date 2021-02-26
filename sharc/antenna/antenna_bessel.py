@@ -11,8 +11,8 @@ import math
 
 class AntennaBessel(object):
     """
-    Implements a parabolic dish antenna pattern using Bessel of an FS antenna array following book Interference Analysis
-    [John Paul] - Please there is an errata in this book on equation 3.79 and the correct equation is:
+    Implements a parabolic dish antenna pattern, Bessel model, based on Interference Analysis[John Pahl] book
+    - Please there is an errata in this book on equation 3.79 and the correct equation is:
     G(theta) = 10*log10((2j1(x)/x)^2)  - Equation 3.79
 
     Attributes
@@ -37,23 +37,12 @@ class AntennaBessel(object):
 
         phi = np.absolute(kwargs["off_axis_angle_vec"])
         lambda1 = self.speed / (self.frequency * 1E6)
-        # x = ((np.pi * self.d) / lambda1) * (np.sin(np.radians(phi)))
         x = ((np.pi * self.d) / lambda1) * (np.sin(np.radians(phi)))
         g = ((np.pi * self.d) / lambda1) ** 2
         g = 10 * np.log10(g)
-
         gain = 10 * np.log10((1 + np.cos(np.radians(phi))) * (special.j1(x) / x) ** 2)
-        # gain = 10 * np.log10((2*(special.j1(x) / x) ** 2))
-        # gain = 10 * np.log10(2*(special.j1(x) / x) ** 2)
         gain = gain + g
         return gain
-
-        # phi = np.absolute(kwargs["off_axis_angle_vec"])
-        # lambda1 = self.speed / (self.frequency * 1E6)
-        # x = ((np.pi * self.d) / lambda1) * (np.sin(np.radians(phi)))
-        # gain = 10 * np.log10((2 * special.j1(x) / x) ** 2)
-        # gain = gain + self.g_max
-        # return gain
 
 
 if __name__ == '__main__':
