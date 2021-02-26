@@ -213,6 +213,7 @@ class Simulation(ABC, Observable):
             station_a.station_type is StationType.RAS:
             # Calculate distance from transmitters to receivers. The result is a
             # num_station_a x num_station_b
+
             d_2D = station_a.get_distance_to(station_b)
             d_3D = station_a.get_3d_distance_to(station_b)
 

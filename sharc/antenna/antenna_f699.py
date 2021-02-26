@@ -125,18 +125,20 @@ if __name__ == '__main__':
     param_lt.diameter = 4
     antenna_lt = AntennaF699(param_lt)
     gain_lt = antenna_lt.calculate_gain(off_axis_angle_vec=phi)
-
-    fig = plt.figure(figsize=(8, 7), facecolor='w', edgecolor='k')  # create a figure object
+    csfont = {'fontname': 'Times New Roman'}
+    hfont = {'fontname': 'Times New Roman'}
+    #plt.legend(prop={'family': 'Times New Roman'})
+    fig = plt.figure( facecolor='w', edgecolor='k')  # create a figure object
 
     # plt.semilogx(phi, gain_gt, "-b", label = "$f = 10.7$ $GHz,$ $D = 3$ $m$")
-    plt.semilogx(phi, gain_lt, "-r", label="$f = 2032$ $MHz,$ $D = 4$ $m$")
+    plt.semilogx(phi, gain_lt, "--b", label="$f = 2032$ $MHz,$ $D = 4$ $m$")
 
     # plt.title("ITU-R F.699 antenna radiation pattern")
-    plt.xlabel("Off-axis angle $\phi$ [deg]")
-    plt.ylabel("Gain relative to $G_m$ [dB]")
-    plt.legend(loc="lower left")
+    plt.xlabel("Off-axis angle $\phi$ [degrees]",fontsize=16, color='black', **csfont)
+    plt.ylabel("Gain relative to $G_m$ [dB]",fontsize=16, color='black', **csfont)
+    #plt.legend(loc="lower left")
     plt.xlim((phi[0], phi[-1]))
-    plt.ylim((-20, 50))
+    plt.ylim((-10, 40))
 
     # ax = plt.gca()
     # ax.set_yticks([-30, -20, -10, 0])

@@ -25,7 +25,7 @@ class Antenna(ABC):
     @abstractmethod
     def calculate_gain(self, *args, **kwargs) -> np.array:
         """
-        Calculates the antenan gain.
+        Calculates the antenna gain.
         """
         pass
 

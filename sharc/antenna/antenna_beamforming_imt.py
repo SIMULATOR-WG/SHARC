@@ -389,7 +389,7 @@ class PlotAntennaPattern(object):
         ax2.set_xlim(0, 180)
         if np.max(gain) > top_y_lim:
             top_y_lim = np.ceil(np.max(gain)/10)*10
-        ax2.set_ylim(top_y_lim - 60, top_y_lim)
+        ax2.set_ylim(top_y_lim - 130, top_y_lim)
 
         if sta_type == "BS":
             file_name = self.figs_dir + "bs_"
@@ -414,8 +414,8 @@ if __name__ == '__main__':
     param.adjacent_antenna_model = "BEAMFORMING"
     param.bs_normalization = False
     param.ue_normalization = False
-    param.bs_normalization_file = 'beamforming_normalization\\bs_8x8_46_08.npz'
-    param.ue_normalization_file = 'beamforming_normalization\\ue_4x4_46_08.npz'
+    param.bs_normalization_file = 'beamforming_normalization\\bs_8x8_46_12.npz'
+    param.ue_normalization_file = 'beamforming_normalization\\ue_4x4_46_12.npz'
     param.bs_minimum_array_gain = -200
     param.ue_minimum_array_gain = -200
     param.bf_enable = "ON"
@@ -449,11 +449,12 @@ if __name__ == '__main__':
 
     # Plot BS TX radiation patterns
     par = param.get_antenna_parameters(StationType.IMT_BS)
-    bs_array = AntennaBeamformingImt(par, 0, 0)
+    bs_array = AntennaBeamformingImt(par, 30, 0)
     f = plot.plot_element_pattern(bs_array, " Base Station", "ELEMENT")
     # f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
     f = plot.plot_element_pattern(bs_array, " Base Station", "ARRAY")
     # f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
+
 
     # Plot UE TX radiation patterns
     par = param.get_antenna_parameters(StationType.IMT_UE)

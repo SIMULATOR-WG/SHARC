@@ -37,7 +37,7 @@ class PropagationP619(Propagation):
         self.atmosphere = ReferenceAtmosphere()
 
         self.depolarization_loss = 0  # 1.5
-        self.polarization_mismatch_loss = 0  # 3
+        self.polarization_mismatch_loss = 3  # 3
         self.elevation_has_atmospheric_loss = []
         self.freq_has_atmospheric_loss = []
         self.surf_water_dens_has_atmospheric_loss = []

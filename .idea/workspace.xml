@@ -35,7 +35,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1ji5WcZIVFuuxZ0ctkwTXVipvs5" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -271,37 +271,37 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>776</line>
+          <line>842</line>
           <option name="timeStamp" value="188" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>775</line>
+          <line>841</line>
           <option name="timeStamp" value="189" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>773</line>
+          <line>839</line>
           <option name="timeStamp" value="190" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>772</line>
+          <line>838</line>
           <option name="timeStamp" value="191" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>771</line>
+          <line>837</line>
           <option name="timeStamp" value="192" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>768</line>
+          <line>834</line>
           <option name="timeStamp" value="193" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>767</line>
+          <line>833</line>
           <option name="timeStamp" value="195" />
         </line-breakpoint>
       </breakpoints>
@@ -335,17 +335,14 @@
         <watch expression="gts" />
         <watch expression="num_ue" />
       </configuration>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_factory.py" line="372">
-        <watch expression="fss_space_station.height" />
-      </inline-watch>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="74">
-        <watch expression="dummy" />
-      </inline-watch>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="166">
-        <watch expression="attenuation" />
-      </inline-watch>
       <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="253">
         <watch expression="active_beams" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="77">
+        <watch expression="dummy" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_factory.py" line="372">
+        <watch expression="fss_space_station.height" />
       </inline-watch>
     </watches-manager>
   </component>

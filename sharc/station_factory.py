@@ -43,6 +43,8 @@ from sharc.antenna.antenna_s1855 import AntennaS1855
 from sharc.antenna.antenna_sa509 import AntennaSA509
 from sharc.antenna.antenna_omni_f1336 import AntennaOmniF1336
 from sharc.antenna.antenna_beamforming_imt import AntennaBeamformingImt
+from sharc.antenna.antenna_bessel import AntennaBessel
+from sharc.antenna.antenna_f1245 import AntennaF1245
 from sharc.topology.topology import Topology
 from sharc.topology.topology_macrocell import TopologyMacrocell
 from sharc.topology.topology_hibs import TopologyHIBS
@@ -515,11 +517,21 @@ class StationFactory(object):
             if (param.distribution_type == "UNIFORM"):
                 if (type(param.azimuth_distribution)) != list:
                     aux_azimuth = param.azimuth_distribution.split(',')
-                    param.azimuth_distribution = [int(i) for i in aux_azimuth]
+                    param.azimuth_distribution = [float(i) for i in aux_azimuth]
                     aux_elevation = param.elevation_distribution.split(',')
-                    param.elevation_distribution = [int(i) for i in aux_elevation]
+                    param.elevation_distribution = [float(i) for i in aux_elevation]
                 param.azimuth = np.random.uniform(param.azimuth_distribution[0], param.azimuth_distribution[1])
                 param.elevation = np.random.uniform(param.elevation_distribution[0], param.elevation_distribution[1])
+                fs_station.azimuth = np.array([param.azimuth])
+                fs_station.elevation = np.array([param.elevation])
+            elif (param.distribution_type == "UNIFORM_NORMAL"):
+                if (type(param.azimuth_distribution)) != list:
+                    aux_azimuth = param.azimuth_distribution.split(',')
+                    param.azimuth_distribution = [float(i) for i in aux_azimuth]
+                    aux_elevation = param.elevation_distribution.split(',')
+                    param.elevation_distribution = [float(i) for i in aux_elevation]
+                param.azimuth = np.random.uniform(param.azimuth_distribution[0], param.azimuth_distribution[1])
+                param.elevation = np.random.normal(param.elevation_distribution[0], param.elevation_distribution[1])
                 fs_station.azimuth = np.array([param.azimuth])
                 fs_station.elevation = np.array([param.elevation])
         else:
@@ -536,6 +548,10 @@ class StationFactory(object):
             fs_station.antenna = np.array([AntennaF699(param)])
         elif param.antenna_pattern == "ITU-R F.1336":
             fs_station.antenna = np.array([AntennaOmniF1336(param)])
+        elif param.antenna_pattern == "BESSEL":
+            fs_station.antenna = np.array([AntennaBessel(param)])
+        elif param.antenna_pattern == "ITU-R F.1245":
+            fs_station.antenna = np.array([AntennaF1245(param)])
         else:
             sys.stderr.write("ERROR\nInvalid FS antenna pattern: " + param.antenna_pattern)
             sys.exit(1)

@@ -190,9 +190,9 @@ class StationManager(object):
         for i in range(self.num_stations):
 
             # calculate coordinates according to ITU-R P619-4
-            rel_x = station.x
-            rel_y = station.y
-            rel_z = self.height[i] - station.height
+            rel_x = station.x-self.x[i]
+            rel_y = station.y- self.y[i]
+            rel_z = self.height[i]-station.height
             gts = np.sqrt(rel_x ** 2 + rel_y ** 2)
             theta_0 = np.arctan2(rel_z, gts)  # free-space elevation angle
             free_space_angle[i] = np.degrees(theta_0)

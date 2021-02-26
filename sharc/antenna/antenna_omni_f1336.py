@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Dec 15 11:53:58 2020
+@Created: Luciano Camilo on Tue Dec 15 11:53:58 2020
 
-@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
 
 import numpy as np
@@ -63,9 +62,10 @@ if __name__ == '__main__':
     phi = np.arange(0, 360, step=1)
     theta = np.arange(0, 90, step=1)
     # theta = np.arange(-90, 90, step=1)
-
+    csfont = {'fontname': 'Times New Roman'}
+    hfont = {'fontname': 'Times New Roman'}
     plt.figure(1)
-    plt.legend(loc='upper left')
+    #plt.legend(loc='upper left')
     plt.plot(theta, antenna.calculate_gain(off_axis_angle_vec=phi, theta_vec=theta), 'b--',
              label='ITU-R F-1336-5 Omni Pattern')
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     plt.grid(which='major', alpha=0.5)
     plt.grid(True, color='b', linestyle='--', linewidth=0.2)
     plt.title('ITU-R F-1336-5 Omni Pattern')
-    plt.xlabel('Elevation angle (degrees)')
-    plt.ylabel('Gain (dBi)')
-    plt.legend()
+    plt.xlabel('Elevation angle (degrees)',fontsize=16, color='black', **csfont)
+    plt.ylabel('Gain (dBi)',fontsize=16, color='black', **csfont)
+    #plt.legend()
     plt.show()
