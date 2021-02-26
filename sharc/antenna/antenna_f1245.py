@@ -10,9 +10,8 @@ import math
 
 class AntennaF1245(object):
     """
-    Implements reference radiation patterns for fixed wireless system antennas
-    for use in coordination studies use in interference assessment in the frequency
-    range from 1 GHz to 86 GHz  . (ITU-R F.1245-3)
+    Implements reference radiation patterns for fixed wireless system antennas for use in coordination studies use in
+    interference assessment in the frequency range from 1 GHz to 86 GHz. (ITU-R F.1245-3)
 
     Attributes
     ----------
