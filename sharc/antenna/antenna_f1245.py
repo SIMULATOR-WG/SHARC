@@ -10,9 +10,9 @@ import math
 
 class AntennaF1245(object):
     """
-    Implements a parabolic dish antenna pattern using Bessel of an FS antenna array following book Interference Analysis
-    [John Paul] - Please there is an errata in this book on equation 3.79 and the correct equation is:
-    G(theta) = 10*log10((2j1(x)/x)^2)  - Equation 3.79
+    Implements reference radiation patterns for fixed wireless system antennas
+    for use in coordination studies use in interference assessment in the frequency
+    range from 1 GHz to 86 GHz  . (ITU-R F.1245-3)
 
     Attributes
     ----------
