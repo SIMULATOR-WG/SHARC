@@ -1,3 +1,6 @@
+import numpy as np
+from matplotlib import pyplot as plt
+
 """
 Author: Luciano Camilo Alexandre (luciano-camilo@hotmail.com)
 
@@ -5,9 +8,6 @@ Date: Thu 29 March 09:00:00 2021
 
     Python script to calculate satellite/pseudo-satellite horizon visibility according Rec. ITU-R P.619 Annex I
 """
-
-import numpy as np
-from matplotlib import pyplot as plt
 
 x = 23 # longitude difference to calculate distance [degrees]
 
