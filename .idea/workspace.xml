@@ -20,7 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34af3610-c741-4ddf-88b3-d5bbe348e854" name="Default Changelist" comment="&quot;Versão atualizada com o PyCharm&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +35,15 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="1ji5WcZIVFuuxZ0ctkwTXVipvs5" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -48,20 +56,26 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../SHARC-LEO/SHARC-development" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\SHARC\SHARC-development\sharc\parameters" />
+      <recent name="C:\SHARC\SHARC-development\sharc\antenna\beamforming_normalization" />
       <recent name="C:\SHARC\SHARC-development\sharc\input\RAS\Arquivos_simulacoes\CA_B3_HIBS_RAS_0_0" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\SHARC\SHARC-development" />
+      <recent name="C:\SHARC\SHARC-development\sharc\antenna\3D_antenna_patterns\3D_planar_plot" />
+      <recent name="C:\SHARC\SHARC-development\sharc\antenna\3D_antenna_patterns\3D_surface_plot" />
+      <recent name="C:\SHARC\SHARC-development\sharc\antenna\3D_antenna_patterns\3D Surface " />
+      <recent name="C:\SHARC\SHARC-development\sharc\antenna\3D_antenna_patterns" />
+      <recent name="C:\SHARC\SHARC-development\sharc\antenna" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
-    <configuration name="exportar_graficos (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="antenna_omni_f1336" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SHARC-development" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -69,11 +83,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/input/FS/PMP/CA-FS-PMP-1/Resultado Final" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/antenna" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/input/FS/PMP/CA-FS-PMP-1/Resultado Final/exportar_graficos.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/antenna_omni_f1336.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -82,7 +96,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="exportar_graficos" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="antenna_radar_phased_array" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SHARC-development" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -90,11 +104,32 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/input/FS/PP/CA-PP-FS-1/Resultado Final" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/antenna" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/input/FS/PP/CA-PP-FS-1/Resultado Final/exportar_graficos.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/antenna_radar_phased_array.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="antenna_s1528_leo" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SHARC-development" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/antenna" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/antenna_s1528_leo.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -124,7 +159,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="simulation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="topology_hibs" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SHARC-development" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -132,32 +167,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/topology" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/simulation.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="station_factory" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="SHARC-development" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/station_factory.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/topology/topology_hibs.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -169,10 +183,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.exportar_graficos (1)" />
-        <item itemvalue="Python.exportar_graficos" />
-        <item itemvalue="Python.simulation" />
-        <item itemvalue="Python.station_factory" />
+        <item itemvalue="Python.antenna_omni_f1336" />
+        <item itemvalue="Python.antenna_radar_phased_array" />
+        <item itemvalue="Python.topology_hibs" />
+        <item itemvalue="Python.antenna_s1528_leo" />
       </list>
     </recent_temporary>
   </component>
@@ -266,43 +280,78 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/antenna/antenna_beamforming_imt.py</url>
-          <line>95</line>
+          <line>92</line>
           <option name="timeStamp" value="185" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>842</line>
-          <option name="timeStamp" value="188" />
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py</url>
+          <line>88</line>
+          <option name="timeStamp" value="203" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_metereological_radar_uniform.py</url>
+          <line>54</line>
+          <option name="timeStamp" value="204" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_metereological_radar_uniform.py</url>
+          <line>55</line>
+          <option name="timeStamp" value="205" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_metereological_radar_uniform.py</url>
+          <line>51</line>
+          <option name="timeStamp" value="206" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/topology/topology_macrocell.py</url>
+          <line>84</line>
+          <option name="timeStamp" value="208" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>841</line>
-          <option name="timeStamp" value="189" />
+          <line>1106</line>
+          <option name="timeStamp" value="209" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>839</line>
-          <option name="timeStamp" value="190" />
+          <line>1125</line>
+          <option name="timeStamp" value="210" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>838</line>
-          <option name="timeStamp" value="191" />
+          <line>1127</line>
+          <option name="timeStamp" value="211" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/topology/topology_factory.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="216" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>135</line>
+          <option name="timeStamp" value="217" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>837</line>
-          <option name="timeStamp" value="192" />
+          <line>1028</line>
+          <option name="timeStamp" value="218" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>834</line>
-          <option name="timeStamp" value="193" />
+          <line>1029</line>
+          <option name="timeStamp" value="219" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>833</line>
-          <option name="timeStamp" value="195" />
+          <line>1082</line>
+          <option name="timeStamp" value="220" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
+          <line>1090</line>
+          <option name="timeStamp" value="221" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -328,21 +377,21 @@
         <watch expression="__py_debug_temp_var_1936780696" />
       </configuration>
       <configuration name="PythonConfigurationType">
-        <watch expression="self.bs.antenna[bs]" />
-        <watch expression="self.parameters.imt.topology " />
-        <watch expression="loss" />
-        <watch expression="hibs_enable" />
-        <watch expression="gts" />
-        <watch expression="num_ue" />
+        <watch expression="imt_base_stations.tx_power" />
+        <watch expression="self.bs.tx_power" />
+        <watch expression="self.g_max" />
       </configuration>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="253">
-        <watch expression="active_beams" />
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_factory.py" line="440">
+        <watch expression="fss_space_station.height" />
       </inline-watch>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="77">
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="166">
+        <watch expression="attenuation" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="74">
         <watch expression="dummy" />
       </inline-watch>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_factory.py" line="372">
-        <watch expression="fss_space_station.height" />
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="268">
+        <watch expression="active_beams" />
       </inline-watch>
     </watches-manager>
   </component>

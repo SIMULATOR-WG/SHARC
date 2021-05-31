@@ -19,12 +19,12 @@ class TopologyHIBS(Topology):
     ____________________________________________________________________________________
     """
 
-    ALLOWED_NUM_CLUSTERS = [1]
+    ALLOWED_NUM_CLUSTERS = [0, 1]
 
     def __init__(self,
                  intersite_distance_hibs: float,
                  cell_radius_hibs: int,
-                 num_clusters_hibs: 1,
+                 num_clusters_hibs: int,
                  number_of_sectors=None,
                  bs_height_hibs=20000,
                  azimuth3_hibs=None,
@@ -79,30 +79,55 @@ class TopologyHIBS(Topology):
 
             self.static_base_stations = True
 
-            aux_azi3 = self.azimuth3.split(',')
-            self.azimuth3 = [int(i) for i in aux_azi3]
+            if self.num_clusters == 1:
+                aux_azi3 = self.azimuth3.split(',')
+                self.azimuth3 = 7*[int(i) for i in aux_azi3]
 
-            aux_azi7 = self.azimuth7.split(',')
-            self.azimuth7 = [int(i) for i in aux_azi7]
+                aux_azi7 = self.azimuth7.split(',')
+                self.azimuth7 = 7*[int(i) for i in aux_azi7]
 
-            aux_azi19 = self.azimuth19.split(',')
-            self.azimuth19 = [int(i) for i in aux_azi19]
+                aux_azi19 = self.azimuth19.split(',')
+                self.azimuth19 = 7*[int(i) for i in aux_azi19]
+            else:
+                aux_azi3 = self.azimuth3.split(',')
+                self.azimuth3 = [int(i) for i in aux_azi3]
 
-            aux_ele3 = self.elevation3.split(',')
-            self.elevation3 = [int(i) for i in aux_ele3]
+                aux_azi7 = self.azimuth7.split(',')
+                self.azimuth7 =  [int(i) for i in aux_azi7]
 
-            aux_ele7 = self.elevation7.split(',')
-            self.elevation7 = [int(i) for i in aux_ele7]
+                aux_azi19 = self.azimuth19.split(',')
+                self.azimuth19 = [int(i) for i in aux_azi19]
 
-            aux_ele19 = self.elevation19.split(',')
-            self.elevation19 = [int(i) for i in aux_ele19]
+            if self.num_clusters == 1:
+                aux_ele3 = self.elevation3.split(',')
+                self.elevation3 = 7*[int(i) for i in aux_ele3]
 
-            # d = self.intersite_distance / 2
-            # h = self.cell_radius
+                aux_ele7 = self.elevation7.split(',')
+                self.elevation7 = 7*[int(i) for i in aux_ele7]
+
+                aux_ele19 = self.elevation19.split(',')
+                self.elevation19 = 7*[int(i) for i in aux_ele19]
+            else:
+                aux_ele3 = self.elevation3.split(',')
+                self.elevation3 = [int(i) for i in aux_ele3]
+
+                aux_ele7 = self.elevation7.split(',')
+                self.elevation7 = [int(i) for i in aux_ele7]
+
+                aux_ele19 = self.elevation19.split(',')
+                self.elevation19 = [int(i) for i in aux_ele19]
+
+
+            d = self.intersite_distance
+            h = self.cell_radius
 
             # these are the coordinates of the central cluster
-            x_central = np.array([0])
-            y_central = np.array([0])
+            if self.num_clusters ==1:
+                x_central = np.array([0, d, -d, d/2, -d/2, d/2, -d/2])
+                y_central = np.array([0, 0, 0, ((d/np.sqrt(3))+h/2), -((d/np.sqrt(3))+h/2), -((d/np.sqrt(3))+h/2), ((d/np.sqrt(3))+h/2) ])
+            else:
+                x_central = np.array([0])
+                y_central = np.array([0])
 
             self.x = np.copy(x_central)
             self.y = np.copy(y_central)
@@ -183,11 +208,20 @@ class TopologyHIBS(Topology):
                 angle = int(az - 30)
 
         # create the hexagon for 7 Sectors
-            elif self.num_sectors == 7:
-                x = x - self.intersite_distance / np.sqrt(3)
-                # y = y - r /2
-                y = y
-                angle = int(az - 60)
+            elif self.num_clusters == 1:
+                if self.num_sectors == 7:
+                    x = x - self.intersite_distance / 2
+                    y = y - r /2
+                    #y = y - self.intersite_distance
+                    angle = int(az - 30)
+
+            elif self.num_clusters == 0:
+                if self.num_sectors == 7:
+                    x = x - self.intersite_distance / np.sqrt(3)
+                    # y = y - r /2
+                    y = y
+                    angle = int(az - 60)
+
 
         # create the dodecagon for 19 Sectors
             elif self.num_sectors == 19:
@@ -244,10 +278,10 @@ class TopologyHIBS(Topology):
 
 if __name__ == '__main__':
 
-    cell_radius = 100000
+    cell_radius = 90000
     intersite_distance = cell_radius * np.sqrt(3)
-    num_clusters = 1
-    num_sectors = 19
+    num_clusters = 0
+    num_sectors = 7
     bs_height = 20000
     azimuth3 = '60,180,300'
     elevation3 = '-90,-90,-90'
@@ -268,8 +302,8 @@ if __name__ == '__main__':
     plt.axis('image')
     plt.title("HIBS System 1 Topology - 7 Sector")
 
-    plt.xlabel("x-coordinate [km]")
-    plt.ylabel("y-coordinate [km]")
+    plt.xlabel("x-coordinate [m]")
+    plt.ylabel("y-coordinate [m]")
     plt.legend()
     plt.tight_layout()
     plt.show()

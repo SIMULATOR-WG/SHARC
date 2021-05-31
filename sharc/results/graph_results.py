@@ -56,19 +56,19 @@ y = data[1]
 # y8 = data8[1]
 
 # Put in variable xlim, the value of system protection criteria
-xlim = -6
+xlim = -10
 x_limite = np.linspace(-xlim, -xlim, 50)
 y_limite = np.linspace(0, 1, 50)
 
 
 plt.subplot(2, 2, 1)
 # plt.xlim(-250, -180)
-# plt.ylim(0, 1)
+plt.ylim(0.9951, 1)
 # plt.legend(prop={'family': 'Times New Roman'})
 # plt.xscale('linear')
-# plt.yscale('log')
+plt.yscale('log')
 # plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x,y: '{}'.format(y)))
-plt.plot(x, y, 'r-', linewidth=1.5, color='brown', label=' 0 km ')
+plt.semilogy(x, y, 'r-', linewidth=1.5, color='brown', label=' 0 km ')
 
 
 ###################################################################################################################
@@ -148,8 +148,8 @@ plt.plot(x, y, 'r-', linewidth=1.5, color='brown', label=' 0 km ')
 
 # plt.ylim(0, 1)
 # plt.legend(prop={'family': 'Times New Roman'})
-# plt.xscale('linear')
-# plt.yscale('log')
+#plt.xscale('linear')
+#plt.yscale('log')
 # plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x,y: '{}'.format(y)))
 # plt.plot(x8, y8,'r-', linewidth=1.5, color = 'black', label= ' 10000 km ')
 

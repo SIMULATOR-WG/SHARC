@@ -19,7 +19,7 @@ class AntennaOmniF1336(object):
 
     def __init__(self, param: ParametersFs):
         """
-        Constructs an AntennaElementImt object.
+        Constructs an AntennaElement object.
 
         Parameters
         ---------
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     csfont = {'fontname': 'Times New Roman'}
     hfont = {'fontname': 'Times New Roman'}
     plt.figure(1)
-    #plt.legend(loc='upper left')
+    # plt.legend(loc='upper left')
     plt.plot(theta, antenna.calculate_gain(off_axis_angle_vec=phi, theta_vec=theta), 'b--',
              label='ITU-R F-1336-5 Omni Pattern')
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     plt.grid(which='major', alpha=0.5)
     plt.grid(True, color='b', linestyle='--', linewidth=0.2)
     plt.title('ITU-R F-1336-5 Omni Pattern')
-    plt.xlabel('Elevation angle (degrees)',fontsize=16, color='black', **csfont)
-    plt.ylabel('Gain (dBi)',fontsize=16, color='black', **csfont)
-    #plt.legend()
+    plt.xlabel('Elevation angle (degrees)', fontsize=16, color='black', **csfont)
+    plt.ylabel('Gain (dBi)', fontsize=16, color='black', **csfont)
+    # plt.legend()
     plt.show()

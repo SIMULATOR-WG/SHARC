@@ -120,9 +120,9 @@ if __name__ == '__main__':
 
     param_lt = ParametersFs()
     param_lt.antenna_pattern = "ITU-R F.1245"
-    param_lt.frequency = 2160
-    param_lt.antenna_gain = 35
-    param_lt.diameter = 4
+    param_lt.frequency = 2600
+    param_lt.antenna_gain = 25
+    param_lt.diameter = 0.9
     antenna_lt = AntennaF1245(param_lt)
     gain_lt = antenna_lt.calculate_gain(off_axis_angle_vec=phi)
     csfont = {'fontname': 'Times New Roman'}

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Apr 15 15:35:51 2017
-
 @author: Calil
 @modified: Luciano Camilo Tue Jan 26 13:49:25 2021
 """
@@ -22,7 +21,6 @@ from sharc.parameters.parameters_antenna_imt import ParametersAntennaImt
 class AntennaBeamformingImt(Antenna):
     """
     Implements an antenna array
-
     Attributes
     ----------
         azimuth (float): physical azimuth inclination
@@ -49,7 +47,6 @@ class AntennaBeamformingImt(Antenna):
         Constructs an AntennaBeamformingImt object.
         Does not receive angles in local coordinate system.
         Elevation taken with x axis as reference.
-
         Parameters
         ---------
             param (AntennaPar): antenna IMT parameters
@@ -98,7 +95,6 @@ class AntennaBeamformingImt(Antenna):
         Add new beam to antenna.
         Does not receive angles in local coordinate system.
         Theta taken with z axis as reference.
-
         Parameters
         ----------
             phi_etilt (float): azimuth electrical tilt angle [degrees]
@@ -120,7 +116,6 @@ class AntennaBeamformingImt(Antenna):
         Calculates the gain in the given direction.
         Does not receive angles in local coordinate system.
         Theta taken with z axis as reference.
-
         Parameters
         ----------
         phi_vec (np.array): azimuth angles [degrees]
@@ -131,7 +126,6 @@ class AntennaBeamformingImt(Antenna):
         co_channel (bool): optional, default is True. Indicates whether the
                 antenna array pattern (co-channel case), or the element pattern
                 (adjacent channel case) will be used for gain calculation.
-
         Returns
         -------
         gains (np.array): gain corresponding to each of the given directions.
@@ -205,12 +199,10 @@ class AntennaBeamformingImt(Antenna):
         """
         Calculates super position vector.
         Angles are in the local coordinate system.
-
         Parameters
         ----------
             theta (float): elevation angle [degrees]
             phi (float): azimuth angle [degrees]
-
         Returns
         -------
             v_vec (np.array): superposition vector
@@ -223,8 +215,7 @@ class AntennaBeamformingImt(Antenna):
 
         exp_arg = (n[:, np.newaxis] - 1)*self.dv*np.cos(r_theta) + \
                   (m - 1)*self.dh*np.sin(r_theta)*np.sin(r_phi)
-
-        v_vec = np.exp(2*np.pi*1.0j*exp_arg)
+        v_vec = np.exp(2*np.pi*1j*exp_arg)
 
         return v_vec
 
@@ -232,12 +223,10 @@ class AntennaBeamformingImt(Antenna):
         """
         Calculates super position vector.
         Angles are in the local coordinate system.
-
         Parameters
         ----------
             phi_tilt (float): electrical horizontal steering [degrees]
             theta_tilt (float): electrical down-tilt steering [degrees]
-
         Returns
         -------
             w_vec (np.array): weighting vector
@@ -252,7 +241,7 @@ class AntennaBeamformingImt(Antenna):
                   (m - 1)*self.dh*np.cos(r_theta)*np.sin(r_phi)
 
         w_vec = (1/np.sqrt(self.n_rows*self.n_cols)) *\
-                np.exp(2*np.pi*1.0j*exp_arg)
+                 np.exp(2*np.pi*1.0j*exp_arg)
 
         return w_vec
 
@@ -260,14 +249,12 @@ class AntennaBeamformingImt(Antenna):
         """
         Calculates gain for a single beam in a given direction.
         Angles are in the local coordinate system.
-
         Parameters
         ----------
             phi (float): azimuth angle [degrees]
             theta (float): elevation angle [degrees]
             beam (int): Optional, beam index. If not provided, maximum gain is
                 calculated
-
         Returns
         -------
             gain (float): beam gain [dBi]
@@ -282,6 +269,7 @@ class AntennaBeamformingImt(Antenna):
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec, w_vec)))**2)
         else:
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec, self.w_vec_list[beam])))**2)
+
 
         gain = element_g + array_g
 
@@ -346,6 +334,7 @@ class PlotAntennaPattern(object):
                                           theta_vec=theta,
                                           beams_l=np.zeros_like(phi, dtype=int))
 
+
         top_y_lim = np.ceil(np.max(gain)/10)*10
 
         fig = plt.figure(figsize=(15, 5), facecolor='w', edgecolor='k')
@@ -389,7 +378,7 @@ class PlotAntennaPattern(object):
         ax2.set_xlim(0, 180)
         if np.max(gain) > top_y_lim:
             top_y_lim = np.ceil(np.max(gain)/10)*10
-        ax2.set_ylim(top_y_lim - 130, top_y_lim)
+        ax2.set_ylim(top_y_lim - 140, top_y_lim)
 
         if sta_type == "BS":
             file_name = self.figs_dir + "bs_"
@@ -402,6 +391,145 @@ class PlotAntennaPattern(object):
             file_name = file_name + "array_pattern.png"
 
         # plt.savefig(file_name)
+        plt.show()
+        return fig
+
+class PlotAntennaPattern3D(object):
+    """
+    Plots imt antenna pattern.
+    """
+    def __init__(self, figs_dir):
+        self.figs_dir = figs_dir
+
+    def plot_element_pattern3D(self,
+                             antenna: AntennaBeamformingImt,
+                             sta_type: str,
+                             plot_type: str):
+
+        phi_escan = 0
+        theta_tilt = 90
+
+        # Plot horizontal pattern
+        phi = np.linspace(-180, 180, num=360)
+        theta = theta_tilt*np.ones(np.size(phi))
+
+        if plot_type == "ELEMENT":
+            gain = antenna.element.element_pattern(phi, theta)
+        elif plot_type == "ARRAY":
+            antenna.add_beam(phi_escan, theta_tilt)
+            gainh = antenna.calculate_gain(phi_vec=phi,
+                                          theta_vec=theta,
+                                          beams_l=np.zeros_like(phi, dtype=int))
+            gainh = gainh
+
+
+
+        top_y_lim = np.ceil(np.max(gainh)/10)*10
+
+        fig = plt.figure(figsize=(15, 5), facecolor='w', edgecolor='k')
+        ax1 = fig.add_subplot(121)
+        ax1.grid(True)
+        ax1.set_xlabel(r"$\varphi$ [deg]")
+        ax1.set_ylabel("Gain [dBi]")
+
+        if plot_type == "ELEMENT":
+            ax1.set_title("HIBS" + sta_type + " element horizontal antenna pattern")
+        elif plot_type == "ARRAY":
+            ax1.set_title("HIBS" + sta_type + " horizontal antenna pattern")
+
+        ax1.set_xlim(-180, 180)
+
+        # Plot vertical pattern
+        theta = np.linspace(0, 180, num=360)
+        phi = phi_escan*np.ones(np.size(theta))
+
+        if plot_type == "ELEMENT":
+            gain = antenna.element.element_pattern(phi, theta)
+        elif plot_type == "ARRAY":
+            gainv = antenna.calculate_gain(phi_vec=phi,
+                                          theta_vec=theta,
+                                          beams_l=np.zeros_like(phi, dtype=int))
+            gainv=gainv
+
+        ax2 = fig.add_subplot(122, sharey=ax1)
+
+        ax2.grid(True)
+        ax2.set_xlabel(r"$\theta$ [deg]")
+        ax2.set_ylabel("Gain [dBi]")
+
+        if plot_type == "ELEMENT":
+            ax2.set_title("HIBS" + sta_type + " element vertical antenna pattern")
+        elif plot_type == "ARRAY":
+            ax2.set_title("HIBS" + sta_type + " vertical antenna pattern")
+
+        ax2.set_xlim(0, 180)
+        if np.max(gainv) > top_y_lim:
+            top_y_lim = np.ceil(np.max(gainv)/10)*10
+        ax2.set_ylim(top_y_lim - 100, top_y_lim)
+
+        if sta_type == "BS":
+            file_name = self.figs_dir + "bs_"
+        else:  # sta_type == "UE":
+            file_name = self.figs_dir + "ue_"
+
+        if plot_type == "ELEMENT":
+            file_name = file_name + "element_pattern.png"
+        elif plot_type == "ARRAY":
+            file_name = file_name + "array_pattern.png"
+
+        #plt.savefig(file_name)
+
+
+
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        # #spherical coordinates
+        # PHI, THETA = np.meshgrid(np.linspace(0, 360, 360), np.linspace(0, 180, 360))
+        # #THETA, PHI = np.meshgrid(x, y)
+        #
+        # X, Y = np.sin(np.radians(PHI)) * np.cos(np.radians(THETA)), np.sin(np.radians(PHI)) * np.sin(np.radians(THETA))
+        #
+        # Z=Z = np.cos(np.radians(THETA))+(gainv+gainh-np.max(gainv))
+        #
+        # fig = plt.figure(figsize=(10, 10))
+        # ax = fig.gca(projection='3d')
+        # # surf = ax.plot_surface(x, y, X + Y-np.max(gainv), cstride=1, rstride=1, cmap='rainbow', antialiased=True, alpha=1)
+        # surf = ax.plot_surface(X, Y, Z, cstride=1, rstride=1, cmap='rainbow', antialiased=True, alpha=1)
+        # fig.colorbar(surf, ax=ax,
+        #              shrink=0.5,
+        #              aspect=20, ticks=np.linspace(-250, np.max(gainv), 10))
+        # ax.view_init(elev=25., azim=0)
+        # ax.set_title('3D Antenna Pattern')
+        # ax.set_xlabel('azimuth [degrees]')
+        # ax.set_ylabel('elevation [degrees]')
+        # ax.grid(False)
+        # plt.show()
+
+        ######################################################################################################
+        ######################################################################################################
+        ######################################################################################################
+        x, y = np.meshgrid(np.linspace(-180, 180, 360), np.linspace(0, 180, 360))
+
+        X, Y = np.meshgrid(gainh, gainv, sparse=False)
+        clevs1 = np.arange(-250, np.max(gainv)+10, 1)
+        #cs1 = plt.contourf(x, y, X + Y-np.max(gainv), clevs1, cmap='viridis', alpha=1)
+        #plt.colorbar(cs1)
+        plt.xlabel('azimuth [degrees]')
+        plt.ylabel('elevation [degrees]')
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.gca(projection='3d')
+        surf = ax.plot_surface(x, y, X + Y-np.max(gainv), cstride=1, rstride=1, cmap='rainbow', antialiased=True, alpha=1)
+        #surf = ax.plot_surface(X, Y, Z, cstride=1, rstride=1, cmap='rainbow', antialiased=True, alpha=1)
+        fig.colorbar(surf, ax=ax,
+                     shrink=0.5,
+                     aspect=20, ticks=np.linspace(-350, np.max(gainv), 10))
+        #ax.view_init(elev=35., azim=0)
+        ax.set_title('3D Antenna Pattern')
+        ax.set_xlabel('azimuth [degrees]')
+        ax.set_ylabel('elevation [degrees]')
+        ax.grid(False)
         plt.show()
         return fig
 
@@ -425,8 +553,8 @@ if __name__ == '__main__':
     param.bs_element_phi_3db = 65
     param.bs_element_theta_3db = 65
     param.bs_element_am = 30
-    param.bs_element_sla_v = 25
-    param.bs_n_rows = 4
+    param.bs_element_sla_v = 30
+    param.bs_n_rows = 2
     param.bs_n_columns = 2
     param.bs_element_horiz_spacing = 0.5
     param.bs_element_vert_spacing = 0.5
@@ -446,15 +574,17 @@ if __name__ == '__main__':
     param.ue_multiplication_factor = 12
 
     plot = PlotAntennaPattern(figs_dir)
+    plot3D = PlotAntennaPattern3D(figs_dir)
 
     # Plot BS TX radiation patterns
     par = param.get_antenna_parameters(StationType.IMT_BS)
-    bs_array = AntennaBeamformingImt(par, 30, 0)
+    bs_array = AntennaBeamformingImt(par, 0, 0)
     f = plot.plot_element_pattern(bs_array, " Base Station", "ELEMENT")
-    # f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
+    #f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
     f = plot.plot_element_pattern(bs_array, " Base Station", "ARRAY")
-    # f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
+    #f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
 
+    #d = plot3D.plot_element_pattern3D(bs_array, " Base Station", "ARRAY")
 
     # Plot UE TX radiation patterns
     par = param.get_antenna_parameters(StationType.IMT_UE)

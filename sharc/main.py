@@ -3,9 +3,9 @@
 Created on Mon Dec 26 17:05:49 2016
 
 @author: edgar
-@modified: Luciano Camilo Wed Jan 27 11:52:23 2021
+@modified: Luciano Camilo Fri May 28 15:49:00 2021
 
-SHARC - Version 2.1.00
+SHARC - Version 2.1.05
 """
 
 import sys

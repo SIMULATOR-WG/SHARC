@@ -63,7 +63,7 @@ if __name__ == '__main__':
     hfont = {'fontname': 'Times New Roman'}
     plt.figure(1)
     # plt.legend(loc='upper left')
-    #plt.plot(phi, antenna.calculate_gain(off_axis_angle_vec=phi), 'b--',
+    # plt.plot(phi, antenna.calculate_gain(off_axis_angle_vec=phi), 'b--',
     #         label='Bessel')
 
     plt.semilogx(phi, antenna.calculate_gain(off_axis_angle_vec=phi), 'b--',

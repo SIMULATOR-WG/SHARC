@@ -128,8 +128,7 @@ if __name__ == '__main__':
     # Initialize variables
     sta_type = StationType.IMT_BS
     p_tx = 43
-    # freq = 2680
-    freq = 2670 # 5 MHz guard band RAS
+    freq = 2680 # 5 MHz guard band RAS
     band = 20
 
     # Create mask
@@ -146,14 +145,14 @@ if __name__ == '__main__':
 
     # Plot
 
-    rasx = np.linspace(2025, 2039, 50)
-    rasy = np.linspace(0, 0, 50)
-    rasx_ = np.linspace(2025, 2025, 50)
-    rasy_ = np.linspace(-13, 0, 50 )
-    rasx_1 = np.linspace(2039, 2039, 50)
-    rasy_1 = np.linspace(0, -13, 50)
+    rasx = np.linspace(2700, 2701.5, 60)
+    rasy = np.linspace(0, 0, 60)
+    rasx_ = np.linspace(2700, 2700, 60)
+    rasy_ = np.linspace(-13, 0, 60)
+    rasx_1 = np.linspace(2701.5, 2701.5, 60)
+    rasy_1 = np.linspace(0, -13, 60)
 
-    # plt.plot(rasx_1, rasy_1, 'r--', linewidth=3, color = 'orange', label= ' FS (PP) Band ')
+    plt.plot(rasx_1, rasy_1, 'r--', linewidth=2, color = 'orange', label= ' Meteorological Radar Band ')
     plt.plot(rasx_, rasy_, 'r--', linewidth=2, color='orange')
     plt.plot(rasx, rasy, 'r--', linewidth=2, color='orange')
     plt.plot(freqs, mask_val, 'r-', linewidth=1.5, color='black', label=' HIBS Spectral Mask ')
@@ -162,6 +161,7 @@ if __name__ == '__main__':
     # plt.grid(which='major', alpha=0.7)
     # plt.grid(True, color='k', linestyle='--', linewidth=0.5)
     plt.xlim([freqs[0], freqs[-1]])
+    #plt.xlim([freqs[0], 2730])
     # plt.title('3GPP 36.104 Spectral Mask')
     plt.xlabel("$\Delta$f [MHz]")
     plt.ylabel("Spectral Mask [dBc]")

@@ -89,10 +89,10 @@ if __name__ == '__main__':
 
     # initialize antenna parameters
     param = ParametersFssSs()
-    param.antenna_gain = 39
+    param.antenna_gain = 36.9
     param.antenna_pattern = "ITU-R S.1528-0"
-    param.antenna_3_dB = 2
-    psi = np.linspace(0, 30, num = 1000)
+    param.antenna_3_dB = 1.2
+    psi = np.linspace(0, 180, num = 10000)
 
     param.antenna_l_s = -15
     antenna = AntennaS1528(param)
@@ -112,13 +112,14 @@ if __name__ == '__main__':
 
     fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')  # create a figure object
 
-    plt.plot(psi, gain15 - param.antenna_gain, "-b", label="$L_S = -15$ dB")
-    plt.plot(psi, gain20 - param.antenna_gain, "-r", label="$L_S = -20$ dB")
-    plt.plot(psi, gain25 - param.antenna_gain, "-g", label="$L_S = -25$ dB")
-    plt.plot(psi, gain30 - param.antenna_gain, "-k", label="$L_S = -30$ dB")
+    #plt.plot(psi, gain15 - param.antenna_gain, "-b", label="$L_S = -15$ dB")
+    #plt.plot(psi, gain20 - param.antenna_gain, "-r", label="$L_S = -20$ dB")
+    #plt.plot(psi, gain25 - param.antenna_gain, "-g", label="$L_S = -25$ dB")
+    plt.semilogx(psi, gain25 , "-g", label="$L_S = -25$ dB")
+    #plt.plot(psi, gain30 - param.antenna_gain, "-k", label="$L_S = -30$ dB")
 
-    plt.ylim((-40, 10))
-    plt.xlim((0, 30))
+    #plt.ylim((-40, 10))
+    plt.xlim((0, 180))
     plt.title("ITU-R S.1528-0 antenna radiation pattern")
     plt.xlabel("Relative off-axis angle, $\psi/\psi_{3dB}$")
     plt.ylabel("Gain relative to $G_{max}$ [dB]")

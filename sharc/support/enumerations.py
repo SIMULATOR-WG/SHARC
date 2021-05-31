@@ -36,6 +36,8 @@ class StationType(Enum):
     FSS_ES = 4  # FSS Earth Station
     FS     = 5  # Fixed Service
     HAPS   = 6  # HAPS (airbone) station
-    RNS    = 7  # Radionavigation service
+    RNS    = 7  # Radionavigation Service
     RAS    = 8  # Radio Astronomy Service
     EESS_PASSIVE = 9 # EESS passive sensor
+    SS_MLEO = 10  # Satellite Service - Medium/Low Earth Orbit
+    ARNS   = 11 # Aeronautical Radionavigation Service (Air Surveillance Radars and Meteorological Radars)

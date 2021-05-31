@@ -246,7 +246,7 @@ if __name__ == '__main__':
 
     propagation_path = os.getcwd()
     sharc_path = os.path.dirname(propagation_path)
-    param_file = os.path.join(sharc_path, "input", "parameters_RAS.ini")
+    param_file = os.path.join(sharc_path, "input", "parameters.ini")
 
     params.set_file_name(param_file)
     params.read_params()
@@ -260,8 +260,8 @@ if __name__ == '__main__':
     ##########################
     # Plot atmospheric loss
     # compare with benchmark from ITU-R P-619 Fig. 3
-    sat_params.imt_altitude = 30
-    frequency_MHz = 2017.
+    sat_params.imt_altitude = 8
+    frequency_MHz = 2680.
     # sat_params.imt_altitude = 20000
 
     apparent_elevation = range(-1, 90, 2)

@@ -128,8 +128,8 @@ if __name__ == '__main__':
     # Plot troposcatter scintillation attenuation
     # compare with benchmark from ITU-R P-619 Fig. 8
     percentage_fading_exceeded = 10 ** np.arange(-2, 1.1, .1)
-    antenna_gain = 35.
-    frequency_MHz = 2017.
+    antenna_gain = 33.5
+    frequency_MHz = 2700.
     wet_refractivity = 42.5
 
     elevation_vec = np.array([5., 10., 20., 35., 90.])

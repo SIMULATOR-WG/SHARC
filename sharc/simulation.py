@@ -3,7 +3,7 @@
 Created on Wed Jan 11 19:04:03 2017
 
 @author: edgar
-@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
+@modified: Luciano Camilo Thu Marc 18 10:24:25 2021
 """
 
 from abc import ABC, abstractmethod
@@ -34,6 +34,8 @@ class Simulation(ABC, Observable):
 
         if self.parameters.general.system == "EESS_PASSIVE":
             self.param_system = self.parameters.eess_passive
+        elif self.parameters.general.system == "SS_MLEO":
+            self.param_system = self.parameters.ss_mleo
         elif self.parameters.general.system == "FSS_SS":
             self.param_system = self.parameters.fss_ss
         elif self.parameters.general.system == "FSS_ES":
@@ -44,6 +46,8 @@ class Simulation(ABC, Observable):
             self.param_system = self.parameters.haps
         elif self.parameters.general.system == "RNS":
             self.param_system = self.parameters.rns
+        elif self.parameters.general.system == "ARNS":
+            self.param_system = self.parameters.arns
         elif self.parameters.general.system == "RAS":
             self.param_system = self.parameters.ras
         else:
@@ -51,8 +55,11 @@ class Simulation(ABC, Observable):
             sys.exit(1)
 
         if (self.parameters.general.system == "FS" and self.parameters.fs.channel_model == "P619" and
-          self.parameters.imt.topology != "HIBS") or (self.parameters.general.system == "RAS" and
-          self.parameters.ras.channel_model == "P619" and self.parameters.imt.topology != "HIBS"):
+            self.parameters.imt.topology != "HIBS") or \
+            (self.parameters.general.system == "RAS" and self.parameters.ras.channel_model == "P619" and
+             self.parameters.imt.topology != "HIBS") or \
+            (self.parameters.general.system == "ARNS" and self.parameters.arns.channel_model == "P619" and
+             self.parameters.imt.topology != "HIBS"):
             sys.stderr.write("ERROR\nInvalid topology: " + self.parameters.imt.topology)
             sys.exit(1)
 
@@ -189,6 +196,7 @@ class Simulation(ABC, Observable):
         TODO: calculate coupling loss between active stations only
         """
         if station_a.station_type is StationType.EESS_PASSIVE or \
+            station_a.station_type is StationType.SS_MLEO or \
             station_a.station_type is StationType.FSS_SS or \
             station_a.station_type is StationType.HAPS or \
             station_a.station_type is StationType.RNS:
@@ -199,17 +207,20 @@ class Simulation(ABC, Observable):
             elevation_angles = np.transpose(station_b.get_elevation(station_a))
         elif station_a.station_type is StationType.FSS_ES or \
             station_a.station_type is StationType.FS and self.parameters.imt.topology == "HIBS" or \
-            station_a.station_type is StationType.RAS and self.parameters.imt.topology == "HIBS":
+            station_a.station_type is StationType.RAS and self.parameters.imt.topology == "HIBS" or \
+            station_a.station_type is StationType.ARNS and self.parameters.imt.topology == "HIBS":
             elevation_angles = station_b.get_elevation_angle_hibs(station_a, self.param_system)
         else:
             elevation_angles = None
 
         if station_a.station_type is StationType.EESS_PASSIVE or \
+            station_a.station_type is StationType.SS_MLEO or \
             station_a.station_type is StationType.FSS_SS or \
             station_a.station_type is StationType.FSS_ES or \
             station_a.station_type is StationType.HAPS or \
             station_a.station_type is StationType.FS or \
             station_a.station_type is StationType.RNS or \
+            station_a.station_type is StationType.ARNS or \
             station_a.station_type is StationType.RAS:
             # Calculate distance from transmitters to receivers. The result is a
             # num_station_a x num_station_b
@@ -246,6 +257,7 @@ class Simulation(ABC, Observable):
                 single_entry = False
 
             if station_a.station_type is StationType.EESS_PASSIVE or \
+                station_a.station_type is StationType.SS_MLEO or \
                 station_a.station_type is StationType.FSS_SS or \
                 station_a.station_type is StationType.HAPS or \
                 station_a.station_type is StationType.IMT_BS or\
@@ -259,8 +271,10 @@ class Simulation(ABC, Observable):
                                                  single_entry=single_entry, number_of_sectors=sectors_in_node,
                                                  HIBS="OFF")
 
-            elif station_a.station_type is StationType.RAS and self.parameters.imt.topology == "HIBS" or \
-                 station_a.station_type is StationType.FS and self.parameters.imt.topology == "HIBS":
+            elif station_a.station_type is StationType.FS and self.parameters.imt.topology == "HIBS" or \
+                station_a.station_type is StationType.RAS and self.parameters.imt.topology == "HIBS" or \
+                station_a.station_type is StationType.ARNS and self.parameters.imt.topology == "HIBS":
+                print(f'Distancia 3D é : {d_3D}')
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                                  frequency=freq * np.ones(d_3D.shape),
                                                  indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),
@@ -398,11 +412,13 @@ class Simulation(ABC, Observable):
                 theta = self.bs_to_ue_theta
                 beams_idx = self.bs_to_ue_beam_rbs[station_2_active]
             elif (station_2.station_type is StationType.EESS_PASSIVE or
+                  station_2.station_type is StationType.SS_MLEO or
                   station_2.station_type is StationType.FSS_SS or
                   station_2.station_type is StationType.FSS_ES or
                   station_2.station_type is StationType.HAPS or
                   station_2.station_type is StationType.FS or
                   station_2.station_type is StationType.RNS or
+                  station_2.station_type is StationType.ARNS or
                   station_2.station_type is StationType.RAS):
                 phi, theta = station_1.get_pointing_vector_to(station_2)
                 phi = np.repeat(phi, self.parameters.imt.ue_k, 0)
@@ -414,11 +430,13 @@ class Simulation(ABC, Observable):
             beams_idx = np.zeros(len(station_2_active), dtype=int)
 
         elif (station_1.station_type is StationType.EESS_PASSIVE or
+              station_1.station_type is StationType.SS_MLEO or \
               station_1.station_type is StationType.FSS_SS or
               station_1.station_type is StationType.FSS_ES or
               station_1.station_type is StationType.HAPS or
               station_1.station_type is StationType.FS or
-              station_1.station_type is StationType.RNS
+              station_1.station_type is StationType.RNS or
+              station_1.station_type is StationType.ARNS
               or station_1.station_type is StationType.RAS):
             phi, theta = station_1.get_pointing_vector_to(station_2)
             beams_idx = np.zeros(len(station_2_active), dtype=int)
@@ -426,11 +444,13 @@ class Simulation(ABC, Observable):
         # Calculate gains
         gains = np.zeros(phi.shape)
         if (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.EESS_PASSIVE) or \
+            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.SS_MLEO) or \
             (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_SS) or \
             (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FSS_ES) or \
             (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.HAPS) or \
             (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.FS) or \
             (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.RNS) or \
+            (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.ARNS) or \
             (station_1.station_type is StationType.IMT_BS and station_2.station_type is StationType.RAS):
             for k in station_1_active:
                 for b in range(k * self.parameters.imt.ue_k, (k + 1) * self.parameters.imt.ue_k):
@@ -441,11 +461,13 @@ class Simulation(ABC, Observable):
                                                                                      co_channel=c_channel)
 
         elif (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.EESS_PASSIVE) or \
+            (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.SS_MLEO) or \
             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_SS) or \
             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FSS_ES) or \
             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.HAPS) or \
             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.FS) or \
             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.RNS) or \
+            (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.ARNS) or \
             (station_1.station_type is StationType.IMT_UE and station_2.station_type is StationType.RAS):
             for k in station_1_active:
                 gains[k, station_2_active] = station_1.antenna[k].calculate_gain(phi_vec=phi[k, station_2_active],
@@ -458,10 +480,12 @@ class Simulation(ABC, Observable):
                                                                              theta_vec=theta[0, station_2_active])
 
         elif station_1.station_type is StationType.EESS_PASSIVE or \
+            station_1.station_type is StationType.SS_MLEO or \
             station_1.station_type is StationType.FSS_SS or \
             station_1.station_type is StationType.FSS_ES or \
             station_1.station_type is StationType.HAPS or \
             station_1.station_type is StationType.FS or \
+            station_1.station_type is StationType.ARNS or \
             station_1.station_type is StationType.RAS:
 
             off_axis_angle = station_1.get_off_axis_angle(station_2)

@@ -193,7 +193,9 @@ class StationManager(object):
             rel_x = station.x-self.x[i]
             rel_y = station.y- self.y[i]
             rel_z = self.height[i]-station.height
+            print(f'Altura: {rel_z}')
             gts = np.sqrt(rel_x ** 2 + rel_y ** 2)
+            print(f'Distancia: {gts}')
             theta_0 = np.arctan2(rel_z, gts)  # free-space elevation angle
             free_space_angle[i] = np.degrees(theta_0)
 
@@ -209,7 +211,7 @@ class StationManager(object):
             tau_fs = tau_fs_deg / 180. * np.pi
 
             angle[i] = np.degrees(theta_0 + tau_fs)
-
+            print(f'Angulo: {angle}')
         return {'free_space': free_space_angle, 'apparent': angle}
 
     def get_elevation_angle(self, station, sat_params) -> dict:
