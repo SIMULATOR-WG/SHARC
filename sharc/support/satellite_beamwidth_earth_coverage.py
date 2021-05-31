@@ -6,7 +6,7 @@ Author: Luciano Camilo Alexandre (luciano-camilo@hotmail.com)
 
 Date: Thu 31 May 14:00:00 2021
 
-    Python script to calculate Low Earth Orbit satellite/pseudo-satellite beamwidth visibility.
+    Python script to calculate Low Earth Orbit satellite/pseudo-satellite beamwidth Earth coverage.
 """
 
 re = 6378                                     # Earth radius [km]

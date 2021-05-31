@@ -13,6 +13,9 @@
 #
 	  - date: 31/05/2021
 
+ - Added in /support the satellite/pseudo-satellite antenna beamwidth earth visibility script.
+ - Added in /support the satellite/pseudo-satellite horizon visibility script.
+ - Added in /support the antenna efficiency script.
  - HIBS Cluster options: 0 and 1;
  - HIBS Band 1 option;
  - Added 3D Antenna patterns for IMT Beamforming;
