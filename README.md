@@ -23,8 +23,8 @@
  - Added new Phased Array Radar antenna for ARNS and Meteorological Radar;
  - Added Pencil Radar antenna pattern;
  - Added Cosine^2 Radar antenna pattern;
- - Added 3D Pencil Radar antenna Plot;
- - Added 3D Cosine^2 Radar antenna Plot;
+ - Added 3D Pencil Radar antenna plot;
+ - Added 3D Cosine^2 Radar antenna plot;
  - Added 3D Cosecant Squared Radar antenna plot;
  - Radar Phased Array Antenna element Cosine^2;
  - Added new section in parameters.ini regarding IMT Base Station;
