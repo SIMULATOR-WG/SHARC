@@ -5,7 +5,7 @@ Created on Fri Marc 12 15:58:01 2021
 @author: Luciano Camilo
 """
 from sharc.antenna.antenna import Antenna
-from sharc.parameters.parameters_fss_ss import ParametersFssSs
+from sharc.parameters.parameters_ss_mleo import ParametersSsMLeo
 
 import numpy as np
 
@@ -17,7 +17,7 @@ class AntennaS1528_LEO(Antenna):
     fixed-satellite service below 30 GHz
     """
 
-    def __init__(self, param: ParametersFssSs):
+    def __init__(self, param: ParametersSsMLeo):
         super().__init__()
         self.peak_gain = param.antenna_gain
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     # initialize antenna parameters
-    param = ParametersFssSs()
+    param = ParametersSsMLeo()
     param.antenna_gain = 35
     param.antenna_pattern = "ITU-R S.1528-LEO"
     param.antenna_3_dB = 1.6
