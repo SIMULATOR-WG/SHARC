@@ -9,7 +9,10 @@
 </p>
 
 # Release notes:
-
+#
+	  - date: 17/06/2021
+	  
+ - Refactoring;	  
 #
 	  - date: 31/05/2021
 
