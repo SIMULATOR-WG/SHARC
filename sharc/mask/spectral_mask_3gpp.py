@@ -145,14 +145,14 @@ if __name__ == '__main__':
 
     # Plot
 
-    rasx = np.linspace(2700, 2701.5, 60)
+    rasx = np.linspace(2704.3, 2705.7, 60)
     rasy = np.linspace(0, 0, 60)
-    rasx_ = np.linspace(2700, 2700, 60)
+    rasx_ = np.linspace(2704.3, 2704.3, 60)
     rasy_ = np.linspace(-13, 0, 60)
-    rasx_1 = np.linspace(2701.5, 2701.5, 60)
+    rasx_1 = np.linspace(2705.7, 2705.7, 60)
     rasy_1 = np.linspace(0, -13, 60)
 
-    plt.plot(rasx_1, rasy_1, 'r--', linewidth=2, color = 'orange', label= ' Meteorological Radar Band ')
+    plt.plot(rasx_1, rasy_1, 'r--', linewidth=2, color = 'orange', label= 'Radar Band ')
     plt.plot(rasx_, rasy_, 'r--', linewidth=2, color='orange')
     plt.plot(rasx, rasy, 'r--', linewidth=2, color='orange')
     plt.plot(freqs, mask_val, 'r-', linewidth=1.5, color='black', label=' HIBS Spectral Mask ')

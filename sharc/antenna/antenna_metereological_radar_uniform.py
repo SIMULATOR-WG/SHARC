@@ -52,7 +52,7 @@ class AntennaMeteorologicalRadarUniform(Antenna):
         gain = self.g_max + self.get_gain_az(phi_l)+self.get_gain_elev(phi_l)
         # print(theta_l)
         # print(self.g_max + self.get_gain_elev(phi_l))
-        print(gain)
+        # print(gain)
         return gain
 
     def get_gain_az(self, phi: np.array) -> np.array:
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     ax1.set_ylabel("Antenna gain [dBi]")
     plt.title("Meteorological Radar Uniform Antenna Pattern")
     # ax1.set_xlim([0, 40])
-    ax1.set_xlim([0, 40])
+    ax1.set_xlim([-90, 90])
     ax1.set_ylim([-60, 0])
 
     ax2 = fig.add_subplot(122)

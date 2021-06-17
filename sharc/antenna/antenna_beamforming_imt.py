@@ -378,7 +378,7 @@ class PlotAntennaPattern(object):
         ax2.set_xlim(0, 180)
         if np.max(gain) > top_y_lim:
             top_y_lim = np.ceil(np.max(gain)/10)*10
-        ax2.set_ylim(top_y_lim - 140, top_y_lim)
+        ax2.set_ylim(top_y_lim - 50, top_y_lim)
 
         if sta_type == "BS":
             file_name = self.figs_dir + "bs_"
@@ -553,7 +553,7 @@ if __name__ == '__main__':
     param.bs_element_phi_3db = 65
     param.bs_element_theta_3db = 65
     param.bs_element_am = 30
-    param.bs_element_sla_v = 30
+    param.bs_element_sla_v = 25
     param.bs_n_rows = 2
     param.bs_n_columns = 2
     param.bs_element_horiz_spacing = 0.5

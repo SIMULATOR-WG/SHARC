@@ -173,7 +173,7 @@ class Simulation(ABC, Observable):
 
         self.results = Results(self.parameters_filename, self.parameters.general.overwrite_output)
 
-        if self.parameters.general.system == 'RAS':
+        if self.parameters.general.system == 'RAS' or self.parameters.imt.topology == 'HIBS':
             self.polarization_loss = 0.0
         else:
             self.polarization_loss = 3.0
@@ -274,7 +274,7 @@ class Simulation(ABC, Observable):
             elif station_a.station_type is StationType.FS and self.parameters.imt.topology == "HIBS" or \
                 station_a.station_type is StationType.RAS and self.parameters.imt.topology == "HIBS" or \
                 station_a.station_type is StationType.ARNS and self.parameters.imt.topology == "HIBS":
-                print(f'Distancia 3D é : {d_3D}')
+                #print(f'Distance 3D : {d_3D}')
                 path_loss = propagation.get_loss(distance_3D=d_3D,
                                                  frequency=freq * np.ones(d_3D.shape),
                                                  indoor_stations=np.tile(station_b.indoor, (station_a.num_stations, 1)),

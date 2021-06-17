@@ -132,13 +132,13 @@ if __name__ == '__main__':
 
     param = ParametersArns()
     param.antenna_gain = 41
-    param.beamwidth_el = 1.1
-    param.beamwidth_az = 1.1
+    param.beamwidth_el = 1
+    param.beamwidth_az = 1
     param.frequency = 2700
     param.beamsteeringangle_az = 0
     param.beamsteeringangle_el = 0
     #param.number_elements = 70
-    param.number_elements = 38
+    param.number_elements = 30
     param.element_space = 0.5
 
     azimuth = np.linspace(-90, 90, num=5000)
@@ -156,8 +156,8 @@ if __name__ == '__main__':
     fig = plt.figure(figsize=(15, 5), facecolor='w', edgecolor='k')
 
     ax1 = fig.add_subplot(121)
-    #ax1.plot(azimuth, gain_az, 'b--', color='blue', label='Phased Array Radar Antenna')
-    ax1.semilogx(azimuth, gain_az, 'b--', color='blue', label='Phased Array Radar Antenna')
+    ax1.plot(azimuth, gain_az, 'b--', color='blue', label='Phased Array Radar Antenna')
+    #ax1.semilogx(azimuth, gain_az, 'b--', color='blue', label='Phased Array Radar Antenna')
     plt.legend(loc='upper right')
     ax1.grid(True)
     ax1.set_xlabel("Azimuth angle [deg]")
@@ -168,13 +168,13 @@ if __name__ == '__main__':
     ax1.set_ylim([-50, 10])
 
     ax2 = fig.add_subplot(122)
-    #ax2.plot(elevation, gain_elev, 'b--', color='darkorange', label='Phased Array Radar Antenna')
-    ax2.semilogx(elevation, gain_elev, 'b--', color='darkorange', label='Phased Array Radar Antenna')
+    ax2.plot(elevation, gain_elev, 'b--', color='darkorange', label='Phased Array Radar Antenna')
+    #ax2.semilogx(elevation, gain_elev, 'b--', color='darkorange', label='Phased Array Radar Antenna')
     ax2.grid(True)
     ax2.set_xlabel("Elevation angle [deg]")
     ax2.set_ylabel("Antenna gain [dBi]")
     ax2.set_xlim([0, 90])
-    ax2.set_ylim([-50, 10])
+    ax2.set_ylim([-60, 0])
     plt.title("Phased Array Radar Antenna")
     plt.legend(loc='upper right')
     plt.show()

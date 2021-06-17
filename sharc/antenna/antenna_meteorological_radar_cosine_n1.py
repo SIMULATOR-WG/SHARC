@@ -51,7 +51,7 @@ class AntennaMeteorologicalRadarCosine1(Antenna):
         gain = self.g_max + self.get_gain_az(phi_l)+self.get_gain_elev(phi_l)
         # print(theta_l)
         # print(self.g_max + self.get_gain_elev(phi_l))
-        print(gain)
+        #print(gain)
 
         return gain
 

@@ -726,7 +726,7 @@ class StationFactory(object):
             arns.y = np.array([y1]) * 1000
             z2 = np.array([(z1 * np.sin(sys_lat_rad) + x1 * np.cos(sys_lat_rad) - dist_system_centre_earth_km)]) * 1000
             arns.height = param.altitude - z2
-            print(arns.height)
+            #print(arns.height)
         else:
             arns.x = np.array([param.x])
             arns.y = np.array([param.y])
@@ -739,8 +739,8 @@ class StationFactory(object):
             param.beamsteeringangle_az = np.random.uniform(-45,45)
             #param.beamsteeringangle_el = np.random.normal(-20,85)
             param.beamsteeringangle_el = np.random.uniform(-2.5,2.5)
-            print(param.beamsteeringangle_az)
-            print(param.beamsteeringangle_el)
+            #print(param.beamsteeringangle_az)
+            #print(param.beamsteeringangle_el)
 
         else:
             if (param.distribution_enable == "ON"):
@@ -768,8 +768,8 @@ class StationFactory(object):
                 arns.azimuth = np.array([param.azimuth])
                 arns.elevation = np.array([param.elevation])
 
-        print(arns.azimuth)
-        print(arns.elevation)
+        #print(arns.azimuth)
+        #print(arns.elevation)
 
         arns.active = np.ones(num_arns, dtype=bool)
 
@@ -1185,16 +1185,16 @@ if __name__ == '__main__':
 
     class ParamsHibs(object):
         def __init__(self):
-            self.cell_radius = 100000
+            self.cell_radius = 90000
             self.intersite_distance = self.cell_radius * np.sqrt(3)
-            self.num_clusters = 1
+            self.num_clusters = 0
             self.num_sectors = 7
             self.bs_height = 20000
             self.azimuth3 = '90,210,330'
             self.elevation3 = '-90,-90,-90'
             self.azimuth7 = '0,0,60,120,180,240,300'
-            #self.elevation7 = '-90,-23,-23,-23,-23,-23,-23'
-            self.elevation7 = '-90,-33,-33,-33,-33,-33,-33'
+            self.elevation7 = '-90,-23,-23,-23,-23,-23,-23'
+            #self.elevation7 = '-90,-33,-33,-33,-33,-33,-33'
             self.azimuth19 = '0,15,30,45,75,90,105,135,150,165,195,210,225,255,270,285,315,330,345'
             self.elevation19 = '-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30,-30'
             self.bs_conducted_power = 37

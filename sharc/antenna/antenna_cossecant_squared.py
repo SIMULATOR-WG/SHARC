@@ -52,8 +52,8 @@ class AntennaCossecantSquared(Antenna):
 
         phi_l, theta_l = self.to_local_coord(phi, theta)
         gain = self.g_max + self.get_gain_az(phi_l)+self.get_gain_elev(phi_l)
-        print(f'Angulo theta de incidencia: {theta_l}')
-        print(f'Ganho da antena no angulo: {gain}')
+        #print(f'Angulo theta de incidencia: {theta_l}')
+        #print(f'Ganho da antena no angulo: {gain}')
         return gain
 
     def get_gain_az(self, phi: np.array) -> np.array:
@@ -125,15 +125,15 @@ if __name__ == '__main__':
 
     param = ParametersArns()
     param.antenna_gain = 0
-    param.beamwidth_el = 5
+    param.beamwidth_el = 4
     param.beamwidth_az = 1.5
-    param.csc2_angle = 40
+    param.csc2_angle = 35
     param.highbeam_csc2 = 0
 
     azimuth = np.linspace(-90, 90, num=1500)
     elevation = np.linspace(-90, 90, num=1500)
 
-    gain = 33.5
+    gain = 0
     azimuth_l = 0
     elevation_l = 0
 
@@ -160,7 +160,7 @@ if __name__ == '__main__':
     ax2.grid(True)
     ax2.set_xlabel("Elevation angle [deg]")
     ax2.set_ylabel("Antenna gain [dBi]")
-    ax2.set_xlim([-10, 50])
+    ax2.set_xlim([-5, 50])
     # ax2.set_ylim([-30, 40])
     plt.title("Aeronautical Surveillance Radar CSC2 Antenna Pattern")
     plt.legend()

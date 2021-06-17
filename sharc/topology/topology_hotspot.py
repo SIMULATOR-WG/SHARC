@@ -226,9 +226,9 @@ class TopologyHotspot(Topology):
 
 if __name__ == '__main__':
     param = ParametersHotspot()
-    param.num_hotspots_per_cell = 1
+    param.num_hotspots_per_cell = 3
 
-    param.max_dist_hotspot_ue = 60
+    param.max_dist_hotspot_ue = 100
     param.min_dist_bs_hotspot = 0
 
     intersite_distance = 371242
@@ -250,6 +250,6 @@ if __name__ == '__main__':
     plt.tight_layout()
 
     axes = plt.gca()
-    axes.set_xlim([-1500, 1000])
+    #axes.set_xlim([-1500, 1000])
 
     plt.show()

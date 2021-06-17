@@ -11,7 +11,7 @@ Date: Thu 31 May 14:00:00 2021
 """
 
 re = 6378                                     # Earth radius [km]
-satellite_altitude = 510                      # Satellite altitude
+satellite_altitude = 20                      # Satellite altitude
 satellite_elevation = np.linspace(0,90,100)   # Satellite elevation vector
 #satellite_elevation = 10
 
@@ -29,21 +29,21 @@ earth_diameter = np.pi *6378*2
 diameter_coverage_LEO = (2*np.radians(b))/(2*np.pi)
 diameter_coverage_LEO = diameter_coverage_LEO*earth_diameter
 angle = ((2*np.radians(b))/(2*np.pi))*360
-plt.title("LEO Coverage diameter arc")
-plt.plot(satellite_elevation,diameter_coverage_LEO,label=f'LEO altitude: {satellite_altitude} km ')
+plt.title("HIBS Full Coverage diameter arc")
+plt.plot(satellite_elevation,diameter_coverage_LEO,label=f'HIBS altitude: {satellite_altitude} km ')
 plt.xlabel('Elevation angle [degrees]', fontsize=10, color='black')
 plt.ylabel('Coverage diameter arc [km]', fontsize=10, color='black')
 plt.legend()
 plt.grid()
 plt.show()
-plt.title("LEO Full angle of the antenna beamwidth coverage")
+plt.title("HIBS Full angle of the antenna beamwidth coverage")
 plt.plot(2*a,diameter_coverage_LEO, label=f'LEO altitude: {satellite_altitude}')
 plt.xlabel('Full angle of the antenna beamwidth at the satellite [degrees]', fontsize=10, color='black')
 plt.ylabel('Coverage diameter arc [km]', fontsize=10, color='black')
 plt.grid()
 plt.legend()
 plt.show()
-plt.title("LEO Full angle of the antenna beamwidth coverage")
+plt.title("HIBS Full angle of the antenna beamwidth coverage")
 plt.plot(2*a,satellite_elevation,label=f'LEO altitude: {satellite_altitude}')
 plt.xlabel('Full angle of the antenna beamwidth at the satellite [degrees]', fontsize=10, color='black')
 plt.ylabel('Elevation angle [degrees]', fontsize=10, color='black')

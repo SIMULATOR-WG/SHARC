@@ -103,7 +103,7 @@ class TopologyMacrocell(Topology):
 
 
 if __name__ == '__main__':
-    intersite_distance = 500
+    intersite_distance = 371242
     num_clusters = 1
     topology = TopologyMacrocell(intersite_distance, num_clusters)
     topology.calculate_coordinates()
