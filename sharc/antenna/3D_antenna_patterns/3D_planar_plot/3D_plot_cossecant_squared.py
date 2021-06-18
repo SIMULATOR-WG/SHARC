@@ -21,7 +21,7 @@ Calculate the vertical antenna pattern (elevation) of Cosecant squared radar ant
 g_max = 33.5
 theta_3db = 5
 maximum_csc = 40
-highbeam_csc2 = 0
+highbeam_csc2 = 5
 
 theta = np.linspace(-90, 90, 100)
 const = np.pi * 50.8

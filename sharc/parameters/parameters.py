@@ -3,7 +3,7 @@
 Created on Wed Aug  9 19:35:52 2017
 
 @author: edgar
-@modified: Luciano Camilo Tue Jan 26 13:49:25 2021
+@modified: Luciano Camilo Tue Jun 18 07:20:00 2021
 """
 
 import configparser
@@ -408,8 +408,6 @@ class Parameters(object):
 
         # Phased Array antenna parameters
         self.arns.element_space        = config.getfloat("ARNS", "element_space")
-        self.arns.number_elements      = config.getfloat("ARNS", "number_elements")
-
 
         #######################################################################
         # RAS station

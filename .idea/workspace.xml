@@ -20,7 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34af3610-c741-4ddf-88b3-d5bbe348e854" name="Default Changelist" comment="&quot;Versão atualizada com o PyCharm&quot;">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sharc/input/parameters.ini" beforeDir="false" afterPath="$PROJECT_DIR$/sharc/input/parameters.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sharc/parameters/parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/sharc/parameters/parameters.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +77,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
-    <configuration name="antenna_omni_f1336" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="3D_plot_cossecant_squared" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SHARC-development" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -83,11 +85,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/antenna" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/antenna/3D_antenna_patterns/3D_planar_plot" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/antenna_omni_f1336.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/3D_antenna_patterns/3D_planar_plot/3D_plot_cossecant_squared.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -96,7 +98,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="antenna_radar_phased_array" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="antenna_cossecant_squared" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SHARC-development" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -108,28 +110,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/antenna_radar_phased_array.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="antenna_s1528_leo" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="SHARC-development" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/antenna" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/antenna_s1528_leo.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -159,7 +140,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="topology_hibs" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="propagation_clutter_loss" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SHARC-development" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -167,11 +148,32 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/topology" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/propagation" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/topology/topology_hibs.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/propagation/propagation_clutter_loss.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="satellite_earth_horizon_visibility" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SHARC-development" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sharc/support" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sharc/support/satellite_earth_horizon_visibility.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -183,10 +185,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.antenna_omni_f1336" />
-        <item itemvalue="Python.antenna_radar_phased_array" />
-        <item itemvalue="Python.topology_hibs" />
-        <item itemvalue="Python.antenna_s1528_leo" />
+        <item itemvalue="Python.satellite_earth_horizon_visibility" />
+        <item itemvalue="Python.antenna_cossecant_squared" />
+        <item itemvalue="Python.3D_plot_cossecant_squared" />
+        <item itemvalue="Python.propagation_clutter_loss" />
       </list>
     </recent_temporary>
   </component>
@@ -284,11 +286,6 @@
           <option name="timeStamp" value="185" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py</url>
-          <line>88</line>
-          <option name="timeStamp" value="203" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/antenna/antenna_metereological_radar_uniform.py</url>
           <line>54</line>
           <option name="timeStamp" value="204" />
@@ -324,34 +321,139 @@
           <option name="timeStamp" value="211" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sharc/topology/topology_factory.py</url>
-          <line>31</line>
-          <option name="timeStamp" value="216" />
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>271</line>
+          <option name="timeStamp" value="226" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
-          <line>135</line>
-          <option name="timeStamp" value="217" />
+          <line>276</line>
+          <option name="timeStamp" value="227" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>1028</line>
-          <option name="timeStamp" value="218" />
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>279</line>
+          <option name="timeStamp" value="228" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>1029</line>
-          <option name="timeStamp" value="219" />
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>283</line>
+          <option name="timeStamp" value="229" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>1082</line>
-          <option name="timeStamp" value="220" />
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>288</line>
+          <option name="timeStamp" value="230" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sharc/station_factory.py</url>
-          <line>1090</line>
-          <option name="timeStamp" value="221" />
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>293</line>
+          <option name="timeStamp" value="231" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>277</line>
+          <option name="timeStamp" value="232" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>246</line>
+          <option name="timeStamp" value="233" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>440</line>
+          <option name="timeStamp" value="235" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_beamforming_imt.py</url>
+          <line>184</line>
+          <option name="timeStamp" value="237" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_element_imt_m2101.py</url>
+          <line>57</line>
+          <option name="timeStamp" value="239" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>75</line>
+          <option name="timeStamp" value="243" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>211</line>
+          <option name="timeStamp" value="244" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>494</line>
+          <option name="timeStamp" value="247" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>493</line>
+          <option name="timeStamp" value="248" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>265</line>
+          <option name="timeStamp" value="249" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/mask/spectral_mask.py</url>
+          <line>75</line>
+          <option name="timeStamp" value="251" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>175</line>
+          <option name="timeStamp" value="252" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>177</line>
+          <option name="timeStamp" value="253" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>178</line>
+          <option name="timeStamp" value="254" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation.py</url>
+          <line>176</line>
+          <option name="timeStamp" value="255" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py</url>
+          <line>225</line>
+          <option name="timeStamp" value="256" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py</url>
+          <line>226</line>
+          <option name="timeStamp" value="257" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/simulation_downlink.py</url>
+          <line>286</line>
+          <option name="timeStamp" value="258" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py</url>
+          <line>53</line>
+          <option name="timeStamp" value="259" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py</url>
+          <line>56</line>
+          <option name="timeStamp" value="260" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py</url>
+          <line>88</line>
+          <option name="timeStamp" value="261" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -377,12 +479,41 @@
         <watch expression="__py_debug_temp_var_1936780696" />
       </configuration>
       <configuration name="PythonConfigurationType">
-        <watch expression="imt_base_stations.tx_power" />
-        <watch expression="self.bs.tx_power" />
-        <watch expression="self.g_max" />
+        <watch expression="oob_power " />
+        <watch expression="oob_interference" />
+        <watch expression="self.coupling_loss_imt_system_adjacent" />
+        <watch expression="self.param_system.bandwidth" />
+        <watch expression="self.system.bandwidth" />
+        <watch expression="self.system.thermal_noise" />
+        <watch expression="self.param_system.frequency" />
+        <watch expression="self.system.noise_temperature" />
+        <watch expression="self.param_system.BOLTZMANN_CONSTANT" />
+        <watch expression="self.system.inr" />
+        <watch expression="self.polarization_loss" />
+        <watch expression="self.parameters.imt.topology" />
+        <watch expression="polarization_loss " />
+        <watch expression="additional_loss " />
+        <watch expression="self.parameters.imt.bs_ohmic_loss" />
+        <watch expression="+ self.polarization_loss" />
+        <watch expression="coupling_loss" />
+        <watch expression="path_loss" />
+        <watch expression="free_space_loss" />
+        <watch expression="self.polarization_mismatch_loss" />
+        <watch expression="atmospheric_gasses_loss" />
+        <watch expression="beam_spreading_attenuation" />
+        <watch expression="diffraction_loss" />
+        <watch expression="rx_interference" />
+        <watch expression="off_axis_angle" />
+        <watch expression="theta" />
+        <watch expression="phi" />
+        <watch expression="gain_b" />
+        <watch expression="gain_a" />
       </configuration>
       <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_factory.py" line="440">
         <watch expression="fss_space_station.height" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/antenna/antenna_beamforming_imt.py" line="184">
+        <watch expression="gains[g]" />
       </inline-watch>
       <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="166">
         <watch expression="attenuation" />
@@ -390,8 +521,86 @@
       <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/propagation/propagation_p619.py" line="74">
         <watch expression="dummy" />
       </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="286">
+        <watch expression="self.system.rx_interference" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="288">
+        <watch expression="self.system.thermal_noise" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="276">
+        <watch expression="oob_power" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="279">
+        <watch expression="oob_interference" />
+      </inline-watch>
       <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="268">
         <watch expression="active_beams" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="283">
+        <watch expression="rx_interference" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation_downlink.py" line="293">
+        <watch expression="self.system.inr " />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/mask/spectral_mask.py" line="75">
+        <watch expression="power_oob" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="494">
+        <watch expression="gains" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="211">
+        <watch expression="elevation_angles" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="493">
+        <watch expression="theta" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="282">
+        <watch expression="sectors_in_node" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="440">
+        <watch expression="theta" language="Python" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="281">
+        <watch expression="gain_b" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="440">
+        <watch expression="phi" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="246">
+        <watch expression="gain_b" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="245">
+        <watch expression="gain_a " />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/simulation.py" line="228">
+        <watch expression="d_3D" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py" line="53">
+        <watch expression="phi_l" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py" line="34">
+        <watch expression="self.highbeam_csc2" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py" line="106">
+        <watch expression="g" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py" line="53">
+        <watch expression="self.get_gain_elev" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py" line="52">
+        <watch expression="phi_l" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/antenna/antenna_cossecant_squared.py" line="53">
+        <watch expression="gain" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_manager.py" line="201">
+        <watch expression="free_space_angle[i]" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_manager.py" line="198">
+        <watch expression="theta_0" />
+      </inline-watch>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/sharc/station_manager.py" line="215">
+        <watch expression="angle[i]" />
       </inline-watch>
     </watches-manager>
   </component>

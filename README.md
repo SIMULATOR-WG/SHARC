@@ -1,24 +1,28 @@
-# SHARC - Version 2.1.05
+# SHARC - Version 2.1.06
 #
       High Altitude Platform as IMT Base Station (HIBS) module.
 	  - Author: Luciano Camilo Alexandre
 	  - contact: luciano-camilo@hotmail.com
 
 <p align="center">
-  <img src="https://github.com/SIMULATOR-WG/SHARC/blob/dev-hibs/sharc/img/sharc-logo.png?raw=true" width="550" title="SHARing and Compatibility studies of radiocommunication systems">
+  <img src="https://github.com/lucianodtel/sharc-TMGTelecom/blob/master/SHARC-development/sharc/img/sharc-logo.png?raw=true" width="550" title="SHARing and Compatibility studies of radiocommunication systems">
 </p>
 
 # Release notes:
+
+#
+	  - date: 18/06/2021
+ - Refactoring ARNS.
 #
 	  - date: 17/06/2021
-	  
- - Refactoring;	  
+ - Refactoring ARNS.
+ 
 #
 	  - date: 31/05/2021
 
- - Added in /support the satellite/pseudo-satellite antenna beamwidth Earth coverage script;
- - Added in /support the satellite/pseudo-satellite horizon visibility script;
- - Added in /support the antenna efficiency script;
+ - Added in /support the satellite/pseudo-satellite antenna beamwidth earth coverage script.
+ - Added in /support the satellite/pseudo-satellite horizon visibility script.
+ - Added in /support the antenna efficiency script.
  - HIBS Cluster options: 0 and 1;
  - HIBS Band 1 option;
  - Added 3D Antenna patterns for IMT Beamforming;
@@ -26,8 +30,8 @@
  - Added new Phased Array Radar antenna for ARNS and Meteorological Radar;
  - Added Pencil Radar antenna pattern;
  - Added Cosine^2 Radar antenna pattern;
- - Added 3D Pencil Radar antenna plot;
- - Added 3D Cosine^2 Radar antenna plot;
+ - Added 3D Pencil Radar antenna Plot;
+ - Added 3D Cosine^2 Radar antenna Plot;
  - Added 3D Cosecant Squared Radar antenna plot;
  - Radar Phased Array Antenna element Cosine^2;
  - Added new section in parameters.ini regarding IMT Base Station;

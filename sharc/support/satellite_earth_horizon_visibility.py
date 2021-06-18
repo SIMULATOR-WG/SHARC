@@ -4,12 +4,13 @@ from matplotlib import pyplot as plt
 """
 Author: Luciano Camilo Alexandre (luciano-camilo@hotmail.com)
 
-Date: Thu 29 March 09:00:00 2021
+Date: Thu 17 Jun 22:00:00 2021
 
     Python script to calculate satellite/pseudo-satellite horizon visibility according Rec. ITU-R P.619 Annex I
 """
 
-x = -4.68 # longitude difference to calculate distance [degrees]
+#x = -4.68 # longitude difference to calculate distance [degrees]
+x = 1.8 # longitude difference to calculate distance [degrees]
 #x = -30 # longitude difference to calculate distance [degrees]
 
 EARTH_RADIUS = 6371000              # [meters]
@@ -18,9 +19,9 @@ satellite_altitude = 20000         # [meters]
 system_altitude = 8                 # [meters]
 
 
-satellite_lat_deg = -15.809422      # [degrees]
+satellite_lat_deg = -15.80      # [degrees]
 satellite_long_diff_deg = np.linspace(0, x, 181)  # [degrees]
-system_lat_deg = -15.809422         # [degrees]
+system_lat_deg = -15.80      # [degrees]
 
 # Creating vectors
 dist = np.linspace(0,180,181)

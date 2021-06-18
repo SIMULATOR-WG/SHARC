@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@Created: Luciano Camilo on Thu Marc 25 10:34:00 2021
+@Created: Luciano Camilo on Thu Jun 17 22:34:00 2021
 
 """
 from sharc.antenna.antenna import Antenna
@@ -63,6 +63,7 @@ class AntennaCossecantSquared(Antenna):
         const = np.pi * 68.8
         g = np.zeros(len(phi))
         mi = np.zeros(len(phi))
+        phi=phi-self.highbeam_csc2
 
         for i in range(len(phi)):
 
@@ -86,6 +87,7 @@ class AntennaCossecantSquared(Antenna):
         g = np.zeros(len(theta))
         mi = np.zeros(len(theta))
         theta = theta-self.highbeam_csc2
+        #print(theta)
         self.maximum_csc = self.maximum_csc-self.highbeam_csc2
 
         for i in range(len(theta)):
@@ -126,8 +128,8 @@ if __name__ == '__main__':
     param = ParametersArns()
     param.antenna_gain = 0
     param.beamwidth_el = 4
-    param.beamwidth_az = 1.5
-    param.csc2_angle = 35
+    param.beamwidth_az = 1.3
+    param.csc2_angle = 30
     param.highbeam_csc2 = 0
 
     azimuth = np.linspace(-90, 90, num=1500)
