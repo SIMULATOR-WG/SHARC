@@ -23,6 +23,7 @@ from sharc.parameters.parameters_haps import ParametersHaps
 from sharc.parameters.parameters_rns import ParametersRns
 from sharc.parameters.parameters_arns import ParametersArns
 from sharc.parameters.parameters_ras import ParametersRas
+from sharc.parameters.parameters_imt_mobile_station import ParametersImtMobileStation
 from sharc.parameters.parameters_hibs import ParametersHibs
 from sharc.station_manager import StationManager
 from sharc.mask.spectral_mask_imt import SpectralMaskImt
@@ -357,6 +358,8 @@ class StationFactory(object):
             return StationFactory.generate_arns(parameters.arns, random_number_gen)
         elif parameters.general.system == "RAS":
             return StationFactory.generate_ras_station(parameters.ras)
+        elif parameters.general.system == "IMT_UE":
+            return StationFactory.generate_imt_mobile_station(parameters.imt_mobile_station, random_number_gen)
         else:
             sys.stderr.write("ERROR\nInvalid system: " + parameters.general.system)
             sys.exit(1)
@@ -907,6 +910,90 @@ class StationFactory(object):
         eess_passive_sensor.total_interference = -500
 
         return eess_passive_sensor
+
+    @staticmethod
+    def generate_imt_mobile_station(param: ParametersImtMobileStation, random_number_gen: np.random.RandomState()):
+
+        num_imt_mobile_station = 1
+        imt_mobile_station = StationManager(num_imt_mobile_station)
+        imt_mobile_station.station_type = StationType.IMT_MOBILE_STATION
+
+        if (param.channel_model == "P619"):
+            # Coordinates according to  ITU-R P619-1, Attachment A
+            # calculate distances to the centre of the Earth
+            dist_hibs_centre_earth_km = (param.EARTH_RADIUS + param.altitude) / 1000
+            dist_system_centre_earth_km = (param.EARTH_RADIUS + param.imt_altitude) / 1000
+
+            # calculate Cartesian coordinates of satellite, with origin at centre of the Earth
+            sat_lat_rad = param.hibs_lat_deg * np.pi / 180.
+            imt_long_diff_rad = param.imt_long_diff_deg * np.pi / 180.
+            x1 = dist_hibs_centre_earth_km * np.cos(sat_lat_rad) * np.cos(imt_long_diff_rad)
+            y1 = dist_hibs_centre_earth_km * np.cos(sat_lat_rad) * np.sin(imt_long_diff_rad)
+            z1 = dist_hibs_centre_earth_km * np.sin(sat_lat_rad)
+
+            # rotate axis and calculate coordinates with origin at System
+            sys_lat_rad = param.imt_lat_deg * np.pi / 180.
+            imt_mobile_station.x = np.array([x1 * np.sin(sys_lat_rad) - z1 * np.cos(sys_lat_rad)]) * 1000
+            imt_mobile_station.y = np.array([y1]) * 1000
+            z2 = np.array([(z1 * np.sin(sys_lat_rad) + x1 * np.cos(sys_lat_rad) - dist_system_centre_earth_km)]) * 1000
+            imt_mobile_station.height = param.altitude - z2
+            # print(arns.height)
+        else:
+            #xis=np.random.uniform(0,500000)
+            #yis=np.random.uniform(0,500000)
+            #imt_mobile_station.x = np.array([xis])
+            #print(f'X position is: = {imt_mobile_station.x}')
+            imt_mobile_station.x = np.array([param.x])
+            #imt_mobile_station.y = np.array([yis])
+            #print(f'Y position is: = {imt_mobile_station.y}')
+            imt_mobile_station.y = np.array([param.y])
+            imt_mobile_station.height = np.array([param.height])
+
+        if (param.distribution_enable == "ON"):
+            if (param.distribution_type == "UNIFORM"):
+                if (type(param.azimuth_distribution)) != list:
+                    aux_azimuth = param.azimuth_distribution.split(',')
+                    param.azimuth_distribution = [float(i) for i in aux_azimuth]
+                    aux_elevation = param.elevation_distribution.split(',')
+                    param.elevation_distribution = [float(i) for i in aux_elevation]
+                param.azimuth = np.random.uniform(param.azimuth_distribution[0], param.azimuth_distribution[1])
+                param.elevation = np.random.uniform(param.elevation_distribution[0],
+                                                        param.elevation_distribution[1])
+                imt_mobile_station.azimuth = np.array([param.azimuth])
+                imt_mobile_station.elevation = np.array([param.elevation])
+            elif (param.distribution_type == "UNIFORM_NORMAL"):
+                if (type(param.azimuth_distribution)) != list:
+                    aux_azimuth = param.azimuth_distribution.split(',')
+                    param.azimuth_distribution = [float(i) for i in aux_azimuth]
+                    aux_elevation = param.elevation_distribution.split(',')
+                    param.elevation_distribution = [float(i) for i in aux_elevation]
+                param.azimuth = np.random.uniform(param.azimuth_distribution[0], param.azimuth_distribution[1])
+                param.elevation = np.random.normal(param.elevation_distribution[0], param.elevation_distribution[1])
+                imt_mobile_station.azimuth = np.array([param.azimuth])
+                imt_mobile_station.elevation = np.array([param.elevation])
+        else:
+            imt_mobile_station.azimuth = np.array([param.azimuth])
+            imt_mobile_station.elevation = np.array([param.elevation])
+
+        # print(arns.azimuth)
+        # print(arns.elevation)
+
+        imt_mobile_station.active = np.ones(num_imt_mobile_station, dtype=bool)
+
+        if param.antenna_pattern == "OMNI":
+            imt_mobile_station.antenna = np.array([AntennaOmni(param.antenna_gain)])
+        #elif param.antenna_pattern == "COSSECANT SQUARED":
+            #arns.antenna = np.array([AntennaCossecantSquared(param)])
+        else:
+            sys.stderr.write("ERROR\nInvalid RNS antenna pattern: " + param.antenna_pattern)
+            sys.exit(1)
+
+        imt_mobile_station.bandwidth = np.array([param.bandwidth])
+        imt_mobile_station.noise_temperature = param.noise_temperature
+        imt_mobile_station.thermal_noise = -500
+        imt_mobile_station.total_interference = -500
+        imt_mobile_station.rx_interference = -500
+        return imt_mobile_station
 
     @staticmethod
     def get_random_position(num_stas: int, topology: Topology,

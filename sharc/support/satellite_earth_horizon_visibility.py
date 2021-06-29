@@ -10,12 +10,12 @@ Date: Thu 17 Jun 22:00:00 2021
 """
 
 #x = -4.68 # longitude difference to calculate distance [degrees]
-x = 1.8 # longitude difference to calculate distance [degrees]
-#x = -30 # longitude difference to calculate distance [degrees]
+#x = 4 # longitude difference to calculate distance [degrees]
+x = -4.66 # longitude difference to calculate distance [degrees]
 
 EARTH_RADIUS = 6371000              # [meters]
 satellite_altitude = 20000         # [meters]
-#satellite_altitude = 510000         # [meters]
+#satellite_altitude = 590000         # [meters]
 system_altitude = 8                 # [meters]
 
 
@@ -40,6 +40,7 @@ theta_0 = np.linspace(0,180,181)
 theta_earth_space = np.linspace(0,180,181)
 angle_trigonometry = np.linspace(0,180,181)
 maximum_distance = 500000 # maximum distance evaluated in trigonometry
+#maximum_distance = 3200000 # maximum distance evaluated in trigonometry
 
 
 # Calculate distances to the centre of the Earth

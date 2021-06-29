@@ -25,6 +25,7 @@ from sharc.parameters.parameters_ras import ParametersRas
 from sharc.parameters.parameters_hibs import ParametersHibs
 from sharc.parameters.parameters_imt_base_station import ParametersImtBaseStation
 from sharc.parameters.parameters_antenna_imt_base_station import ParametersAntennaImtBaseStation
+from sharc.parameters.parameters_imt_mobile_station import ParametersImtMobileStation
 
 
 class Parameters(object):
@@ -52,6 +53,7 @@ class Parameters(object):
         self.hibs = ParametersHibs()
         self.imt_bs = ParametersImtBaseStation()
         self.antenna_imt_bs = ParametersAntennaImtBaseStation()
+        self.imt_mobile_station = ParametersImtMobileStation()
 
     def set_file_name(self, file_name: str):
         self.file_name = file_name
@@ -533,3 +535,54 @@ class Parameters(object):
         self.antenna_imt_bs.bs_minimum_array_gain      = config.getfloat("IMT BASE STATION", "bs_minimum_array_gain")
         self.antenna_imt_bs.bs_downtilt                = config.getfloat("IMT BASE STATION", "bs_downtilt")
         self.antenna_imt_bs.bf_enable                      = config.get("IMT BASE STATION", "bf_enable")
+
+        #######################################################################
+        # IMT MOBILE STATION (UE)
+        #######################################################################
+
+        self.imt_mobile_station.x = config.getfloat("IMT UE", "x")
+        self.imt_mobile_station.y = config.getfloat("IMT UE", "y")
+        self.imt_mobile_station.height = config.getfloat("IMT UE", "height")
+        self.imt_mobile_station.elevation = config.getfloat("IMT UE", "elevation")
+        self.imt_mobile_station.azimuth = config.getfloat("IMT UE", "azimuth")
+        self.imt_mobile_station.distribution_enable = config.get("IMT UE", "distribution_enable")
+        self.imt_mobile_station.distribution_type = config.get("IMT UE", "distribution_type")
+        self.imt_mobile_station.azimuth_distribution = config.get("IMT UE", "azimuth_distribution")
+        self.imt_mobile_station.elevation_distribution = config.get("IMT UE", "elevation_distribution")
+        self.imt_mobile_station.frequency = config.getfloat("IMT UE", "frequency")
+        self.imt_mobile_station.bandwidth = config.getfloat("IMT UE", "bandwidth")
+        self.imt_mobile_station.noise_temperature = config.getfloat("IMT UE", "noise_temperature")
+        self.imt_mobile_station.acs = config.getfloat("IMT UE", "acs")
+        self.imt_mobile_station.antenna_gain = config.getfloat("IMT UE", "antenna_gain")
+        self.imt_mobile_station.antenna_pattern = config.get("IMT UE", "antenna_pattern")
+        self.imt_mobile_station.channel_model = config.get("IMT UE", "channel_model")
+        self.imt_mobile_station.BOLTZMANN_CONSTANT = config.getfloat("IMT UE", "BOLTZMANN_CONSTANT")
+        self.imt_mobile_station.EARTH_RADIUS = config.getfloat("IMT UE", "EARTH_RADIUS")
+        self.imt_mobile_station.altitude = config.getfloat("IMT UE", "altitude")
+
+
+        # P.619 parameters
+        self.imt_mobile_station.hibs_lat_deg      = config.getfloat("IMT UE", "hibs_lat_deg")
+        self.imt_mobile_station.imt_altitude      = config.getfloat("IMT UE", "system_altitude")
+        self.imt_mobile_station.imt_lat_deg       = config.getfloat("IMT UE", "system_lat_deg")
+        self.imt_mobile_station.imt_long_diff_deg = config.getfloat("IMT UE", "system_long_diff_deg")
+        self.imt_mobile_station.season            = config.get("IMT UE", "season")
+
+        # IMT Mobile Station Antenna parameters
+        # self.antenna_imt_ue.bs_antenna_type = config.get("IMT BASE STATION", "ue_antenna_type")
+        # self.antenna_imt_ue.adjacent_antenna_model = config.get("IMT BASE STATION", "adjacent_antenna_model")
+        # self.antenna_imt_ue.ue_normalization = config.getboolean("IMT BASE STATION", "ue_normalization")
+        # self.antenna_imt_ue.ue_normalization_file = config.get("IMT BASE STATION", "ue_normalization_file")
+        # self.antenna_imt_ue.ue_element_pattern = config.get("IMT BASE STATION", "ue_element_pattern")
+        #
+        # self.antenna_imt_ue.ue_element_max_g = config.getfloat("IMT BASE STATION", "bs_element_max_g")
+        # self.antenna_imt_ue.ue_element_phi_3db = config.getfloat("IMT BASE STATION", "bs_element_phi_3db")
+        # self.antenna_imt_ue.ue_element_theta_3db = config.getfloat("IMT BASE STATION", "bs_element_theta_3db")
+        # self.antenna_imt_ue.ue_element_am = config.getfloat("IMT BASE STATION", "bs_element_am")
+        # self.antenna_imt_ue.ue_element_sla_v = config.getfloat("IMT BASE STATION", "bs_element_sla_v")
+        # self.antenna_imt_ue.ue_n_rows = config.getfloat("IMT BASE STATION", "bs_n_rows")
+        # self.antenna_imt_ue.ue_n_columns = config.getfloat("IMT BASE STATION", "bs_n_columns")
+        # self.antenna_imt_ue.ue_element_horiz_spacing = config.getfloat("IMT BASE STATION", "bs_element_horiz_spacing")
+        # self.antenna_imt_ue.ue_element_vert_spacing = config.getfloat("IMT BASE STATION", "bs_element_vert_spacing")
+        # self.antenna_imt_ue.ue_multiplication_factor = config.getfloat("IMT BASE STATION", "bs_multiplication_factor")
+        # self.antenna_imt_ue.ue_minimum_array_gain = config.getfloat("IMT BASE STATION", "bs_minimum_array_gain")

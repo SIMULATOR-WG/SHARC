@@ -11,6 +11,12 @@
 # Release notes:
 
 #
+	  - date: 29/06/2021
+ - Refactoring HIBS co-channel;
+#
+	  - date: 23/06/2021
+ - Added new section in parameters.ini regarding IMT Mobile Station;
+#
 	  - date: 18/06/2021
  - Refactoring ARNS.
 #

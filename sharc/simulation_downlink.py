@@ -95,8 +95,7 @@ class SimulationDownlink(Simulation):
         # divided among the selected UEs
         # Note: For HIBS Topology the maximum transmit power is the same for all UEs
         if self.parameters.imt.topology == 'HIBS':
-            total_power = self.parameters.hibs.bs_conducted_power \
-                          + self.bs_power_gain
+            total_power = self.parameters.hibs.bs_conducted_power
             tx_power = total_power
         else:
             total_power = self.parameters.imt.bs_conducted_power \
@@ -119,7 +118,7 @@ class SimulationDownlink(Simulation):
             if self.parameters.hibs.num_sectors == 1:
                 for bs in bs_active:
                     if bs == 0 in bs_active:
-                        self.bs.tx_power = dict([(bs, tx_power * np.ones(self.parameters.imt.ue_k)) for
+                        self.bs.tx_power = dict([(bs, (tx_power+10*np.log10(2*2)) * np.ones(self.parameters.imt.ue_k)) for
                                                  bs in bs_active])
 
             elif self.parameters.hibs.num_sectors == 7:
@@ -127,35 +126,35 @@ class SimulationDownlink(Simulation):
                     for bs in bs_active:
                         if (bs==0 or bs==7 or bs==14 or bs==21 or bs== 28 or bs == 35 or bs==42):
                             numero=bs
-                            self.bs.tx_power[numero] = tx_power * np.ones(self.parameters.imt.ue_k)
+                            self.bs.tx_power[numero] = (tx_power+10*np.log10(2*2)) * np.ones(self.parameters.imt.ue_k)
                         else:
                             numero = bs
-                            self.bs.tx_power[numero] = tx_power - self.parameters.hibs.bs_backoff_power * \
+                            self.bs.tx_power[numero] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power * \
                                                   np.ones(self.parameters.imt.ue_k)
                 if self.parameters.hibs.num_clusters == 0:
                     for bs in bs_active:
                         if bs == 0 in bs_active:
-                            self.bs.tx_power[0] = tx_power * np.ones(self.parameters.imt.ue_k)
+                            self.bs.tx_power[0] = (tx_power+10*np.log10(2*2)) * np.ones(self.parameters.imt.ue_k)
                         elif bs == 1 in bs_active:
-                            self.bs.tx_power[1] = tx_power - self.parameters.hibs.bs_backoff_power * \
+                            self.bs.tx_power[1] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power * \
                                                   np.ones(self.parameters.imt.ue_k)
                         elif bs == 2 in bs_active:
-                            self.bs.tx_power[2] = tx_power - self.parameters.hibs.bs_backoff_power \
+                            self.bs.tx_power[2] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power \
                                                   * np.ones(self.parameters.imt.ue_k)
                         elif bs == 3 in bs_active:
-                            self.bs.tx_power[3] = tx_power - self.parameters.hibs.bs_backoff_power \
+                            self.bs.tx_power[3] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power \
                                                   * np.ones(self.parameters.imt.ue_k)
                         elif bs == 4 in bs_active:
-                            self.bs.tx_power[4] = tx_power - self.parameters.hibs.bs_backoff_power \
+                            self.bs.tx_power[4] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power \
                                                   * np.ones(self.parameters.imt.ue_k)
                         elif bs == 5 in bs_active:
-                            self.bs.tx_power[5] = tx_power - self.parameters.hibs.bs_backoff_power \
+                            self.bs.tx_power[5] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power \
                                                   * np.ones(self.parameters.imt.ue_k)
                         elif bs == 6 in bs_active:
-                            self.bs.tx_power[6] = tx_power - self.parameters.hibs.bs_backoff_power \
+                            self.bs.tx_power[6] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power \
                                                   * np.ones(self.parameters.imt.ue_k)
                         elif bs == 7 in bs_active:
-                            self.bs.tx_power[6] = tx_power - self.parameters.hibs.bs_backoff_power \
+                            self.bs.tx_power[6] = (tx_power+10*np.log10(4*2)) - self.parameters.hibs.bs_backoff_power \
                                                   * np.ones(self.parameters.imt.ue_k)
 
                         #self.bs.tx_power = dict([(bs, tx_power * np.ones(self.parameters.imt.ue_k)) for bs in bs_active])

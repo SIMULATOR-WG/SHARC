@@ -121,9 +121,10 @@ class SpectralMaskImt(SpectralMask):
 if __name__ == '__main__':
     # Initialize variables
     sta_type = StationType.IMT_BS
-    p_tx = 43.02
-    freq = 2150
-    band = 20
+    p_tx = 28.06
+    #freq = 2150
+    freq = 24350
+    band = 200
 
     # Create mask
     msk = SpectralMaskImt(sta_type,freq,band,-13)

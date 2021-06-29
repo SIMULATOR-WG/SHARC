@@ -41,3 +41,4 @@ class StationType(Enum):
     EESS_PASSIVE = 9 # EESS passive sensor
     SS_MLEO = 10  # Satellite Service - Medium/Low Earth Orbit
     ARNS   = 11 # Aeronautical Radionavigation Service (Air Surveillance Radars and Meteorological Radars)
+    IMT_MOBILE_STATION = 12 # IMT Mobile Station (User Equipment)

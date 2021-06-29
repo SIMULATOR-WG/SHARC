@@ -69,6 +69,7 @@ class AntennaBeamformingImt(Antenna):
 
         self.azimuth = azimuth
         self.elevation = elevation
+
         self._calculate_rotation_matrix()
         self.minimum_array_gain = par.minimum_array_gain
 
@@ -178,8 +179,7 @@ class AntennaBeamformingImt(Antenna):
 
         if co_channel:
             for g in range(n_direct):
-                gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g], beams_l[g])\
-                           + correction_factor[correction_factor_idx[g]]
+                gains[g] = self._beam_gain(lo_phi_vec[g], lo_theta_vec[g], beams_l[g]) + correction_factor[correction_factor_idx[g]]
         else:
             for g in range(n_direct):
                 gains[g] = self.element.element_pattern(lo_phi_vec[g],
@@ -209,6 +209,10 @@ class AntennaBeamformingImt(Antenna):
         """
         r_phi = np.deg2rad(phi)
         r_theta = np.deg2rad(theta)
+
+        #r_phi = np.deg2rad(0)
+        #print(f"Theta = {theta}")
+        #r_theta = np.deg2rad(0)
 
         n = np.arange(self.n_rows) + 1
         m = np.arange(self.n_cols) + 1
@@ -259,19 +263,19 @@ class AntennaBeamformingImt(Antenna):
         -------
             gain (float): beam gain [dBi]
         """
-
         element_g = self.element.element_pattern(phi, theta)
+        #print(f"Ganho do elemento é = {element_g}")
 
         v_vec = self._super_position_vector(phi, theta)
-
         if beam == -1:
             w_vec = self._weight_vector(phi, theta-90)
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec, w_vec)))**2)
         else:
             array_g = 10*np.log10(abs(np.sum(np.multiply(v_vec, self.w_vec_list[beam])))**2)
-
+        #print(array_g)
 
         gain = element_g + array_g
+        #print(f"Ganho do arranjo é ={array_g}")
 
         return gain
 
@@ -295,6 +299,7 @@ class AntennaBeamformingImt(Antenna):
 
         alpha = np.deg2rad(self.azimuth)
         beta = np.deg2rad(self.elevation)
+
 
         ry = np.matrix([[np.cos(beta), 0.0, np.sin(beta)],
                         [0.0, 1.0,       0.0],
@@ -378,7 +383,7 @@ class PlotAntennaPattern(object):
         ax2.set_xlim(0, 180)
         if np.max(gain) > top_y_lim:
             top_y_lim = np.ceil(np.max(gain)/10)*10
-        ax2.set_ylim(top_y_lim - 50, top_y_lim)
+        ax2.set_ylim(top_y_lim - 100, top_y_lim)
 
         if sta_type == "BS":
             file_name = self.figs_dir + "bs_"
@@ -554,7 +559,7 @@ if __name__ == '__main__':
     param.bs_element_theta_3db = 65
     param.bs_element_am = 30
     param.bs_element_sla_v = 25
-    param.bs_n_rows = 2
+    param.bs_n_rows = 4
     param.bs_n_columns = 2
     param.bs_element_horiz_spacing = 0.5
     param.bs_element_vert_spacing = 0.5
