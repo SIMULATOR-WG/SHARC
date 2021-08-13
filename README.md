@@ -14,6 +14,6 @@
 	  - date: 12/08/2021
  - Added nadir angle statistical distributions in EESS passive Section;
  - Added new EESS Active antenna pattern based on ITU-RS.2043-0, Table 9;
- - Added Beamsteering vertical angle limit conifguration in EESS passive Section ;
+ - Added Beamsteering vertical angle limit configuration in EESS passive Section ;
  - Added Beamsteering vertical angle limit enable in EESS passive Section;
 #
