@@ -3086,3 +3086,28 @@ Elapsed time: 00 h 00 min 03 seg
 SHARC - Version 2.1.08
 Ready to run!
 
+SHARC - Version 2.1.08
+Ready to run!
+
+Loading file:
+C:/SHARC-EESS-Active/SHARC-development/sharc/input/parameters.ini
+
+IMT:
+	interfered with: False
+	direction: DOWNLINK
+	frequency: 10.100 GHz
+	bandwidth: 200 MHz
+	spurious emissions: -13 dBm/MHz
+	topology: HOTSPOT
+	path loss model: UMi
+EESS_PASSIVE:
+	frequency: 9.800 GHz
+	bandwidth: 1200 MHz
+	path loss model: FSPL
+	antenna pattern: ITU-R RS.2043
+
+Simulation is running...
+Snapshot #10
+STOPPED BY USER, FINALIZING SIMULATION
+FINISHED!
+Elapsed time: 00 h 00 min 02 seg

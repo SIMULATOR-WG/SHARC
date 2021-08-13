@@ -692,16 +692,16 @@ class StationFactory(object):
                     param.nadir_angle_distribution = [float(i) for i in aux_nadir_angle]
                 param.nadir_angle = np.random.uniform(param.nadir_angle_distribution[0],
                                                   param.nadir_angle_distribution[1])
-                print(param.nadir_angle)
+                #print(param.nadir_angle)
                 incidence_angle = math.degrees(math.asin(math.sin(math.radians(param.nadir_angle)) *
                                                          (1 + (param.altitude / param.EARTH_RADIUS))))
                 # distance to field of view centre according to Rec. ITU-R RS.1861-0
                 distance = param.EARTH_RADIUS * \
                            math.sin(math.radians(incidence_angle - param.nadir_angle)) / \
                            math.sin(math.radians(param.nadir_angle))
-                print(incidence_angle)
+                #print(incidence_angle)
         else:
-            print(param.nadir_angle)
+            #print(param.nadir_angle)
             incidence_angle = math.degrees(math.asin(math.sin(math.radians(param.nadir_angle))*(1 + (param.altitude/param.EARTH_RADIUS))))
             #print(incidence_angle)
             # distance to field of view centre according to Rec. ITU-R RS.1861-0
