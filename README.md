@@ -5,7 +5,7 @@
 	  - contact: luciano-camilo@hotmail.com
 
 <p align="center">
-  <img src="https://github.com/lucianodtel/sharc-TMGTelecom/blob/master/SHARC-development/sharc/img/sharc-logo.png?raw=true" width="550" title="SHARing and Compatibility studies of radiocommunication systems">
+  <img src="https://github.com/SIMULATOR-WG/SHARC/blob/dev_eess_active/sharc/img/sharc-logo.png?raw=true" width="550" title="SHARing and Compatibility studies of radiocommunication systems">
 </p>
 
 # Release notes:
