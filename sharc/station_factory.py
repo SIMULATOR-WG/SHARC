@@ -743,7 +743,7 @@ class StationFactory(object):
         eess_passive_sensor.bandwidth = param.bandwidth
         # Noise temperature is not an input parameter for EESS passive.
         # It is included here to calculate the useless I/N values
-        eess_passive_sensor.noise_temperature = 250
+        eess_passive_sensor.noise_temperature = 288.6
         eess_passive_sensor.thermal_noise = -500
         eess_passive_sensor.total_interference = -500
 

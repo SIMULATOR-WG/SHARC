@@ -68,7 +68,7 @@ class TopologyHotspot(Topology):
             hotspot_x = np.array(0)
             hotspot_y = np.array(0)
             hotspot_azimuth = np.array(0)
-            
+
             for hs in range(self.param.num_hotspots_per_cell):
                 num_attempts = 0
                 while(True):
@@ -105,21 +105,22 @@ class TopologyHotspot(Topology):
                             break
                         else:
                             num_attempts = num_attempts + 1
-                            
+
                         if num_attempts > TopologyHotspot.MAX_NUM_LOOPS:
                             sys.stderr.write("ERROR\nInfinite loop while creating hotspots.\nTry less hotspots per cell or greater macro cell intersite distance.\n")
                             sys.exit(1)
                 #if num_attempts > 1: print("number of attempts: {}".format(num_attempts))
             x = np.concatenate([x, hotspot_x])
             y = np.concatenate([y, hotspot_y])
-            azimuth = np.concatenate([azimuth, hotspot_azimuth])            
-            
+            azimuth = np.concatenate([azimuth, hotspot_azimuth])
+
         self.x = x
         self.y = y
         self.azimuth = azimuth
         # In the end, we have to update the number of base stations
         self.num_base_stations = len(self.x)
         self.indoor = np.zeros(self.num_base_stations, dtype = bool)
+        #print(self.num_base_stations)
 
 
     def overlapping_hotspots(self,
@@ -128,7 +129,7 @@ class TopologyHotspot(Topology):
                              candidate_azimuth: np.array,
                              set_x: np.array,
                              set_y: np.array,
-                             set_azimuth: np.array,                             
+                             set_azimuth: np.array,
                              radius: float) -> bool:
         """
         Evaluates the spatial relationships among hotspots and checks whether
@@ -142,7 +143,7 @@ class TopologyHotspot(Topology):
             candidate_azimuth: horizontal angle of the candidate hotspot (orientation)
             set_x: x-coordinates of the set of hotspots
             set_y: y-coordinates of the set of hotspots
-            set_azimuth: horizontal angle of the set of hotspots (orientation)            
+            set_azimuth: horizontal angle of the set of hotspots (orientation)
             radius: radius of all hotspots
 
         Returns
@@ -157,7 +158,7 @@ class TopologyHotspot(Topology):
             set_points = list()
             set_points.append((x, y))
             for a in range(len(azimuth_values)):
-                set_points.append((x + radius*math.cos(np.radians(azimuth + azimuth_values[a])), 
+                set_points.append((x + radius*math.cos(np.radians(azimuth + azimuth_values[a])),
                                    y + radius*math.sin(np.radians(azimuth + azimuth_values[a]))))
             set_polygons.append(Polygon(set_points))
 
@@ -165,12 +166,12 @@ class TopologyHotspot(Topology):
         points = list()
         points.append((candidate_x, candidate_y))
         for a in range(len(azimuth_values)):
-            points.append((candidate_x + radius*math.cos(np.radians(candidate_azimuth + azimuth_values[a])), 
+            points.append((candidate_x + radius*math.cos(np.radians(candidate_azimuth + azimuth_values[a])),
                            candidate_y + radius*math.sin(np.radians(candidate_azimuth + azimuth_values[a]))))
         polygon = Polygon(points)
-            
-        # Check if there is overlapping between the candidate hotspot and 
-        # any of the hotspots of the set. In other words, check if any polygons 
+
+        # Check if there is overlapping between the candidate hotspot and
+        # any of the hotspots of the set. In other words, check if any polygons
         # intersect
         for p in range(len(set_polygons)):
             overlapping = polygon.intersects(set_polygons[p])
@@ -228,14 +229,15 @@ class TopologyHotspot(Topology):
 
 if __name__ == '__main__':
     param = ParametersHotspot()
-    param.num_hotspots_per_cell = 2
+    param.num_hotspots_per_cell = 3
 
-    param.max_dist_hotspot_ue = 60
+    param.max_dist_hotspot_ue = 100
     param.min_dist_bs_hotspot = 0
 
-    intersite_distance = 339.81
+    #intersite_distance = 7795.7
+    intersite_distance = 272411.8
 
-    num_clusters = 1
+    num_clusters = 7
     topology = TopologyHotspot(param, intersite_distance, num_clusters)
     topology.calculate_coordinates()
 
@@ -252,6 +254,6 @@ if __name__ == '__main__':
     plt.tight_layout()
 
     axes = plt.gca()
-    axes.set_xlim([-1500, 1000])
+    #axes.set_xlim([-1500, 1500])
 
     plt.show()

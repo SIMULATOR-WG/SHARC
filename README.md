@@ -11,6 +11,9 @@
 # Release notes:
 
 #
+	  - date: 25/08/2021
+ - Added suppression sidelobe -30 dB into antenna imt beamforming for initial simulations;
+#
 	  - date: 12/08/2021
  - Added nadir angle statistical distributions in EESS passive Section;
  - Added new EESS Active antenna pattern based on ITU-RS.2043-0, Table 9;

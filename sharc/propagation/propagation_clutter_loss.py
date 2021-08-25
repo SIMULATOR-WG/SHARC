@@ -149,7 +149,8 @@ if __name__ == '__main__':
 
     elevation_angle = np.array([90, 80, 70, 60, 50, 40, 30, 20, 15, 10, 5, 0])
     loc_percentage = np.linspace(0.01, 0.99, 1000)
-    frequency = 27250 * np.ones(elevation_angle.shape)
+    #frequency = 27250 * np.ones(elevation_angle.shape)
+    frequency = 10050 * np.ones(elevation_angle.shape)
 
     random_number_gen = np.random.RandomState(101)
     cl = PropagationClutterLoss(random_number_gen)

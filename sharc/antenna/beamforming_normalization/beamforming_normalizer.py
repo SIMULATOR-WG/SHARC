@@ -67,8 +67,8 @@ class BeamformingNormalizer(object):
                                         self.theta_max_deg,res_deg)
         self.antenna = None
 
-    def generate_correction_matrix(self, 
-                                   par: AntennaPar, 
+    def generate_correction_matrix(self,
+                                   par: AntennaPar,
                                    file_name: str,
                                    testing = False):
         """
@@ -209,10 +209,10 @@ if __name__ == '__main__':
     normalization = False
     norm_file = None
     element_pattern = "M2101"
-    element_max_g = 5
-    element_phi_deg_3db = 65
-    element_theta_deg_3db = 65
-    element_am = 30
+    element_max_g = 5.5
+    element_phi_deg_3db = 90
+    element_theta_deg_3db = 90
+    element_am = 25
     element_sla_v = 30
     n_rows = 8
     n_columns = 8
