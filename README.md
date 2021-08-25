@@ -12,7 +12,7 @@
 
 #
 	  - date: 25/08/2021
- - Added suppression sidelobe -30 dB into antenna imt beamforming for initial simulations;
+ - Added suppression sidelobe -30 dB in antenna imt beamforming script for initial simulations;
 #
 	  - date: 12/08/2021
  - Added nadir angle statistical distributions in EESS passive Section;
