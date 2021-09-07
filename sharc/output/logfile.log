@@ -25219,3 +25219,120 @@ Simulation is running...
 Snapshot #10
 Snapshot #20
 STOPPED BY USER, FINALIZING SIMULATION
+SHARC - Version 2.1.08
+Ready to run!
+
+Loading file:
+C:/SHARC-EESS-Active/SHARC-development/sharc/input/arquivos novos/parameters_8510345km2_nadir_50.ini
+
+IMT:
+	interfered with: False
+	direction: DOWNLINK
+	frequency: 10.050 GHz
+	bandwidth: 100 MHz
+	spurious emissions: -13 dBm/MHz
+	topology: HOTSPOT
+	path loss model: UMi
+EESS_PASSIVE:
+	frequency: 10.050 GHz
+	bandwidth: 100 MHz
+	path loss model: P619
+	antenna pattern: ITU-R RS.2043
+
+Simulation is running...
+Snapshot #10
+Snapshot #20
+Snapshot #30
+Snapshot #40
+Snapshot #50
+Snapshot #60
+Snapshot #70
+Snapshot #80
+Snapshot #90
+Snapshot #100
+Snapshot #110
+Snapshot #120
+Snapshot #130
+Snapshot #140
+Snapshot #150
+Snapshot #160
+Snapshot #170
+Snapshot #180
+Snapshot #190
+Snapshot #200
+Snapshot #210
+Snapshot #220
+Snapshot #230
+Snapshot #240
+Snapshot #250
+Snapshot #260
+Snapshot #270
+Snapshot #280
+Snapshot #290
+Snapshot #300
+Snapshot #310
+Snapshot #320
+Snapshot #330
+Snapshot #340
+Snapshot #350
+Snapshot #360
+Snapshot #370
+Snapshot #380
+Snapshot #390
+Snapshot #400
+Snapshot #410
+Snapshot #420
+Snapshot #430
+Snapshot #440
+Snapshot #450
+Snapshot #460
+Snapshot #470
+Snapshot #480
+Snapshot #490
+Snapshot #500
+Snapshot #510
+Snapshot #520
+Snapshot #530
+Snapshot #540
+Snapshot #550
+Snapshot #560
+Snapshot #570
+Snapshot #580
+Snapshot #590
+Snapshot #600
+Snapshot #610
+Snapshot #620
+Snapshot #630
+Snapshot #640
+Snapshot #650
+Snapshot #660
+Snapshot #670
+Snapshot #680
+Snapshot #690
+Snapshot #700
+Snapshot #710
+Snapshot #720
+Snapshot #730
+Snapshot #740
+Snapshot #750
+Snapshot #760
+Snapshot #770
+Snapshot #780
+Snapshot #790
+Snapshot #800
+Snapshot #810
+Snapshot #820
+Snapshot #830
+Snapshot #840
+Snapshot #850
+Snapshot #860
+Snapshot #870
+Snapshot #880
+Snapshot #890
+Snapshot #900
+Snapshot #910
+Snapshot #920
+Snapshot #930
+Snapshot #940
+Snapshot #950
+Snapshot #960
