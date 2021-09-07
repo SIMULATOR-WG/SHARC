@@ -95,7 +95,7 @@ if __name__ == "__main__":
     minimum_array_gain = -200
     downtilt = 0
 
-    file_names = ["bs_norm_8x8_050.npz"]
+    file_names = ["bs_norm_8x8_0502.npz"]
     param_list = [AntennaPar(adjacent_antenna_model,
                              normalization,
                              normalization_data,

@@ -122,20 +122,20 @@ if __name__ == '__main__':
 
     param = ParametersEessPassive()
     antenna = AntennaRS2043(param)
-    # phi = np.arange(-90, 90, step=0.01)
-    # theta = np.arange(-40, 40, step=0.01)
-    phi = np.arange(0, 180, step=0.01)
-    theta = np.arange(0, 90, step=0.01)
+    phi = np.arange(-90, 90, step=0.01)
+    theta = np.arange(-40, 40, step=0.01)
+    # phi = np.arange(0, 180, step=0.01)
+    # theta = np.arange(0, 90, step=0.01)
     csfont = {'fontname': 'Times New Roman'}
     hfont = {'fontname': 'Times New Roman'}
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 6))
 
-    ax1.semilogx(theta, antenna.get_gain_el(theta=theta), '-',color='blue', label='ITU-R RS.2043-0 (Table 9)')
-    ax2.semilogx(phi, antenna.get_gain_az(phi=phi), '-', color='darkorange', label='ITU-R RS.2043-0 (Table 9)')
+    # ax1.semilogx(theta, antenna.get_gain_el(theta=theta), '-',color='blue', label='ITU-R RS.2043-0 (Table 9)')
+    # ax2.semilogx(phi, antenna.get_gain_az(phi=phi), '-', color='darkorange', label='ITU-R RS.2043-0 (Table 9)')
 
-    # ax1.plot(theta, antenna.get_gain_el(theta=theta), '-', color='blue', label='ITU-R RS.2043-0 (Table 9)')
-    # ax2.plot(phi, antenna.get_gain_az(phi=phi)+47, '-', color='darkorange', label='ITU-R RS.2043-0 (Table 9)')
+    ax1.plot(theta, antenna.get_gain_el(theta=theta), '-', color='blue', label='ITU-R RS.2043-0 (Table 9)')
+    ax2.plot(phi, antenna.get_gain_az(phi=phi)+47, '-', color='darkorange', label='ITU-R RS.2043-0 (Table 9)')
     ax1.grid()
     ax2.grid()
     ax1.legend()
