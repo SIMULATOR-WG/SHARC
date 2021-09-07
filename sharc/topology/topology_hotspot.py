@@ -120,7 +120,7 @@ class TopologyHotspot(Topology):
         # In the end, we have to update the number of base stations
         self.num_base_stations = len(self.x)
         self.indoor = np.zeros(self.num_base_stations, dtype = bool)
-        #print(self.num_base_stations)
+        print(self.num_base_stations)
 
 
     def overlapping_hotspots(self,
@@ -229,17 +229,17 @@ class TopologyHotspot(Topology):
 
 if __name__ == '__main__':
     param = ParametersHotspot()
-    param.num_hotspots_per_cell = 3
+    param.num_hotspots_per_cell = 4
 
     param.max_dist_hotspot_ue = 100
     param.min_dist_bs_hotspot = 0
 
     #intersite_distance = 7795.7
-    intersite_distance = 271820.7
-    #intersite_distance = 1232.6
+    #intersite_distance = 271820.7
+    intersite_distance = 1232.6
 
-    num_clusters = 7
-    #num_clusters = 1
+    #num_clusters = 7
+    num_clusters = 1
     topology = TopologyHotspot(param, intersite_distance, num_clusters)
     topology.calculate_coordinates()
 
@@ -248,12 +248,12 @@ if __name__ == '__main__':
 
     topology.plot(ax)
 
-    plt.axis('image')
-    plt.title("Macro cell topology with hotspots")
-    plt.xlabel("x-coordinate [m]")
-    plt.ylabel("y-coordinate [m]")
-    plt.legend(loc="upper left", scatterpoints=1)
-    plt.tight_layout()
+    # plt.axis('image')
+    # plt.title("Macro cell topology with hotspots")
+    # plt.xlabel("x-coordinate [m]")
+    # plt.ylabel("y-coordinate [m]")
+    # plt.legend(loc="upper left", scatterpoints=1)
+    # plt.tight_layout()
 
     axes = plt.gca()
     #axes.set_xlim([-1500, 1500])

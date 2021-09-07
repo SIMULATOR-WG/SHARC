@@ -236,7 +236,7 @@ if __name__ == '__main__':
 
     # Set range of values & calculate correction factor
     norm.theta_vals_deg = np.array([90])
-    file_name = 'main_test.npz'
+    file_name = 'bs_norm_8x8_050.npz'
     norm.generate_correction_matrix(par,file_name)
     data = np.load(file_name)
     correction_factor = data['correction_factor_co_channel']

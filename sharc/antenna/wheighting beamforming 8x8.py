@@ -629,7 +629,7 @@ if __name__ == '__main__':
     param1.adjacent_antenna_model = "BEAMFORMING"
     param1.bs_normalization = False
     param1.ue_normalization = False
-    param1.bs_normalization_file = 'beamforming_normalization\\bs_8x8_46_12.npz'
+    param1.bs_normalization_file = 'beamforming_normalization\\bs_norm_8x8_050.npz'
     param1.ue_normalization_file = 'beamforming_normalization\\ue_4x4_46_12.npz'
     param1.bs_minimum_array_gain = -200
     param1.ue_minimum_array_gain = -200
@@ -669,7 +669,7 @@ if __name__ == '__main__':
     # f.savefig(figs_dir + "BS_element.pdf", bbox_inches='tight')
 
     f = plot1.plot_element_pattern(bs_array1, " Base Station", "ARRAY", "Beamforming d/λ = 0.5, k = 12", 0)
-    f1 = plot1.plot_element_pattern(bs_array, " Base Station", "ARRAY", "Beamforming d/λ = 0.5, k = 12, Weighting", 1)
+    #f1 = plot1.plot_element_pattern(bs_array, " Base Station", "ARRAY", "Beamforming d/λ = 0.5, k = 12, Weighting", 1)
     # f.savefig(figs_dir + "BS_array.pdf", bbox_inches='tight')
     #d = plot3D.plot_element_pattern3D(bs_array1, " Base Station", "ARRAY", 0)
     #d1 = plot3D.plot_element_pattern3D(bs_array, " Base Station", "ARRAY", 1)

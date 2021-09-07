@@ -1,4 +1,4 @@
-# Results collected after 970 snapshots.
+# Results collected after 1730 snapshots.
 -4.50000	0.00000
 -4.49500	0.00000
 -4.49000	0.00000

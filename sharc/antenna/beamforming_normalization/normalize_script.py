@@ -82,20 +82,20 @@ if __name__ == "__main__":
     normalization = False       # not needed here
     normalization_data = None   # not needed here
     element_pattern = "M2101"
-    element_max_g = 5
+    element_max_g = 5.5
     element_phi_3db = 90
     element_theta_3db = 90
     element_am = 25
-    element_sla_v = 25
-    n_rows = 4
-    n_columns = 4
+    element_sla_v = 30
+    n_rows = 8
+    n_columns = 8
     element_horiz_spacing = 0.5
     element_vert_spacing = 0.5
     multiplication_factor = 12
     minimum_array_gain = -200
     downtilt = 0
 
-    file_names = ["ue_norm_4x4_050.npz"]
+    file_names = ["bs_norm_8x8_050.npz"]
     param_list = [AntennaPar(adjacent_antenna_model,
                              normalization,
                              normalization_data,
