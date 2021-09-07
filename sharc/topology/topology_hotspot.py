@@ -235,9 +235,11 @@ if __name__ == '__main__':
     param.min_dist_bs_hotspot = 0
 
     #intersite_distance = 7795.7
-    intersite_distance = 272411.8
+    intersite_distance = 271820.7
+    #intersite_distance = 1232.6
 
     num_clusters = 7
+    #num_clusters = 1
     topology = TopologyHotspot(param, intersite_distance, num_clusters)
     topology.calculate_coordinates()
 

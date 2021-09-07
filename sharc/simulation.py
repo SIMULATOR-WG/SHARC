@@ -339,8 +339,11 @@ class Simulation(ABC, Observable):
                     # add beam to BS antennas
                     if self.parameters.antenna_imt.bs_enable_beamsteering_vertical_limit == 'ON':
                         if self.bs_to_ue_theta[bs,ue] > self.parameters.antenna_imt.bs_beamsteering_vertical_limit+90:
-                            self.bs_to_ue_theta[bs, ue]=self.parameters.antenna_imt.bs_beamsteering_vertical_limit+90
+                            self.bs_to_ue_theta[bs, ue]= self.parameters.antenna_imt.bs_beamsteering_vertical_limit+90
+                        if self.bs_to_ue_theta[bs,ue] < -self.parameters.antenna_imt.bs_downtilt+90:
+                            self.bs_to_ue_theta[bs, ue]=-self.parameters.antenna_imt.bs_downtilt+90
                         self.bs.antenna[bs].add_beam(self.bs_to_ue_phi[bs,ue], self.bs_to_ue_theta[bs,ue])
+                        print(self.bs_to_ue_theta[bs,ue])
                     else:
                         self.bs.antenna[bs].add_beam(self.bs_to_ue_phi[bs, ue], self.bs_to_ue_theta[bs, ue])
                     # add beam to UE antennas

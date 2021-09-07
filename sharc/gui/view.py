@@ -87,7 +87,7 @@ class View(tkinter.Tk, Observer):
         self.update()
         self.geometry(self.geometry())
 
-        self.__insert_text(__name__, "SHARC - Version 2.1.08")
+        self.__insert_text(__name__, "SHARC - Version 2.1.09")
         self.__insert_text(__name__, "Ready to run!\n")
         self.__set_state(State.INITIAL)
 

@@ -30,7 +30,7 @@ class SimulationDownlink(Simulation):
         seed = kwargs["seed"]
 
         random_number_gen = np.random.RandomState(seed)
-        
+
         # In case of hotspots, base stations coordinates have to be calculated
         # on every snapshot. Anyway, let topology decide whether to calculate
         # or not
@@ -51,7 +51,7 @@ class SimulationDownlink(Simulation):
                                                  self.topology, random_number_gen)
 
         #self.plot_scenario()
-        
+
         self.connect_ue_to_bs()
         self.select_ue(random_number_gen)
 
@@ -107,14 +107,14 @@ class SimulationDownlink(Simulation):
         bs_active = np.where(self.bs.active)[0]
         for bs in bs_active:
             ue = self.link[bs]
-            self.ue.rx_power[ue] = self.bs.tx_power[bs] - self.coupling_loss_imt[bs,ue] 
+            self.ue.rx_power[ue] = self.bs.tx_power[bs] - self.coupling_loss_imt[bs,ue]
 
             # create a list with base stations that generate interference in ue_list
             bs_interf = [b for b in bs_active if b not in [bs]]
 
             # calculate intra system interference
             for bi in bs_interf:
-                interference = self.bs.tx_power[bi] - self.coupling_loss_imt[bi,ue] 
+                interference = self.bs.tx_power[bi] - self.coupling_loss_imt[bi,ue]
 
                 self.ue.rx_interference[ue] = 10*np.log10( \
                     np.power(10, 0.1*self.ue.rx_interference[ue]) + np.power(10, 0.1*interference))
@@ -147,7 +147,7 @@ class SimulationDownlink(Simulation):
         ue = np.where(self.ue.active)[0]
 
         tx_power_sys = self.param_system.tx_power_density + 10*np.log10(self.ue.bandwidth[ue]*1e6) + 30
-        self.ue.ext_interference[ue] = tx_power_sys - self.coupling_loss_imt_system[ue] 
+        self.ue.ext_interference[ue] = tx_power_sys - self.coupling_loss_imt_system[ue]
 
         self.ue.sinr_ext[ue] = self.ue.rx_power[ue] \
             - (10*np.log10(np.power(10, 0.1*self.ue.total_interference[ue]) + np.power(10, 0.1*self.ue.ext_interference[ue])))
@@ -194,9 +194,9 @@ class SimulationDownlink(Simulation):
 
             if self.adjacent_channel:
 
-                # The unwanted emission is calculated in terms of TRP (after 
-                # antenna). In SHARC implementation, ohmic losses are already 
-                # included in coupling loss. Then, care has to be taken; 
+                # The unwanted emission is calculated in terms of TRP (after
+                # antenna). In SHARC implementation, ohmic losses are already
+                # included in coupling loss. Then, care has to be taken;
                 # otherwise ohmic loss will be included twice.
                 oob_power = self.bs.spectral_mask.power_calc(self.param_system.frequency, self.system.bandwidth) \
                             + self.parameters.imt.bs_ohmic_loss
@@ -205,7 +205,7 @@ class SimulationDownlink(Simulation):
                                    - self.coupling_loss_imt_system_adjacent[active_beams[0]] \
                                    + 10*np.log10((self.param_system.bandwidth - self.overlapping_bandwidth)/
                                                  self.param_system.bandwidth)
-                                   
+
                 rx_interference += math.pow(10, 0.1*oob_interference)
 
         self.system.rx_interference = 10*np.log10(rx_interference)
@@ -213,7 +213,7 @@ class SimulationDownlink(Simulation):
         self.system.thermal_noise = \
             10*math.log10(self.param_system.BOLTZMANN_CONSTANT* \
                           self.system.noise_temperature*1e3) + \
-                          10*math.log10(self.param_system.bandwidth * 1e6)
+                          10*math.log10(self.param_system.bandwidth * 1e6)+6
 
         # calculate INR at the system
         self.system.inr = np.array([self.system.rx_interference - self.system.thermal_noise])
