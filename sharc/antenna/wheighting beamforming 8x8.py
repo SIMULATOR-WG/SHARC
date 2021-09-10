@@ -629,7 +629,7 @@ if __name__ == '__main__':
     param1.adjacent_antenna_model = "BEAMFORMING"
     param1.bs_normalization = False
     param1.ue_normalization = False
-    param1.bs_normalization_file = 'beamforming_normalization\\bs_norm_8x8_0502.npz'
+    param1.bs_normalization_file = 'beamforming_normalization\\bs_norm_8x8_050.npz'
     param1.ue_normalization_file = 'beamforming_normalization\\ue_4x4_46_12.npz'
     param1.bs_minimum_array_gain = -200
     param1.ue_minimum_array_gain = -200

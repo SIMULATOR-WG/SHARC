@@ -248,12 +248,12 @@ if __name__ == '__main__':
 
     topology.plot(ax)
 
-    # plt.axis('image')
-    # plt.title("Macro cell topology with hotspots")
-    # plt.xlabel("x-coordinate [m]")
-    # plt.ylabel("y-coordinate [m]")
-    # plt.legend(loc="upper left", scatterpoints=1)
-    # plt.tight_layout()
+    plt.axis('image')
+    plt.title("Macro cell topology with hotspots")
+    plt.xlabel("x-coordinate [m]")
+    plt.ylabel("y-coordinate [m]")
+    plt.legend(loc="upper left", scatterpoints=1)
+    plt.tight_layout()
 
     axes = plt.gca()
     #axes.set_xlim([-1500, 1500])

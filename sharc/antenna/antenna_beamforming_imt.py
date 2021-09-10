@@ -251,30 +251,30 @@ class AntennaBeamformingImt(Antenna):
         exp_arg = (n[:,np.newaxis] - 1)*self.dv*np.sin(r_theta) - \
                   (m - 1)*self.dh*np.cos(r_theta)*np.sin(r_phi)
 
-        # if(self.n_rows==8 and self.n_cols==8):
-        #     pesos = np.array([
-        #         np.ones(8) * 0.28,
-        #         np.ones(8) * 0.52,
-        #         np.ones(8) * 0.80,
-        #         np.ones(8) * 0.97,
-        #
-        #         np.ones(8) * 0.97,
-        #         np.ones(8) * 0.80,
-        #         np.ones(8) * 0.52,
-        #         np.ones(8) * 0.28,
-        #         ])
-        #     print(pesos)
-        #     w_vec = pesos * (1 / np.sqrt(self.n_rows * self.n_cols)) * \
-        #             np.exp(2 * np.pi * 1.0j * exp_arg)
-        # else:
-        #     #
-        #     w_vec = (1 / np.sqrt(self.n_rows * self.n_cols)) * \
-        #                  np.exp(2*np.pi*1.0j*exp_arg)
+        if(self.n_rows==8 and self.n_cols==8):
+            pesos = np.array([
+                np.ones(8) * 0.28,
+                np.ones(8) * 0.52,
+                np.ones(8) * 0.80,
+                np.ones(8) * 0.97,
+
+                np.ones(8) * 0.97,
+                np.ones(8) * 0.80,
+                np.ones(8) * 0.52,
+                np.ones(8) * 0.28,
+                ])
+            print(pesos)
+            w_vec = pesos * (1 / np.sqrt(self.n_rows * self.n_cols)) * \
+                    np.exp(2 * np.pi * 1.0j * exp_arg)
+        else:
+            #
+            w_vec = (1 / np.sqrt(self.n_rows * self.n_cols)) * \
+                         np.exp(2*np.pi*1.0j*exp_arg)
 
 
 
-        w_vec = (1/np.sqrt(self.n_rows*self.n_cols))*\
-                np.exp(2*np.pi*1.0j*exp_arg)
+        # w_vec = (1/np.sqrt(self.n_rows*self.n_cols))*\
+        #         np.exp(2*np.pi*1.0j*exp_arg)
 
         return w_vec
 
