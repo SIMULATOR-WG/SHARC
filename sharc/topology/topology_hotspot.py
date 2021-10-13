@@ -237,6 +237,8 @@ if __name__ == '__main__':
     #intersite_distance = 7795.7
     #intersite_distance = 271820.7
     intersite_distance = 1232.6
+    #intersite_distance = 418019.3
+    #intersite_distance = 1105975.1
 
     #num_clusters = 7
     num_clusters = 1

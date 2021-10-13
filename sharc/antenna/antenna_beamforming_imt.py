@@ -3,6 +3,8 @@
 Created on Sat Apr 15 15:35:51 2017
 
 @author: Calil
+
+#modified: Luciano Camilo Sep 10 10:00:00 2021
 """
 
 import numpy as np
