@@ -75,36 +75,33 @@ class PropagationTvro(Propagation):
             (params.imt.topology == 'MACROCELL' or params.imt.topology == 'HOTSPOT') and \
             params.imt.num_clusters == 1
 
-        if wrap_around_enabled:
-            bs_to_ue_dist_2d, bs_to_ue_dist_3d, _, _ = \
-                station_b.get_dist_angles_wrap_around(station_a)
+        if wrap_around_enabled and (station_a.is_imt_station() and station_b.is_imt_station()):
+            distances_2d, distances_3d, _, _ = \
+                station_a.get_dist_angles_wrap_around(station_b)
         else:
-            bs_to_ue_dist_2d = station_b.get_distance_to(station_a)
-            bs_to_ue_dist_3d = station_b.get_3d_distance_to(station_a)
+            distances_2d = station_a.get_distance_to(station_b)
+            distances_3d = station_a.get_3d_distance_to(station_b)
+
+        indoor_stations = np.tile(station_a.indoor, (station_b.num_stations, 1)).transpose()
 
         # Use the right interface whether the link is IMT-IMT or IMT-System
         # TODO: Refactor __get_loss and get rid of that if-else.
         if station_a.is_imt_station() and station_b.is_imt_station():
             loss = self._get_loss(
-                distance_3D=bs_to_ue_dist_3d,
-                distance_2D=bs_to_ue_dist_2d,
-                frequency=frequency *
-                np.ones(bs_to_ue_dist_2d.shape),
+                distance_3D=distances_3d,
+                distance_2D=distances_2d,
+                frequency=frequency * np.ones(distances_2d.shape),
                 bs_height=station_b.height,
                 ue_height=station_a.height,
-                indoor_stations=np.tile(
-                    station_a.indoor,
-                    (station_b.num_stations, 1),
-                ),
+                indoor_stations=indoor_stations
             )
         else:
             imt_station, sys_station = (station_a, station_b) \
                 if station_a.is_imt_station() else (station_b, station_a)
             loss = self._get_loss(
-                distance_3D=bs_to_ue_dist_3d,
-                distance_2D=bs_to_ue_dist_2d,
-                frequency=frequency *
-                np.ones(bs_to_ue_dist_2d.shape),
+                distance_3D=distances_3d,
+                distance_2D=distances_2d,
+                frequency=frequency * np.ones(distances_2d.shape),
                 bs_height=station_b.height,
                 imt_sta_type=imt_station.station_type,
                 imt_x=imt_station.x,
@@ -113,10 +110,7 @@ class PropagationTvro(Propagation):
                 es_x=sys_station.x,
                 es_y=sys_station.y,
                 es_z=sys_station.height,
-                indoor_stations=np.tile(
-                    station_a.indoor,
-                    (station_b.num_stations, 1),
-                ),
+                indoor_stations=indoor_stations
             )
 
         return loss
@@ -221,7 +215,7 @@ class PropagationTvro(Propagation):
 
         f_fc = .25 + .375 * (1 + np.tanh(7.5 * (frequency / 1000 - .5)))
         clutter_loss = 10.25 * f_fc * np.exp(-self.d_k) * \
-            (1 - np.tanh(6 * (height / self.h_a - .625))) - .33
+            (1 - np.tanh(6 * (height[:, np.newaxis] / self.h_a - .625))) - .33
 
         loss = free_space_path_loss.copy()
 

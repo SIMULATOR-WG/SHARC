@@ -9,7 +9,7 @@
             "console": "integratedTerminal",
             "args": [
                 "-p",
-                "${workspaceFolder}/sharc/input/parameters.ini"
+                "${workspaceFolder}/sharc/input/parameters.yaml"
             ]
         }
     ]

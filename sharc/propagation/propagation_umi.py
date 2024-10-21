@@ -60,17 +60,17 @@ class PropagationUMi(Propagation):
             (params.imt.topology == 'MACROCELL' or params.imt.topology == 'HOTSPOT') and \
             params.imt.num_clusters == 1
 
-        if wrap_around_enabled:
-            bs_to_ue_dist_2d, bs_to_ue_dist_3d, _, _ = \
-                station_b.get_dist_angles_wrap_around(station_a)
+        if wrap_around_enabled and (station_a.is_imt_station() and station_b.is_imt_station()):
+            distance_2d, distance_3d, _, _ = \
+                station_a.get_dist_angles_wrap_around(station_b)
         else:
-            bs_to_ue_dist_2d = station_b.get_distance_to(station_a)
-            bs_to_ue_dist_3d = station_b.get_3d_distance_to(station_a)
+            distance_2d = station_a.get_distance_to(station_b)
+            distance_3d = station_a.get_3d_distance_to(station_b)
 
         loss = self.get_loss(
-            bs_to_ue_dist_3d,
-            bs_to_ue_dist_2d,
-            frequency * np.ones(bs_to_ue_dist_2d.shape),
+            distance_3d,
+            distance_2d,
+            frequency * np.ones(distance_2d.shape),
             station_b.height,
             station_a.height,
             params.imt.shadowing,
