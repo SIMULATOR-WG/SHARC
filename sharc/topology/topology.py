@@ -9,13 +9,16 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import matplotlib.axes
 
+
 class Topology(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,
-                 intersite_distance: float,
-                 cell_radius: float):
+    def __init__(
+        self,
+        intersite_distance: float,
+        cell_radius: float,
+    ):
         self.intersite_distance = intersite_distance
         self.cell_radius = cell_radius
 
@@ -25,9 +28,9 @@ class Topology(object):
         self.y = np.empty(0)
         self.azimuth = np.empty(0)
         self.indoor = np.empty(0)
+        self.is_space_station = False
         self.num_base_stations = -1
         self.static_base_stations = False
-
 
     @abstractmethod
     def calculate_coordinates(self, random_number_gen=np.random.RandomState()):
@@ -35,12 +38,9 @@ class Topology(object):
         Calculates the coordinates of the stations according to the class
         atributes.
         """
-        pass
-
 
     @abstractmethod
     def plot(self, ax: matplotlib.axes.Axes):
         """
         Plots the topology on the given axis.
         """
-        pass

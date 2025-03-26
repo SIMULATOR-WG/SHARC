@@ -23,7 +23,7 @@ class TestPropagationP619(unittest.TestCase):
     def setUp(self):
         self.p619 = PropagationP619(np.random.RandomState())
 
-    def test_atmospheric_gasses_loss (self):
+    def test_atmospheric_gasses_loss(self):
         # compare with benchmark from ITU-R P-619 Fig. 3
         frequency_MHz = 30000.
         sat_params = DummyParams()
@@ -47,13 +47,12 @@ class TestPropagationP619(unittest.TestCase):
             self.assertLessEqual(loss_lower, loss)
             self.assertGreaterEqual(loss_upper, loss)
 
-
     def test_beam_spreading_attenuation(self):
         # compare with benchmark from ITU-R P-619 Fig. 7
 
-        altitude_vec = np.array([0,1,2,3,4,6]) * 1000
-        elevation_vec = [0,.5,1,2,3,5]
-        att_lower_vec = [.8, .6 , .4, .2, .1, .05]
+        altitude_vec = np.array([0, 1, 2, 3, 4, 6]) * 1000
+        elevation_vec = [0, .5, 1, 2, 3, 5]
+        att_lower_vec = [.8, .6, .4, .2, .1, .05]
         att_upper_vec = [.9, .7, .5, .3, .2, .1]
         earth_to_space_vec = [True, False, True, False, True, False]
 
@@ -63,7 +62,8 @@ class TestPropagationP619(unittest.TestCase):
                                                                      att_upper_vec,
                                                                      earth_to_space_vec):
 
-            attenuation = self.p619._get_beam_spreading_att(elevation, altitude, earth_to_space)
+            attenuation = self.p619._get_beam_spreading_att(
+                elevation, altitude, earth_to_space)
             self.assertLessEqual(lower, abs(attenuation))
             self.assertGreaterEqual(upper, abs(attenuation))
 

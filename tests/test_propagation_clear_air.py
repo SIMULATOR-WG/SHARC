@@ -3,75 +3,59 @@
 
 import unittest
 import numpy as np
-import matplotlib.pyplot as plt
-from sharc.parameters.parameters_fss_es import ParametersFssEs
-
 import numpy.testing as npt
-
+from sharc.parameters.parameters_p452 import ParametersP452
 from sharc.propagation.propagation_clear_air_452 import PropagationClearAir
+
 
 class PropagationClearAirTest(unittest.TestCase):
 
     def setUp(self):
-        self.__ClearAir = PropagationClearAir(np.random.RandomState())
+        param_p452 = ParametersP452()
+        # param_p452.atmospheric_pressure = 1013
+        # param_p452.air_temperature = 288
+        # param_p452.Dct = 10
+        # param_p452.Dcr = 10
+
+        # param_p452.Hte = 50
+        # param_p452.Hre = 50
+
+        # param_p452.N0 = 355
+        # param_p452.delta_N = 60
+        # param_p452.percentage_p = 40
+
+        # param_p452.clutter_loss = False
+
+        self.prop_clear_air = PropagationClearAir(
+            np.random.RandomState(), param_p452)
 
     def test_loss(self):
 
-        params = ParametersFssEs()
+        # distance between stations in meters
+        distances = np.ones((1, 1), dtype=float) * 1000
+        frequencies = np.ones((1, 1), dtype=float) * 27000  # frequency in MHz
+        indoor_stations = np.zeros((1, 1), dtype=bool)
+        # elevation between stations in degrees
+        elevations = np.zeros((1, 1), dtype=float)
+        tx_gain = np.ones((1, 1), dtype=float) * 0
+        rx_gain = np.ones((1, 1), dtype=float) * 0
 
-        d = 10000
-        f = 27000
-        params.atmospheric_pressure = 1013
-        params.air_temperature = 288
-        params.water_vapour = 7.5
-        params.Dlt = 30
-        params.Dlr = 10
-        params.Dct = 10
-        params.Dcr = 10
+        loss = self.prop_clear_air.get_loss(
+            distances,
+            frequencies,
+            indoor_stations,
+            elevations,
+            tx_gain,
+            rx_gain)
+        # npt.assert_allclose(158.491, loss, atol=1e-3)
 
-        params.Hts = 244
-        params.Hrs = 280
-        params.Hte = 50
-        params.Hre = 50
+    #    Ld50, Ldbeta, Ldb = self.__Diffraction.get_loss(beta = Beta, distance=d, frequency=f, atmospheric_pressure=Ph,
+    # air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=hrs, Hts=hts, Hte=hte, Hre=hre, Hsr=hsr, Hst=hst, H0=h0,
+    # Hn=hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=dlt ,Dlr=dlr, percentage_p=p)
 
-        params.theta_tx = 20
-        params.theta_rx = 20
+    #    npt.assert_allclose(158.491,Ldb,atol=1e-3)
 
-        params.N0 = 355
-        params.delta_N = 60
-        params.percentage_p = 40
-
-        params.omega = 0
-        params.phi = 60
-        params.dtm = .8
-        params.dlm = .8
-
-        params.epsilon = 3.5
-
-        params.hm = 15
-        params.Hsr = 45
-        params.Hst = 48
-
-        params.H0 = 15
-        params.Hn = 17
-
-        params.thetaJ = 0.3
-        params.par_ep = 0.8
-
-        params.clutter_loss = False
-
-        Gt = 10
-        Gr = 10
-
-        di = [1,1,1]
-        hi = [2,4,6]
-
-
-#        Ld50, Ldbeta, Ldb = self.__Diffraction.get_loss(beta = Beta, distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro, delta_N=deltaN, Hrs=hrs, Hts=hts, Hte=hte, Hre=hre, Hsr=hsr, Hst=hst, H0=h0, Hn=hn, dist_di=di, hight_hi=hi, omega=omega, Dlt=dlt ,Dlr=dlr, percentage_p=p)
-#
-#        npt.assert_allclose(158.491,Ldb,atol=1e-3)
-
-        #Grafico da perda de difraçao em funçao da distancia e da frequencia
+        # Grafico da perda de difraçao em funçao da distancia e da frequencia
 #        data1 = []
 #        data2 = []
 #        data3 = []

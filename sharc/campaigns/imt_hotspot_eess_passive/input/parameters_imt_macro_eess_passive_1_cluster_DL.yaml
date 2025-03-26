@@ -1,0 +1,270 @@
+general:
+    ###########################################################################
+    # Number of simulation snapshots
+    num_snapshots: 10000
+    ###########################################################################
+    # IMT link that will be simulated (DOWNLINK or UPLINK)
+    imt_link: DOWNLINK
+    ###########################################################################
+    # The chosen system for sharing study
+    # EESS_SS, FSS_SS, FSS_ES, FS, RAS
+    system: EESS_SS
+    ###########################################################################
+    # Compatibility scenario (co-channel and/or adjacent channel interference)
+    enable_cochannel: FALSE
+    enable_adjacent_channel: TRUE
+    ###########################################################################
+    # Seed for random number generator
+    seed: 39
+    ###########################################################################
+    # if FALSE, then a new output directory is created
+    overwrite_output: FALSE
+    ###########################################################################
+    # output destination folder - this is relative SHARC/sharc directory
+    output_dir: campaigns/imt_hotspot_eess_passive/output/
+    ###########################################################################
+    # output folder prefix
+    output_dir_prefix: output_imt_hotspot_eess_passive_1_cluster_DL
+imt:
+    ###########################################################################
+    # Defines if IMT service is the interferer or interfered-with service
+    #   TRUE  : IMT suffers interference
+    #   FALSE : IMT generates interference
+    interfered_with: FALSE
+    ###########################################################################
+    # IMT center frequency [MHz]
+    frequency: 10250
+    ###########################################################################
+    # IMT bandwidth [MHz]
+    bandwidth: 100
+    ###########################################################################
+    # Amount of guard band wrt total bandwidth. Setting this parameter to 0.1
+    # means that 10% of the total bandwidth will be used as guard band: 5% in
+    # the lower
+    guard_band_ratio: 0.1
+    ###########################################################################
+    # level of spurious emissions [dBm/MHz]
+    spurious_emissions: -13
+    ###########################################################################
+    # Defines the antenna model to be used in compatibility studies between
+    # IMT and other services in adjacent band
+    # Possible values: SINGLE_ELEMENT, BEAMFORMING
+    adjacent_antenna_model: BEAMFORMING
+    bs:
+        ###########################################################################
+        # Conducted power per antenna element [dBm/bandwidth]
+        conducted_power: 16
+        ###########################################################################
+        # Base station height [m]
+        height: 6
+        ###########################################################################
+        # Base station array ohmic loss  [dB]
+        ohmic_loss: 0
+        antenna:
+            ###########################################################################
+            # mechanical downtilt [degrees]
+            # NOTE: consider defining it to 90 degrees in case of indoor simulations
+            downtilt: 10
+            ###########################################################################
+            # BS/UE number of rows in antenna array
+            n_rows: 8
+            ###########################################################################
+            # BS/UE number of columns in antenna array
+            n_columns: 8
+            # BS/UE horizontal 3dB beamwidth of single element [degrees].
+            element_phi_3db: 120.0
+            ###########################################################################
+            # BS/UE vertical 3dB beamwidth of single element [degrees]
+            # For F1336: if equal to 0, then beamwidth is calculated automaticaly
+            element_theta_3db: 90.0
+            ###########################################################################
+            # Radiation pattern of each antenna element
+            # Possible values: "M2101", "F1336", "FIXED"
+            element_pattern: M2101
+            ###########################################################################
+            # BS/UE maximum transmit/receive element gain [dBi]
+            # default: element_max_g = 5, for M.2101
+            #                           = 15, for M.2292
+            #                           = -3, for M.2292
+            element_max_g: 5.5
+            ###########################################################################
+            # BS/UE array horizontal element spacing (d/lambda)
+            element_horiz_spacing: 0.5195
+            ###########################################################################
+            # BS/UE array vertical element spacing (d/lambda)
+            element_vert_spacing: 0.5195
+            ###########################################################################
+            # BS/UE single element vertical sidelobe attenuation [dB]
+            # element_sla_v = 30
+            enable_beamsteering_vertical_limit: "ON"
+            beamsteering_vertical_limit: 30
+            ###########################################################################
+            # Multiplication factor k that is used to adjust the single-element pattern.
+            # According to Report ITU-R M.[IMT.AAS], this may give a closer match of the
+            # side lobes when beamforming is assumed in adjacent channel.
+            #       Original value: 12 (Rec. ITU-R M.2101)
+            multiplication_factor: 12
+    topology:
+        ###########################################################################
+        # Network topology. Possible values are "MACROCELL", "HOTSPOT", "SINGLE_BS"
+        # "INDOOR"
+        type: HOTSPOT
+        hotspot:
+            ###########################################################################
+            # Enable wrap around. Available only for "MACROCELL" and "HOTSPOT" topologies
+            wrap_around: FALSE
+            ###########################################################################
+            # Number of clusters in macro cell topology
+            num_clusters: 1
+            ###########################################################################
+            # Inter-site distance in macrocell network topology [m]
+            # 1,14884 / 1,000,000 m2
+            intersite_distance: 4647
+            ###########################################################################
+            # Number of hotspots per macro cell (sector)
+            num_hotspots_per_cell: 3
+            # ###########################################################################
+            # # Maximum 2D distance between hotspot and UE [m]
+            # # This is the hotspot radius
+            # max_dist_hotspot_ue: 100
+            # ###########################################################################
+            # # Minimum 2D distance between macro cell base station and hotspot [m]
+            # min_dist_bs_hotspot: 0
+    ue:
+        ###########################################################################
+        # Number of UEs that are allocated to each cell within handover margin.
+        # Remember that in macrocell network each base station has 3 cells (sectors)
+        k: 3
+        ###########################################################################
+        # Multiplication factor that is used to ensure that the sufficient number
+        # of UE's will distributed throughout ths system area such that the number
+        # of K users is allocated to each cell. Normally, this values varies
+        # between 2 and 10 according to the user drop method
+        k_m: 1
+        ###########################################################################
+        # Percentage of indoor UE's [%]
+        indoor_percent: 5
+        ###########################################################################
+        # UE height [m]
+        height: 1.5
+        ###########################################################################
+        # Power control algorithm
+        # tx_power_control = "ON",power control On
+        # tx_power_control = "OFF",power control Off
+        tx_power_control: ON
+        ###########################################################################
+        # User equipment body loss [dB]
+        body_loss: 4
+        ###########################################################################
+        # Regarding the distribution of active UE's over the cell area, this
+        # parameter states how the UEs will be distributed
+        # Possible values: UNIFORM : UEs will be uniformly distributed within the
+        #                            whole simulation area. Not applicable to
+        #                            hotspots.
+        #                  ANGLE_AND_DISTANCE : UEs will be distributed following
+        #                                   given distributions for angle and
+        #                                   distance. In this case, these must be
+        #                                   defined later.
+        distribution_type: ANGLE_AND_DISTANCE
+        ###########################################################################
+        # Regarding the distribution of active UE's over the cell area, this
+        # parameter models the distance between UE's and BS.
+        # Possible values: RAYLEIGH, UNIFORM
+        distribution_distance: RAYLEIGH
+        ###########################################################################
+        # Regarding the distribution of active UE's over the cell area, this
+        # parameter models the azimuth between UE and BS (within ±60° range).
+        # Possible values: NORMAL, UNIFORM
+        distribution_azimuth: NORMAL
+        ###########################################################################
+        # Maximum UE transmit power [dBm]
+        p_cmax: 23
+        ###########################################################################
+        # Power per RB used as target value [dBm]
+        p_o_pusch: -95
+        ###########################################################################
+        # Alfa is the balancing factor for UEs with bad channel
+        # and UEs with good channel
+        alpha: 1
+        antenna:
+            ###########################################################################
+            # BS/UE number of rows in antenna array
+            n_rows: 1
+            ###########################################################################
+            # BS/UE number of columns in antenna array
+            n_columns: 1
+            # BS/UE horizontal 3dB beamwidth of single element [degrees].
+            element_phi_3db: 360
+            ###########################################################################
+            # BS/UE vertical 3dB beamwidth of single element [degrees]
+            # For F1336: if equal to 0, then beamwidth is calculated automaticaly
+            element_theta_3db: 180
+            ###########################################################################
+            # Radiation pattern of each antenna element
+            # Possible values: "M2101", "F1336", "FIXED"
+            element_pattern: FIXED
+            ###########################################################################
+            # BS/UE maximum transmit/receive element gain [dBi]
+            #                           = 15, for M.2292
+            # default: element_max_g = 5, for M.2101
+            #                           = -3, for M.2292
+            element_max_g: -4
+            ###########################################################################
+            # BS/UE single element vertical sidelobe attenuation [dB]
+            # element_sla_v = 25
+            ###########################################################################
+            # Multiplication factor k that is used to adjust the single-element pattern.
+            # According to Report ITU-R M.[IMT.AAS], this may give a closer match of the
+            # side lobes when beamforming is assumed in adjacent channel.
+            #       Original value: 12 (Rec. ITU-R M.2101)
+            multiplication_factor: 12
+eess_ss:
+    # sensor C7
+    ###########################################################################
+    # satellite altitude [m]
+    altitude: 407000.0
+    ###########################################################################
+    # Off-nadir pointing angle [deg]
+    nadir_angle: 48.6
+    ###########################################################################
+    # satellite center frequency [MHz]
+    frequency: 10650
+    ###########################################################################
+    # satellite bandwidth [MHz]
+    bandwidth: 100
+    ###########Creates a statistical distribution of nadir angle###############
+    ##############following variables nadir_angle_distribution#################
+    # if distribution_enable = ON, nadir_angle will vary statistically#########
+    # if distribution_enable = OFF, nadir_angle follow nadir_angle variable ###
+    # distribution_type = UNIFORM
+    # UNIFORM = UNIFORM distribution in nadir_angle
+    # - nadir_angle_distribution = initial nadir angle, final nadir angle
+    distribution_enable: OFF
+    # # distribution_type = UNIFORM
+    # # nadir_angle_distribution = 18.6,49.4
+    # ###########################################################################
+    # Antenna pattern of the sensor
+    # Possible values: "ITU-R RS.1813"
+    #                  "ITU-R RS.1861 9a"
+    #                  "ITU-R RS.1861 9b"
+    #                  "ITU-R RS.1861 9c"
+    #                  "ITU-R RS.2043"
+    #                  "OMNI"
+    antenna_pattern: ITU-R RS.1813
+    # Antenna efficiency for pattern described in ITU-R RS.1813 [0-1]
+    antenna_efficiency: 0.606
+    # Antenna diameter for ITU-R RS.1813 [m]
+    antenna_diameter: 1.1
+    ###########################################################################
+    # receive antenna gain - applicable for 9a, 9b and OMNI [dBi]
+    antenna_gain: 39.6
+    ###########################################################################
+    # Channel parameters
+    # channel model, possible values are "FSPL" (free-space path loss),
+    #                                    "P619"
+    channel_model: P619
+    # earth station at Brasília - Brasil
+    earth_station_alt_m: 6
+    earth_station_lat_deg: -15.8
+    earth_station_long_diff_deg: 0.0
+    season: SUMMER

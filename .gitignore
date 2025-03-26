@@ -1,7 +1,8 @@
-/sharc/logfile.log
 /sharc/output/*.txt
 /sharc/output/*.png
 /sharc/output_*/*
+/sharc/campaigns/*/output/
+
 
 __pycache__
 .spyproject
@@ -17,6 +18,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+venv/
 env/
 build/
 develop-eggs/
@@ -70,3 +72,30 @@ target/
 # pyenv python configuration file
 .python-version
 /sharc/antenna/figs
+/sharc/.venv/
+.DS_Store
+.venv/
+venv/
+myenv/pyvenv.cfg
+myenv/Scripts/activate
+myenv/Scripts/activate.bat
+myenv/Scripts/Activate.ps1
+myenv/Scripts/deactivate.bat
+myenv/Scripts/pip.exe
+myenv/Scripts/pip3.12.exe
+myenv/Scripts/pip3.exe
+myenv/Scripts/python.exe
+myenv/Scripts/pythonw.exe
+
+# Ignore output files
+[IMT]*.txt
+[SYS]*.txt
+IMT_*.txt
+SYS_*.txt
+
+
+# Ignores campaigns output
+
+/sharc/campaigns/imt_*/output/output_imt*/*.csv
+/sharc/campaigns/imt_*/output/output_imt*/*.ini
+/sharc/campaigns/imt_*/output/Figs/*.png

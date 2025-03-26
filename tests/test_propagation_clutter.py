@@ -1,63 +1,63 @@
-# -*- coding: utf-8 -*-
-
-"""
-Created on Tue Mai 02 15:02:31 2017
-
-@author: LeticiaValle_Mac
-"""
-
 import unittest
 import numpy as np
-
-
 from sharc.propagation.propagation_clutter_loss import PropagationClutterLoss
+from sharc.support.enumerations import StationType
 
-class PropagationClutterLossTest(unittest.TestCase):
 
+class TestPropagationClutterLoss(unittest.TestCase):
     def setUp(self):
-        self.__ClutterAtt = PropagationClutterLoss(np.random.RandomState())
+        self.clutter_loss = PropagationClutterLoss(np.random.RandomState(42))
 
-    def test_loss(self):
+    def test_spatial_clutter_loss(self):
+        frequency = np.array([27000])  # MHz
+        elevation = np.array([0, 45, 90])
+        loc_percentage = np.array([0.1, 0.5, 0.9])
+        distance = np.array([1000])  # meters, dummy value
 
-        f = 27000    #GHz
-        theta = 0
-        per_p =50
-        d = 10000
-        P = 0.9
-        dist = 10
-        r = 12.64
-        s = 3.72
-        t = 0.96
-        u = 9.6
-        v = 2
-        w = 9.1
-        x = -3
-        y = 4.5
-        z = -2
-        #npt.assert_allclose(73.150,
-         #                self.__ClutterAtt.get_loss(frequency=f, distance = d,percentage_p = per_p, dist = dist, elevation_angle_facade=theta, probability_loss_notExceeded=P, coeff_r=r, coeff_s=s, coeff_t=t, coeff_u=u,coeff_v=v, coeff_w=w,coeff_x=x,coeff_y=y,coeff_z=z),atol=1e-3)
+        loss = self.clutter_loss.get_loss(
+            distance=distance,
+            frequency=frequency,
+            elevation=elevation,
+            loc_percentage=loc_percentage,
+            station_type=StationType.FSS_SS
+        )
 
+        # Check the shape of the output
+        self.assertEqual(loss.shape, (3,))
 
-#        f = [10,20]    #GHz
-#        d = 10
-#        Ph = 1013
-#        T = 288
-#        ro = 7.5
-#        npt.assert_allclose([0.140, 1.088],
-#                         self.__gasAtt.get_loss_Ag(distance=d, frequency=f, atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro),atol=1e-3)
+        # Check if loss decreases with increasing elevation
+        self.assertTrue(loss[0] >= loss[1] >= loss[2])
 
+    def test_terrestrial_clutter_loss(self):
+        frequency = np.array([2000, 6000])  # MHz
+        distance = np.array([500, 2000])  # meters
+        # Using a single value for location percentage
+        loc_percentage = np.array([0.5])
 
-#        d = [[10, 20, 30],[40, 50, 60]]
-#        f = 10
-#        Ph = 1013
-#        T = 288
-#        ro = 7.5
-#        self.assertTrue(np.all(np.isclose([0.140, 0.280, 0.420],[0.560, 0.700, 0.840],
-#                        self.__gasAtt.get_loss_Ag(distance=d, frequency=f,atmospheric_pressure=Ph, air_temperature=T, water_vapour=ro), atol=1e-3)))
-#
-#
+        loss = self.clutter_loss.get_loss(
+            frequency=frequency,
+            distance=distance,
+            loc_percentage=loc_percentage,
+            station_type=StationType.IMT_BS
+        )
+
+        self.assertEqual(loss.shape, (2,))
+
+        self.assertTrue(loss[1] >= loss[0])
+
+    def test_random_loc_percentage(self):
+        frequency = np.array([4000])  # MHz
+        distance = np.array([1000])  # meters
+
+        loss = self.clutter_loss.get_loss(
+            frequency=frequency,
+            distance=distance,
+            loc_percentage="RANDOM",
+            station_type=StationType.IMT_UE
+        )
+
+        self.assertTrue(0 <= loss <= 100)
 
 
 if __name__ == '__main__':
     unittest.main()
-

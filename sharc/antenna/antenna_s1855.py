@@ -11,6 +11,7 @@ import numpy as np
 from sharc.antenna.antenna import Antenna
 from sharc.parameters.parameters_fss_ss import ParametersFssSs
 
+
 class AntennaS1855(Antenna):
     """"
     Implements amntenna radiation pattern for Earth Station according
@@ -40,7 +41,6 @@ class AntennaS1855(Antenna):
         self.frequency = params.frequency
         self.antenna_gain = params.antenna_gain
 
-
     def calculate_gain(self, *args, **kwargs) -> np.array:
         """
         Calculates the gain of the antenna af arrays of angles.
@@ -62,15 +62,14 @@ class AntennaS1855(Antenna):
         phi_list = kwargs["off_axis_angle_vec"]
         theta_list = kwargs["theta_vec"]
 
-        gain = np.empty(phi_list.shape, dtype = np.float)
+        gain = np.empty(phi_list.shape, dtype=float)
 
         for i in range(len(phi_list)):
             gain[i] = self.get_gain_pair(phi_list[i], theta_list[i])
 
         return gain
 
-
-    def get_gain_pair(self, phi: np.float, theta: np.float) -> np.float:
+    def get_gain_pair(self, phi: float, theta: float) -> float:
         """
         Calculates the gain of the antenna of a pair of angles.
 
@@ -88,7 +87,7 @@ class AntennaS1855(Antenna):
         """
         gain = None
         wavelength = 3e8 / (self.frequency * 1000000)
-        d_to_wavel = self.diameter/wavelength
+        d_to_wavel = self.diameter / wavelength
         phimin1 = 15.85 * math.pow(d_to_wavel, -0.6)
         phimin2 = 118 * math.pow(d_to_wavel, -1.06)
         if phimin1 > phimin2:
@@ -96,25 +95,29 @@ class AntennaS1855(Antenna):
         else:
             phimin = phimin2
 
-
         if d_to_wavel >= 46.8:
-            if   phi < phimin:
+            if phi < phimin:
                 gain = self.antenna_gain
             elif phi >= phimin and phi <= 7:
-                gain = 29 + 3 * np.power(np.sin(theta * math.pi / 180) , 2) - 25 * np.log10(phi)
+                gain = 29 + 3 * \
+                    np.power(np.sin(theta * math.pi / 180), 2) - \
+                    25 * np.log10(phi)
             elif phi > 7 and phi <= 9.2:
-                gain = 7.9 + (3 * np.power(np.sin(theta * np.pi / 180),2)) * (9.2 - phi) / 2.2
+                gain = 7.9 + \
+                    (3 * np.power(np.sin(theta * np.pi / 180), 2)) * (9.2 - phi) / 2.2
             elif phi > 9.2 and phi <= 48:
                 gain = 32 - 25 * np.log10(phi)
             else:
                 return -10
         elif d_to_wavel < 46.8 and d_to_wavel >= 15:
-            if   phi < phimin:
+            if phi < phimin:
                 gain = self.antenna_gain
             elif phi >= phimin and phi <= 7:
-                gain = 29 + 3 * np.pow(np.sin(theta * np.pi / 180),2) - 25 * np.log10(phi)
+                gain = 29 + 3 * \
+                    np.pow(np.sin(theta * np.pi / 180), 2) - 25 * np.log10(phi)
             elif phi > 7 and phi <= 9.2:
-                gain = 7.9 + (3 * np.pow(np.sin(theta * np.pi / 180)),2) * (9.2 - phi) / 2.2
+                gain = 7.9 + \
+                    (3 * np.pow(np.sin(theta * np.pi / 180)), 2) * (9.2 - phi) / 2.2
             elif phi > 9.2 and phi <= 30.2:
                 gain = 32 - 25 * np.log10(phi)
             elif phi > 30.2 and phi <= 70:
@@ -138,16 +141,20 @@ if __name__ == '__main__':
     antenna = AntennaS1855(params_fss_ss)
 
     # Plot radiation pattern for theta = 90 degrees
-    off_axis_angle_vec = np.linspace(0.01, 180, num = 10000)
-    theta_90 = 90*np.ones(off_axis_angle_vec.shape)
-    theta = 0*np.ones(off_axis_angle_vec.shape)
+    off_axis_angle_vec = np.linspace(0.01, 180, num=10000)
+    theta_90 = 90 * np.ones(off_axis_angle_vec.shape)
+    theta = 0 * np.ones(off_axis_angle_vec.shape)
 
-    gain_90 = antenna.calculate_gain(off_axis_angle_vec = off_axis_angle_vec, theta_vec = theta_90)
-    gain = antenna.calculate_gain(off_axis_angle_vec = off_axis_angle_vec, theta_vec = theta)
+    gain_90 = antenna.calculate_gain(
+        off_axis_angle_vec=off_axis_angle_vec, theta_vec=theta_90,
+    )
+    gain = antenna.calculate_gain(
+        off_axis_angle_vec=off_axis_angle_vec, theta_vec=theta,
+    )
 
-    fig = plt.figure(figsize=(8,7), facecolor='w', edgecolor='k')
-    plt.semilogx(off_axis_angle_vec, gain_90, "-b", label = "$\\theta = 90$ deg")
-    plt.semilogx(off_axis_angle_vec, gain, "-r", label = "$\\theta = 0$ deg")
+    fig = plt.figure(figsize=(8, 7), facecolor='w', edgecolor='k')
+    plt.semilogx(off_axis_angle_vec, gain_90, "-b", label="$\\theta = 90$ deg")
+    plt.semilogx(off_axis_angle_vec, gain, "-r", label="$\\theta = 0$ deg")
 
     plt.xlabel("Off-axis angle, $\\varphi$ [deg]")
     plt.ylabel("Gain [dBi]")

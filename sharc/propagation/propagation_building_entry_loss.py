@@ -16,8 +16,10 @@ class PropagationBuildingEntryLoss(Propagation):
     Implements the building entry loss according to ITU-R P.2109-0 (Prediction of Building Entry Loss)
     """
 
-    def get_loss(self, frequency_MHz, elevation, prob="RANDOM",
-                 building_class="TRADITIONAL", test = False) -> np.array:
+    def get_loss(
+        self, frequency_MHz, elevation, prob="RANDOM",
+        building_class="TRADITIONAL", test=False,
+    ) -> np.array:
         """
         Calculates building loss
 
@@ -86,22 +88,33 @@ class PropagationBuildingEntryLoss(Propagation):
 
         return loss
 
+
 if __name__ == '__main__':
 
     entry_loss = PropagationBuildingEntryLoss(np.random.RandomState())
 
-    freq_GHz_log = np.arange(-1,2.1,.1)
+    freq_GHz_log = np.arange(-1, 2.1, .1)
     freq_GHz = 10 ** freq_GHz_log
     freq_MHz = freq_GHz * 1000
 
     # Plot median BLE mu_1, for comparison with ITU-R P2109-0
     plt.figure()
-    median_loss_traditional = entry_loss.get_loss( freq_MHz, 0, prob=.5,
-                                                   building_class="TRADITIONAL", test=True)
-    median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 0, prob=.5,
-                                                building_class="THERMALLY_EFFICIENT", test=True)
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 0deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 0deg")
+    median_loss_traditional = entry_loss.get_loss(
+        freq_MHz, 0, prob=.5,
+        building_class="TRADITIONAL", test=True,
+    )
+    median_loss_therm_eff = entry_loss.get_loss(
+        freq_MHz, 0, prob=.5,
+        building_class="THERMALLY_EFFICIENT", test=True,
+    )
+    plt.semilogx(
+        freq_GHz, median_loss_traditional,
+        '-', label="TRADITIONAL, 0deg",
+    )
+    plt.semilogx(
+        freq_GHz, median_loss_therm_eff, '--',
+        label="THERMALLY_EFFICIENT, 0deg",
+    )
 
     plt.legend(title="Building Type, elevation")
     plt.grid()
@@ -112,31 +125,61 @@ if __name__ == '__main__':
     # Plot median loss at different angles,
     # 0 degrees
     plt.figure()
-    median_loss_traditional = entry_loss.get_loss( freq_MHz, 0, prob=.5,
-                                                   building_class="TRADITIONAL")
-    median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 0, prob=.5,
-                                                building_class="THERMALLY_EFFICIENT")
+    median_loss_traditional = entry_loss.get_loss(
+        freq_MHz, 0, prob=.5,
+        building_class="TRADITIONAL",
+    )
+    median_loss_therm_eff = entry_loss.get_loss(
+        freq_MHz, 0, prob=.5,
+        building_class="THERMALLY_EFFICIENT",
+    )
 
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 0deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 0deg")
+    plt.semilogx(
+        freq_GHz, median_loss_traditional,
+        '-', label="TRADITIONAL, 0deg",
+    )
+    plt.semilogx(
+        freq_GHz, median_loss_therm_eff, '--',
+        label="THERMALLY_EFFICIENT, 0deg",
+    )
 
     # 45 degrees
-    median_loss_traditional = entry_loss.get_loss( freq_MHz, 45, prob=.5,
-                                                   building_class="TRADITIONAL")
-    median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 45, prob=.5,
-                                                building_class="THERMALLY_EFFICIENT")
+    median_loss_traditional = entry_loss.get_loss(
+        freq_MHz, 45, prob=.5,
+        building_class="TRADITIONAL",
+    )
+    median_loss_therm_eff = entry_loss.get_loss(
+        freq_MHz, 45, prob=.5,
+        building_class="THERMALLY_EFFICIENT",
+    )
 
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 45deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 45deg")
+    plt.semilogx(
+        freq_GHz, median_loss_traditional,
+        '-', label="TRADITIONAL, 45deg",
+    )
+    plt.semilogx(
+        freq_GHz, median_loss_therm_eff, '--',
+        label="THERMALLY_EFFICIENT, 45deg",
+    )
 
     # 90 deg
-    median_loss_traditional = entry_loss.get_loss( freq_MHz, 90, prob=.5,
-                                                   building_class="TRADITIONAL")
-    median_loss_therm_eff = entry_loss.get_loss(freq_MHz, 90, prob=.5,
-                                                building_class="THERMALLY_EFFICIENT")
+    median_loss_traditional = entry_loss.get_loss(
+        freq_MHz, 90, prob=.5,
+        building_class="TRADITIONAL",
+    )
+    median_loss_therm_eff = entry_loss.get_loss(
+        freq_MHz, 90, prob=.5,
+        building_class="THERMALLY_EFFICIENT",
+    )
 
-    plt.semilogx(freq_GHz, median_loss_traditional, '-', label="TRADITIONAL, 90deg")
-    plt.semilogx(freq_GHz, median_loss_therm_eff, '--', label="THERMALLY_EFFICIENT, 90deg")
+    plt.semilogx(
+        freq_GHz, median_loss_traditional,
+        '-', label="TRADITIONAL, 90deg",
+    )
+    plt.semilogx(
+        freq_GHz, median_loss_therm_eff, '--',
+        label="THERMALLY_EFFICIENT, 90deg",
+    )
 
     plt.legend(title="Building Type, elevation")
     plt.grid()
@@ -146,30 +189,29 @@ if __name__ == '__main__':
 
     plt.show()
     plt.close()
-    
+
     # parameters
     freq_MHz = 40e3
-    probability = np.linspace(0,1,num=1000)
+    probability = np.linspace(0, 1, num=1000)
     elevations = np.array([0, 45, 90])
-    loss = np.zeros((len(elevations),len(probability)))
-    
+    loss = np.zeros((len(elevations), len(probability)))
+
     # calculate loss
-    for n,el in enumerate(elevations):
-        for m,pb in enumerate(probability):
-            loss[n,m] = entry_loss.get_loss( freq_MHz, el, prob=pb,
-                                          building_class="TRADITIONAL")
-            
-    for n,el in enumerate(elevations):
+    for n, el in enumerate(elevations):
+        for m, pb in enumerate(probability):
+            loss[n, m] = entry_loss.get_loss(
+                freq_MHz, el, prob=pb,
+                building_class="TRADITIONAL",
+            )
+
+    for n, el in enumerate(elevations):
         lbl = str(el) + " deg"
-        plt.plot(loss[n],probability,label=lbl)
-    
+        plt.plot(loss[n], probability, label=lbl)
+
     plt.xlabel("Building Entry Loss [dB]")
     plt.ylabel("Probability that loss is exceeded")
-    plt.ylim((0,1))
+    plt.ylim((0, 1))
 #    plt.xlim((0,65))
     plt.grid()
     plt.legend()
     plt.show()
-
-
-

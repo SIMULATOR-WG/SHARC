@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -26,9 +26,7 @@ setup(
     author="Edgar Souza",
     author_email='edgar@anatel.gov.br',
     url='https://github.com/edgar-souza/sharc',
-    packages=[
-        'sharc',
-    ],
+    packages=find_packages(include=['sharc', 'sharc.*']),
     package_dir={'sharc':
                  'sharc'},
     entry_points={

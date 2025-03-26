@@ -22,8 +22,10 @@ class TestScintillation(unittest.TestCase):
         frequency_MHz = 30000.
         wet_refractivity = 42.5
 
-        elevation_vec = np.array([5., 10., 20., 90., 35., 5., 10., 20., 35., 90.])
-        percentage_gain_exceeded = np.array([.01, .1, 1, 3, 10, 90, 98, 99, 99.9, 99.99])
+        elevation_vec = np.array(
+            [5., 10., 20., 90., 35., 5., 10., 20., 35., 90.])
+        percentage_gain_exceeded = np.array(
+            [.01, .1, 1, 3, 10, 90, 98, 99, 99.9, 99.99])
         attenuation_lower = [5, 1, .5, .1, .1, 1, 1, .5, .4, .3]
         attenuation_upper = [7, 2, .6, .2, .2, 2, 2, .7, .6, .5]
         sign = [-1, -1, -1, -1, -1, +1, +1, +1, +1, +1]

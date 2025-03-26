@@ -1,0 +1,22 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.rulers": [
+            120
+        ]
+    },
+    "flake8.args": [
+        "--count",
+        "--max-line-length=127",
+        "--statistics",
+        "--ignore=W605,W504,E266,F811,E131,C0209,C0103,C0115,C0115,C0116,C0201"
+    ],
+    "autopep8.args": [
+        "--max-line-length 120",
+        "--agressive"
+    ]
+}

@@ -6,13 +6,12 @@ Created on Fri Feb  3 15:29:48 2017
 """
 
 import numpy as np
-import math
 
 from sharc.support.enumerations import StationType
 from sharc.station import Station
 from sharc.antenna.antenna import Antenna
-from sharc.mask.spectral_mask_imt import SpectralMaskImt
 from sharc.mask.spectral_mask_3gpp import SpectralMask3Gpp
+
 
 class StationManager(object):
     """
@@ -32,10 +31,10 @@ class StationManager(object):
         self.active = np.ones(n, dtype=bool)
         self.tx_power = np.empty(n)
         self.rx_power = np.empty(n)
-        self.rx_interference = np.empty(n)
-        self.ext_interference = np.empty(n)
+        self.rx_interference = np.empty(n)  # Rx interferece in dBW
+        self.ext_interference = np.empty(n)  # External interferece in dBW
         self.antenna = np.empty(n, dtype=Antenna)
-        self.bandwidth = np.empty(n)
+        self.bandwidth = np.empty(n)  # Bandwidth in MHz
         self.noise_figure = np.empty(n)
         self.noise_temperature = np.empty(n)
         self.thermal_noise = np.empty(n)
@@ -43,16 +42,17 @@ class StationManager(object):
         self.snr = np.empty(n)
         self.sinr = np.empty(n)
         self.sinr_ext = np.empty(n)
-        self.inr = np.empty(n)
-        self.pfd = np.empty(n)
+        self.inr = np.empty(n)  # INR in dBm/MHz
+        self.pfd = np.empty(n)  # Powerflux density in dBm/m^2
         self.spectral_mask = np.empty(n, dtype=SpectralMask3Gpp)
         self.center_freq = np.empty(n)
         self.spectral_mask = None
         self.station_type = StationType.NONE
+        self.is_space_station = False
         self.intersite_dist = 0.0
 
     def get_station_list(self, id=None) -> list:
-        if(id is None):
+        if (id is None):
             id = range(self.num_stations)
         station_list = list()
         for i in id:
@@ -89,18 +89,22 @@ class StationManager(object):
     def get_distance_to(self, station) -> np.array:
         distance = np.empty([self.num_stations, station.num_stations])
         for i in range(self.num_stations):
-            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) +
-                           np.power(self.y[i] - station.y, 2))
+            distance[i] = np.sqrt(
+                np.power(self.x[i] - station.x, 2) +
+                np.power(self.y[i] - station.y, 2),
+            )
         return distance
 
     def get_3d_distance_to(self, station) -> np.array:
         distance = np.empty([self.num_stations, station.num_stations])
         for i in range(self.num_stations):
-            distance[i] = np.sqrt(np.power(self.x[i] - station.x, 2) +
-                           np.power(self.y[i] - station.y, 2) +
-                            np.power(self.height[i] - station.height, 2))
+            distance[i] = np.sqrt(
+                np.power(self.x[i] - station.x, 2) +
+                np.power(self.y[i] - station.y, 2) +
+                np.power(self.height[i] - station.height, 2),
+            )
         return distance
-    
+
     def get_dist_angles_wrap_around(self, station) -> np.array:
         """
         Calcualtes distances and angles using the wrap around technique
@@ -115,112 +119,122 @@ class StationManager(object):
         """
         # Initialize variables
         distance_3D = np.empty([self.num_stations, station.num_stations])
-        distance_2D = np.inf*np.ones_like(distance_3D)
+        distance_2D = np.inf * np.ones_like(distance_3D)
         cluster_num = np.zeros_like(distance_3D, dtype=int)
-        
+
         # Cluster coordinates
-        cluster_x = np.array([station.x,
-                              station.x + 3.5*self.intersite_dist,
-                              station.x - 0.5*self.intersite_dist,
-                              station.x - 4.0*self.intersite_dist,
-                              station.x - 3.5*self.intersite_dist,
-                              station.x + 0.5*self.intersite_dist,
-                              station.x + 4.0*self.intersite_dist])
-    
-        cluster_y = np.array([station.y,
-                              station.y + 1.5*np.sqrt(3.0)*self.intersite_dist,
-                              station.y + 2.5*np.sqrt(3.0)*self.intersite_dist,
-                              station.y + 1.0*np.sqrt(3.0)*self.intersite_dist,
-                              station.y - 1.5*np.sqrt(3.0)*self.intersite_dist,
-                              station.y - 2.5*np.sqrt(3.0)*self.intersite_dist,
-                              station.y - 1.0*np.sqrt(3.0)*self.intersite_dist])
-        
+        cluster_x = np.array([
+            station.x,
+            station.x + 3.5 * self.intersite_dist,
+            station.x - 0.5 * self.intersite_dist,
+            station.x - 4.0 * self.intersite_dist,
+            station.x - 3.5 * self.intersite_dist,
+            station.x + 0.5 * self.intersite_dist,
+            station.x + 4.0 * self.intersite_dist,
+        ])
+
+        cluster_y = np.array([
+            station.y,
+            station.y + 1.5 *
+            np.sqrt(3.0) * self.intersite_dist,
+            station.y + 2.5 *
+            np.sqrt(3.0) * self.intersite_dist,
+            station.y + 1.0 *
+            np.sqrt(3.0) * self.intersite_dist,
+            station.y - 1.5 *
+            np.sqrt(3.0) * self.intersite_dist,
+            station.y - 2.5 *
+            np.sqrt(3.0) * self.intersite_dist,
+            station.y - 1.0 * np.sqrt(3.0) * self.intersite_dist,
+        ])
+
         # Calculate 2D distance
         temp_distance = np.zeros_like(distance_2D)
-        for k,(x,y) in enumerate(zip(cluster_x,cluster_y)):                
-            temp_distance = np.sqrt(np.power(x - self.x[:,np.newaxis], 2) +
-                                    np.power(y - self.y[:,np.newaxis], 2))
+        for k, (x, y) in enumerate(zip(cluster_x, cluster_y)):
+            temp_distance = np.sqrt(
+                np.power(x - self.x[:, np.newaxis], 2) +
+                np.power(y - self.y[:, np.newaxis], 2),
+            )
             is_shorter = temp_distance < distance_2D
             distance_2D[is_shorter] = temp_distance[is_shorter]
             cluster_num[is_shorter] = k
-            
+
         # Calculate 3D distance
-        distance_3D = np.sqrt(np.power(distance_2D, 2) +
-                              np.power(station.height - self.height[:,np.newaxis], 2))
-            
+        distance_3D = np.sqrt(
+            np.power(distance_2D, 2) +
+            np.power(station.height - self.height[:, np.newaxis], 2),
+        )
+
         # Calcualte pointing vector
-        point_vec_x = cluster_x[cluster_num,np.arange(station.num_stations)] \
-                      - self.x[:,np.newaxis]
-        point_vec_y = cluster_y[cluster_num,np.arange(station.num_stations)] \
-                      - self.y[:,np.newaxis]
-        point_vec_z = station.height - self.height[:,np.newaxis]
-        
-        phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
-        theta = np.rad2deg(np.arccos(point_vec_z/distance_3D))
-                
+        point_vec_x = cluster_x[cluster_num, np.arange(station.num_stations)] \
+            - self.x[:, np.newaxis]
+        point_vec_y = cluster_y[cluster_num, np.arange(station.num_stations)] \
+            - self.y[:, np.newaxis]
+        point_vec_z = station.height - self.height[:, np.newaxis]
+
+        phi = np.array(
+            np.rad2deg(
+                np.arctan2(
+                    point_vec_y, point_vec_x,
+                ),
+            ), ndmin=2,
+        )
+        theta = np.rad2deg(np.arccos(point_vec_z / distance_3D))
+
         return distance_2D, distance_3D, phi, theta
 
     def get_elevation(self, station) -> np.array:
         """
         Calculates the elevation angle between stations. Can be used for
         IMT stations.
-        
-        TODO: this implementation is essentialy the same as the one from 
+
+        TODO: this implementation is essentialy the same as the one from
               get_elevation_angle (free-space elevation angle), despite the
-              different matrix dimentions. So, the methods should be merged 
+              different matrix dimentions. So, the methods should be merged
               in order to reuse the source code
         """
 
         elevation = np.empty([self.num_stations, station.num_stations])
 
         for i in range(self.num_stations):
-            distance = np.sqrt(np.power(self.x[i] - station.x, 2) +
-                           np.power(self.y[i] - station.y, 2))
+            distance = np.sqrt(
+                np.power(self.x[i] - station.x, 2) +
+                np.power(self.y[i] - station.y, 2),
+            )
             rel_z = station.height - self.height[i]
             elevation[i] = np.degrees(np.arctan2(rel_z, distance))
-            
+
         return elevation
-        
-        
-    def get_elevation_angle(self, station, sat_params) -> dict:
-        free_space_angle = np.empty(self.num_stations)
-        angle = np.empty(self.num_stations)
-        for i in range(self.num_stations):
-            # calculate free-space elevation angle according to Attachment A
-            rel_x = station.x - self.x[i]
-            rel_y = station.y - self.y[i]
-            rel_z = station.height - self.height[i]
-
-            gts = np.sqrt(rel_x**2 + rel_y**2)
-            theta_0 = np.arctan2(rel_z, gts) # free-space elevation angle
-            free_space_angle[i] = np.degrees(theta_0)
-
-            ##
-            # calculate apparent elevation angle according to ITU-R P619, Attachment B
-
-            tau_fs1 = 1.728 + 0.5411 * theta_0 + 0.03723 * theta_0**2
-            tau_fs2 = 0.1815 + 0.06272 * theta_0 + 0.01380 * theta_0**2
-            tau_fs3 = 0.01727 + 0.008288 * theta_0
-
-            # change in elevation angle due to refraction
-            tau_fs_deg = 1/(tau_fs1 + sat_params.altitude*tau_fs2 +
-                            sat_params.altitude**2*tau_fs3)
-            tau_fs = tau_fs_deg / 180. * np.pi
-
-            angle[i] = np.degrees(theta_0 + tau_fs)
-
-        return{'free_space': free_space_angle, 'apparent': angle}
 
     def get_pointing_vector_to(self, station) -> tuple:
+        """calculate the pointing vector (angles) w.r.t. the other station
 
-        point_vec_x = station.x- self.x[:,np.newaxis]
-        point_vec_y = station.y - self.y[:,np.newaxis]
-        point_vec_z = station.height - self.height[:,np.newaxis]
+        Parameters
+        ----------
+        station : StationManager
+            The other station to calculate the pointing vector
+
+        Returns
+        -------
+        tuple
+            phi, theta (phi is calculated with respect to x counter-clock-wise and
+            theta is calculated with respect to z counter-clock-wise)
+        """
+
+        point_vec_x = station.x - self.x[:, np.newaxis]
+        point_vec_y = station.y - self.y[:, np.newaxis]
+        point_vec_z = station.height - self.height[:, np.newaxis]
 
         dist = self.get_3d_distance_to(station)
 
-        phi = np.array(np.rad2deg(np.arctan2(point_vec_y,point_vec_x)),ndmin=2)
-        theta = np.rad2deg(np.arccos(point_vec_z/dist))
+        phi = np.array(
+            np.rad2deg(
+                np.arctan2(
+                    point_vec_y, point_vec_x,
+                ),
+            ), ndmin=2,
+        )
+        theta = np.rad2deg(np.arccos(point_vec_z / dist))
 
         return phi, theta
 
@@ -234,8 +248,28 @@ class StationManager(object):
         a = 90 - self.elevation
         C = Az0 - Az
 
-        phi = np.arccos(np.cos(np.radians(a))*np.cos(np.radians(b)) \
-                        + np.sin(np.radians(a))*np.sin(np.radians(b))*np.cos(np.radians(C)))
+        phi = np.arccos(
+            np.cos(np.radians(a)) * np.cos(np.radians(b)) +
+            np.sin(np.radians(a)) * np.sin(np.radians(b)) * np.cos(np.radians(C)),
+        )
         phi_deg = np.degrees(phi)
 
         return phi_deg
+
+    def is_imt_station(self) -> bool:
+        """Whether this station is IMT or not
+
+        Parameters
+        ----------
+        sta : StationManager
+            The station that we're testing.
+
+        Returns
+        -------
+        bool
+            Whether this station is IMT or not
+        """
+        if self.station_type is StationType.IMT_BS or self.station_type is StationType.IMT_UE:
+            return True
+        else:
+            return False

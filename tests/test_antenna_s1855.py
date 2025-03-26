@@ -13,10 +13,11 @@ import numpy.testing as npt
 from sharc.antenna.antenna_s1855 import AntennaS1855
 from sharc.parameters.parameters_fss_es import ParametersFssEs
 
+
 class AntennaS1855Test(unittest.TestCase):
 
     def setUp(self):
-        #Earth Station Antenna parameters
+        # Earth Station Antenna parameters
         params = ParametersFssEs()
         params.diameter = 9.1
         params.frequency = 27200
@@ -31,10 +32,11 @@ class AntennaS1855Test(unittest.TestCase):
 
         off_axis_angle = np.array([7, 8, 15, 100])
         theta = np.array([90, 45, 45, 45])
-        expected_result = np.array([ 10.87, 8.71, 2.59, -10 ])
-        gain = self.antenna.calculate_gain(off_axis_angle_vec = off_axis_angle, 
-                                           theta_vec = theta)
+        expected_result = np.array([10.87, 8.71, 2.59, -10])
+        gain = self.antenna.calculate_gain(off_axis_angle_vec=off_axis_angle,
+                                           theta_vec=theta)
         npt.assert_allclose(gain, expected_result, atol=1e-2)
+
 
 if __name__ == '__main__':
     unittest.main()
