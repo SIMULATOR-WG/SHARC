@@ -10,14 +10,15 @@ import numpy as np
 import numpy.testing as npt
 from sharc.propagation.atmosphere import ReferenceAtmosphere
 
+
 class TestAtmosphere(unittest.TestCase):
 
     def setUp(self):
         self.atmosphere = ReferenceAtmosphere()
 
     def test_specific_attenuation(self):
-        temperature = 15 + 273.15 # K
-        vapour_density = 7.5 # g/m**3
+        temperature = 15 + 273.15  # K
+        vapour_density = 7.5  # g/m**3
         pressure_hPa = 1013.25
         vapour_pressure_hPa = vapour_density * temperature / 216.7
 
@@ -28,12 +29,15 @@ class TestAtmosphere(unittest.TestCase):
         specific_att_p676_upper = [5e-1, 2e1, 5e-1, 4, 7e1, 8e2]
 
         for index in range(len(f_GHz_vec)):
-            specific_att[index] = self.atmosphere._get_specific_attenuation(pressure_hPa,
-                                                                            vapour_pressure_hPa,
-                                                                            temperature,
-                                                                            float(f_GHz_vec[index]) * 1000)
+            specific_att[index] = self.atmosphere._get_specific_attenuation(
+                pressure_hPa,
+                vapour_pressure_hPa,
+                temperature,
+                float(f_GHz_vec[index]) * 1000,
+            )
         npt.assert_array_less(specific_att_p676_lower, specific_att)
         npt.assert_array_less(specific_att, specific_att_p676_upper)
+
 
 if __name__ == '__main__':
     unittest.main()

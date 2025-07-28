@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 16 17:11:06 2017
+from dataclasses import dataclass
+import numpy as np
 
-@author: Calil
-"""
+from sharc.parameters.parameters_single_earth_station import ParametersSingleEarthStation
 
-class ParametersRas(object):
+
+@dataclass
+class ParametersRas(ParametersSingleEarthStation):
     """
     Simulation parameters for Radio Astronomy Service
     """
-
-    def __init__(self):
-        pass
+    section_name: str = "ras"
+    polarization_loss: float = 0.0

@@ -13,7 +13,7 @@ from sharc.simulation_uplink import SimulationUplink
 from sharc.parameters.parameters import Parameters
 
 import random
-import sys
+
 
 class Model(Observable):
     """
@@ -32,8 +32,10 @@ class Model(Observable):
 
     def set_param_file(self, param_file):
         self.param_file = param_file
-        self.notify_observers(source = __name__,
-                              message = "Loading file:\n" + self.param_file)
+        self.notify_observers(
+            source=__name__,
+            message="Loading file:\n" + self.param_file,
+        )
 
     def initialize(self):
         """
@@ -45,21 +47,27 @@ class Model(Observable):
         self.parameters.read_params()
 
         if self.parameters.general.imt_link == "DOWNLINK":
-            self.simulation = SimulationDownlink(self.parameters, self.param_file)
+            self.simulation = SimulationDownlink(
+                self.parameters, self.param_file,
+            )
         else:
-            self.simulation = SimulationUplink(self.parameters, self.param_file)
+            self.simulation = SimulationUplink(
+                self.parameters, self.param_file,
+            )
         self.simulation.add_observer_list(self.observers)
 
         description = self.get_description()
 
-        self.notify_observers(source=__name__,
-                              message=description + "\nSimulation is running...",
-                              state=State.RUNNING )
+        self.notify_observers(
+            source=__name__,
+            message=description + "\nSimulation is running...",
+            state=State.RUNNING,
+        )
         self.current_snapshot = 0
 
         self.simulation.initialize()
 
-        random.seed( self.parameters.general.seed )
+        random.seed(self.parameters.general.seed)
 
         self.secondary_seeds = [None] * self.parameters.general.num_snapshots
 
@@ -72,18 +80,18 @@ class Model(Observable):
         param_system = self.simulation.param_system
 
         description = "\nIMT:\n" \
-                            + "\tinterfered with: {:s}\n".format(str(self.parameters.imt.interfered_with)) \
-                            + "\tdirection: {:s}\n".format(self.parameters.general.imt_link) \
-                            + "\tfrequency: {:.3f} GHz\n".format(self.parameters.imt.frequency*1e-3) \
-                            + "\tbandwidth: {:.0f} MHz\n".format(self.parameters.imt.bandwidth) \
-                            + "\tspurious emissions: {:.0f} dBm/MHz\n".format(self.parameters.imt.spurious_emissions) \
-                            + "\ttopology: {:s}\n".format(self.parameters.imt.topology) \
-                            + "\tpath loss model: {:s}\n".format(self.parameters.imt.channel_model)  \
-                    + "{:s}:\n".format(self.parameters.general.system) \
-                            + "\tfrequency: {:.3f} GHz\n".format(param_system.frequency*1e-3) \
-                            + "\tbandwidth: {:.0f} MHz\n".format(param_system.bandwidth) \
-                            + "\tpath loss model: {:s}\n".format(param_system.channel_model) \
-                            + "\tantenna pattern: {:s}\n".format(param_system.antenna_pattern)
+            + "\tinterfered with: {:s}\n".format(str(self.parameters.imt.interfered_with)) \
+            + "\tdirection: {:s}\n".format(self.parameters.general.imt_link) \
+            + "\tfrequency: {:.3f} GHz\n".format(self.parameters.imt.frequency * 1e-3) \
+            + "\tbandwidth: {:.0f} MHz\n".format(self.parameters.imt.bandwidth) \
+            + "\tspurious emissions: {:.0f} dBm/MHz\n".format(self.parameters.imt.spurious_emissions) \
+            + "\ttopology: {:s}\n".format(self.parameters.imt.topology.type) \
+            + "\tpath loss model: {:s}\n".format(self.parameters.imt.channel_model)  \
+            + "{:s}:\n".format(self.parameters.general.system) \
+            + "\tfrequency: {:.3f} GHz\n".format(param_system.frequency * 1e-3) \
+            + "\tbandwidth: {:.0f} MHz\n".format(param_system.bandwidth) \
+            + "\tpath loss model: {:s}\n".format(param_system.channel_model) \
+            + "\tantenna pattern: {:s}\n".format(param_system.antenna_pattern)
 
         return description
 
@@ -96,12 +104,16 @@ class Model(Observable):
 
         if not self.current_snapshot % 10:
             write_to_file = True
-            self.notify_observers(source=__name__,
-                                  message="Snapshot #" + str(self.current_snapshot))
+            self.notify_observers(
+                source=__name__,
+                message="Snapshot #" + str(self.current_snapshot),
+            )
 
-        self.simulation.snapshot(write_to_file=write_to_file,
-                                 snapshot_number=self.current_snapshot,
-                                 seed = self.secondary_seeds[self.current_snapshot - 1])
+        self.simulation.snapshot(
+            write_to_file=write_to_file,
+            snapshot_number=self.current_snapshot,
+            seed=self.secondary_seeds[self.current_snapshot - 1],
+        )
 
     def is_finished(self) -> bool:
         """
@@ -122,8 +134,10 @@ class Model(Observable):
         Finalizes the simulation and performs all post-simulation tasks
         """
         self.simulation.finalize(snapshot_number=self.current_snapshot)
-        self.notify_observers(source=__name__,
-                              message="FINISHED!", state=State.FINISHED)
+        self.notify_observers(
+            source=__name__,
+            message="FINISHED!", state=State.FINISHED,
+        )
 
     def set_elapsed_time(self, elapsed_time: str):
         """
@@ -134,6 +148,8 @@ class Model(Observable):
         ----------
             elapsed_time: Elapsed time.
         """
-        self.notify_observers(source=__name__,
-                              message="Elapsed time: " + elapsed_time,
-                              state=State.FINISHED)
+        self.notify_observers(
+            source=__name__,
+            message="Elapsed time: " + elapsed_time,
+            state=State.FINISHED,
+        )

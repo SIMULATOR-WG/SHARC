@@ -1,0 +1,6 @@
+# This file is used to ignore files in the input directory of the MSS D2D to IMT campaign.
+*
+!.gitignore
+!parameters_mss_d2d_to_imt_dl_co_channel_system_A.yaml
+!parameters_mss_d2d_to_imt_ul_co_channel_system_A.yaml
+!parameters_mss_d2d_to_imt_lat_variation_template.yaml

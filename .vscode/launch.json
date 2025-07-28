@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: SHARC main_cli.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/sharc/main_cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-p",
+                "${workspaceFolder}/sharc/input/parameters.yaml"
+            ]
+        }
+    ]
+}

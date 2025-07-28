@@ -39,6 +39,7 @@ class BeamformingNormalizer(object):
         antenna (AntennaBeamformingImt): antenna to which calculate
             normalization
     """
+
     def __init__(self, res_deg: float, tol: float):
         """
         Class constructor
@@ -61,16 +62,22 @@ class BeamformingNormalizer(object):
         self.theta_min_rad = np.deg2rad(self.theta_min_deg)
         self.theta_max_rad = np.deg2rad(self.theta_max_deg)
 
-        self.phi_vals_deg = np.arange(self.phi_min_deg,
-                                      self.phi_max_deg,res_deg)
-        self.theta_vals_deg = np.arange(self.theta_min_deg,
-                                        self.theta_max_deg,res_deg)
+        self.phi_vals_deg = np.arange(
+            self.phi_min_deg,
+            self.phi_max_deg, res_deg,
+        )
+        self.theta_vals_deg = np.arange(
+            self.theta_min_deg,
+            self.theta_max_deg, res_deg,
+        )
         self.antenna = None
 
-    def generate_correction_matrix(self, 
-                                   par: AntennaPar, 
-                                   file_name: str,
-                                   testing = False):
+    def generate_correction_matrix(
+        self,
+        par: AntennaPar,
+        file_name: str,
+        testing=False,
+    ):
         """
         Generates the correction factor matrix and saves it in a file
 
@@ -80,34 +87,44 @@ class BeamformingNormalizer(object):
             file_name (str): name of file to which save the correction matrix
         """
         # Create antenna object
-        azi = 0 # Antenna azimuth: 0 degrees for simplicity
-        ele = 0 # Antenna elevation: 0 degrees as well
-        self.antenna = AntennaBeamformingImt(par,azi,ele)
+        azi = 0  # Antenna azimuth: 0 degrees for simplicity
+        ele = 0  # Antenna elevation: 0 degrees as well
+        self.antenna = AntennaBeamformingImt(par, azi, ele)
 
         # For co-channel beamforming
         # Correction factor numpy array
-        correction_factor_co = np.zeros((len(self.phi_vals_deg),len(self.theta_vals_deg)))
-        error_co = np.empty((len(self.phi_vals_deg),len(self.theta_vals_deg)), dtype=tuple)
+        correction_factor_co = np.zeros(
+            (len(self.phi_vals_deg), len(self.theta_vals_deg)),
+        )
+        error_co = np.empty(
+            (len(self.phi_vals_deg), len(self.theta_vals_deg)), dtype=tuple,
+        )
 
         # Loop throug all the possible beams
         for phi_idx, phi in enumerate(self.phi_vals_deg):
-            if not testing: print('\n' + str(100*phi_idx/len(self.phi_vals_deg)) + '%')
+            if not testing:
+                print('\n' + str(100 * phi_idx / len(self.phi_vals_deg)) + '%')
             for theta_idx, theta in enumerate(self.theta_vals_deg):
                 s = '\tphi = ' + str(phi) + ', theta = ' + str(theta)
-                if not testing: print(s)
+                if not testing:
+                    print(s)
                 stdout.flush()
-                correction_factor_co[phi_idx,theta_idx], error_co[phi_idx,theta_idx] = self.calculate_correction_factor(phi,theta,True)
+                correction_factor_co[phi_idx, theta_idx], error_co[phi_idx, theta_idx] = \
+                    self.calculate_correction_factor(phi, theta, True)
 
-
-        correction_factor_adj, error_adj = self.calculate_correction_factor(0,0,False)
+        correction_factor_adj, error_adj = self.calculate_correction_factor(
+            0, 0, False,
+        )
 
         # Save in file
-        self._save_files(correction_factor_co,
-                         error_co,
-                         correction_factor_adj,
-                         error_adj,
-                         par,
-                         file_name)
+        self._save_files(
+            correction_factor_co,
+            error_co,
+            correction_factor_adj,
+            error_adj,
+            par,
+            file_name,
+        )
 
     def calculate_correction_factor(self, phi_beam: float, theta_beam: float, c_chan: bool):
         """
@@ -125,26 +142,29 @@ class BeamformingNormalizer(object):
             error (tuple): upper and lower error bounds [dB]
         """
         if c_chan:
-            self.antenna.add_beam(phi_beam,theta_beam)
+            self.antenna.add_beam(phi_beam, theta_beam)
             beam = int(len(self.antenna.beams_list) - 1)
-            int_f = lambda t,p: \
-            np.power(10,self.antenna._beam_gain(np.rad2deg(p),np.rad2deg(t),beam)/10)*np.sin(t)
+
+            def int_f(t, p):
+                return np.power(10, self.antenna._beam_gain(np.rad2deg(p), np.rad2deg(t), beam) / 10) * np.sin(t)
         else:
-            int_f = lambda t,p: \
-            np.power(10,self.antenna.element.element_pattern(np.rad2deg(p),np.rad2deg(t))/10)*np.sin(t)
+            def int_f(t, p):
+                return np.power(10, self.antenna.element.element_pattern(np.rad2deg(p), np.rad2deg(t)) / 10) * np.sin(t)
 
-        integral_val, err = dblquad(int_f,self.phi_min_rad,self.phi_max_rad,
-                          lambda p: self.theta_min_rad,
-                          lambda p: self.theta_max_rad,
-                          epsabs=self.tolerance,
-                          epsrel=0.0)
+        integral_val, err = dblquad(
+            int_f, self.phi_min_rad, self.phi_max_rad,
+            lambda p: self.theta_min_rad,
+            lambda p: self.theta_max_rad,
+            epsabs=self.tolerance,
+            epsrel=0.0,
+        )
 
-        correction_factor = -10*np.log10(integral_val/(4*np.pi))
+        correction_factor = -10 * np.log10(integral_val / (4 * np.pi))
 
-        hig_bound = -10*np.log10((integral_val - err)/(4*np.pi))
-        low_bound = -10*np.log10((integral_val + err)/(4*np.pi))
+        hig_bound = -10 * np.log10((integral_val - err) / (4 * np.pi))
+        low_bound = -10 * np.log10((integral_val + err) / (4 * np.pi))
 
-        return correction_factor, (low_bound,hig_bound)
+        return correction_factor, (low_bound, hig_bound)
 
     def _save_files(self, cf_co, err_co, cf_adj, err_adj, par, file_name):
         """
@@ -182,15 +202,18 @@ class BeamformingNormalizer(object):
             par (AtennaPar): antenna parameters used in normalization
             file_name (str): name of file to which save normalization data
         """
-        np.savez(file_name,
-                 resolution = self.resolution_deg,
-                 phi_range = (self.phi_min_deg, self.phi_max_deg),
-                 theta_range = (self.theta_min_deg, self.theta_max_deg),
-                 correction_factor_co_channel = cf_co,
-                 error_co_channel = err_co,
-                 correction_factor_adj_channel = cf_adj,
-                 error_adj_channel = err_adj,
-                 parameters = par)
+        np.savez(
+            file_name,
+            resolution=self.resolution_deg,
+            phi_range=(self.phi_min_deg, self.phi_max_deg),
+            theta_range=(self.theta_min_deg, self.theta_max_deg),
+            correction_factor_co_channel=cf_co,
+            error_co_channel=err_co,
+            correction_factor_adj_channel=cf_adj,
+            error_adj_channel=err_adj,
+            parameters=par,
+        )
+
 
 if __name__ == '__main__':
     """
@@ -202,7 +225,7 @@ if __name__ == '__main__':
     # Create normalizer object
     resolution = 5
     tolerance = 1e-1
-    norm = BeamformingNormalizer(resolution,tolerance)
+    norm = BeamformingNormalizer(resolution, tolerance)
 
     # Antenna parameters
     adjacent_antenna_model = "SINGLE_ELEMENT"
@@ -220,32 +243,36 @@ if __name__ == '__main__':
     vert_spacing = 0.5
     minimum_array_gain = -200
     down_tilt = 0
-    par = AntennaPar(normalization,
-                     norm_file,
-                     element_pattern,
-                     element_max_g,
-                     element_phi_deg_3db,
-                     element_theta_deg_3db,
-                     element_am,
-                     element_sla_v,
-                     n_rows,
-                     n_columns,
-                     horiz_spacing,
-                     vert_spacing,
-                     down_tilt)
+    par = AntennaPar(
+        normalization,
+        norm_file,
+        element_pattern,
+        element_max_g,
+        element_phi_deg_3db,
+        element_theta_deg_3db,
+        element_am,
+        element_sla_v,
+        n_rows,
+        n_columns,
+        horiz_spacing,
+        vert_spacing,
+        down_tilt,
+    )
 
     # Set range of values & calculate correction factor
     norm.theta_vals_deg = np.array([90])
     file_name = 'main_test.npz'
-    norm.generate_correction_matrix(par,file_name)
+    norm.generate_correction_matrix(par, file_name)
     data = np.load(file_name)
     correction_factor = data['correction_factor_co_channel']
     err_low, err_high = zip(*np.ravel(data['error_co_channel']))
 
-    plt.plot(norm.phi_vals_deg,correction_factor,
-             norm.phi_vals_deg,err_low,'r--',
-             norm.phi_vals_deg,err_high,'r--')
-    plt.xlim(-180,180)
+    plt.plot(
+        norm.phi_vals_deg, correction_factor,
+        norm.phi_vals_deg, err_low, 'r--',
+        norm.phi_vals_deg, err_high, 'r--',
+    )
+    plt.xlim(-180, 180)
     plt.ylabel(r"Correction factor [dB]")
     plt.xlabel(r"Azimuth angle $\phi$ [deg]")
     plt.title(r"Elevation angle $\theta$ = 90 deg")
@@ -253,21 +280,22 @@ if __name__ == '__main__':
     data.close()
 
     # Set range of values & calculate correction factor
-    norm = BeamformingNormalizer(resolution,tolerance)
+    norm = BeamformingNormalizer(resolution, tolerance)
     norm.phi_vals_deg = np.array([0])
-    norm.generate_correction_matrix(par,file_name)
+    norm.generate_correction_matrix(par, file_name)
     data = np.load(file_name)
     correction_factor = data['correction_factor_co_channel']
     err_low, err_high = zip(*np.ravel(data['error_co_channel']))
 
-    plt.plot(norm.theta_vals_deg,np.transpose(correction_factor),
-             norm.theta_vals_deg,np.transpose(err_low),'r--',
-             norm.theta_vals_deg,np.transpose(err_high),'r--')
-    plt.xlim(0,180)
+    plt.plot(
+        norm.theta_vals_deg, np.transpose(correction_factor),
+        norm.theta_vals_deg, np.transpose(err_low), 'r--',
+        norm.theta_vals_deg, np.transpose(err_high), 'r--',
+    )
+    plt.xlim(0, 180)
     plt.ylabel(r"Correction factor [dB]")
     plt.xlabel(r"Elevation angle $\theta$ [deg]")
     plt.title(r"Azimuth angle $\phi$ = 0 deg")
     plt.show()
     data.close()
     os.remove(file_name)
-
